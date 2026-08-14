@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -43,6 +44,7 @@ func OpenAPITags() []*huma.Tag {
 		{Name: "users", Description: "User accounts"},
 		{Name: "tokens", Description: "API tokens"},
 		{Name: "opml", Description: "OPML import/export"},
+		{Name: "feed-lists", Description: "Shareable feed list collections"},
 	}
 }
 
@@ -54,6 +56,7 @@ func (a *API) RegisterRoutes() {
 	a.registerFeedRoutes()
 	a.registerEntryRoutes()
 	a.registerTokenRoutes()
+	a.registerFeedListRoutes()
 }
 
 // --- Health ---
@@ -207,11 +210,11 @@ type PreviewFeedItem struct {
 }
 
 type PreviewFeedBody struct {
-	Title       string           `json:"title"`
-	SiteURL     string           `json:"site_url"`
-	FeedURL     string           `json:"feed_url"`
-	Description string           `json:"description,omitempty"`
-	FaviconURL  string           `json:"favicon_url,omitempty"`
+	Title       string            `json:"title"`
+	SiteURL     string            `json:"site_url"`
+	FeedURL     string            `json:"feed_url"`
+	Description string            `json:"description,omitempty"`
+	FaviconURL  string            `json:"favicon_url,omitempty"`
 	Items       []PreviewFeedItem `json:"items"`
 }
 
@@ -228,26 +231,7 @@ func (a *API) registerFeedRoutes() {
 		Tags:        []string{"feeds"},
 	}, func(ctx context.Context, input *CreateFeedInput) (*FeedOutput, error) {
 		userID := auth.UserIDFromCtx(ctx)
-
-		siteURL := ""
-		title := input.Body.FeedURL
-
-		// Fetch and parse the feed to populate the real site URL and title.
-		// If this fails, fall back to creating the feed with the URL as the title.
-		if a.fetcher != nil {
-			if result, err := a.fetcher.Fetch(ctx, input.Body.FeedURL, "", ""); err == nil && !result.NotModified {
-				if parsed, err := parser.Parse(result.Body, result.ContentType); err == nil {
-					if parsed.SiteURL != "" {
-						siteURL = parsed.SiteURL
-					}
-					if parsed.Title != "" {
-						title = parsed.Title
-					}
-				}
-			}
-		}
-
-		feed, err := a.store.CreateFeed(ctx, userID, input.Body.CategoryID, input.Body.FeedURL, siteURL, title)
+		feed, err := a.subscribeToFeed(ctx, userID, input.Body.FeedURL, input.Body.CategoryID)
 		if err != nil {
 			return nil, huma.Error400BadRequest(err.Error())
 		}
@@ -598,6 +582,365 @@ func generateToken() string {
 	b := make([]byte, 32)
 	_, _ = rand.Read(b)
 	return "pla_" + hex.EncodeToString(b)
+}
+
+// subscribeToFeed fetches and parses the feed URL to populate site URL and
+// title, then creates the subscription. If the user already subscribes to the
+// feed URL, the existing feed is returned (idempotent), making it safe for
+// feed-list import.
+func (a *API) subscribeToFeed(ctx context.Context, userID int, feedURL string, categoryID *int) (*store.Feed, error) {
+	if existing, err := a.store.GetFeedByURL(ctx, feedURL, userID); err != nil {
+		return nil, err
+	} else if existing != nil {
+		return existing, nil
+	}
+
+	siteURL := ""
+	title := feedURL
+
+	// Fetch and parse the feed to populate the real site URL and title.
+	// If this fails, fall back to creating the feed with the URL as the title.
+	if a.fetcher != nil {
+		if result, err := a.fetcher.Fetch(ctx, feedURL, "", ""); err == nil && !result.NotModified {
+			if parsed, err := parser.Parse(result.Body, result.ContentType); err == nil {
+				if parsed.SiteURL != "" {
+					siteURL = parsed.SiteURL
+				}
+				if parsed.Title != "" {
+					title = parsed.Title
+				}
+			}
+		}
+	}
+
+	return a.store.CreateFeed(ctx, userID, categoryID, feedURL, siteURL, title)
+}
+
+// --- Feed Lists ---
+
+type CreateFeedListInput struct {
+	Body struct {
+		Title       string `json:"title" minLength:"1" maxLength:"255"`
+		Description string `json:"description,omitempty" maxLength:"2000"`
+		IsPublic    bool   `json:"is_public"`
+	}
+}
+
+type UpdateFeedListInput struct {
+	ListID int `path:"listId"`
+	Body   struct {
+		Title       string `json:"title" minLength:"1" maxLength:"255"`
+		Description string `json:"description,omitempty" maxLength:"2000"`
+		IsPublic    bool   `json:"is_public"`
+	}
+}
+
+type AddFeedListFeedInput struct {
+	ListID int `path:"listId"`
+	Body   struct {
+		FeedURL string `json:"feed_url" minLength:"1" maxLength:"2048"`
+		SiteURL string `json:"site_url,omitempty" maxLength:"2048"`
+		Title   string `json:"title,omitempty" maxLength:"512"`
+	}
+}
+
+type FeedListDetailOutput struct {
+	Body store.FeedList
+}
+
+type FeedListListOutput struct {
+	Body []store.FeedList
+}
+
+func (a *API) registerFeedListRoutes() {
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "create-feed-list",
+		Method:      http.MethodPost,
+		Path:        "/api/v1/feed-lists",
+		Summary:     "Create a feed list",
+		Tags:        []string{"feed-lists"},
+	}, func(ctx context.Context, input *CreateFeedListInput) (*FeedListDetailOutput, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		fl, err := a.store.CreateFeedList(ctx, userID, input.Body.Title, input.Body.Description, input.Body.IsPublic)
+		if err != nil {
+			return nil, huma.Error400BadRequest(err.Error())
+		}
+		return &FeedListDetailOutput{Body: *fl}, nil
+	})
+
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "list-my-feed-lists",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/feed-lists",
+		Summary:     "List my feed lists",
+		Tags:        []string{"feed-lists"},
+	}, func(ctx context.Context, _ *struct{}) (*FeedListListOutput, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		lists, err := a.store.ListMyFeedLists(ctx, userID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if lists == nil {
+			lists = []store.FeedList{}
+		}
+		return &FeedListListOutput{Body: lists}, nil
+	})
+
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "list-followed-feed-lists",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/feed-lists/followed",
+		Summary:     "List feed lists I follow",
+		Tags:        []string{"feed-lists"},
+	}, func(ctx context.Context, _ *struct{}) (*FeedListListOutput, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		lists, err := a.store.ListFollowedFeedLists(ctx, userID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if lists == nil {
+			lists = []store.FeedList{}
+		}
+		return &FeedListListOutput{Body: lists}, nil
+	})
+
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "discover-feed-lists",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/feed-lists/discover",
+		Summary:     "Discover public feed lists",
+		Tags:        []string{"feed-lists"},
+	}, func(ctx context.Context, input *struct {
+		Limit  int `query:"limit" default:"24" maximum:"100"`
+		Offset int `query:"offset" default:"0"`
+	}) (*FeedListListOutput, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		if input.Limit == 0 {
+			input.Limit = 24
+		}
+		lists, err := a.store.ListPublicFeedLists(ctx, userID, input.Limit, input.Offset)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if lists == nil {
+			lists = []store.FeedList{}
+		}
+		return &FeedListListOutput{Body: lists}, nil
+	})
+
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "get-feed-list",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/feed-lists/{listId}",
+		Summary:     "Get a feed list",
+		Tags:        []string{"feed-lists"},
+	}, func(ctx context.Context, input *struct {
+		ListID int `path:"listId"`
+	}) (*FeedListDetailOutput, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		fl, err := a.store.GetFeedList(ctx, input.ListID, userID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if fl == nil {
+			return nil, huma.Error404NotFound("feed list not found")
+		}
+		feeds, err := a.store.ListFeedListFeeds(ctx, input.ListID, userID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if feeds != nil {
+			fl.Feeds = feeds
+		} else {
+			fl.Feeds = []store.FeedListFeed{}
+		}
+		return &FeedListDetailOutput{Body: *fl}, nil
+	})
+
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "update-feed-list",
+		Method:      http.MethodPatch,
+		Path:        "/api/v1/feed-lists/{listId}",
+		Summary:     "Update a feed list",
+		Tags:        []string{"feed-lists"},
+	}, func(ctx context.Context, input *UpdateFeedListInput) (*FeedListDetailOutput, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		fl, err := a.store.UpdateFeedList(ctx, input.ListID, userID, input.Body.Title, input.Body.Description, input.Body.IsPublic)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if fl == nil {
+			return nil, huma.Error404NotFound("feed list not found")
+		}
+		return &FeedListDetailOutput{Body: *fl}, nil
+	})
+
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "delete-feed-list",
+		Method:      http.MethodDelete,
+		Path:        "/api/v1/feed-lists/{listId}",
+		Summary:     "Delete a feed list",
+		Tags:        []string{"feed-lists"},
+	}, func(ctx context.Context, input *struct {
+		ListID int `path:"listId"`
+	}) (*struct{}, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		if err := a.store.DeleteFeedList(ctx, input.ListID, userID); err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		return nil, nil
+	})
+
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "add-feed-list-feed",
+		Method:      http.MethodPost,
+		Path:        "/api/v1/feed-lists/{listId}/feeds",
+		Summary:     "Add a feed to a feed list",
+		Tags:        []string{"feed-lists"},
+	}, func(ctx context.Context, input *AddFeedListFeedInput) (*struct {
+		Body store.FeedListFeed
+	}, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		isOwner, err := a.store.IsFeedListOwner(ctx, input.ListID, userID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if !isOwner {
+			return nil, huma.Error403Forbidden("not the feed list owner")
+		}
+		flf, err := a.store.AddFeedListFeed(ctx, input.ListID, userID, input.Body.FeedURL, input.Body.SiteURL, input.Body.Title)
+		if err != nil {
+			return nil, huma.Error400BadRequest(err.Error())
+		}
+		return &struct {
+			Body store.FeedListFeed
+		}{Body: *flf}, nil
+	})
+
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "remove-feed-list-feed",
+		Method:      http.MethodDelete,
+		Path:        "/api/v1/feed-lists/{listId}/feeds/{itemId}",
+		Summary:     "Remove a feed from a feed list",
+		Tags:        []string{"feed-lists"},
+	}, func(ctx context.Context, input *struct {
+		ListID int `path:"listId"`
+		ItemID int `path:"itemId"`
+	}) (*struct{}, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		if err := a.store.RemoveFeedListFeed(ctx, input.ListID, input.ItemID, userID); err != nil {
+			if errors.Is(err, store.ErrFeedListNotFound) {
+				return nil, huma.Error404NotFound("feed list item not found")
+			}
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		return nil, nil
+	})
+
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "follow-feed-list",
+		Method:      http.MethodPost,
+		Path:        "/api/v1/feed-lists/{listId}/follow",
+		Summary:     "Follow a feed list",
+		Tags:        []string{"feed-lists"},
+	}, func(ctx context.Context, input *struct {
+		ListID int `path:"listId"`
+	}) (*struct{}, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		if err := a.store.FollowFeedList(ctx, input.ListID, userID); err != nil {
+			switch {
+			case errors.Is(err, store.ErrFeedListNotFound):
+				return nil, huma.Error404NotFound("feed list not found")
+			case errors.Is(err, store.ErrFeedListOwnList):
+				return nil, huma.Error400BadRequest("cannot follow your own list")
+			case errors.Is(err, store.ErrFeedListNotPublic):
+				return nil, huma.Error403Forbidden("feed list is not public")
+			}
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		return nil, nil
+	})
+
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "unfollow-feed-list",
+		Method:      http.MethodDelete,
+		Path:        "/api/v1/feed-lists/{listId}/follow",
+		Summary:     "Unfollow a feed list",
+		Tags:        []string{"feed-lists"},
+	}, func(ctx context.Context, input *struct {
+		ListID int `path:"listId"`
+	}) (*struct{}, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		if err := a.store.UnfollowFeedList(ctx, input.ListID, userID); err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		return nil, nil
+	})
+
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "import-feed-list",
+		Method:      http.MethodPost,
+		Path:        "/api/v1/feed-lists/{listId}/import",
+		Summary:     "Subscribe to all feeds in a feed list",
+		Tags:        []string{"feed-lists"},
+	}, func(ctx context.Context, input *struct {
+		ListID int `path:"listId"`
+	}) (*struct {
+		Body struct {
+			Imported int      `json:"imported"`
+			Skipped  int      `json:"skipped"`
+			Failed   int      `json:"failed"`
+			FeedIDs  []int    `json:"feed_ids"`
+			Errors   []string `json:"errors,omitempty"`
+		}
+	}, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		fl, err := a.store.GetFeedList(ctx, input.ListID, userID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if fl == nil {
+			return nil, huma.Error404NotFound("feed list not found")
+		}
+		feeds, err := a.store.ListFeedListFeeds(ctx, input.ListID, userID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+
+		result := struct {
+			Imported int      `json:"imported"`
+			Skipped  int      `json:"skipped"`
+			Failed   int      `json:"failed"`
+			FeedIDs  []int    `json:"feed_ids"`
+			Errors   []string `json:"errors,omitempty"`
+		}{FeedIDs: []int{}}
+
+		for _, flf := range feeds {
+			// Idempotent: subscribeToFeed returns the existing feed if already subscribed.
+			feed, fErr := a.subscribeToFeed(ctx, userID, flf.FeedURL, nil)
+			if fErr != nil {
+				result.Failed++
+				result.Errors = append(result.Errors, flf.FeedURL+": "+fErr.Error())
+				continue
+			}
+			result.FeedIDs = append(result.FeedIDs, feed.ID)
+			// Heuristic: if last_fetch_at is nil the feed is brand new.
+			if feed.LastFetchAt == nil {
+				result.Imported++
+			} else {
+				result.Skipped++
+			}
+		}
+		return &struct {
+			Body struct {
+				Imported int      `json:"imported"`
+				Skipped  int      `json:"skipped"`
+				Failed   int      `json:"failed"`
+				FeedIDs  []int    `json:"feed_ids"`
+				Errors   []string `json:"errors,omitempty"`
+			}
+		}{Body: result}, nil
+	})
 }
 
 // uuid import used by future OPML import/export

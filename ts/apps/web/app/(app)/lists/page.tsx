@@ -1,0 +1,160 @@
+"use client"
+
+import Link from "next/link"
+import { useQuery } from "@tanstack/react-query"
+import { ListChecks, Plus, Globe, Users, Loader2, Compass } from "lucide-react"
+import { buttonVariants } from "@workspace/ui/components/button"
+import { Empty, EmptyDescription, EmptyTitle } from "@/components/empty"
+import {
+  getClient,
+  listMyFeedLists,
+  listFollowedFeedLists,
+  unwrap,
+} from "@/lib/planetary"
+import { cn } from "@workspace/ui/lib/utils"
+import type { FeedList } from "@/lib/types"
+
+export default function FeedListsPage() {
+  const { data: mine, isLoading: mineLoading } = useQuery<FeedList[]>({
+    queryKey: ["feed-lists", "mine"],
+    queryFn: async () =>
+      unwrap(listMyFeedLists({ client: await getClient() })),
+  })
+  const { data: followed, isLoading: followedLoading } = useQuery<FeedList[]>({
+    queryKey: ["feed-lists", "followed"],
+    queryFn: async () =>
+      unwrap(listFollowedFeedLists({ client: await getClient() })),
+  })
+
+  return (
+    <div className="mx-auto w-full max-w-3xl px-4 py-6">
+      <div className="flex items-center justify-between">
+        <h1 className="flex items-center gap-2 font-serif text-2xl font-bold tracking-tight">
+          <ListChecks className="size-5" />
+          Feed lists
+        </h1>
+        <div className="flex gap-2">
+          <Link
+            href="/lists/discover"
+            className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+          >
+            <Compass className="size-4" />
+            Discover
+          </Link>
+          <Link href="/lists/new" className={cn(buttonVariants({ size: "sm" }))}>
+            <Plus className="size-4" />
+            New list
+          </Link>
+        </div>
+      </div>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Curated collections of feeds you can share and follow.
+      </p>
+
+      {/* My lists */}
+      <section className="mt-8">
+        <h2 className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          My lists
+        </h2>
+        {mineLoading ? (
+          <LoadingRow />
+        ) : (mine ?? []).length === 0 ? (
+          <Empty className="py-10">
+            <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10">
+              <ListChecks className="size-6 text-primary" />
+            </div>
+            <EmptyTitle>No lists yet</EmptyTitle>
+            <EmptyDescription>
+              Create a list, add feeds to it, and share it publicly so others
+              can follow.
+            </EmptyDescription>
+            <Link
+              href="/lists/new"
+              className={cn(buttonVariants({ size: "sm" }), "mt-2")}
+            >
+              <Plus className="size-4" />
+              Create a list
+            </Link>
+          </Empty>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {(mine ?? []).map((list) => (
+              <FeedListRow key={list.id} list={list} mine />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Followed lists */}
+      <section className="mt-8">
+        <h2 className="mb-2 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          <Users className="size-3.5" />
+          Lists you follow
+        </h2>
+        {followedLoading ? (
+          <LoadingRow />
+        ) : (followed ?? []).length === 0 ? (
+          <p className="rounded-lg border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground">
+            You aren&apos;t following any lists yet.{" "}
+            <Link href="/lists/discover" className="text-primary hover:underline">
+              Discover public lists
+            </Link>
+            .
+          </p>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {(followed ?? []).map((list) => (
+              <FeedListRow key={list.id} list={list} />
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
+  )
+}
+
+function LoadingRow() {
+  return (
+    <div className="flex items-center gap-2 py-6 text-sm text-muted-foreground">
+      <Loader2 className="size-4 animate-spin" />
+      Loading…
+    </div>
+  )
+}
+
+function FeedListRow({ list, mine = false }: { list: FeedList; mine?: boolean }) {
+  return (
+    <Link
+      href={`/lists/${list.id}`}
+      className="flex items-center gap-3 rounded-lg border border-border p-4 transition-colors hover:bg-muted/50"
+    >
+      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+        <ListChecks className="size-5 text-primary" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <p className="truncate font-medium">{list.title}</p>
+          {list.is_public ? (
+            <span className="flex shrink-0 items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+              <Globe className="size-3" />
+              Public
+            </span>
+          ) : (
+            <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+              Private
+            </span>
+          )}
+        </div>
+        {list.description && (
+          <p className="line-clamp-1 text-sm text-muted-foreground">
+            {list.description}
+          </p>
+        )}
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          {list.feed_count} {list.feed_count === 1 ? "feed" : "feeds"}
+          {!mine && list.owner_email ? ` · by ${list.owner_email}` : ""}
+        </p>
+      </div>
+    </Link>
+  )
+}

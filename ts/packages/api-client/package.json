@@ -12,7 +12,7 @@
     }
   },
   "scripts": {
-    "gen": "openapi-ts",
+    "gen": "openapi-ts && node scripts/strip-import-extensions.mjs",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit"

@@ -1,7 +1,9 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
 import {
   Rss,
   LayoutList,
@@ -10,10 +12,22 @@ import {
   Folder,
   Loader2,
   Plus,
+  Trash2,
+  ListChecks,
+  Key,
 } from "lucide-react"
-import { getClient, listFeeds, listCategories, unwrap } from "@/lib/planetary"
+import {
+  getClient,
+  listFeeds,
+  listCategories,
+  deleteCategory,
+  unwrap,
+} from "@/lib/planetary"
+import { getApiErrorMessage } from "@/lib/errors"
 import { Logo } from "@/components/logo"
 import { buttonVariants } from "@workspace/ui/components/button"
+import { ConfirmDialog } from "@/components/confirm-dialog"
+import { CategoryCreateDialog } from "@/components/category-create-dialog"
 import { cn } from "@workspace/ui/lib/utils"
 import { SidebarSeparator } from "@workspace/ui/components/separator"
 import type { Feed, Category } from "@/lib/types"
@@ -23,6 +37,7 @@ function SidebarNav() {
     { href: "/", label: "All", icon: LayoutList },
     { href: "/unread", label: "Unread", icon: Circle },
     { href: "/starred", label: "Starred", icon: Star },
+    { href: "/lists", label: "Feed lists", icon: ListChecks },
   ]
 
   return (
@@ -45,10 +60,6 @@ function SidebarNav() {
   )
 }
 
-function faviconUrl(siteUrl: string): string {
-  return `https://www.google.com/s2/favicons?domain=${siteUrl}&sz=64`
-}
-
 function FeedIcon({ siteUrl }: { siteUrl: string }) {
   if (siteUrl) {
     return (
@@ -63,6 +74,10 @@ function FeedIcon({ siteUrl }: { siteUrl: string }) {
     )
   }
   return <Rss className="size-3.5 shrink-0 text-muted-foreground" />
+}
+
+function faviconUrl(siteUrl: string): string {
+  return `https://www.google.com/s2/favicons?domain=${siteUrl}&sz=64`
 }
 
 function FeedList({ feeds }: { feeds: Feed[] }) {
@@ -95,6 +110,65 @@ function FeedList({ feeds }: { feeds: Feed[] }) {
   )
 }
 
+function CategoryRow({ category }: { category: Category }) {
+  const queryClient = useQueryClient()
+  const [pending, setPending] = useState(false)
+
+  async function handleDelete() {
+    setPending(true)
+    try {
+      const { error } = await deleteCategory({
+        client: await getClient(),
+        path: { categoryId: category.id },
+      })
+      if (error) throw error
+      await queryClient.invalidateQueries({ queryKey: ["categories"] })
+      await queryClient.invalidateQueries({ queryKey: ["feeds"] })
+      toast.success(`Deleted category "${category.title}"`)
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, "Could not delete category"))
+    } finally {
+      setPending(false)
+    }
+  }
+
+  return (
+    <li className="group flex items-center">
+      <Link
+        href={`/categories/${category.id}`}
+        className={cn(
+          "flex min-w-0 flex-1 items-center gap-2.5 rounded-md px-3 py-1.5 text-sm",
+          "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+          "transition-colors"
+        )}
+      >
+        <Folder className="size-3.5 shrink-0 text-muted-foreground" />
+        <span className="truncate">{category.title}</span>
+      </Link>
+      <ConfirmDialog
+        trigger={
+          <button
+            type="button"
+            aria-label={`Delete category ${category.title}`}
+            disabled={pending}
+            className={cn(
+              "mr-1 hidden size-6 shrink-0 items-center justify-center rounded-sm text-muted-foreground",
+              "hover:bg-sidebar-accent hover:text-destructive",
+              "group-hover:flex"
+            )}
+          >
+            <Trash2 className="size-3.5" />
+          </button>
+        }
+        title="Delete category?"
+        description={`"${category.title}" will be removed. Feeds in it are kept but unassigned.`}
+        confirmLabel="Delete"
+        onConfirm={handleDelete}
+      />
+    </li>
+  )
+}
+
 function CategoryList({ categories }: { categories: Category[] }) {
   if (categories.length === 0) {
     return (
@@ -107,19 +181,7 @@ function CategoryList({ categories }: { categories: Category[] }) {
   return (
     <ul className="flex flex-col gap-0.5">
       {categories.map((cat) => (
-        <li key={cat.id}>
-          <Link
-            href={`/categories/${cat.id}`}
-            className={cn(
-              "flex items-center gap-2.5 rounded-md px-3 py-1.5 text-sm",
-              "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              "transition-colors truncate"
-            )}
-          >
-            <Folder className="size-3.5 shrink-0 text-muted-foreground" />
-            <span className="truncate">{cat.title}</span>
-          </Link>
-        </li>
+        <CategoryRow key={cat.id} category={cat} />
       ))}
     </ul>
   )
@@ -184,9 +246,12 @@ function SidebarContent() {
         <SidebarSeparator />
 
         <div className="flex flex-col gap-1">
-          <h3 className="px-3 pb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Categories
-          </h3>
+          <div className="flex items-center justify-between px-3 pb-1">
+            <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Categories
+            </h3>
+            <CategoryCreateDialog />
+          </div>
           {categoriesLoading ? (
             <div className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground">
               <Loader2 className="size-3.5 animate-spin" />
@@ -196,6 +261,20 @@ function SidebarContent() {
             <CategoryList categories={categories ?? []} />
           )}
         </div>
+
+        <SidebarSeparator />
+
+        <Link
+          href="/settings/tokens"
+          className={cn(
+            "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium",
+            "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+            "transition-colors"
+          )}
+        >
+          <Key className="size-4" />
+          API tokens
+        </Link>
       </div>
     </div>
   )

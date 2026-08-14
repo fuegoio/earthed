@@ -1,0 +1,147 @@
+"use client"
+
+import { useEffect, useRef } from "react"
+import Link from "next/link"
+import {
+  useInfiniteQuery,
+  useQuery,
+  type InfiniteData,
+} from "@tanstack/react-query"
+import { Loader2, Rss } from "lucide-react"
+import { EntryCard } from "@/components/entry-card"
+import { Empty, EmptyDescription, EmptyTitle } from "@/components/empty"
+import { getClient, listEntries, listFeeds, unwrap } from "@/lib/planetary"
+import type { Entry, Feed } from "@/lib/types"
+import { buttonVariants } from "@workspace/ui/components/button"
+import { cn } from "@workspace/ui/lib/utils"
+
+export type EntryFilter = {
+  feed_id?: number
+  category_id?: number
+  status?: "unread" | "read" | "removed"
+  starred?: boolean
+  search?: string
+}
+
+const PAGE_SIZE = 50
+
+/**
+ * Filtered, paginated entry list with infinite scroll. Fetches the user's feeds
+ * in parallel so each card can show the owning feed's favicon + title.
+ */
+export function EntryTimeline({
+  filter,
+  emptyTitle = "Nothing here yet",
+  emptyDescription = "Subscribe to feeds and your latest articles will appear here.",
+}: {
+  filter: EntryFilter
+  emptyTitle?: string
+  emptyDescription?: string
+}) {
+  const { data: feeds } = useQuery<Feed[]>({
+    queryKey: ["feeds"],
+    queryFn: async () => unwrap(listFeeds({ client: await getClient() })),
+  })
+  const feedMap = new Map<number, Feed>()
+  for (const f of feeds ?? []) feedMap.set(f.id, f)
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    error,
+  } = useInfiniteQuery<
+    Entry[],
+    Error,
+    InfiniteData<Entry[]>,
+    ["entries", EntryFilter],
+    number
+  >({
+    queryKey: ["entries", filter],
+    queryFn: async ({ pageParam }) => {
+      const result = await listEntries({
+        client: await getClient(),
+        query: { ...filter, limit: PAGE_SIZE, offset: pageParam },
+      })
+      if (result.error) throw result.error
+      return (result.data ?? []) as Entry[]
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, _all, lastParam) =>
+      lastPage.length < PAGE_SIZE ? undefined : lastParam + PAGE_SIZE,
+  })
+
+  const sentinelRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = sentinelRef.current
+    if (!el || !hasNextPage || isFetchingNextPage) return
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) fetchNextPage()
+      },
+      { rootMargin: "600px" }
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+
+  const entries = data?.pages.flat() ?? []
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
+        <Loader2 className="size-4 animate-spin" />
+        Loading entries…
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="px-4 py-8 text-sm text-muted-foreground">
+        Could not load entries.
+      </div>
+    )
+  }
+
+  if (entries.length === 0) {
+    return (
+      <div className="p-4">
+        <Empty>
+          <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10">
+            <Rss className="size-6 text-primary" />
+          </div>
+          <EmptyTitle>{emptyTitle}</EmptyTitle>
+          <EmptyDescription>{emptyDescription}</EmptyDescription>
+          <Link
+            href="/feeds/new"
+            className={cn(buttonVariants({ size: "sm" }), "mt-2")}
+          >
+            Subscribe to a feed
+          </Link>
+        </Empty>
+      </div>
+    )
+  }
+
+  return (
+    <div className="divide-y divide-border">
+      {entries.map((entry) => (
+        <EntryCard
+          key={entry.id}
+          entry={entry}
+          feed={feedMap.get(entry.feed_id)}
+        />
+      ))}
+      <div ref={sentinelRef} className="h-px" />
+      {isFetchingNextPage && (
+        <div className="flex items-center justify-center gap-2 py-4 text-sm text-muted-foreground">
+          <Loader2 className="size-4 animate-spin" />
+          Loading more…
+        </div>
+      )}
+    </div>
+  )
+}

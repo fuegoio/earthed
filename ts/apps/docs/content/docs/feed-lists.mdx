@@ -1,0 +1,85 @@
+---
+title: Feed Lists
+description: Curate, share, and follow collections of feeds.
+---
+
+Feed lists are curated, shareable collections of feeds. You build a list
+from feed URLs, make it public, and other users can follow it or import
+all its feeds into their own subscriptions in one click.
+
+A feed list stores feed URLs and a metadata snapshot (title, site URL) —
+it does not reference a specific user's subscriptions, so a list is
+portable and can be followed by anyone.
+
+## Create a feed list
+
+```bash
+curl -X POST http://localhost:8080/api/v1/feed-lists \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer pla_your-token" \
+  -d '{"title":"Best engineering blogs","description":"A curated set.","is_public":true}'
+```
+
+Set `is_public` to `true` so others can discover and follow the list. You
+can change this later with `PATCH /api/v1/feed-lists/{listId}`.
+
+## Add feeds to a list
+
+Only the list owner can add feeds. Provide the feed URL; a title is
+optional but recommended so the list reads well before import.
+
+```bash
+curl -X POST http://localhost:8080/api/v1/feed-lists/1/feeds \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer pla_your-token" \
+  -d '{"feed_url":"https://blog.golang.org/feeds/posts/default","title":"The Go Blog"}'
+```
+
+Adding the same feed URL twice is a no-op (the existing entry is
+returned). Remove a feed with
+`DELETE /api/v1/feed-lists/{listId}/feeds/{itemId}`.
+
+## Discover and follow
+
+List public feed lists created by other users:
+
+```bash
+curl http://localhost:8080/api/v1/feed-lists/discover \
+  -H "Authorization: Bearer pla_your-token"
+```
+
+Follow a public list:
+
+```bash
+curl -X POST http://localhost:8080/api/v1/feed-lists/1/follow \
+  -H "Authorization: Bearer pla_your-token"
+```
+
+You cannot follow your own list, and you cannot follow a private list.
+Lists you follow are returned by `GET /api/v1/feed-lists/followed`.
+
+## Import a list's feeds
+
+Following a list keeps it bookmarked but does not subscribe you to its
+feeds. To subscribe to every feed in a list at once:
+
+```bash
+curl -X POST http://localhost:8080/api/v1/feed-lists/1/import \
+  -H "Authorization: Bearer pla_your-token"
+```
+
+The response reports how many feeds were newly imported, how many you
+already subscribed to (skipped), and any that failed. Importing is
+idempotent — running it again only creates subscriptions for feeds you
+don't already have.
+
+## Visibility
+
+A feed list is visible to:
+
+- its owner,
+- anyone following it, and
+- everyone, if it is public.
+
+`GET /api/v1/feed-lists/{listId}` returns the list (with its feeds,
+follow status, and owner email) to any user who can see it.

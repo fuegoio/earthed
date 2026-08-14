@@ -1,11 +1,12 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { Menu as MenuIcon, Search, LogOut } from "lucide-react"
+import { Menu as MenuIcon, LogOut } from "lucide-react"
 import { Menu } from "@base-ui/react/menu"
 import { Avatar } from "@base-ui/react/avatar"
 import { Button } from "@workspace/ui/components/button"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { SearchBox } from "@/components/search-box"
 import { signout } from "@/lib/auth"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -37,18 +38,8 @@ export function AppTopbar({
       </Button>
 
       <div className="flex flex-1 items-center gap-2">
-        <div className="relative hidden max-w-xs flex-1 md:block">
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            type="search"
-            placeholder="Search entries..."
-            className={cn(
-              "h-9 w-full rounded-md border border-input bg-transparent pl-9 pr-3 text-sm",
-              "placeholder:text-muted-foreground",
-              "focus-visible:border-ring focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/30",
-              "transition-[color,box-shadow]"
-            )}
-          />
+        <div className="hidden max-w-xs flex-1 md:block">
+          <SearchBox />
         </div>
       </div>
 

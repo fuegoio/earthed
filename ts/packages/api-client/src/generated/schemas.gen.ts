@@ -36,6 +36,38 @@ export const APITokenSchema = {
     type: 'object'
 } as const;
 
+export const AddFeedListFeedInputBodySchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/AddFeedListFeedInputBody.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        feed_url: {
+            maxLength: 2048,
+            minLength: 1,
+            type: 'string'
+        },
+        site_url: {
+            maxLength: 2048,
+            type: 'string'
+        },
+        title: {
+            maxLength: 512,
+            type: 'string'
+        }
+    },
+    required: [
+        'feed_url'
+    ],
+    type: 'object'
+} as const;
+
 export const CategorySchema = {
     additionalProperties: false,
     properties: {
@@ -121,6 +153,38 @@ export const CreateFeedInputBodySchema = {
     },
     required: [
         'feed_url'
+    ],
+    type: 'object'
+} as const;
+
+export const CreateFeedListInputBodySchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/CreateFeedListInputBody.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        description: {
+            maxLength: 2000,
+            type: 'string'
+        },
+        is_public: {
+            type: 'boolean'
+        },
+        title: {
+            maxLength: 255,
+            minLength: 1,
+            type: 'string'
+        }
+    },
+    required: [
+        'title',
+        'is_public'
     ],
     type: 'object'
 } as const;
@@ -442,6 +506,120 @@ export const FeedSchema = {
     type: 'object'
 } as const;
 
+export const FeedListSchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/FeedList.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        created_at: {
+            format: 'date-time',
+            type: 'string'
+        },
+        description: {
+            type: 'string'
+        },
+        feed_count: {
+            format: 'int64',
+            type: 'integer'
+        },
+        feeds: {
+            items: {
+                $ref: '#/components/schemas/FeedListFeed'
+            },
+            type: [
+                'array',
+                'null'
+            ]
+        },
+        id: {
+            format: 'int64',
+            type: 'integer'
+        },
+        is_following: {
+            type: 'boolean'
+        },
+        is_public: {
+            type: 'boolean'
+        },
+        owner_email: {
+            type: 'string'
+        },
+        title: {
+            type: 'string'
+        },
+        updated_at: {
+            format: 'date-time',
+            type: 'string'
+        },
+        user_id: {
+            format: 'int64',
+            type: 'integer'
+        }
+    },
+    required: [
+        'id',
+        'user_id',
+        'title',
+        'is_public',
+        'feed_count',
+        'created_at',
+        'updated_at'
+    ],
+    type: 'object'
+} as const;
+
+export const FeedListFeedSchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/FeedListFeed.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        feed_list_id: {
+            format: 'int64',
+            type: 'integer'
+        },
+        feed_url: {
+            type: 'string'
+        },
+        id: {
+            format: 'int64',
+            type: 'integer'
+        },
+        position: {
+            format: 'int64',
+            type: 'integer'
+        },
+        site_url: {
+            type: 'string'
+        },
+        title: {
+            type: 'string'
+        }
+    },
+    required: [
+        'id',
+        'feed_list_id',
+        'feed_url',
+        'site_url',
+        'title',
+        'position'
+    ],
+    type: 'object'
+} as const;
+
 export const HealthResponseSchema = {
     additionalProperties: false,
     properties: {
@@ -460,6 +638,59 @@ export const HealthResponseSchema = {
     },
     required: [
         'status'
+    ],
+    type: 'object'
+} as const;
+
+export const Import_feed_listResponseSchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/Import-feed-listResponse.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        errors: {
+            items: {
+                type: 'string'
+            },
+            type: [
+                'array',
+                'null'
+            ]
+        },
+        failed: {
+            format: 'int64',
+            type: 'integer'
+        },
+        feed_ids: {
+            items: {
+                format: 'int64',
+                type: 'integer'
+            },
+            type: [
+                'array',
+                'null'
+            ]
+        },
+        imported: {
+            format: 'int64',
+            type: 'integer'
+        },
+        skipped: {
+            format: 'int64',
+            type: 'integer'
+        }
+    },
+    required: [
+        'imported',
+        'skipped',
+        'failed',
+        'feed_ids'
     ],
     type: 'object'
 } as const;
@@ -671,6 +902,38 @@ export const Update_entriesRequestSchema = {
     type: 'object'
 } as const;
 
+export const UpdateFeedListInputBodySchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/UpdateFeedListInputBody.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        description: {
+            maxLength: 2000,
+            type: 'string'
+        },
+        is_public: {
+            type: 'boolean'
+        },
+        title: {
+            maxLength: 255,
+            minLength: 1,
+            type: 'string'
+        }
+    },
+    required: [
+        'title',
+        'is_public'
+    ],
+    type: 'object'
+} as const;
+
 export const UserSchema = {
     additionalProperties: false,
     properties: {
@@ -706,6 +969,29 @@ export const UserSchema = {
         'email',
         'is_admin',
         'created_at'
+    ],
+    type: 'object'
+} as const;
+
+export const AddFeedListFeedInputBodyWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        feed_url: {
+            maxLength: 2048,
+            minLength: 1,
+            type: 'string'
+        },
+        site_url: {
+            maxLength: 2048,
+            type: 'string'
+        },
+        title: {
+            maxLength: 512,
+            type: 'string'
+        }
+    },
+    required: [
+        'feed_url'
     ],
     type: 'object'
 } as const;
@@ -768,6 +1054,29 @@ export const CreateFeedInputBodyWritableSchema = {
     },
     required: [
         'feed_url'
+    ],
+    type: 'object'
+} as const;
+
+export const CreateFeedListInputBodyWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        description: {
+            maxLength: 2000,
+            type: 'string'
+        },
+        is_public: {
+            type: 'boolean'
+        },
+        title: {
+            maxLength: 255,
+            minLength: 1,
+            type: 'string'
+        }
+    },
+    required: [
+        'title',
+        'is_public'
     ],
     type: 'object'
 } as const;
@@ -1003,6 +1312,102 @@ export const FeedWritableSchema = {
     type: 'object'
 } as const;
 
+export const FeedListWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        created_at: {
+            format: 'date-time',
+            type: 'string'
+        },
+        description: {
+            type: 'string'
+        },
+        feed_count: {
+            format: 'int64',
+            type: 'integer'
+        },
+        feeds: {
+            items: {
+                $ref: '#/components/schemas/FeedListFeedWritable'
+            },
+            type: [
+                'array',
+                'null'
+            ]
+        },
+        id: {
+            format: 'int64',
+            type: 'integer'
+        },
+        is_following: {
+            type: 'boolean'
+        },
+        is_public: {
+            type: 'boolean'
+        },
+        owner_email: {
+            type: 'string'
+        },
+        title: {
+            type: 'string'
+        },
+        updated_at: {
+            format: 'date-time',
+            type: 'string'
+        },
+        user_id: {
+            format: 'int64',
+            type: 'integer'
+        }
+    },
+    required: [
+        'id',
+        'user_id',
+        'title',
+        'is_public',
+        'feed_count',
+        'created_at',
+        'updated_at'
+    ],
+    type: 'object'
+} as const;
+
+export const FeedListFeedWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        feed_list_id: {
+            format: 'int64',
+            type: 'integer'
+        },
+        feed_url: {
+            type: 'string'
+        },
+        id: {
+            format: 'int64',
+            type: 'integer'
+        },
+        position: {
+            format: 'int64',
+            type: 'integer'
+        },
+        site_url: {
+            type: 'string'
+        },
+        title: {
+            type: 'string'
+        }
+    },
+    required: [
+        'id',
+        'feed_list_id',
+        'feed_url',
+        'site_url',
+        'title',
+        'position'
+    ],
+    type: 'object'
+} as const;
+
 export const HealthResponseWritableSchema = {
     additionalProperties: false,
     properties: {
@@ -1012,6 +1417,50 @@ export const HealthResponseWritableSchema = {
     },
     required: [
         'status'
+    ],
+    type: 'object'
+} as const;
+
+export const Import_feed_listResponseWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        errors: {
+            items: {
+                type: 'string'
+            },
+            type: [
+                'array',
+                'null'
+            ]
+        },
+        failed: {
+            format: 'int64',
+            type: 'integer'
+        },
+        feed_ids: {
+            items: {
+                format: 'int64',
+                type: 'integer'
+            },
+            type: [
+                'array',
+                'null'
+            ]
+        },
+        imported: {
+            format: 'int64',
+            type: 'integer'
+        },
+        skipped: {
+            format: 'int64',
+            type: 'integer'
+        }
+    },
+    required: [
+        'imported',
+        'skipped',
+        'failed',
+        'feed_ids'
     ],
     type: 'object'
 } as const;
@@ -1133,6 +1582,29 @@ export const Update_entriesRequestWritableSchema = {
     required: [
         'entry_ids',
         'status'
+    ],
+    type: 'object'
+} as const;
+
+export const UpdateFeedListInputBodyWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        description: {
+            maxLength: 2000,
+            type: 'string'
+        },
+        is_public: {
+            type: 'boolean'
+        },
+        title: {
+            maxLength: 255,
+            minLength: 1,
+            type: 'string'
+        }
+    },
+    required: [
+        'title',
+        'is_public'
     ],
     type: 'object'
 } as const;
