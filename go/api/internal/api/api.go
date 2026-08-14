@@ -624,9 +624,11 @@ func generateToken() string {
 }
 
 // subscribeToFeed fetches and parses the feed URL to populate site URL and
-// title, then creates the subscription. If the user already subscribes to the
-// feed URL, the existing feed is returned (idempotent), making it safe for
-// feed-list import.
+// title, then creates the subscription. After creating the feed record, it
+// processes the feed to persist entries immediately — so the feed is not
+// empty after subscription. If the user already subscribes to the feed URL,
+// the existing feed is returned (idempotent), making it safe for feed-list
+// import.
 func (a *API) subscribeToFeed(ctx context.Context, userID int, feedURL string, categoryID *int) (*store.Feed, error) {
 	if existing, err := a.store.GetFeedByURL(ctx, feedURL, userID); err != nil {
 		return nil, err
@@ -652,7 +654,18 @@ func (a *API) subscribeToFeed(ctx context.Context, userID int, feedURL string, c
 		}
 	}
 
-	return a.store.CreateFeed(ctx, userID, categoryID, feedURL, siteURL, title)
+	feed, err := a.store.CreateFeed(ctx, userID, categoryID, feedURL, siteURL, title)
+	if err != nil {
+		return nil, err
+	}
+
+	// Process the feed immediately so entries are persisted on subscribe.
+	// Best-effort: the scheduler will retry on failure.
+	if a.processor != nil {
+		_ = a.processor.ProcessFeed(ctx, feed)
+	}
+
+	return feed, nil
 }
 
 // --- Feed Lists ---
