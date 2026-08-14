@@ -1,0 +1,9 @@
+# oapi-codegen configuration for the Planetary Go SDK.
+# Regenerate with: make gen (from go/sdk/)
+package: planetary
+generate:
+  models: true
+  client: true
+output: planetary/client.gen.go
+output-options:
+  response-type-suffix: Resp

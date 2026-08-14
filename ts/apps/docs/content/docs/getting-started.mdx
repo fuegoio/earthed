@@ -1,0 +1,164 @@
+---
+title: Getting Started
+description: Run Planetary locally, create an account, subscribe to a feed, and read entries.
+---
+
+## Prerequisites
+
+- [Go](https://go.dev/dl/) 1.25 or later
+- [Node.js](https://nodejs.org/) 20+ with [pnpm](https://pnpm.io/) 10+
+- [Docker](https://docs.docker.com/get-docker/) (for PostgreSQL)
+
+## 1. Start PostgreSQL
+
+Planetary needs a PostgreSQL database. The fastest way is Docker:
+
+```bash
+cd go/api
+make db-up
+```
+
+This starts a PostgreSQL 16 container on port 5432 with database `planetary`,
+user `planetary`, password `planetary`.
+
+## 2. Configure environment
+
+Create a `.env` file in `go/api/`:
+
+```bash
+LIMEN_SECRET=<32-byte-secret>
+PLANETARY_DATABASE_URL=postgres://planetary:planetary@localhost:5432/planetary?sslmode=disable
+PLANETARY_BASE_URL=http://localhost:8080
+PLANETARY_WEB_URL=http://localhost:3000
+```
+
+`LIMEN_SECRET` must be exactly 32 bytes. Generate one with:
+
+```bash
+openssl rand -hex 16
+```
+
+## 3. Run migrations
+
+Apply the database schema:
+
+```bash
+cd go/api
+make migrate
+```
+
+## 4. Start the API server
+
+```bash
+cd go/api
+make run
+```
+
+The API listens on `http://localhost:8080`. Verify it is running:
+
+```bash
+curl http://localhost:8080/api/v1/health
+# {"status":"ok"}
+```
+
+## 5. Create an account
+
+Planetary uses [Limen](https://github.com/thecodearcher/limen) for
+authentication. Create an account via the auth endpoints:
+
+```bash
+curl -X POST http://localhost:8080/api/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"your-password"}'
+```
+
+Then sign in to get a session cookie:
+
+```bash
+curl -X POST http://localhost:8080/api/auth/signin \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"your-password"}' \
+  -c cookies.txt
+```
+
+## 6. Create an API token
+
+For programmatic access (CLI, curl, scripts), create an API token:
+
+```bash
+curl -X POST http://localhost:8080/api/v1/tokens \
+  -H "Content-Type: application/json" \
+  -H "Cookie: $(cat cookies.txt | grep session | awk '{print $NF}')" \
+  -d '{"label":"my-token"}'
+```
+
+The response includes the token string (prefixed with `pla_`). Save it
+— it is shown only once.
+
+## 7. Subscribe to a feed
+
+Use the token to subscribe to an RSS feed:
+
+```bash
+curl -X POST http://localhost:8080/api/v1/feeds \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer pla_your-token-here" \
+  -d '{"feed_url":"https://blog.golang.org/feeds/posts/default"}'
+```
+
+## 8. Read entries
+
+List the latest entries:
+
+```bash
+curl "http://localhost:8080/api/v1/entries?limit=10" \
+  -H "Authorization: Bearer pla_your-token-here"
+```
+
+Filter by feed, status, or starred:
+
+```bash
+curl "http://localhost:8080/api/v1/entries?feed_id=1&status=unread&starred=true" \
+  -H "Authorization: Bearer pla_your-token-here"
+```
+
+## 9. Use the CLI
+
+Build and configure the CLI:
+
+```bash
+cd go/cli
+make build
+./planetary config set base_url http://localhost:8080
+./planetary config set token pla_your-token-here
+```
+
+List feeds, entries, and more:
+
+```bash
+./planetary feeds list
+./planetary entries list
+./planetary entries read 1
+```
+
+Or launch the interactive TUI:
+
+```bash
+./planetary-tui
+```
+
+## 10. Start the web frontend
+
+```bash
+cd ts
+pnpm install
+pnpm dev
+```
+
+The web app is available at `http://localhost:3000`.
+
+## Next steps
+
+- [API Reference](/docs/api-reference) — all REST endpoints.
+- [CLI](/docs/cli) — CLI and TUI usage.
+- [Self-Hosting](/docs/self-hosting) — production deployment.
