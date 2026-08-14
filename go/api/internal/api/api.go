@@ -228,7 +228,26 @@ func (a *API) registerFeedRoutes() {
 		Tags:        []string{"feeds"},
 	}, func(ctx context.Context, input *CreateFeedInput) (*FeedOutput, error) {
 		userID := auth.UserIDFromCtx(ctx)
-		feed, err := a.store.CreateFeed(ctx, userID, input.Body.CategoryID, input.Body.FeedURL, "", input.Body.FeedURL)
+
+		siteURL := ""
+		title := input.Body.FeedURL
+
+		// Fetch and parse the feed to populate the real site URL and title.
+		// If this fails, fall back to creating the feed with the URL as the title.
+		if a.fetcher != nil {
+			if result, err := a.fetcher.Fetch(ctx, input.Body.FeedURL, "", ""); err == nil && !result.NotModified {
+				if parsed, err := parser.Parse(result.Body, result.ContentType); err == nil {
+					if parsed.SiteURL != "" {
+						siteURL = parsed.SiteURL
+					}
+					if parsed.Title != "" {
+						title = parsed.Title
+					}
+				}
+			}
+		}
+
+		feed, err := a.store.CreateFeed(ctx, userID, input.Body.CategoryID, input.Body.FeedURL, siteURL, title)
 		if err != nil {
 			return nil, huma.Error400BadRequest(err.Error())
 		}
