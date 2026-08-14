@@ -55,16 +55,16 @@ func parseXMLFeed(body []byte) (*Feed, error) {
 	var generic struct {
 		XMLName xml.Name `xml:"rss"`
 		Channel struct {
-			Title       string `xml:"title"`
-			Link        string `xml:"link"`
-			Description string `xml:"description"`
+			Title       string   `xml:"title"`
+			Links       []string `xml:"link"`
+			Description string   `xml:"description"`
 			Items       []struct {
-				Title       string `xml:"title"`
-				Link        string `xml:"link"`
-				Description string `xml:"description"`
-				Content     string `xml:"encoded"`
-				PubDate     string `xml:"pubDate"`
-				Author      string `xml:"author"`
+				Title       string   `xml:"title"`
+				Links       []string `xml:"link"`
+				Description string   `xml:"description"`
+				Content     string   `xml:"encoded"`
+				PubDate     string   `xml:"pubDate"`
+				Author      string   `xml:"author"`
 				Categories  []string `xml:"category"`
 				Enclosures  []struct {
 					URL  string `xml:"url,attr"`
@@ -79,13 +79,13 @@ func parseXMLFeed(body []byte) (*Feed, error) {
 	if err := xml.Unmarshal(body, &generic); err == nil && generic.XMLName.Local == "rss" {
 		feed := &Feed{
 			Title:       generic.Channel.Title,
-			SiteURL:     generic.Channel.Link,
+			SiteURL:     firstNonEmpty(generic.Channel.Links),
 			Description: generic.Channel.Description,
 		}
 		for _, item := range generic.Channel.Items {
 			feed.Items = append(feed.Items, Item{
 				Title:       item.Title,
-				Link:        item.Link,
+				Link:        firstNonEmpty(item.Links),
 				Description: item.Description,
 				Content:     item.Content,
 				Author:      item.Author,
@@ -98,6 +98,19 @@ func parseXMLFeed(body []byte) (*Feed, error) {
 
 	// Fallback: try Atom
 	return parseAtom(body)
+}
+
+// firstNonEmpty returns the first non-empty string in s, or "" if none.
+// This handles RSS feeds where <atom:link> (a self-closing element with
+// no text content) appears alongside <link> and overrides it in Go's
+// encoding/xml, which matches by local name regardless of namespace.
+func firstNonEmpty(s []string) string {
+	for _, v := range s {
+		if v != "" {
+			return v
+		}
+	}
+	return ""
 }
 
 func parseAtom(body []byte) (*Feed, error) {
