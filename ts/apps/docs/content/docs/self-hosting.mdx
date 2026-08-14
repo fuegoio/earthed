@@ -123,7 +123,26 @@ server {
 
 ## Web frontend
 
-The web frontend is a Next.js app. Build and run it separately:
+The web frontend is a Next.js app with a standalone Docker build:
+
+```bash
+docker build -f ts/apps/web/Dockerfile -t planetary-web ts/
+```
+
+Run the container:
+
+```bash
+docker run -p 3000:3000 \
+  -e PLANETARY_API_URL=http://api-host:8080 \
+  -e NEXT_PUBLIC_PLANETARY_API_URL=https://api.your-domain.com \
+  planetary-web
+```
+
+`PLANETARY_API_URL` is used server-side (must be reachable from the
+container). `NEXT_PUBLIC_PLANETARY_API_URL` is used client-side (must be
+reachable from the browser).
+
+Alternatively, build and run from source:
 
 ```bash
 cd ts
@@ -132,15 +151,12 @@ pnpm build
 pnpm start
 ```
 
-Set the API URL via environment variables:
-
-- `PLANETARY_API_URL` — server-side (must be reachable from the server)
-- `NEXT_PUBLIC_PLANETARY_API_URL` — client-side (must be reachable from the browser)
-
 ## CI/CD
 
 The repository includes GitHub Actions workflows (`.github/workflows/go.yml`
 and `.github/workflows/ts.yml`) that build and push Docker images to GitHub
-Container Registry. On push to `main`, the API image is published as
-`ghcr.io/<owner>/planetary-api:latest` and the docs image as
-`ghcr.io/<owner>/planetary-docs:latest`.
+Container Registry. On push to `main`:
+
+- API: `ghcr.io/<owner>/planetary-api:latest`
+- Web: `ghcr.io/<owner>/planetary-web:latest`
+- Docs: `ghcr.io/<owner>/planetary-docs:latest`
