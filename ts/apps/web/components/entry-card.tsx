@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { StarToggle } from "@/components/star-toggle"
+import { LikeToggle } from "@/components/like-toggle"
 import { FeedIcon } from "@/components/feed-icon"
 import { formatRelative, htmlSnippet } from "@/lib/format"
 import { cn } from "@workspace/ui/lib/utils"
@@ -54,7 +55,8 @@ export function EntryCard({ entry, feed }: { entry: Entry; feed?: Feed }) {
           </p>
         )}
       </div>
-      <div className="flex shrink-0 items-start">
+      <div className="flex shrink-0 items-start gap-0.5">
+        <LikeToggle entryId={entry.id} liked={entry.liked} size="icon-sm" />
         <StarToggle entryId={entry.id} starred={entry.starred} size="icon-sm" />
       </div>
     </Link>

@@ -7,6 +7,7 @@ import { ExternalLink, ArrowLeft, Circle } from "lucide-react"
 import Link from "next/link"
 import { Button, buttonVariants } from "@workspace/ui/components/button"
 import { StarToggle } from "@/components/star-toggle"
+import { LikeToggle } from "@/components/like-toggle"
 import { FeedIcon } from "@/components/feed-icon"
 import { getClient, updateEntries } from "@/lib/planetary"
 import { getApiErrorMessage } from "@/lib/errors"
@@ -114,7 +115,12 @@ export function EntryReader({
             <Circle className="size-3.5" />
             Mark unread
           </Button>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-0.5">
+            <LikeToggle
+              entryId={entry.id}
+              liked={entry.liked}
+              size="icon-sm"
+            />
             <StarToggle
               entryId={entry.id}
               starred={entry.starred}

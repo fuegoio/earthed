@@ -529,6 +529,25 @@ func (a *API) registerEntryRoutes() {
 		}
 		return nil, nil
 	})
+
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "toggle-entry-liked",
+		Method:      http.MethodPut,
+		Path:        "/api/v1/entries/{entryId}/liked",
+		Summary:     "Toggle liked on an entry",
+		Tags:        []string{"entries"},
+	}, func(ctx context.Context, input *struct {
+		EntryID int64 `path:"entryId"`
+		Body    struct {
+			Liked bool `json:"liked"`
+		}
+	}) (*struct{}, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		if err := a.store.ToggleEntryLiked(ctx, input.EntryID, userID, input.Body.Liked); err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		return nil, nil
+	})
 }
 
 // --- API Tokens ---

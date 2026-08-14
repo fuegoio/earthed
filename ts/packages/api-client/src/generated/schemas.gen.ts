@@ -293,6 +293,9 @@ export const EntrySchema = {
             format: 'int64',
             type: 'integer'
         },
+        liked: {
+            type: 'boolean'
+        },
         published_at: {
             format: 'date-time',
             type: 'string'
@@ -333,6 +336,7 @@ export const EntrySchema = {
         'content',
         'status',
         'starred',
+        'liked',
         'published_at',
         'changed_at'
     ],
@@ -806,6 +810,28 @@ export const PreviewFeedItemSchema = {
     type: 'object'
 } as const;
 
+export const Toggle_entry_likedRequestSchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/Toggle-entry-likedRequest.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        liked: {
+            type: 'boolean'
+        }
+    },
+    required: [
+        'liked'
+    ],
+    type: 'object'
+} as const;
+
 export const Toggle_entry_starredRequestSchema = {
     additionalProperties: false,
     properties: {
@@ -1135,6 +1161,9 @@ export const EntryWritableSchema = {
             format: 'int64',
             type: 'integer'
         },
+        liked: {
+            type: 'boolean'
+        },
         published_at: {
             format: 'date-time',
             type: 'string'
@@ -1175,6 +1204,7 @@ export const EntryWritableSchema = {
         'content',
         'status',
         'starred',
+        'liked',
         'published_at',
         'changed_at'
     ],
@@ -1513,6 +1543,19 @@ export const PreviewFeedInputBodyWritableSchema = {
     },
     required: [
         'feed_url'
+    ],
+    type: 'object'
+} as const;
+
+export const Toggle_entry_likedRequestWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        liked: {
+            type: 'boolean'
+        }
+    },
+    required: [
+        'liked'
     ],
     type: 'object'
 } as const;

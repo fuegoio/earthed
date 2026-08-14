@@ -5,7 +5,7 @@ description: Browse, filter, search, and manage entry status with the Planetary 
 
 Entries are individual articles fetched from your feed subscriptions.
 Each entry has a status (`unread`, `read`, or `removed`), a starred flag,
-and sanitized HTML content.
+a liked flag, and sanitized HTML content.
 
 ## List entries
 
@@ -155,6 +155,26 @@ curl -X PUT http://localhost:8080/api/v1/entries/42/starred \
 Starred entries persist their starred flag regardless of status. A
 `removed` entry that is starred will still appear when filtering with
 `starred=true`.
+
+## Like and unlike entries
+
+Like an entry to mark it as a favorite:
+
+```bash
+curl -X PUT http://localhost:8080/api/v1/entries/42/liked \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer pla_your-token" \
+  -d '{"liked":true}'
+```
+
+Unlike an entry:
+
+```bash
+curl -X PUT http://localhost:8080/api/v1/entries/42/liked \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer pla_your-token" \
+  -d '{"liked":false}'
+```
 
 ## Entry content
 

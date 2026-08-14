@@ -2,7 +2,7 @@
 
 import { client } from './client.gen';
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client/index';
-import type { AddFeedListFeedData, AddFeedListFeedErrors, AddFeedListFeedResponses, CreateCategoryData, CreateCategoryErrors, CreateCategoryResponses, CreateFeedData, CreateFeedErrors, CreateFeedListData, CreateFeedListErrors, CreateFeedListResponses, CreateFeedResponses, CreateTokenData, CreateTokenErrors, CreateTokenResponses, DeleteCategoryData, DeleteCategoryErrors, DeleteCategoryResponses, DeleteFeedData, DeleteFeedErrors, DeleteFeedListData, DeleteFeedListErrors, DeleteFeedListResponses, DeleteFeedResponses, DeleteTokenData, DeleteTokenErrors, DeleteTokenResponses, DiscoverFeedListsData, DiscoverFeedListsErrors, DiscoverFeedListsResponses, FollowFeedListData, FollowFeedListErrors, FollowFeedListResponses, GetEntryData, GetEntryErrors, GetEntryResponses, GetFeedData, GetFeedErrors, GetFeedListData, GetFeedListErrors, GetFeedListResponses, GetFeedResponses, GetMeData, GetMeErrors, GetMeResponses, HealthData, HealthErrors, HealthResponses, ImportFeedListData, ImportFeedListErrors, ImportFeedListResponses, ListCategoriesData, ListCategoriesErrors, ListCategoriesResponses, ListEntriesData, ListEntriesErrors, ListEntriesResponses, ListFeedsData, ListFeedsErrors, ListFeedsResponses, ListFollowedFeedListsData, ListFollowedFeedListsErrors, ListFollowedFeedListsResponses, ListMyFeedListsData, ListMyFeedListsErrors, ListMyFeedListsResponses, ListTokensData, ListTokensErrors, ListTokensResponses, MarkFeedReadData, MarkFeedReadErrors, MarkFeedReadResponses, PreviewFeedData, PreviewFeedErrors, PreviewFeedResponses, RefreshFeedData, RefreshFeedErrors, RefreshFeedResponses, RemoveFeedListFeedData, RemoveFeedListFeedErrors, RemoveFeedListFeedResponses, ToggleEntryStarredData, ToggleEntryStarredErrors, ToggleEntryStarredResponses, UnfollowFeedListData, UnfollowFeedListErrors, UnfollowFeedListResponses, UpdateEntriesData, UpdateEntriesErrors, UpdateEntriesResponses, UpdateFeedListData, UpdateFeedListErrors, UpdateFeedListResponses } from './types.gen';
+import type { AddFeedListFeedData, AddFeedListFeedErrors, AddFeedListFeedResponses, CreateCategoryData, CreateCategoryErrors, CreateCategoryResponses, CreateFeedData, CreateFeedErrors, CreateFeedListData, CreateFeedListErrors, CreateFeedListResponses, CreateFeedResponses, CreateTokenData, CreateTokenErrors, CreateTokenResponses, DeleteCategoryData, DeleteCategoryErrors, DeleteCategoryResponses, DeleteFeedData, DeleteFeedErrors, DeleteFeedListData, DeleteFeedListErrors, DeleteFeedListResponses, DeleteFeedResponses, DeleteTokenData, DeleteTokenErrors, DeleteTokenResponses, DiscoverFeedListsData, DiscoverFeedListsErrors, DiscoverFeedListsResponses, FollowFeedListData, FollowFeedListErrors, FollowFeedListResponses, GetEntryData, GetEntryErrors, GetEntryResponses, GetFeedData, GetFeedErrors, GetFeedListData, GetFeedListErrors, GetFeedListResponses, GetFeedResponses, GetMeData, GetMeErrors, GetMeResponses, HealthData, HealthErrors, HealthResponses, ImportFeedListData, ImportFeedListErrors, ImportFeedListResponses, ListCategoriesData, ListCategoriesErrors, ListCategoriesResponses, ListEntriesData, ListEntriesErrors, ListEntriesResponses, ListFeedsData, ListFeedsErrors, ListFeedsResponses, ListFollowedFeedListsData, ListFollowedFeedListsErrors, ListFollowedFeedListsResponses, ListMyFeedListsData, ListMyFeedListsErrors, ListMyFeedListsResponses, ListTokensData, ListTokensErrors, ListTokensResponses, MarkFeedReadData, MarkFeedReadErrors, MarkFeedReadResponses, PreviewFeedData, PreviewFeedErrors, PreviewFeedResponses, RefreshFeedData, RefreshFeedErrors, RefreshFeedResponses, RemoveFeedListFeedData, RemoveFeedListFeedErrors, RemoveFeedListFeedResponses, ToggleEntryLikedData, ToggleEntryLikedErrors, ToggleEntryLikedResponses, ToggleEntryStarredData, ToggleEntryStarredErrors, ToggleEntryStarredResponses, UnfollowFeedListData, UnfollowFeedListErrors, UnfollowFeedListResponses, UpdateEntriesData, UpdateEntriesErrors, UpdateEntriesResponses, UpdateFeedListData, UpdateFeedListErrors, UpdateFeedListResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -61,6 +61,18 @@ export const updateEntries = <ThrowOnError extends boolean = false>(options: Opt
  * Get an entry
  */
 export const getEntry = <ThrowOnError extends boolean = false>(options: Options<GetEntryData, ThrowOnError>): RequestResult<GetEntryResponses, GetEntryErrors, ThrowOnError> => (options.client ?? client).get<GetEntryResponses, GetEntryErrors, ThrowOnError>({ url: '/api/v1/entries/{entryId}', ...options });
+
+/**
+ * Toggle liked on an entry
+ */
+export const toggleEntryLiked = <ThrowOnError extends boolean = false>(options: Options<ToggleEntryLikedData, ThrowOnError>): RequestResult<ToggleEntryLikedResponses, ToggleEntryLikedErrors, ThrowOnError> => (options.client ?? client).put<ToggleEntryLikedResponses, ToggleEntryLikedErrors, ThrowOnError>({
+    url: '/api/v1/entries/{entryId}/liked',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Toggle starred on an entry

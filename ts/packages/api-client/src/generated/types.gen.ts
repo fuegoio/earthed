@@ -90,6 +90,7 @@ export type Entry = {
     feed_id: number;
     hash: string;
     id: number;
+    liked: boolean;
     published_at: string;
     starred: boolean;
     status: string;
@@ -250,6 +251,14 @@ export type PreviewFeedItem = {
     url: string;
 };
 
+export type ToggleEntryLikedRequest = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    liked: boolean;
+};
+
 export type ToggleEntryStarredRequest = {
     /**
      * A URL to the JSON Schema for this object.
@@ -342,6 +351,7 @@ export type EntryWritable = {
     feed_id: number;
     hash: string;
     id: number;
+    liked: boolean;
     published_at: string;
     starred: boolean;
     status: string;
@@ -443,6 +453,10 @@ export type PreviewFeedBodyWritable = {
 
 export type PreviewFeedInputBodyWritable = {
     feed_url: string;
+};
+
+export type ToggleEntryLikedRequestWritable = {
+    liked: boolean;
 };
 
 export type ToggleEntryStarredRequestWritable = {
@@ -636,6 +650,33 @@ export type GetEntryResponses = {
 };
 
 export type GetEntryResponse = GetEntryResponses[keyof GetEntryResponses];
+
+export type ToggleEntryLikedData = {
+    body: ToggleEntryLikedRequestWritable;
+    path: {
+        entryId: number;
+    };
+    query?: never;
+    url: '/api/v1/entries/{entryId}/liked';
+};
+
+export type ToggleEntryLikedErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type ToggleEntryLikedError = ToggleEntryLikedErrors[keyof ToggleEntryLikedErrors];
+
+export type ToggleEntryLikedResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type ToggleEntryLikedResponse = ToggleEntryLikedResponses[keyof ToggleEntryLikedResponses];
 
 export type ToggleEntryStarredData = {
     body: ToggleEntryStarredRequestWritable;

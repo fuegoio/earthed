@@ -286,6 +286,9 @@
                         "format": "int64",
                         "type": "integer"
                     },
+                    "liked": {
+                        "type": "boolean"
+                    },
                     "published_at": {
                         "format": "date-time",
                         "type": "string"
@@ -326,6 +329,7 @@
                     "content",
                     "status",
                     "starred",
+                    "liked",
                     "published_at",
                     "changed_at"
                 ],
@@ -788,6 +792,27 @@
                 ],
                 "type": "object"
             },
+            "Toggle-entry-likedRequest": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/Toggle-entry-likedRequest.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "liked": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "liked"
+                ],
+                "type": "object"
+            },
             "Toggle-entry-starredRequest": {
                 "additionalProperties": false,
                 "properties": {
@@ -1245,6 +1270,51 @@
                     }
                 },
                 "summary": "Get an entry",
+                "tags": [
+                    "entries"
+                ]
+            }
+        },
+        "/api/v1/entries/{entryId}/liked": {
+            "put": {
+                "operationId": "toggle-entry-liked",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entryId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Toggle-entry-likedRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Toggle liked on an entry",
                 "tags": [
                     "entries"
                 ]
