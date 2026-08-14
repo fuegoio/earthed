@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx,mdx}\"",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "fumadocs-mdx && tsc --noEmit"
   },
   "dependencies": {
     "fumadocs-core": "^16.11.5",
