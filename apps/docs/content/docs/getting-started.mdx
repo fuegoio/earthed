@@ -1,0 +1,48 @@
+---
+title: Getting Started
+description: Run Planetary locally with Docker, subscribe to your first feed, and read entries.
+---
+
+## 1. Start the server
+
+Planetary ships with a `docker-compose.yml` that runs PostgreSQL and
+the API together:
+
+```bash
+cd api
+docker compose up -d
+```
+
+This starts a PostgreSQL 16 container and the Planetary API on port
+8080.
+
+## 2. Run migrations
+
+Apply the database schema:
+
+```bash
+make migrate
+```
+
+## 3. Subscribe to a feed
+
+Use the REST API to add an RSS feed:
+
+```bash
+curl -X POST http://localhost:8080/feeds \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com/feed.xml"}'
+```
+
+## 4. Read entries
+
+List the latest entries:
+
+```bash
+curl http://localhost:8080/entries
+```
+
+## Next steps
+
+- Explore the [API endpoints](/docs) for managing feeds and entries.
+- Point the frontend at the API and browse your timeline.
