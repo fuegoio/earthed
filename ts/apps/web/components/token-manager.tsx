@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { Dialog } from "@base-ui/react/dialog"
 import { Key, Plus, Trash2, Loader2, Copy, Check } from "lucide-react"
+import { Skeleton } from "@workspace/ui/components/skeleton"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
@@ -108,9 +109,19 @@ export function TokenManager() {
 
       <div className="mt-6 flex flex-col gap-3">
         {isLoading ? (
-          <div className="flex items-center gap-2 py-8 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" />
-            Loading tokens…
+          <div className="flex flex-col gap-3">
+            {Array.from({ length: 2 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-3 rounded-lg border border-border p-4"
+              >
+                <div className="min-w-0 flex-1 space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-48" />
+                </div>
+                <Skeleton className="size-8 rounded-md" />
+              </div>
+            ))}
           </div>
         ) : (tokens ?? []).length === 0 ? (
           <Empty>

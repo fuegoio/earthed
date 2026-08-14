@@ -3,7 +3,8 @@
 import Link from "next/link"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { Compass, Globe, Loader2, UserPlus, Check } from "lucide-react"
+import { Compass, Globe, UserPlus, Check } from "lucide-react"
+import { Skeleton } from "@workspace/ui/components/skeleton"
 import { Button, buttonVariants } from "@workspace/ui/components/button"
 import {
   Empty,
@@ -62,9 +63,19 @@ export default function DiscoverPage() {
 
       <div className="mt-6 flex flex-col gap-3">
         {isLoading ? (
-          <div className="flex items-center gap-2 py-10 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" />
-            Loading public lists…
+          <div className="flex flex-col gap-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex items-start gap-3 rounded-lg border border-border p-4"
+              >
+                <div className="min-w-0 flex-1 space-y-2">
+                  <Skeleton className="h-4 w-40" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+                <Skeleton className="h-8 w-20 rounded-md" />
+              </div>
+            ))}
           </div>
         ) : (lists ?? []).length === 0 ? (
           <Empty>

@@ -1,0 +1,205 @@
+package store
+
+import (
+	"context"
+	"database/sql"
+	"fmt"
+	"os"
+	"testing"
+	"time"
+
+	_ "github.com/lib/pq"
+)
+
+// testDB returns a Store backed by a real PostgreSQL instance, or skips
+// the test if the database is not reachable. The database must already
+// have migrations applied.
+func testDB(t *testing.T) *Store {
+	t.Helper()
+	dsn := os.Getenv("PLANETARY_DATABASE_URL")
+	if dsn == "" {
+		dsn = "postgres://planetary:planetary@localhost:5432/planetary?sslmode=disable"
+	}
+	db, err := sql.Open("postgres", dsn)
+	if err != nil {
+		t.Skipf("could not open database: %v", err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	if err := db.PingContext(ctx); err != nil {
+		t.Skipf("database not reachable, skipping integration test: %v", err)
+	}
+	return New(db)
+}
+
+// seedUser creates a test user and returns its ID. Cleans up via t.Cleanup.
+func seedUser(t *testing.T, s *Store, email string) int {
+	t.Helper()
+	var id int
+	err := s.DB.QueryRow(
+		`INSERT INTO users (email, password, email_verified_at) VALUES ($1, 'hash', NOW()) RETURNING id`,
+		email,
+	).Scan(&id)
+	if err != nil {
+		t.Fatalf("seed user: %v", err)
+	}
+	t.Cleanup(func() {
+		s.DB.Exec(`DELETE FROM users WHERE id = $1`, id)
+	})
+	return id
+}
+
+// seedFeed creates a test feed and returns its ID. Cleans up via t.Cleanup.
+func seedFeed(t *testing.T, s *Store, userID int, categoryID *int, title string) int {
+	t.Helper()
+	var id int
+	err := s.DB.QueryRow(
+		`INSERT INTO feeds (user_id, category_id, feed_url, title) VALUES ($1, $2, $3, $4) RETURNING id`,
+		userID, categoryID, fmt.Sprintf("https://example.com/%s.xml", title), title,
+	).Scan(&id)
+	if err != nil {
+		t.Fatalf("seed feed: %v", err)
+	}
+	t.Cleanup(func() {
+		s.DB.Exec(`DELETE FROM feeds WHERE id = $1`, id)
+	})
+	return id
+}
+
+// seedEntry creates a test entry and returns its ID. Cleans up via t.Cleanup.
+func seedEntry(t *testing.T, s *Store, userID, feedID int, title, status string, starred bool) int64 {
+	t.Helper()
+	var id int64
+	err := s.DB.QueryRow(
+		`INSERT INTO entries (user_id, feed_id, hash, title, content, status, starred, published_at)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+		 RETURNING id`,
+		userID, feedID, fmt.Sprintf("hash-%d-%s", feedID, title), title, title, status, starred,
+	).Scan(&id)
+	if err != nil {
+		t.Fatalf("seed entry: %v", err)
+	}
+	t.Cleanup(func() {
+		s.DB.Exec(`DELETE FROM entries WHERE id = $1`, id)
+	})
+	return id
+}
+
+// TestListEntriesByFeedID verifies that filtering entries by feed_id
+// does not produce a SQL syntax error. This is a regression test for a
+// bug where the feed_id condition was appended with a dangling AND
+// before the WHERE clause.
+func TestListEntriesByFeedID(t *testing.T) {
+	s := testDB(t)
+	ctx := context.Background()
+
+	userID := seedUser(t, s, "test-feed-filter@example.com")
+	feedID := seedFeed(t, s, userID, nil, "Test Feed")
+	seedEntry(t, s, userID, feedID, "Entry A", "unread", false)
+	seedEntry(t, s, userID, feedID, "Entry B", "read", true)
+
+	fid := feedID
+	entries, err := s.ListEntries(ctx, userID, &fid, nil, "", nil, "", 50, 0)
+	if err != nil {
+		t.Fatalf("ListEntries with feed_id failed: %v", err)
+	}
+	if len(entries) != 2 {
+		t.Errorf("expected 2 entries for feed_id=%d, got %d", feedID, len(entries))
+	}
+}
+
+// TestListEntriesByCategoryID verifies that filtering by category_id
+// works without errors.
+func TestListEntriesByCategoryID(t *testing.T) {
+	s := testDB(t)
+	ctx := context.Background()
+
+	userID := seedUser(t, s, "test-cat-filter@example.com")
+
+	// Create category
+	var catID int
+	err := s.DB.QueryRow(
+		`INSERT INTO categories (user_id, title) VALUES ($1, 'Tech') RETURNING id`,
+		userID,
+	).Scan(&catID)
+	if err != nil {
+		t.Fatalf("seed category: %v", err)
+	}
+	t.Cleanup(func() { s.DB.Exec(`DELETE FROM categories WHERE id = $1`, catID) })
+
+	feedID := seedFeed(t, s, userID, &catID, "Cat Feed")
+	seedEntry(t, s, userID, feedID, "Cat Entry", "unread", false)
+
+	cid := catID
+	entries, err := s.ListEntries(ctx, userID, nil, &cid, "", nil, "", 50, 0)
+	if err != nil {
+		t.Fatalf("ListEntries with category_id failed: %v", err)
+	}
+	if len(entries) != 1 {
+		t.Errorf("expected 1 entry for category_id=%d, got %d", catID, len(entries))
+	}
+}
+
+// TestListEntriesCombinedFilters verifies that multiple filters can be
+// combined without SQL errors.
+func TestListEntriesCombinedFilters(t *testing.T) {
+	s := testDB(t)
+	ctx := context.Background()
+
+	userID := seedUser(t, s, "test-combined@example.com")
+	feedID := seedFeed(t, s, userID, nil, "Combined Feed")
+	seedEntry(t, s, userID, feedID, "Unread Starred", "unread", true)
+	seedEntry(t, s, userID, feedID, "Read Unstarred", "read", false)
+	seedEntry(t, s, userID, feedID, "Unread Unstarred", "unread", false)
+
+	fid := feedID
+	starred := true
+	entries, err := s.ListEntries(ctx, userID, &fid, nil, "unread", &starred, "", 50, 0)
+	if err != nil {
+		t.Fatalf("ListEntries with combined filters failed: %v", err)
+	}
+	if len(entries) != 1 {
+		t.Errorf("expected 1 entry (unread+starred), got %d", len(entries))
+	}
+	if len(entries) > 0 && entries[0].Title != "Unread Starred" {
+		t.Errorf("expected 'Unread Starred', got %q", entries[0].Title)
+	}
+}
+
+// TestListEntriesNoFilters verifies the base case with no optional filters.
+func TestListEntriesNoFilters(t *testing.T) {
+	s := testDB(t)
+	ctx := context.Background()
+
+	userID := seedUser(t, s, "test-nofilter@example.com")
+	feedID := seedFeed(t, s, userID, nil, "No Filter Feed")
+	seedEntry(t, s, userID, feedID, "Entry 1", "unread", false)
+	seedEntry(t, s, userID, feedID, "Entry 2", "read", false)
+
+	entries, err := s.ListEntries(ctx, userID, nil, nil, "", nil, "", 50, 0)
+	if err != nil {
+		t.Fatalf("ListEntries with no filters failed: %v", err)
+	}
+	if len(entries) < 2 {
+		t.Errorf("expected at least 2 entries, got %d", len(entries))
+	}
+}
+
+// TestListEntriesSearch verifies that full-text search works.
+func TestListEntriesSearch(t *testing.T) {
+	s := testDB(t)
+	ctx := context.Background()
+
+	userID := seedUser(t, s, "test-search@example.com")
+	feedID := seedFeed(t, s, userID, nil, "Search Feed")
+	seedEntry(t, s, userID, feedID, "Go programming language", "unread", false)
+	seedEntry(t, s, userID, feedID, "Rust memory safety", "unread", false)
+
+	entries, err := s.ListEntries(ctx, userID, nil, nil, "", nil, "Go", 50, 0)
+	if err != nil {
+		t.Fatalf("ListEntries with search failed: %v", err)
+	}
+	if len(entries) != 1 {
+		t.Errorf("expected 1 entry matching 'Go', got %d", len(entries))
+	}
+}

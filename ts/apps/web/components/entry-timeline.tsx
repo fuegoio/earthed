@@ -7,7 +7,8 @@ import {
   useQuery,
   type InfiniteData,
 } from "@tanstack/react-query"
-import { Loader2, Rss } from "lucide-react"
+import { Rss } from "lucide-react"
+import { Skeleton } from "@workspace/ui/components/skeleton"
 import { EntryCard } from "@/components/entry-card"
 import {
   Empty,
@@ -99,9 +100,16 @@ export function EntryTimeline({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
-        <Loader2 className="size-4 animate-spin" />
-        Loading entries…
+      <div className="divide-y divide-border">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="flex gap-3 px-4 py-3">
+            <Skeleton className="size-10 shrink-0 rounded-lg" />
+            <div className="min-w-0 flex-1 space-y-2">
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-3 w-1/2" />
+            </div>
+          </div>
+        ))}
       </div>
     )
   }
@@ -167,9 +175,16 @@ export function EntryTimeline({
       ))}
       <div ref={sentinelRef} className="h-px" />
       {isFetchingNextPage && (
-        <div className="flex items-center justify-center gap-2 py-4 text-sm text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" />
-          Loading more…
+        <div className="divide-y divide-border">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="flex gap-3 px-4 py-3">
+              <Skeleton className="size-10 shrink-0 rounded-lg" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-1/2" />
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

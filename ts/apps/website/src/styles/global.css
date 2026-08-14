@@ -106,10 +106,9 @@ button {
       warms (the sky tint lifts).
    4. "Planetary" wordmark fades + lifts in, followed by the tagline
       and CTAs.
-   Content is visible by default. Animations use `forwards` fill so
-   the end-state persists, but the base state (opacity:1) is the
-   default — content never ships invisible, even on backgrounded tabs
-   or headless renderers where animations may not fire.
+   Elements start hidden (opacity:0) and animate to visible.
+   The reduced-motion media query at the bottom resets them to
+   opacity:1 immediately.
 */
 
 /*
@@ -204,39 +203,47 @@ button {
 }
 
 .sun-wrap {
+  opacity: 0;
   animation: sun-rise 2.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .sun-glow {
+  opacity: 0;
   animation: glow-bloom 3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   animation-delay: 0.4s;
 }
 
 .sky-warm-layer {
+  opacity: 0;
   animation: sky-warm 3.6s ease-out forwards;
 }
 
 .wordmark {
+  opacity: 0;
   animation: wordmark-in 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   animation-delay: 1.4s;
 }
 
 .tagline {
+  opacity: 0;
   animation: fade-up 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   animation-delay: 2s;
 }
 
 .cta-row > *:nth-child(1) {
+  opacity: 0;
   animation: cta-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   animation-delay: 2.4s;
 }
 
 .cta-row > *:nth-child(2) {
+  opacity: 0;
   animation: cta-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   animation-delay: 2.55s;
 }
 
 .scroll-cue {
+  opacity: 0;
   animation: fade-in 1.5s ease-out forwards;
   animation-delay: 3.2s;
 }

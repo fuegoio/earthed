@@ -290,17 +290,18 @@ func (s *Store) ListEntries(ctx context.Context, userID int, feedID *int, catego
 	args := []interface{}{userID}
 	argIdx := 2
 
+	q += " WHERE e.user_id = $1"
+
 	if categoryID != nil {
-		q += fmt.Sprintf(" JOIN feeds f ON f.id = e.feed_id AND f.user_id = $1 AND f.category_id = $%d", argIdx)
+		q += fmt.Sprintf(" AND e.feed_id IN (SELECT f.id FROM feeds f WHERE f.user_id = $1 AND f.category_id = $%d)", argIdx)
 		args = append(args, *categoryID)
 		argIdx++
-	} else if feedID != nil {
+	}
+	if feedID != nil {
 		q += fmt.Sprintf(" AND e.feed_id = $%d", argIdx)
 		args = append(args, *feedID)
 		argIdx++
 	}
-
-	q += " WHERE e.user_id = $1"
 
 	if status != "" {
 		q += fmt.Sprintf(" AND e.status = $%d", argIdx)

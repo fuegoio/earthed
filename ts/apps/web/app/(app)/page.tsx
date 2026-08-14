@@ -1,5 +1,7 @@
 import { EntryTimeline } from "@/components/entry-timeline"
 
+export const metadata = { title: "Timeline" }
+
 export default function HomePage() {
   return (
     <div className="mx-auto w-full max-w-3xl">

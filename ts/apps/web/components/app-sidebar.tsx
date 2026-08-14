@@ -10,12 +10,11 @@ import {
   Circle,
   Star,
   Folder,
-  Loader2,
   Plus,
   Trash2,
   ListChecks,
-  Key,
 } from "lucide-react"
+import { Skeleton } from "@workspace/ui/components/skeleton"
 import {
   getClient,
   listFeeds,
@@ -210,7 +209,6 @@ function CategoryList({ categories }: { categories: Category[] }) {
 }
 
 function SidebarContent() {
-  const pathname = usePathname()
   const { data: feeds, isLoading: feedsLoading } = useQuery<Feed[]>({
     queryKey: ["feeds"],
     queryFn: async () => unwrap(listFeeds({ client: await getClient() })),
@@ -223,8 +221,6 @@ function SidebarContent() {
     queryFn: async () =>
       unwrap(listCategories({ client: await getClient() })),
   })
-
-  const tokensActive = isActive(pathname, "/settings/tokens")
 
   return (
     <div className="flex h-full flex-col">
@@ -260,9 +256,13 @@ function SidebarContent() {
             </Link>
           </div>
           {feedsLoading ? (
-            <div className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground">
-              <Loader2 className="size-3.5 animate-spin" />
-              Loading feeds…
+            <div className="flex flex-col gap-0.5">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-2.5 px-3 py-1.5">
+                  <Skeleton className="size-3.5 shrink-0 rounded-sm" />
+                  <Skeleton className="h-3 flex-1" />
+                </div>
+              ))}
             </div>
           ) : (
             <FeedList feeds={feeds ?? []} />
@@ -279,25 +279,18 @@ function SidebarContent() {
             <CategoryCreateDialog />
           </div>
           {categoriesLoading ? (
-            <div className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground">
-              <Loader2 className="size-3.5 animate-spin" />
-              Loading categories…
+            <div className="flex flex-col gap-0.5">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-2.5 px-3 py-1.5">
+                  <Skeleton className="size-3.5 shrink-0" />
+                  <Skeleton className="h-3 flex-1" />
+                </div>
+              ))}
             </div>
           ) : (
             <CategoryList categories={categories ?? []} />
           )}
         </div>
-
-        <SidebarSeparator />
-
-        <Link
-          href="/settings/tokens"
-          aria-current={tokensActive ? "page" : undefined}
-          className={cn(navLinkClass, tokensActive && navLinkActiveClass)}
-        >
-          <Key className={cn("size-4", tokensActive && "text-primary")} />
-          API tokens
-        </Link>
       </div>
     </div>
   )

@@ -1,7 +1,8 @@
 "use client"
 
+import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Menu as MenuIcon, LogOut } from "lucide-react"
+import { Menu as MenuIcon, LogOut, Key } from "lucide-react"
 import { Menu } from "@base-ui/react/menu"
 import { Avatar } from "@base-ui/react/avatar"
 import { Button } from "@workspace/ui/components/button"
@@ -76,6 +77,19 @@ export function AppTopbar({
                 <p className="text-sm font-medium truncate">{userEmail}</p>
               </div>
               <div className="my-1 h-px bg-border" />
+              <Menu.Item
+                className={cn(
+                  "flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm",
+                  "hover:bg-accent hover:text-accent-foreground transition-colors",
+                  "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
+                )}
+                render={
+                  <Link href="/settings/tokens" />
+                }
+              >
+                <Key className="size-4" />
+                API tokens
+              </Menu.Item>
               <Menu.Item
                 className={cn(
                   "flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm",

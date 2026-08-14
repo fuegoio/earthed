@@ -1,6 +1,8 @@
 import { Star } from "lucide-react"
 import { EntryTimeline } from "@/components/entry-timeline"
 
+export const metadata = { title: "Starred" }
+
 export default function StarredPage() {
   return (
     <div className="mx-auto w-full max-w-3xl">

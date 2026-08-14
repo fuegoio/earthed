@@ -3,7 +3,28 @@ import { getClient, getFeedList, getMe } from "@/lib/planetary"
 import { getApiErrorMessage, apiErrorStatus } from "@/lib/errors"
 import { ApiError } from "@/components/api-error"
 import { FeedListDetail } from "@/components/feed-list-detail"
+import type { Metadata } from "next"
 import type { FeedList, User } from "@/lib/types"
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+  const listId = Number(id)
+  if (!Number.isFinite(listId)) return { title: "Feed List" }
+  try {
+    const { data } = await getFeedList({ client: await getClient(), path: { listId } })
+    if (data) {
+      const list = data as FeedList
+      return { title: list.title || "Feed List" }
+    }
+  } catch {
+    // metadata is best-effort; fall through to default
+  }
+  return { title: "Feed List" }
+}
 
 export default async function FeedListPage({
   params,

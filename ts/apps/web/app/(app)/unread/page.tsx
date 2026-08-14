@@ -1,6 +1,8 @@
 import { Circle } from "lucide-react"
 import { EntryTimeline } from "@/components/entry-timeline"
 
+export const metadata = { title: "Unread" }
+
 export default function UnreadPage() {
   return (
     <div className="mx-auto w-full max-w-3xl">

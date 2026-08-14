@@ -2,7 +2,8 @@
 
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
-import { ListChecks, Plus, Globe, Users, Loader2, Compass } from "lucide-react"
+import { ListChecks, Plus, Globe, Users, Compass } from "lucide-react"
+import { Skeleton } from "@workspace/ui/components/skeleton"
 import { buttonVariants } from "@workspace/ui/components/button"
 import {
   Empty,
@@ -140,9 +141,19 @@ export default function FeedListsPage() {
 
 function LoadingRow() {
   return (
-    <div className="flex items-center gap-2 py-6 text-sm text-muted-foreground">
-      <Loader2 className="size-4 animate-spin" />
-      Loading…
+    <div className="flex flex-col gap-2">
+      {Array.from({ length: 2 }).map((_, i) => (
+        <div
+          key={i}
+          className="flex items-center gap-3 rounded-lg border border-border p-4"
+        >
+          <Skeleton className="size-10 shrink-0 rounded-lg" />
+          <div className="min-w-0 flex-1 space-y-2">
+            <Skeleton className="h-4 w-40" />
+            <Skeleton className="h-3 w-24" />
+          </div>
+        </div>
+      ))}
     </div>
   )
 }

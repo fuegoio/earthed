@@ -8,6 +8,8 @@ import {
   EmptyTitle,
 } from "@/components/empty"
 
+export const metadata = { title: "Search" }
+
 export default async function SearchPage({
   searchParams,
 }: {

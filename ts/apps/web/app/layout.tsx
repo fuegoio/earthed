@@ -6,6 +6,14 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { QueryProvider } from "@/components/query-provider"
 import { cn } from "@workspace/ui/lib/utils"
 
+export const metadata = {
+  title: {
+    default: "Planetary",
+    template: "%s — Planetary",
+  },
+  description: "A modern, self-hostable RSS reader with a clean REST API.",
+}
+
 const ibmPlexSans = IBM_Plex_Sans({
   subsets: ["latin"],
   variable: "--font-sans",

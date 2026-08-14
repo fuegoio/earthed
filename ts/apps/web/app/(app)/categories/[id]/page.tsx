@@ -4,7 +4,29 @@ import { getApiErrorMessage, apiErrorStatus } from "@/lib/errors"
 import { ApiError } from "@/components/api-error"
 import { EntryTimeline } from "@/components/entry-timeline"
 import { Folder } from "lucide-react"
+import type { Metadata } from "next"
 import type { Category } from "@/lib/types"
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+  const categoryId = Number(id)
+  if (!Number.isFinite(categoryId)) return { title: "Category" }
+  try {
+    const { data } = await listCategories({ client: await getClient() })
+    if (data) {
+      const cats = data as Category[]
+      const cat = cats.find((c) => c.id === categoryId)
+      if (cat) return { title: cat.title }
+    }
+  } catch {
+    // metadata is best-effort; fall through to default
+  }
+  return { title: "Category" }
+}
 
 export default async function CategoryPage({
   params,
