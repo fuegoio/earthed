@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
@@ -19,6 +19,8 @@ import {
   Download,
   Check,
   Rss,
+  Search,
+  Link as LinkIcon,
 } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@workspace/ui/components/button"
@@ -37,6 +39,7 @@ import { FeedIcon } from "@/components/feed-icon"
 import {
   getClient,
   getFeedList,
+  listFeeds,
   addFeedListFeed,
   removeFeedListFeed,
   deleteFeedList,
@@ -48,7 +51,7 @@ import {
 } from "@/lib/planetary"
 import { getApiErrorMessage } from "@/lib/errors"
 import { cn } from "@workspace/ui/lib/utils"
-import type { FeedList, FeedListFeed } from "@/lib/types"
+import type { Feed, FeedList, FeedListFeed } from "@/lib/types"
 
 /**
  * Feed list detail: shows the list metadata and its feeds. Owners can edit,
@@ -72,16 +75,66 @@ export function FeedListDetail({
     initialData: initial,
   })
 
+  const { data: userFeeds } = useQuery<Feed[]>({
+    queryKey: ["feeds"],
+    queryFn: async () => unwrap(listFeeds({ client: await getClient() })),
+  })
+
   const feeds = list?.feeds ?? []
   const isFollowing = !!list?.is_following
 
+  // URLs already in the list, so we can filter them out of the picker.
+  const existingUrls = useMemo(() => {
+    return new Set((list?.feeds ?? []).map((f) => f.feed_url))
+  }, [list?.feeds])
+
+  // Feeds from the user's subscriptions that are not yet in this list.
+  const availableFeeds = useMemo(() => {
+    return (userFeeds ?? [])
+      .filter((f) => !existingUrls.has(f.feed_url))
+      .sort((a, b) => a.title.localeCompare(b.title))
+  }, [userFeeds, existingUrls])
+
   const [addUrl, setAddUrl] = useState("")
   const [addTitle, setAddTitle] = useState("")
+  const [feedSearch, setFeedSearch] = useState("")
   const [adding, setAdding] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [shareCopied, setShareCopied] = useState(false)
   const [followPending, setFollowPending] = useState(false)
   const [importing, setImporting] = useState(false)
+
+  const filteredFeeds = useMemo(() => {
+    if (!feedSearch.trim()) return availableFeeds
+    const q = feedSearch.toLowerCase()
+    return availableFeeds.filter(
+      (f) =>
+        f.title.toLowerCase().includes(q) ||
+        f.feed_url.toLowerCase().includes(q)
+    )
+  }, [availableFeeds, feedSearch])
+
+  async function handleAddFromSubscription(feed: Feed) {
+    setAdding(true)
+    try {
+      const { error } = await addFeedListFeed({
+        client: await getClient(),
+        path: { listId: initial.id },
+        body: {
+          feed_url: feed.feed_url,
+          site_url: feed.site_url || undefined,
+          title: feed.title || undefined,
+        },
+      })
+      if (error) throw error
+      await queryClient.invalidateQueries({ queryKey: ["feed-list", initial.id] })
+      toast.success(`Added "${feed.title}" to list`)
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, "Could not add feed"))
+    } finally {
+      setAdding(false)
+    }
+  }
 
   async function handleAddFeed(e: React.FormEvent) {
     e.preventDefault()
@@ -382,12 +435,68 @@ export function FeedListDetail({
 
       {/* Add feed (owner only) */}
       {isOwner && (
-        <form
-          onSubmit={handleAddFeed}
-          className="mt-6 flex flex-col gap-3 rounded-lg border border-border p-4"
-        >
+        <div className="mt-6 rounded-lg border border-border p-4">
           <h3 className="text-sm font-medium">Add a feed</h3>
-          <div className="flex flex-col gap-2 sm:flex-row">
+
+          {/* Feed picker from subscriptions */}
+          <div className="mt-3">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={feedSearch}
+                onChange={(e) => setFeedSearch(e.target.value)}
+                placeholder="Search your subscriptions..."
+                className="pl-8"
+              />
+            </div>
+            {availableFeeds.length === 0 ? (
+              <p className="mt-2 text-xs text-muted-foreground">
+                {feeds.length > 0 && availableFeeds.length === 0
+                  ? "All your subscriptions are already in this list."
+                  : "You don't have any subscriptions yet."}
+              </p>
+            ) : (
+              <ul className="mt-2 max-h-48 overflow-y-auto rounded-md border border-border">
+                {filteredFeeds.map((feed) => (
+                  <li key={feed.id}>
+                    <button
+                      type="button"
+                      onClick={() => handleAddFromSubscription(feed)}
+                      disabled={adding}
+                      className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-sm hover:bg-muted/50 disabled:opacity-50"
+                    >
+                      <FeedIcon
+                        siteUrl={feed.site_url}
+                        className="size-4 shrink-0 rounded-sm"
+                      />
+                      <span className="min-w-0 flex-1 truncate">
+                        {feed.title}
+                      </span>
+                      <Plus className="size-3.5 shrink-0 text-muted-foreground" />
+                    </button>
+                  </li>
+                ))}
+                {filteredFeeds.length === 0 && feedSearch.trim() && (
+                  <li className="px-2 py-1.5 text-xs text-muted-foreground">
+                    No matches.
+                  </li>
+                )}
+              </ul>
+            )}
+          </div>
+
+          {/* Divider */}
+          <div className="my-3 flex items-center gap-3">
+            <div className="h-px flex-1 bg-border" />
+            <span className="flex items-center gap-1 text-xs text-muted-foreground">
+              <LinkIcon className="size-3" />
+              or add by URL
+            </span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+
+          {/* Add by URL */}
+          <form onSubmit={handleAddFeed} className="flex flex-col gap-2 sm:flex-row">
             <Input
               value={addUrl}
               onChange={(e) => setAddUrl(e.target.value)}
@@ -409,8 +518,8 @@ export function FeedListDetail({
               )}
               Add
             </Button>
-          </div>
-        </form>
+          </form>
+        </div>
       )}
 
       <EditListDialog
