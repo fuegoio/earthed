@@ -269,7 +269,7 @@ func (s *Store) ListEntries(ctx context.Context, userID int, feedID *int, catego
 		argIdx++
 	}
 
-	q += fmt.Sprintf(" WHERE e.user_id = $1")
+	q += " WHERE e.user_id = $1"
 
 	if status != "" {
 		q += fmt.Sprintf(" AND e.status = $%d", argIdx)

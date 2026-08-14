@@ -1,15 +1,44 @@
 ---
 title: Planetary
-description: Planetary is a self-hosted RSS reader with a Go backend and a Next.js frontend.
+description: A self-hosted RSS reader with a Go API, CLI, TUI, and Next.js web frontend.
 ---
 
 ## What is Planetary
 
-Planetary is a self-hosted RSS reader. It aggregates feeds into a
-single timeline you can browse from the web UI, and exposes a REST API
-for subscribing to feeds and reading entries programmatically.
+Planetary is a self-hosted RSS reader. It fetches and parses RSS 2.0,
+Atom 1.0, RDF, and JSON Feed subscriptions into a single timeline you can
+browse from the web UI, the terminal CLI, or the interactive TUI.
+
+## Architecture
+
+Planetary is a monorepo with a clear boundary between Go and TypeScript:
+
+```
+planetary/
+├── go/          # Go: API server, generated SDK, CLI + TUI
+│   ├── api/     # HTTP API server (huma, PostgreSQL)
+│   ├── sdk/     # Go client generated from OpenAPI
+│   └── cli/     # planetary (CLI) and planetary-tui (TUI)
+├── ts/          # TypeScript: web frontend and docs site
+│   ├── apps/
+│   │   ├── web/    # Next.js frontend
+│   │   └── docs/   # This documentation site
+│   └── packages/
+│       └── api-client/  # TS client generated from OpenAPI
+└── Makefile     # Cross-ecosystem orchestration
+```
+
+The OpenAPI spec (`go/api/openapi.json`) is the contract bridge: both the
+Go SDK and the TypeScript client are generated from it.
 
 ## Where to start
 
-- [Getting Started](/docs/getting-started) — run Planetary locally
-  with Docker, subscribe to your first feed, and read entries.
+- [Getting Started](/docs/getting-started) — run Planetary locally with
+  Docker, create an account, subscribe to your first feed, and read
+  entries.
+- [API Reference](/docs/api-reference) — REST endpoints for feeds,
+  entries, categories, tokens, and user management.
+- [CLI](/docs/cli) — the `planetary` command-line tool and the
+  `planetary-tui` interactive terminal UI.
+- [Self-Hosting](/docs/self-hosting) — deployment, environment
+  variables, and Docker configuration.

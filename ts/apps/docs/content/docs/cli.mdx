@@ -1,0 +1,106 @@
+---
+title: CLI
+description: The planetary command-line tool and planetary-tui interactive terminal UI.
+---
+
+The Planetary CLI lets you manage feeds, entries, categories, and API
+tokens from the terminal. The TUI provides an interactive browsing
+experience.
+
+## Building
+
+```bash
+cd go/cli
+make build
+```
+
+This produces two binaries: `planetary` (CLI) and `planetary-tui` (TUI).
+
+## Configuration
+
+Before first use, point the CLI at your API server and set an API token:
+
+```bash
+./planetary config set base_url http://localhost:8080
+./planetary config set token pla_your-token-here
+```
+
+View the current configuration:
+
+```bash
+./planetary config show
+```
+
+Configuration is stored at `~/.config/planetary/config.json` (or the
+equivalent on your OS).
+
+## Commands
+
+### feeds
+
+```bash
+planetary feeds list              # list all subscriptions
+planetary feeds add <url>         # subscribe to a feed
+planetary feeds delete <id>       # unsubscribe from a feed
+```
+
+### entries
+
+```bash
+planetary entries list             # list recent entries
+planetary entries read <id>        # read a single entry
+```
+
+### categories
+
+```bash
+planetary categories list          # list categories
+planetary categories create <title>  # create a category
+planetary categories delete <id>   # delete a category
+```
+
+### tokens
+
+```bash
+planetary tokens list              # list API tokens
+planetary tokens create <label>   # create a token (shown once)
+planetary tokens delete <id>       # delete a token
+```
+
+### me
+
+```bash
+planetary me                       # show current user profile
+```
+
+### health
+
+```bash
+planetary health                   # check API health
+```
+
+## TUI
+
+The TUI is an interactive feed browser:
+
+```bash
+./planetary-tui
+```
+
+### Navigation
+
+| Key     | Action                  |
+| ------- | ----------------------- |
+| `j` / `↓` | move cursor down       |
+| `k` / `↑` | move cursor up         |
+| `enter` / `l` | open selected item |
+| `h` / `esc` | go back             |
+| `r`     | refresh feed list       |
+| `q`     | quit                    |
+
+The TUI has three views:
+
+1. **Feeds** — lists all subscriptions. Press enter to browse entries.
+2. **Entries** — lists entries in the selected feed. Press enter to
+   read.
+3. **Entry** — shows the full entry content. Press esc to go back.
