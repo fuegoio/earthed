@@ -1,10 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import {
@@ -25,20 +23,16 @@ import {
   unwrap,
 } from "@/lib/planetary"
 import { getApiErrorMessage } from "@/lib/errors"
-import {
-  subscribeFeedSchema,
-  type SubscribeFeedValues,
-} from "@/lib/schemas"
+import { subscribeFeedSchema } from "@/lib/schemas"
 import type { PreviewFeedBody, Category } from "@/lib/types"
 import { cn } from "@workspace/ui/lib/utils"
-
-type Phase = "input" | "preview" | "subscribing"
 
 export default function SubscribeFeedPage() {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const [phase, setPhase] = useState<Phase>("input")
-  const [preview, setPreview] = useState<PreviewFeedBody | null>(null)
+  const [url, setUrl] = useState("")
+  const [debouncedUrl, setDebouncedUrl] = useState("")
+  const [subscribing, setSubscribing] = useState(false)
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | "">("")
 
   const { data: categories } = useQuery<Category[]>({
@@ -47,38 +41,38 @@ export default function SubscribeFeedPage() {
       unwrap(listCategories({ client: await getClient() })),
   })
 
-  const {
-    register,
-    handleSubmit,
-    setError,
-    formState: { errors },
-  } = useForm<SubscribeFeedValues>({
-    resolver: zodResolver(subscribeFeedSchema),
-  })
+  // Debounce the URL so we only fetch after the user pauses typing.
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedUrl(url), 400)
+    return () => clearTimeout(t)
+  }, [url])
 
-  async function onSubmit(values: SubscribeFeedValues) {
-    setPhase("preview")
-    setPreview(null)
-    try {
+  const urlValidation = subscribeFeedSchema.safeParse({
+    feed_url: debouncedUrl,
+  })
+  const isUrlValid = urlValidation.success
+
+  const {
+    data: preview,
+    error: previewError,
+    isFetching: isPreviewFetching,
+  } = useQuery<PreviewFeedBody>({
+    queryKey: ["previewFeed", debouncedUrl],
+    queryFn: async () => {
       const result = await previewFeed({
         client: await getClient(),
-        body: { feed_url: values.feed_url },
+        body: { feed_url: debouncedUrl },
       })
-      if (result.error) {
-        throw result.error
-      }
-      setPreview(result.data)
-    } catch (err) {
-      setError("feed_url", {
-        message: getApiErrorMessage(err, "Could not fetch that feed"),
-      })
-      setPhase("input")
-    }
-  }
+      if (result.error) throw result.error
+      return result.data as PreviewFeedBody
+    },
+    enabled: isUrlValid,
+    retry: false,
+  })
 
   async function handleSubscribe() {
     if (!preview) return
-    setPhase("subscribing")
+    setSubscribing(true)
     try {
       const categoryId =
         selectedCategoryId === "" ? undefined : Number(selectedCategoryId)
@@ -96,15 +90,13 @@ export default function SubscribeFeedPage() {
       router.refresh()
     } catch (err) {
       toast.error(getApiErrorMessage(err, "Could not subscribe to feed"))
-      setPhase("preview")
+      setSubscribing(false)
     }
   }
 
-  function handleBackToInput() {
-    setPhase("input")
-    setPreview(null)
-    setSelectedCategoryId("")
-  }
+  const showLoading = isUrlValid && isPreviewFetching && !preview
+  const showError = isUrlValid && !isPreviewFetching && previewError && !preview
+  const showPreview = !!preview
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
@@ -116,79 +108,21 @@ export default function SubscribeFeedPage() {
         Back
       </Link>
 
-      {phase === "input" && (
-        <InputPhase
-          register={register}
-          handleSubmit={handleSubmit}
-          onSubmit={onSubmit}
-          errors={errors}
-        />
-      )}
-
-      {phase === "preview" && !preview && <PreviewLoading />}
-
-      {phase === "preview" && preview && (
-        <PreviewPhase
-          preview={preview}
-          categories={categories ?? []}
-          selectedCategoryId={selectedCategoryId}
-          onSelectCategory={setSelectedCategoryId}
-          onSubscribe={handleSubscribe}
-          onBack={handleBackToInput}
-        />
-      )}
-
-      {phase === "subscribing" && preview && (
-        <SubscribingPhase preview={preview} />
-      )}
-    </div>
-  )
-}
-
-// --- Input phase ---
-
-function InputPhase({
-  register,
-  handleSubmit,
-  onSubmit,
-  errors,
-}: {
-  register: ReturnType<typeof useForm<SubscribeFeedValues>>["register"]
-  handleSubmit: ReturnType<typeof useForm<SubscribeFeedValues>>["handleSubmit"]
-  onSubmit: (values: SubscribeFeedValues) => void
-  errors: ReturnType<typeof useForm<SubscribeFeedValues>>["formState"]["errors"]
-}) {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  async function handleFormSubmit(values: SubscribeFeedValues) {
-    setIsSubmitting(true)
-    try {
-      await onSubmit(values)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-3">
-        <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10">
-          <Rss className="size-6 text-primary" />
+      <div className="flex flex-col gap-8">
+        {/* Header + URL input — always visible */}
+        <div className="flex flex-col gap-3">
+          <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10">
+            <Rss className="size-6 text-primary" />
+          </div>
+          <h1 className="font-serif text-2xl font-bold tracking-tight">
+            Subscribe to a feed
+          </h1>
+          <p className="max-w-md text-sm text-muted-foreground">
+            Paste the URL of any RSS, Atom, or JSON feed. We&apos;ll fetch it
+            and show you what you&apos;ll get before you subscribe.
+          </p>
         </div>
-        <h1 className="font-serif text-2xl font-bold tracking-tight">
-          Subscribe to a feed
-        </h1>
-        <p className="max-w-md text-sm text-muted-foreground">
-          Paste the URL of any RSS, Atom, or JSON feed. We&apos;ll fetch it and
-          show you what you&apos;ll get before you subscribe.
-        </p>
-      </div>
 
-      <form
-        onSubmit={handleSubmit(handleFormSubmit)}
-        className="flex flex-col gap-4"
-        noValidate
-      >
         <div className="flex flex-col gap-2">
           <Label htmlFor="feed_url">Feed URL</Label>
           <Input
@@ -197,57 +131,76 @@ function InputPhase({
             placeholder="https://example.com/feed.xml"
             autoComplete="url"
             spellCheck={false}
-            aria-invalid={!!errors.feed_url}
-            aria-describedby={
-              errors.feed_url ? "feed_url-error" : undefined
-            }
-            {...register("feed_url")}
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            aria-invalid={!isUrlValid && debouncedUrl.length > 0}
           />
-          {errors.feed_url && (
-            <p id="feed_url-error" className="text-sm text-destructive">
-              {errors.feed_url.message}
+          {!isUrlValid && debouncedUrl.length > 0 && (
+            <p className="text-sm text-destructive">
+              Enter a valid URL
             </p>
           )}
         </div>
 
-        <Button type="submit" disabled={isSubmitting} size="lg">
-          {isSubmitting && <Loader2 className="size-4 animate-spin" />}
-          {isSubmitting ? "Fetching feed..." : "Preview feed"}
-        </Button>
-      </form>
+        {/* Live states below the input */}
+        {showLoading && (
+          <div className="flex flex-col items-center gap-4 py-8">
+            <Loader2 className="size-6 animate-spin text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">
+              Fetching and parsing feed...
+            </p>
+          </div>
+        )}
+
+        {showError && (
+          <div
+            role="alert"
+            className="rounded-md border border-destructive/50 bg-destructive/10 p-4 text-foreground"
+          >
+            <div className="flex items-center gap-2 font-medium">
+              <span className="text-destructive">Could not fetch feed</span>
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {getApiErrorMessage(previewError, "Check the URL and try again")}
+            </p>
+          </div>
+        )}
+
+        {showPreview && !subscribing && (
+          <PreviewContent
+            preview={preview}
+            categories={categories ?? []}
+            selectedCategoryId={selectedCategoryId}
+            onSelectCategory={setSelectedCategoryId}
+            onSubscribe={handleSubscribe}
+          />
+        )}
+
+        {showPreview && subscribing && (
+          <div className="flex flex-col items-center gap-4 py-8">
+            <Loader2 className="size-6 animate-spin text-primary" />
+            <p className="text-sm text-muted-foreground">
+              Subscribing to &ldquo;{preview.title || preview.feed_url}&rdquo;...
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
 
-// --- Preview loading ---
-
-function PreviewLoading() {
-  return (
-    <div className="flex flex-col items-center gap-4 py-16">
-      <Loader2 className="size-6 animate-spin text-muted-foreground" />
-      <p className="text-sm text-muted-foreground">
-        Fetching and parsing feed...
-      </p>
-    </div>
-  )
-}
-
-// --- Preview phase ---
-
-function PreviewPhase({
+function PreviewContent({
   preview,
   categories,
   selectedCategoryId,
   onSelectCategory,
   onSubscribe,
-  onBack,
 }: {
   preview: PreviewFeedBody
   categories: Category[]
   selectedCategoryId: number | ""
   onSelectCategory: (id: number | "") => void
   onSubscribe: () => void
-  onBack: () => void
 }) {
   const items = preview.items ?? []
 
@@ -270,9 +223,9 @@ function PreviewPhase({
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <h1 className="truncate font-serif text-xl font-bold tracking-tight">
+          <h2 className="truncate font-serif text-xl font-bold tracking-tight">
             {preview.title || "Untitled feed"}
-          </h1>
+          </h2>
           {preview.site_url && (
             <a
               href={preview.site_url}
@@ -295,14 +248,14 @@ function PreviewPhase({
       {/* Articles preview */}
       <div className="rounded-lg border border-border">
         <div className="border-b border-border px-4 py-2.5">
-          <h2 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Recent articles
             {items.length > 0 && (
               <span className="ml-1.5 text-muted-foreground/70">
                 ({items.length})
               </span>
             )}
-          </h2>
+          </h3>
         </div>
         {items.length === 0 ? (
           <p className="px-4 py-6 text-sm text-muted-foreground">
@@ -372,29 +325,11 @@ function PreviewPhase({
           </div>
         )}
 
-        <div className="flex items-center gap-2">
-          <Button onClick={onSubscribe} size="lg">
-            <Plus className="size-4" />
-            Subscribe to this feed
-          </Button>
-          <Button variant="ghost" onClick={onBack} size="lg">
-            Try another URL
-          </Button>
-        </div>
+        <Button onClick={onSubscribe} size="lg">
+          <Plus className="size-4" />
+          Subscribe to this feed
+        </Button>
       </div>
-    </div>
-  )
-}
-
-// --- Subscribing phase ---
-
-function SubscribingPhase({ preview }: { preview: PreviewFeedBody }) {
-  return (
-    <div className="flex flex-col items-center gap-4 py-16">
-      <Loader2 className="size-6 animate-spin text-primary" />
-      <p className="text-sm text-muted-foreground">
-        Subscribing to &ldquo;{preview.title || preview.feed_url}&rdquo;...
-      </p>
     </div>
   )
 }
