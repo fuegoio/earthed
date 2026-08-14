@@ -2,16 +2,17 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/danielgtaylor/huma/v2"
-	"github.com/google/uuid"
 
 	"github.com/fuegoio/planetary/go/api/internal/auth"
 	"github.com/fuegoio/planetary/go/api/internal/reader/fetcher"
@@ -62,6 +63,7 @@ func (a *API) RegisterRoutes() {
 	a.registerEntryRoutes()
 	a.registerTokenRoutes()
 	a.registerFeedListRoutes()
+	a.registerOPMLRoutes()
 }
 
 // --- Health ---
@@ -1014,5 +1016,213 @@ func (a *API) registerFeedListRoutes() {
 	})
 }
 
-// uuid import used by future OPML import/export
-var _ = uuid.New
+// --- OPML ---
+
+// opmlXML is the XML representation of an OPML document.
+type opmlXML struct {
+	XMLName xml.Name      `xml:"opml"`
+	Version string        `xml:"version,attr"`
+	Head    opmlHead      `xml:"head"`
+	Body    opmlBody      `xml:"body"`
+}
+
+type opmlHead struct {
+	Title string `xml:"title,omitempty"`
+}
+
+type opmlBody struct {
+	Outlines []opmlOutline `xml:"outline"`
+}
+
+type opmlOutline struct {
+	XMLURL  string        `xml:"xmlUrl,attr,omitempty"`
+	HTMLURL string        `xml:"htmlUrl,attr,omitempty"`
+	Title   string        `xml:"title,attr,omitempty"`
+	Text    string        `xml:"text,attr,omitempty"`
+	Type    string        `xml:"type,attr,omitempty"`
+	Outlines []opmlOutline `xml:"outline,omitempty"`
+}
+
+type OPMLExportOutput struct {
+	Body []byte
+}
+
+type OPMLImportInput struct {
+	RawBody []byte
+}
+
+type OPMLImportResult struct {
+	Body struct {
+		Imported int      `json:"imported"`
+		Skipped  int      `json:"skipped"`
+		Failed   int      `json:"failed"`
+		FeedIDs  []int    `json:"feed_ids"`
+		Errors   []string `json:"errors,omitempty"`
+	}
+}
+
+func (a *API) registerOPMLRoutes() {
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "export-opml",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/opml/export",
+		Summary:     "Export feeds as OPML",
+		Description: "Returns all feed subscriptions and categories as an OPML XML document.",
+		Tags:        []string{"opml"},
+	}, func(ctx context.Context, _ *struct{}) (*OPMLExportOutput, error) {
+		userID := auth.UserIDFromCtx(ctx)
+
+		feeds, err := a.store.ListFeeds(ctx, userID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		cats, err := a.store.ListCategories(ctx, userID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+
+		// Group feeds by category. Feeds without a category go into the root.
+		catMap := make(map[int][]store.Feed)
+		var uncategorized []store.Feed
+		for _, f := range feeds {
+			if f.CategoryID != nil {
+				catMap[*f.CategoryID] = append(catMap[*f.CategoryID], f)
+			} else {
+				uncategorized = append(uncategorized, f)
+			}
+		}
+
+		var outlines []opmlOutline
+		for _, c := range cats {
+			catFeeds := catMap[c.ID]
+			if len(catFeeds) == 0 {
+				continue
+			}
+			catOutline := opmlOutline{
+				Title:    c.Title,
+				Text:     c.Title,
+				Outlines: feedsToOutlines(catFeeds),
+			}
+			outlines = append(outlines, catOutline)
+		}
+		outlines = append(outlines, feedsToOutlines(uncategorized)...)
+
+		doc := opmlXML{
+			Version: "2.0",
+			Head:    opmlHead{Title: "Planetary Subscriptions"},
+			Body:    opmlBody{Outlines: outlines},
+		}
+
+		data, err := xml.MarshalIndent(doc, "", "  ")
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		data = append([]byte(xml.Header), data...)
+
+		return &OPMLExportOutput{Body: data}, nil
+	})
+
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "import-opml",
+		Method:      http.MethodPost,
+		Path:        "/api/v1/opml/import",
+		Summary:     "Import feeds from an OPML file",
+		Description: "Parses an OPML XML document and subscribes the user to all feeds found. Categories are created as needed. Existing subscriptions are skipped.",
+		Tags:        []string{"opml"},
+	}, func(ctx context.Context, input *OPMLImportInput) (*OPMLImportResult, error) {
+		userID := auth.UserIDFromCtx(ctx)
+
+		var doc opmlXML
+		decoder := xml.NewDecoder(bytes.NewReader(input.RawBody))
+		decoder.Strict = false
+		if err := decoder.Decode(&doc); err != nil {
+			return nil, huma.Error400BadRequest(fmt.Sprintf("invalid OPML: %s", err.Error()))
+		}
+
+		// Build category name → ID map from existing categories.
+		existingCats, err := a.store.ListCategories(ctx, userID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		catByName := make(map[string]int)
+		for _, c := range existingCats {
+			catByName[c.Title] = c.ID
+		}
+
+		result := OPMLImportResult{}
+		result.Body.FeedIDs = []int{}
+
+		getOrCreateCategory := func(name string) (*int, error) {
+			if name == "" {
+				return nil, nil
+			}
+			if id, ok := catByName[name]; ok {
+				return &id, nil
+			}
+			cat, err := a.store.CreateCategory(ctx, userID, name)
+			if err != nil {
+				return nil, err
+			}
+			catByName[name] = cat.ID
+			return &cat.ID, nil
+		}
+
+		var processOutlines func(outlines []opmlOutline, categoryName string)
+		processOutlines = func(outlines []opmlOutline, categoryName string) {
+			for _, o := range outlines {
+				if o.XMLURL != "" {
+					// Leaf node — a feed subscription.
+					var catID *int
+					if categoryName != "" {
+						c, err := getOrCreateCategory(categoryName)
+						if err != nil {
+							result.Body.Failed++
+							result.Body.Errors = append(result.Body.Errors, o.XMLURL+": "+err.Error())
+							continue
+						}
+						catID = c
+					}
+
+					feed, fErr := a.subscribeToFeed(ctx, userID, o.XMLURL, catID)
+					if fErr != nil {
+						result.Body.Failed++
+						result.Body.Errors = append(result.Body.Errors, o.XMLURL+": "+fErr.Error())
+						continue
+					}
+					result.Body.FeedIDs = append(result.Body.FeedIDs, feed.ID)
+					if feed.LastFetchAt == nil {
+						result.Body.Imported++
+					} else {
+						result.Body.Skipped++
+					}
+				} else {
+					// Container node — a category. Use its title, falling back to text.
+					name := o.Title
+					if name == "" {
+						name = o.Text
+					}
+					processOutlines(o.Outlines, name)
+				}
+			}
+		}
+
+		processOutlines(doc.Body.Outlines, "")
+
+		return &result, nil
+	})
+}
+
+// feedsToOutlines converts a slice of feeds to OPML outline elements.
+func feedsToOutlines(feeds []store.Feed) []opmlOutline {
+	outlines := make([]opmlOutline, 0, len(feeds))
+	for _, f := range feeds {
+		outlines = append(outlines, opmlOutline{
+			XMLURL:  f.FeedURL,
+			HTMLURL: f.SiteURL,
+			Title:   f.Title,
+			Text:    f.Title,
+			Type:    "rss",
+		})
+	}
+	return outlines
+}

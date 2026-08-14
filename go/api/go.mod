@@ -5,7 +5,6 @@ go 1.25.0
 require (
 	github.com/PuerkitoBio/goquery v1.10.1
 	github.com/danielgtaylor/huma/v2 v2.32.0
-	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.12.3
 	github.com/thecodearcher/limen v0.1.4

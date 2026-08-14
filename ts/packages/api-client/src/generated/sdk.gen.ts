@@ -2,7 +2,7 @@
 
 import { client } from './client.gen';
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client/index';
-import type { AddFeedListFeedData, AddFeedListFeedErrors, AddFeedListFeedResponses, CreateCategoryData, CreateCategoryErrors, CreateCategoryResponses, CreateFeedData, CreateFeedErrors, CreateFeedListData, CreateFeedListErrors, CreateFeedListResponses, CreateFeedResponses, CreateTokenData, CreateTokenErrors, CreateTokenResponses, DeleteCategoryData, DeleteCategoryErrors, DeleteCategoryResponses, DeleteFeedData, DeleteFeedErrors, DeleteFeedListData, DeleteFeedListErrors, DeleteFeedListResponses, DeleteFeedResponses, DeleteTokenData, DeleteTokenErrors, DeleteTokenResponses, DiscoverFeedListsData, DiscoverFeedListsErrors, DiscoverFeedListsResponses, FollowFeedListData, FollowFeedListErrors, FollowFeedListResponses, GetEntryData, GetEntryErrors, GetEntryResponses, GetFeedData, GetFeedErrors, GetFeedListData, GetFeedListErrors, GetFeedListResponses, GetFeedResponses, GetMeData, GetMeErrors, GetMeResponses, HealthData, HealthErrors, HealthResponses, ImportFeedListData, ImportFeedListErrors, ImportFeedListResponses, ListCategoriesData, ListCategoriesErrors, ListCategoriesResponses, ListEntriesData, ListEntriesErrors, ListEntriesResponses, ListFeedsData, ListFeedsErrors, ListFeedsResponses, ListFollowedFeedListsData, ListFollowedFeedListsErrors, ListFollowedFeedListsResponses, ListMyFeedListsData, ListMyFeedListsErrors, ListMyFeedListsResponses, ListTokensData, ListTokensErrors, ListTokensResponses, MarkFeedReadData, MarkFeedReadErrors, MarkFeedReadResponses, PreviewFeedData, PreviewFeedErrors, PreviewFeedResponses, RefreshFeedData, RefreshFeedErrors, RefreshFeedResponses, RemoveFeedListFeedData, RemoveFeedListFeedErrors, RemoveFeedListFeedResponses, ToggleEntryLikedData, ToggleEntryLikedErrors, ToggleEntryLikedResponses, ToggleEntryStarredData, ToggleEntryStarredErrors, ToggleEntryStarredResponses, UnfollowFeedListData, UnfollowFeedListErrors, UnfollowFeedListResponses, UpdateEntriesData, UpdateEntriesErrors, UpdateEntriesResponses, UpdateFeedListData, UpdateFeedListErrors, UpdateFeedListResponses } from './types.gen';
+import type { AddFeedListFeedData, AddFeedListFeedErrors, AddFeedListFeedResponses, CreateCategoryData, CreateCategoryErrors, CreateCategoryResponses, CreateFeedData, CreateFeedErrors, CreateFeedListData, CreateFeedListErrors, CreateFeedListResponses, CreateFeedResponses, CreateTokenData, CreateTokenErrors, CreateTokenResponses, DeleteCategoryData, DeleteCategoryErrors, DeleteCategoryResponses, DeleteFeedData, DeleteFeedErrors, DeleteFeedListData, DeleteFeedListErrors, DeleteFeedListResponses, DeleteFeedResponses, DeleteTokenData, DeleteTokenErrors, DeleteTokenResponses, DiscoverFeedListsData, DiscoverFeedListsErrors, DiscoverFeedListsResponses, ExportOpmlData, ExportOpmlErrors, ExportOpmlResponses, FollowFeedListData, FollowFeedListErrors, FollowFeedListResponses, GetEntryData, GetEntryErrors, GetEntryResponses, GetFeedData, GetFeedErrors, GetFeedListData, GetFeedListErrors, GetFeedListResponses, GetFeedResponses, GetMeData, GetMeErrors, GetMeResponses, HealthData, HealthErrors, HealthResponses, ImportFeedListData, ImportFeedListErrors, ImportFeedListResponses, ImportOpmlData, ImportOpmlErrors, ImportOpmlResponses, ListCategoriesData, ListCategoriesErrors, ListCategoriesResponses, ListEntriesData, ListEntriesErrors, ListEntriesResponses, ListFeedsData, ListFeedsErrors, ListFeedsResponses, ListFollowedFeedListsData, ListFollowedFeedListsErrors, ListFollowedFeedListsResponses, ListMyFeedListsData, ListMyFeedListsErrors, ListMyFeedListsResponses, ListTokensData, ListTokensErrors, ListTokensResponses, MarkFeedReadData, MarkFeedReadErrors, MarkFeedReadResponses, PreviewFeedData, PreviewFeedErrors, PreviewFeedResponses, RefreshFeedData, RefreshFeedErrors, RefreshFeedResponses, RemoveFeedListFeedData, RemoveFeedListFeedErrors, RemoveFeedListFeedResponses, ToggleEntryLikedData, ToggleEntryLikedErrors, ToggleEntryLikedResponses, ToggleEntryStarredData, ToggleEntryStarredErrors, ToggleEntryStarredResponses, UnfollowFeedListData, UnfollowFeedListErrors, UnfollowFeedListResponses, UpdateEntriesData, UpdateEntriesErrors, UpdateEntriesResponses, UpdateFeedListData, UpdateFeedListErrors, UpdateFeedListResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -229,6 +229,28 @@ export const health = <ThrowOnError extends boolean = false>(options?: Options<H
  * Get current user
  */
 export const getMe = <ThrowOnError extends boolean = false>(options?: Options<GetMeData, ThrowOnError>): RequestResult<GetMeResponses, GetMeErrors, ThrowOnError> => (options?.client ?? client).get<GetMeResponses, GetMeErrors, ThrowOnError>({ url: '/api/v1/me', ...options });
+
+/**
+ * Export feeds as OPML
+ *
+ * Returns all feed subscriptions and categories as an OPML XML document.
+ */
+export const exportOpml = <ThrowOnError extends boolean = false>(options?: Options<ExportOpmlData, ThrowOnError>): RequestResult<ExportOpmlResponses, ExportOpmlErrors, ThrowOnError> => (options?.client ?? client).get<ExportOpmlResponses, ExportOpmlErrors, ThrowOnError>({ url: '/api/v1/opml/export', ...options });
+
+/**
+ * Import feeds from an OPML file
+ *
+ * Parses an OPML XML document and subscribes the user to all feeds found. Categories are created as needed. Existing subscriptions are skipped.
+ */
+export const importOpml = <ThrowOnError extends boolean = false>(options: Options<ImportOpmlData, ThrowOnError>): RequestResult<ImportOpmlResponses, ImportOpmlErrors, ThrowOnError> => (options.client ?? client).post<ImportOpmlResponses, ImportOpmlErrors, ThrowOnError>({
+    bodySerializer: null,
+    url: '/api/v1/opml/import',
+    ...options,
+    headers: {
+        'Content-Type': 'application/octet-stream',
+        ...options.headers
+    }
+});
 
 /**
  * List API tokens

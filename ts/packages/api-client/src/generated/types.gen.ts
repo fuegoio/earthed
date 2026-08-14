@@ -219,6 +219,18 @@ export type ImportFeedListResponse = {
     skipped: number;
 };
 
+export type OpmlImportResultBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    errors?: Array<string> | null;
+    failed: number;
+    feed_ids: Array<number> | null;
+    imported: number;
+    skipped: number;
+};
+
 export type PreviewFeedBody = {
     /**
      * A URL to the JSON Schema for this object.
@@ -433,6 +445,14 @@ export type HealthResponseWritable = {
 };
 
 export type ImportFeedListResponseWritable = {
+    errors?: Array<string> | null;
+    failed: number;
+    feed_ids: Array<number> | null;
+    imported: number;
+    skipped: number;
+};
+
+export type OpmlImportResultBodyWritable = {
     errors?: Array<string> | null;
     failed: number;
     feed_ids: Array<number> | null;
@@ -1255,6 +1275,56 @@ export type GetMeResponses = {
 };
 
 export type GetMeResponse = GetMeResponses[keyof GetMeResponses];
+
+export type ExportOpmlData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/opml/export';
+};
+
+export type ExportOpmlErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type ExportOpmlError = ExportOpmlErrors[keyof ExportOpmlErrors];
+
+export type ExportOpmlResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type ExportOpmlResponse = ExportOpmlResponses[keyof ExportOpmlResponses];
+
+export type ImportOpmlData = {
+    body: Blob | File;
+    path?: never;
+    query?: never;
+    url: '/api/v1/opml/import';
+};
+
+export type ImportOpmlErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type ImportOpmlError = ImportOpmlErrors[keyof ImportOpmlErrors];
+
+export type ImportOpmlResponses = {
+    /**
+     * OK
+     */
+    200: OpmlImportResultBody;
+};
+
+export type ImportOpmlResponse = ImportOpmlResponses[keyof ImportOpmlResponses];
 
 export type ListTokensData = {
     body?: never;

@@ -695,6 +695,59 @@ export const Import_feed_listResponseSchema = {
     type: 'object'
 } as const;
 
+export const OPMLImportResultBodySchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/OPMLImportResultBody.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        errors: {
+            items: {
+                type: 'string'
+            },
+            type: [
+                'array',
+                'null'
+            ]
+        },
+        failed: {
+            format: 'int64',
+            type: 'integer'
+        },
+        feed_ids: {
+            items: {
+                format: 'int64',
+                type: 'integer'
+            },
+            type: [
+                'array',
+                'null'
+            ]
+        },
+        imported: {
+            format: 'int64',
+            type: 'integer'
+        },
+        skipped: {
+            format: 'int64',
+            type: 'integer'
+        }
+    },
+    required: [
+        'imported',
+        'skipped',
+        'failed',
+        'feed_ids'
+    ],
+    type: 'object'
+} as const;
+
 export const PreviewFeedBodySchema = {
     additionalProperties: false,
     properties: {
@@ -1444,6 +1497,50 @@ export const HealthResponseWritableSchema = {
 } as const;
 
 export const Import_feed_listResponseWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        errors: {
+            items: {
+                type: 'string'
+            },
+            type: [
+                'array',
+                'null'
+            ]
+        },
+        failed: {
+            format: 'int64',
+            type: 'integer'
+        },
+        feed_ids: {
+            items: {
+                format: 'int64',
+                type: 'integer'
+            },
+            type: [
+                'array',
+                'null'
+            ]
+        },
+        imported: {
+            format: 'int64',
+            type: 'integer'
+        },
+        skipped: {
+            format: 'int64',
+            type: 'integer'
+        }
+    },
+    required: [
+        'imported',
+        'skipped',
+        'failed',
+        'feed_ids'
+    ],
+    type: 'object'
+} as const;
+
+export const OPMLImportResultBodyWritableSchema = {
     additionalProperties: false,
     properties: {
         errors: {
