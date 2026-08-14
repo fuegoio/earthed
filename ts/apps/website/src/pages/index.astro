@@ -1,0 +1,565 @@
+---
+import Base from "../layouts/Base.astro"
+import Logo from "../components/Logo.astro"
+
+// CTA targets — reasonable defaults, wire to real endpoints later.
+const loginUrl = "https://app.planetary.dev"
+const selfHostUrl = "https://github.com/planetary-dev/planetary"
+---
+
+<Base>
+  <a href="#positioning-heading" class="skip-link">Skip to content</a>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       HERO — the dawn
+       A deep warm sky. The sun (logo) rises from the left.
+       "Planetary" appears as the light blooms. Then the tagline and CTAs.
+  ═════════════════════════════════════════════════════════════════ -->
+  <section class="hero" aria-label="Hero">
+    <!-- Sky layers: base deep sky, warming layer (fades in as sun rises) -->
+    <div class="sky-base" aria-hidden="true"></div>
+    <div class="sky-warm-layer sky-warm" aria-hidden="true"></div>
+
+    <!-- Drifting dawn haze low on the horizon -->
+    <div class="haze haze-layer" aria-hidden="true"></div>
+
+    <!-- The sun's glow, blooming behind the logo -->
+    <div class="sun-glow" aria-hidden="true"></div>
+
+    <!-- The sun itself -->
+    <div class="sun-wrap">
+      <Logo class="sun-logo-mark" />
+    </div>
+
+    <!-- Wordmark + tagline + CTAs -->
+    <div class="hero-content">
+      <h1 class="wordmark">Planetary</h1>
+      <p class="tagline">
+        A modern, self-hostable RSS reader. Clean API, multiple
+        interfaces, one timeline.
+      </p>
+
+      <div class="cta-row">
+        <a class="cta cta-primary" href={loginUrl}>
+          <span>Login</span>
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path
+              d="M4.5 10h11m0 0-4.5-4.5M15.5 10 11 14.5"
+              stroke="currentColor"
+              stroke-width="1.75"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
+          </svg>
+        </a>
+        <a class="cta cta-secondary" href={selfHostUrl}>
+          Self-host
+        </a>
+      </div>
+    </div>
+
+    <!-- Scroll cue -->
+    <div class="scroll-cue" aria-hidden="true">
+      <svg width="20" height="32" viewBox="0 0 20 32" fill="none">
+        <rect
+          x="0.5"
+          y="0.5"
+          width="19"
+          height="31"
+          rx="9.5"
+          stroke="currentColor"
+          stroke-opacity="0.4"></rect>
+        <circle cx="10" cy="9" r="2" fill="currentColor">
+          <animate
+            attributeName="cy"
+            values="9;20;9"
+            dur="2.4s"
+            repeatCount="indefinite"
+            calcMode="spline"
+            keySplines="0.4 0 0.2 1; 0.4 0 0.2 1"
+            keyTimes="0;0.5;1"></animate>
+        </circle>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       BELOW THE FOLD — reading-first positioning
+       Prose carries the message. A CLI sample shows the product.
+  ═════════════════════════════════════════════════════════════════ -->
+  <section class="positioning" aria-labelledby="positioning-heading">
+    <div class="positioning-inner">
+      <p class="kicker">The reader</p>
+      <h2 id="positioning-heading" class="positioning-headline">
+        Your feeds, your terms.
+      </h2>
+
+      <div class="positioning-body">
+        <p>
+          Planetary fetches RSS 2.0, Atom, RDF, and JSON Feed into a single
+          timeline you actually want to read. No ads, no tracking, no
+          algorithm deciding what reaches you. Just the sources you chose,
+          in a calm space built for reading.
+        </p>
+        <p>
+          It's self-hostable: run it on your own machine and own your data
+          end to end. Or use the hosted version and skip the setup. Either
+          way, the same clean REST API and the same interfaces (web,
+          terminal, and CLI) connect you to your feeds from wherever you
+          work.
+        </p>
+      </div>
+
+      <!-- A CLI sample shows the product, not a restatement of the prose -->
+      <div class="code-sample" role="region" aria-label="Planetary CLI sample">
+        <div class="code-tabbar" aria-hidden="true">
+          <span class="code-dot"></span>
+          <span class="code-dot"></span>
+          <span class="code-dot"></span>
+          <span class="code-label">terminal</span>
+        </div>
+        <pre class="code-body"><code><span class="code-prompt">$</span> planetary feeds add https://example.com/feed.xml
+<span class="code-prompt">$</span> planetary list --unread
+<span class="code-comment"># 3 unread in Technology</span>
+  planet4.local  Rust 2026 roadmap
+  planet4.local  The end of Moore's law (again)
+  planet4.local  Why RSS still matters
+
+<span class="code-prompt">$</span> planetary read 1 --open</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       FOOTER
+  ═════════════════════════════════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <Logo class="footer-mark" static />
+        <span>Planetary</span>
+      </div>
+      <nav class="footer-nav" aria-label="Footer">
+        <a href={loginUrl}>Login</a>
+        <a href={selfHostUrl}>Self-host</a>
+        <a href="https://planetary.dev/docs">Docs</a>
+      </nav>
+      <p class="footer-note">
+        Open source. Self-hostable. Built for people who still read.
+      </p>
+    </div>
+  </footer>
+</Base>
+
+<style>
+  /* ── Skip link ────────────────────────────────────────────────── */
+
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 1rem;
+    z-index: 100;
+    padding: 0.625rem 1.25rem;
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: top 0.2s ease;
+  }
+
+  .skip-link:focus {
+    top: 1rem;
+  }
+
+  /* ── Hero ─────────────────────────────────────────────────────── */
+
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  /* Base sky — deep warm near-black */
+  .sky-base {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(
+        ellipse 90% 70% at 50% 85%,
+        oklch(0.22 0.045 60) 0%,
+        oklch(0.16 0.028 55) 40%,
+        oklch(0.12 0.018 55) 100%
+      );
+  }
+
+  /* Warming layer — fades in as the sun rises, tints the sky warmer */
+  .sky-warm {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      radial-gradient(
+        ellipse 60% 50% at 50% 60%,
+        oklch(0.3 0.08 65 / 0.35) 0%,
+        oklch(0.25 0.05 60 / 0.15) 35%,
+        transparent 70%
+      );
+    pointer-events: none;
+  }
+
+  /* Dawn haze — drifting low near the horizon */
+  .haze {
+    position: absolute;
+    bottom: -10%;
+    left: -10%;
+    right: -10%;
+    height: 45%;
+    z-index: 2;
+    background:
+      radial-gradient(
+        ellipse 80% 100% at 50% 100%,
+        oklch(0.32 0.07 65 / 0.18) 0%,
+        oklch(0.28 0.05 60 / 0.08) 40%,
+        transparent 75%
+      );
+    filter: blur(20px);
+    pointer-events: none;
+  }
+
+  /* The glow behind the sun */
+  .sun-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -55%);
+    width: clamp(280px, 50vw, 560px);
+    height: clamp(280px, 50vw, 560px);
+    z-index: 3;
+    border-radius: 50%;
+    background:
+      radial-gradient(
+        circle at center,
+        color-mix(in oklab, var(--color-sun-glow) 45%, transparent) 0%,
+        color-mix(in oklab, var(--primary) 25%, transparent) 30%,
+        color-mix(in oklab, var(--color-sun-deep) 10%, transparent) 55%,
+        transparent 70%
+      );
+    filter: blur(8px);
+    pointer-events: none;
+  }
+
+  /* The sun logo */
+  .sun-wrap {
+    position: relative;
+    z-index: 4;
+    width: clamp(120px, 18vw, 200px);
+    height: clamp(120px, 18vw, 200px);
+    margin-bottom: clamp(2rem, 5vh, 3.5rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sun-logo-mark {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 50px color-mix(in oklab, var(--primary) 40%, transparent));
+  }
+
+  /* Content — wordmark, tagline, CTAs */
+  .hero-content {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0 1.5rem;
+    max-width: 42rem;
+  }
+
+  .wordmark {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(3.5rem, 13vw, 7rem);
+    line-height: 1;
+    letter-spacing: -0.045em;
+    color: oklch(0.97 0.015 79);
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .tagline {
+    margin: 1.5rem 0 0;
+    font-size: clamp(1.0625rem, 2.5vw, 1.375rem);
+    line-height: 1.55;
+    color: oklch(0.82 0.025 79);
+    max-width: 32rem;
+    font-weight: 400;
+    text-wrap: pretty;
+  }
+
+  /* CTAs */
+  .cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.875rem;
+    margin-top: 2.5rem;
+  }
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    border-radius: 0.625rem;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1;
+    transition:
+      transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 0.2s ease,
+      border-color 0.2s ease;
+    min-height: 48px;
+  }
+
+  .cta-primary {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .cta-primary:hover {
+    background-color: var(--color-sun-glow);
+    transform: translateY(-1px);
+  }
+
+  .cta-primary:active {
+    transform: translateY(0);
+  }
+
+  .cta-secondary {
+    background-color: transparent;
+    color: oklch(0.92 0.015 79);
+    border: 1px solid oklch(0.6 0.02 79 / 0.35);
+  }
+
+  .cta-secondary:hover {
+    border-color: oklch(0.7 0.03 79 / 0.6);
+    background-color: oklch(0.3 0.01 79 / 0.3);
+    transform: translateY(-1px);
+  }
+
+  .cta-secondary:active {
+    transform: translateY(0);
+  }
+
+  /* Scroll cue */
+  .scroll-cue {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    color: oklch(0.7 0.02 79);
+    opacity: 0.6;
+  }
+
+  /* ── Positioning section ───────────────────────────────────────── */
+
+  .positioning {
+    background-color: var(--paper);
+    color: var(--ink);
+    padding: clamp(5rem, 12vh, 9rem) 1.5rem;
+  }
+
+  .positioning-inner {
+    max-width: 44rem;
+    margin: 0 auto;
+  }
+
+  .kicker {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: color-mix(in oklab, var(--primary) 85%, var(--foreground));
+    margin: 0 0 1rem;
+    letter-spacing: 0.02em;
+  }
+
+  .positioning-headline {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2.25rem, 6vw, 3.75rem);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    margin: 0 0 2.5rem;
+    text-wrap: balance;
+  }
+
+  .positioning-body {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    max-width: 38rem;
+  }
+
+  .positioning-body p {
+    margin: 0;
+  }
+
+  .positioning-body p + p {
+    margin-top: 1.25rem;
+  }
+
+  /* ── Code sample ─────────────────────────────────────────────── */
+
+  .code-sample {
+    margin-top: clamp(3.5rem, 8vh, 5rem);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    border: 1px solid var(--rule);
+    background-color: oklch(0.18 0.006 79);
+  }
+
+  .code-tabbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid oklch(0.28 0.006 79);
+  }
+
+  .code-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background-color: oklch(0.3 0.006 79);
+  }
+
+  .code-dot:nth-child(1) {
+    background-color: oklch(0.6 0.1 25);
+  }
+
+  .code-dot:nth-child(2) {
+    background-color: oklch(0.62 0.14 85);
+  }
+
+  .code-dot:nth-child(3) {
+    background-color: oklch(0.62 0.12 145);
+  }
+
+  .code-label {
+    margin-left: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: oklch(0.6 0.006 79);
+  }
+
+  .code-body {
+    margin: 0;
+    padding: 1.25rem 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    color: oklch(0.85 0.006 79);
+    overflow-x: auto;
+  }
+
+  .code-prompt {
+    color: oklch(0.62 0.18 78.8);
+    font-weight: 600;
+  }
+
+  .code-comment {
+    color: oklch(0.5 0.006 79);
+  }
+
+  /* ── Footer ──────────────────────────────────────────────────── */
+
+  .site-footer {
+    background-color: var(--muted);
+    border-top: 1px solid var(--rule);
+    padding: 3rem 1.5rem;
+  }
+
+  .footer-inner {
+    max-width: 44rem;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    text-align: center;
+  }
+
+  .footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.125rem;
+    color: var(--ink);
+  }
+
+  .footer-mark {
+    width: 1.5rem;
+    height: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .footer-mark :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .footer-nav {
+    display: flex;
+    gap: 1.75rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+
+  .footer-nav a {
+    color: var(--ink-soft);
+    transition: color 0.15s ease;
+  }
+
+  .footer-nav a:hover {
+    color: var(--ink);
+  }
+
+  .footer-note {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+    max-width: 30rem;
+  }
+
+  /* ── Responsive tweaks ────────────────────────────────────────── */
+
+  @media (max-width: 640px) {
+    .cta-row {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .cta {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .scroll-cue {
+      display: none;
+    }
+  }
+</style>
