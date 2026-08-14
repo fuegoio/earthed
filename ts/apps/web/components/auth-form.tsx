@@ -57,16 +57,16 @@ export function AuthForm({ mode }: { mode: Mode }) {
           toast.error(signupError)
           return
         }
-      }
-
-      const { error: signinError } = await signin({
-        email: values.email,
-        password: values.password,
-      })
-      if (signinError) {
-        toast.error(signinError)
-        if (isSignup) router.push("/login")
-        return
+        // Signup auto-signs-in (Limen sets the session cookie)
+      } else {
+        const { error: signinError } = await signin({
+          email: values.email,
+          password: values.password,
+        })
+        if (signinError) {
+          toast.error(signinError)
+          return
+        }
       }
 
       router.push(redirect)

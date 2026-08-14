@@ -48,14 +48,17 @@ export async function signin(values: {
   email: string
   password: string
 }): Promise<AuthResult> {
-  return authFetch("/api/auth/signin", values)
+  return authFetch("/api/auth/signin/credential", {
+    credential: values.email,
+    password: values.password,
+  })
 }
 
 export async function signup(values: {
   email: string
   password: string
 }): Promise<AuthResult> {
-  return authFetch("/api/auth/signup", values)
+  return authFetch("/api/auth/signup/credential", values)
 }
 
 export async function signout(): Promise<void> {
