@@ -1,21 +1,69 @@
-# shadcn/ui monorepo template
+# Planetary
 
-This is a Next.js monorepo template with shadcn/ui.
+A self-hosted RSS reader.
 
-## Adding components
+## Repository structure
 
-To add components to your app, run the following command at the root of your `web` app:
-
-```bash
-pnpm dlx shadcn@latest add button -c apps/web
+```
+planetary/
+├── go/                      # Go (API server, SDK, CLI/TUI)
+│   ├── go.work              # Go workspace — links all modules
+│   ├── api/                 # API server (huma, PostgreSQL)
+│   ├── sdk/                 # Go client generated from OpenAPI (oapi-codegen)
+│   └── cli/                 # CLI + TUI (cobra, bubbletea)
+├── ts/                      # TypeScript (web, docs, shared packages)
+│   ├── apps/
+│   │   ├── web/             # Next.js frontend
+│   │   └── docs/            # Fumadocs documentation site
+│   └── packages/
+│       ├── api-client/      # TS client generated from OpenAPI (openapi-ts)
+│       ├── ui/              # Shared UI components
+│       ├── eslint-config/
+│       └── typescript-config/
+├── Makefile                 # Root orchestration (make gen, make dev, ...)
+└── .github/workflows/       # CI
 ```
 
-This will place the ui components in the `packages/ui/src/components` directory.
+## Quick start
 
-## Using components
+### Prerequisites
 
-To use the components in your app, import them from the `ui` package.
+- Go 1.25+
+- Node.js 20+ with pnpm 10+
+- PostgreSQL 16+ (or Docker for local dev)
 
-```tsx
-import { Button } from "@workspace/ui/components/button";
+### API server
+
+```bash
+cd go/api
+make db-up          # start PostgreSQL via docker compose
+make migrate        # run database migrations
+make run            # start the API server on :8080
+```
+
+### CLI
+
+```bash
+cd go/cli
+make build
+./planetary config set base_url http://localhost:8080
+./planetary config set token <your-api-token>
+./planetary feeds list
+./planetary-tui      # interactive TUI
+```
+
+### Web frontend
+
+```bash
+cd ts
+pnpm install
+pnpm dev
+```
+
+### Code generation
+
+Both the Go SDK and TS client are generated from the OpenAPI spec:
+
+```bash
+make gen             # from repo root — regenerates spec + both clients
 ```

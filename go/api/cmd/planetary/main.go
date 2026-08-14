@@ -1,0 +1,150 @@
+// Package main implements the Planetary API server entry point.
+package main
+
+import (
+	"context"
+	"database/sql"
+	"flag"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"time"
+
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/danielgtaylor/huma/v2/adapters/humago"
+	"github.com/joho/godotenv"
+
+	"github.com/fuegoio/planetary/go/api/internal/api"
+	"github.com/fuegoio/planetary/go/api/internal/auth"
+	"github.com/fuegoio/planetary/go/api/internal/config"
+	"github.com/fuegoio/planetary/go/api/internal/cors"
+	"github.com/fuegoio/planetary/go/api/internal/httplog"
+	"github.com/fuegoio/planetary/go/api/internal/logging"
+	"github.com/fuegoio/planetary/go/api/internal/migrations"
+	"github.com/fuegoio/planetary/go/api/internal/reader/fetcher"
+	"github.com/fuegoio/planetary/go/api/internal/reader/processor"
+	"github.com/fuegoio/planetary/go/api/internal/scheduler"
+	"github.com/fuegoio/planetary/go/api/internal/store"
+	"github.com/fuegoio/planetary/go/api/internal/worker"
+
+	_ "github.com/lib/pq"
+)
+
+func main() {
+	code, err := run()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if code != 0 {
+		os.Exit(code)
+	}
+}
+
+func run() (int, error) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	migrateOnly := flag.Bool("migrate", false, "Run migrations and exit")
+	dumpOpenAPI := flag.Bool("openapi", false, "Print OpenAPI spec as JSON and exit")
+	flag.Parse()
+
+	if err := godotenv.Load(); err != nil && !os.IsNotExist(err) {
+		log.Printf("env: %v", err)
+	}
+
+	// The OpenAPI spec is derived from huma operations + struct tags alone.
+	// Short-circuit before any DB or auth dependency so --openapi works without
+	// a running Postgres or a LIMEN_SECRET.
+	if *dumpOpenAPI {
+		humaMux := http.NewServeMux()
+		humaConfig := huma.DefaultConfig("Planetary API", "1.0.0")
+		humaConfig.Servers = []*huma.Server{{URL: "/api"}}
+		humaConfig.Tags = api.OpenAPITags()
+		humaRouter := humago.New(humaMux, humaConfig)
+
+		apiHandler := api.New(humaRouter, nil, nil)
+		apiHandler.RegisterRoutes()
+
+		b, err := humaRouter.OpenAPI().MarshalJSON()
+		if err != nil {
+			return 0, fmt.Errorf("marshal openapi: %w", err)
+		}
+		fmt.Println(string(b))
+		return 0, nil
+	}
+
+	cfg, err := config.Load()
+	if err != nil {
+		return 0, fmt.Errorf("config: %w", err)
+	}
+
+	if _, err := logging.Init(cfg.LogFormat, os.Stderr); err != nil {
+		return 0, fmt.Errorf("logging: %w", err)
+	}
+
+	db, err := sql.Open("postgres", cfg.DatabaseURL)
+	if err != nil {
+		return 0, fmt.Errorf("open db: %w", err)
+	}
+	defer func() { _ = db.Close() }()
+
+	db.SetMaxOpenConns(25)
+	db.SetMaxIdleConns(5)
+	db.SetConnMaxLifetime(5 * time.Minute)
+
+	if err := db.Ping(); err != nil {
+		return 0, fmt.Errorf("ping db: %w", err)
+	}
+
+	if err := migrations.Run(db); err != nil {
+		return 0, fmt.Errorf("migrate: %w", err)
+	}
+
+	if *migrateOnly {
+		log.Println("migrations complete")
+		return 0, nil
+	}
+
+	st := store.New(db)
+	authInst, err := auth.New(cfg, db, st)
+	if err != nil {
+		return 0, fmt.Errorf("auth: %w", err)
+	}
+
+	humaMux := http.NewServeMux()
+	humaConfig := huma.DefaultConfig("Planetary API", "1.0.0")
+	humaConfig.Servers = []*huma.Server{{URL: "/api"}}
+	humaConfig.Tags = api.OpenAPITags()
+	humaRouter := humago.New(humaMux, humaConfig)
+
+	apiHandler := api.New(humaRouter, st, authInst)
+	apiHandler.RegisterRoutes()
+
+	mux := http.NewServeMux()
+
+	mux.Handle("/api/auth/", authInst.Handler())
+	mux.Handle("/api/", authInst.Middleware(humaMux))
+	mux.Handle("/docs", humaRouter.Adapter())
+	mux.Handle("/openapi.json", humaRouter.Adapter())
+
+	if !cfg.DisableSched {
+		f := fetcher.New(cfg.HTTPTimeout, cfg.HTTPMaxBody, "Planetary/1.0")
+		proc := processor.New(st, f)
+		pool := worker.New(proc, cfg.WorkerPool)
+		sched := scheduler.New(st, pool, cfg.PollingFreq, cfg.BatchSize)
+		go sched.Start(ctx)
+	}
+
+	log.Printf("HTTP server listening on %s", cfg.HTTPAddr)
+	srv := &http.Server{
+		Addr:              cfg.HTTPAddr,
+		Handler:           httplog.Middleware(cors.Middleware(mux)),
+		ReadHeaderTimeout: 10 * time.Second,
+	}
+
+	if err := srv.ListenAndServe(); err != nil {
+		return 0, fmt.Errorf("server: %w", err)
+	}
+	return 0, nil
+}
