@@ -45,6 +45,26 @@ function SidebarNav() {
   )
 }
 
+function faviconUrl(siteUrl: string): string {
+  return `https://www.google.com/s2/favicons?domain=${siteUrl}&sz=64`
+}
+
+function FeedIcon({ siteUrl }: { siteUrl: string }) {
+  if (siteUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={faviconUrl(siteUrl)}
+        alt=""
+        className="size-3.5 shrink-0 rounded-sm"
+        width={14}
+        height={14}
+      />
+    )
+  }
+  return <Rss className="size-3.5 shrink-0 text-muted-foreground" />
+}
+
 function FeedList({ feeds }: { feeds: Feed[] }) {
   if (feeds.length === 0) {
     return (
@@ -66,7 +86,7 @@ function FeedList({ feeds }: { feeds: Feed[] }) {
               "transition-colors truncate"
             )}
           >
-            <Rss className="size-3.5 shrink-0 text-muted-foreground" />
+            <FeedIcon siteUrl={feed.site_url ?? ""} />
             <span className="truncate">{feed.title}</span>
           </Link>
         </li>
