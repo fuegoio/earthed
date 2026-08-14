@@ -5,13 +5,14 @@
  */
 interface Props {
   class?: string
+  static?: boolean
 }
 
-const { class: className } = Astro.props
+const { class: className, static: isStatic = false } = Astro.props
 ---
 
 <svg
-  class:list={["sun-settled", className]}
+  class:list={[isStatic ? undefined : "sun-settled", className]}
   viewBox="0 0 615 615"
   fill="none"
   xmlns="http://www.w3.org/2000/svg"

@@ -8,13 +8,15 @@ const selfHostUrl = "https://github.com/planetary-dev/planetary"
 ---
 
 <Base>
+  <a href="#positioning-heading" class="skip-link">Skip to content</a>
+
   <!-- ════════════════════════════════════════════════════════════════
        HERO — the dawn
-       A deep warm sky. The sun (logo) rises from below the horizon.
+       A deep warm sky. The sun (logo) rises from the left.
        "Planetary" appears as the light blooms. Then the tagline and CTAs.
   ═════════════════════════════════════════════════════════════════ -->
-  <section class="hero" aria-label="Planetary">
-    <!-- Sky layers: base deep sky → warming layer (fades in as sun rises) -->
+  <section class="hero" aria-label="Hero">
+    <!-- Sky layers: base deep sky, warming layer (fades in as sun rises) -->
     <div class="sky-base" aria-hidden="true"></div>
     <div class="sky-warm-layer sky-warm" aria-hidden="true"></div>
 
@@ -82,8 +84,7 @@ const selfHostUrl = "https://github.com/planetary-dev/planetary"
 
   <!-- ════════════════════════════════════════════════════════════════
        BELOW THE FOLD — reading-first positioning
-       No card grid, no feature dump. A single column of prose that
-       earns its scroll.
+       Prose carries the message. A CLI sample shows the product.
   ═════════════════════════════════════════════════════════════════ -->
   <section class="positioning" aria-labelledby="positioning-heading">
     <div class="positioning-inner">
@@ -102,35 +103,28 @@ const selfHostUrl = "https://github.com/planetary-dev/planetary"
         <p>
           It's self-hostable: run it on your own machine and own your data
           end to end. Or use the hosted version and skip the setup. Either
-          way, the same clean REST API and the same interfaces — web,
-          terminal, and CLI — connect you to your feeds from wherever you
+          way, the same clean REST API and the same interfaces (web,
+          terminal, and CLI) connect you to your feeds from wherever you
           work.
         </p>
       </div>
 
-      <!-- A quiet three-up, not a card grid -->
-      <div class="triad">
-        <div class="triad-item">
-          <h3>One timeline</h3>
-          <p>
-            Every format — RSS, Atom, RDF, JSON Feed — normalized into a
-            single, readable stream.
-          </p>
+      <!-- A CLI sample shows the product, not a restatement of the prose -->
+      <div class="code-sample" role="region" aria-label="Planetary CLI sample">
+        <div class="code-tabbar" aria-hidden="true">
+          <span class="code-dot"></span>
+          <span class="code-dot"></span>
+          <span class="code-dot"></span>
+          <span class="code-label">terminal</span>
         </div>
-        <div class="triad-item">
-          <h3>Everywhere you work</h3>
-          <p>
-            A pleasant web reader, plus a CLI and TUI for the terminal.
-            One account, every surface.
-          </p>
-        </div>
-        <div class="triad-item">
-          <h3>Yours to run</h3>
-          <p>
-            Self-host with a single binary and own your data — or use the
-            hosted version. No lock-in either way.
-          </p>
-        </div>
+        <pre class="code-body"><code><span class="code-prompt">$</span> planetary feeds add https://example.com/feed.xml
+<span class="code-prompt">$</span> planetary list --unread
+<span class="code-comment"># 3 unread in Technology</span>
+  planet4.local  Rust 2026 roadmap
+  planet4.local  The end of Moore's law (again)
+  planet4.local  Why RSS still matters
+
+<span class="code-prompt">$</span> planetary read 1 --open</code></pre>
       </div>
     </div>
   </section>
@@ -141,16 +135,12 @@ const selfHostUrl = "https://github.com/planetary-dev/planetary"
   <footer class="site-footer">
     <div class="footer-inner">
       <div class="footer-brand">
-        <span class="footer-mark" aria-hidden="true">
-          <svg width="24" height="24" viewBox="0 0 615 615" fill="none">
-            <circle cx="308" cy="307" r="160" fill="var(--primary)" />
-          </svg>
-        </span>
+        <Logo class="footer-mark" static />
         <span>Planetary</span>
       </div>
       <nav class="footer-nav" aria-label="Footer">
         <a href={loginUrl}>Login</a>
-        <a href={selfHostUrl}>GitHub</a>
+        <a href={selfHostUrl}>Self-host</a>
         <a href="https://planetary.dev/docs">Docs</a>
       </nav>
       <p class="footer-note">
@@ -161,12 +151,32 @@ const selfHostUrl = "https://github.com/planetary-dev/planetary"
 </Base>
 
 <style>
+  /* ── Skip link ────────────────────────────────────────────────── */
+
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 1rem;
+    z-index: 100;
+    padding: 0.625rem 1.25rem;
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: top 0.2s ease;
+  }
+
+  .skip-link:focus {
+    top: 1rem;
+  }
+
   /* ── Hero ─────────────────────────────────────────────────────── */
 
   .hero {
     position: relative;
-    min-height: 100svh;
     min-height: 100vh;
+    min-height: 100svh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -417,28 +427,67 @@ const selfHostUrl = "https://github.com/planetary-dev/planetary"
     margin-top: 1.25rem;
   }
 
-  /* The triad — not a card grid, a quiet three-up */
-  .triad {
-    margin-top: clamp(3.5rem, 8vh, 5.5rem);
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 2.5rem 2rem;
+  /* ── Code sample ─────────────────────────────────────────────── */
+
+  .code-sample {
+    margin-top: clamp(3.5rem, 8vh, 5rem);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    border: 1px solid var(--rule);
+    background-color: oklch(0.18 0.006 79);
   }
 
-  .triad-item h3 {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 1.25rem;
-    margin: 0 0 0.625rem;
-    letter-spacing: -0.01em;
+  .code-tabbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid oklch(0.28 0.006 79);
   }
 
-  .triad-item p {
+  .code-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background-color: oklch(0.3 0.006 79);
+  }
+
+  .code-dot:nth-child(1) {
+    background-color: oklch(0.6 0.1 25);
+  }
+
+  .code-dot:nth-child(2) {
+    background-color: oklch(0.62 0.14 85);
+  }
+
+  .code-dot:nth-child(3) {
+    background-color: oklch(0.62 0.12 145);
+  }
+
+  .code-label {
+    margin-left: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: oklch(0.6 0.006 79);
+  }
+
+  .code-body {
     margin: 0;
-    color: var(--ink-soft);
-    font-size: 1rem;
-    line-height: 1.6;
-    max-width: 28ch;
+    padding: 1.25rem 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    color: oklch(0.85 0.006 79);
+    overflow-x: auto;
+  }
+
+  .code-prompt {
+    color: oklch(0.62 0.18 78.8);
+    font-weight: 600;
+  }
+
+  .code-comment {
+    color: oklch(0.5 0.006 79);
   }
 
   /* ── Footer ──────────────────────────────────────────────────── */
@@ -470,8 +519,14 @@ const selfHostUrl = "https://github.com/planetary-dev/planetary"
   }
 
   .footer-mark {
-    display: flex;
-    align-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .footer-mark :global(svg) {
+    width: 100%;
+    height: 100%;
   }
 
   .footer-nav {
