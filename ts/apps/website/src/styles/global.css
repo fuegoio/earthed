@@ -93,10 +93,8 @@ button {
 */
 
 /*
- * Sun rises from the left along a circular arc.
- * Keyframes approximate a quadratic bezier curve from (-520, 200)
- * to (0, 0) with control point (-260, 50), so the sun always
- * moves right and up — never overshooting its resting position.
+ * Sun rises from the left in one smooth, continuous motion
+ * along an arc, then stays static at center.
  */
 @keyframes sun-rise {
   0% {
@@ -105,15 +103,6 @@ button {
   }
   15% {
     opacity: 1;
-  }
-  25% {
-    transform: translate(-390px, 131px);
-  }
-  50% {
-    transform: translate(-260px, 75px);
-  }
-  75% {
-    transform: translate(-130px, 31px);
   }
   100% {
     transform: translate(0, 0);
