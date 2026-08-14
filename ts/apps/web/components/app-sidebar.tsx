@@ -9,9 +9,11 @@ import {
   Star,
   Folder,
   Loader2,
+  Plus,
 } from "lucide-react"
 import { getClient, listFeeds, listCategories, unwrap } from "@/lib/planetary"
 import { Logo } from "@/components/logo"
+import { buttonVariants } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { SidebarSeparator } from "@workspace/ui/components/separator"
 import type { Feed, Category } from "@/lib/types"
@@ -134,9 +136,21 @@ function SidebarContent() {
         <SidebarSeparator />
 
         <div className="flex flex-col gap-1">
-          <h3 className="px-3 pb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Feeds
-          </h3>
+          <div className="flex items-center justify-between px-3 pb-1">
+            <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Feeds
+            </h3>
+            <Link
+              href="/feeds/new"
+              aria-label="Subscribe to a feed"
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "icon-xs" }),
+                "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <Plus className="size-3.5" />
+            </Link>
+          </div>
           {feedsLoading ? (
             <div className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground">
               <Loader2 className="size-3.5 animate-spin" />

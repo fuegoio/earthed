@@ -11,6 +11,8 @@ export type {
   ErrorModel,
   Feed,
   FeedWritable,
+  PreviewFeedBody,
+  PreviewFeedItem,
   User,
 } from "@planetary/api-client"
 

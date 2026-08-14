@@ -94,6 +94,13 @@ func hashItem(item parser.Item) string {
 	return hex.EncodeToString(h[:])
 }
 
+// ParseDate parses a date string using the formats supported by the feed
+// processor. It is exported so the preview handler can reuse the same logic
+// without duplicating the format list.
+func ParseDate(s string) (time.Time, error) {
+	return parseDate(s)
+}
+
 func parseDate(s string) (time.Time, error) {
 	if s == "" {
 		return time.Now(), nil

@@ -454,6 +454,114 @@
                 ],
                 "type": "object"
             },
+            "PreviewFeedBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/PreviewFeedBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "favicon_url": {
+                        "type": "string"
+                    },
+                    "feed_url": {
+                        "type": "string"
+                    },
+                    "items": {
+                        "items": {
+                            "$ref": "#/components/schemas/PreviewFeedItem"
+                        },
+                        "type": [
+                            "array",
+                            "null"
+                        ]
+                    },
+                    "site_url": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "title",
+                    "site_url",
+                    "feed_url",
+                    "items"
+                ],
+                "type": "object"
+            },
+            "PreviewFeedInputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/PreviewFeedInputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "feed_url": {
+                        "maxLength": 2048,
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "feed_url"
+                ],
+                "type": "object"
+            },
+            "PreviewFeedItem": {
+                "additionalProperties": false,
+                "properties": {
+                    "author": {
+                        "type": "string"
+                    },
+                    "content": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "published_at": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "tags": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": [
+                            "array",
+                            "null"
+                        ]
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "title",
+                    "url",
+                    "content",
+                    "published_at"
+                ],
+                "type": "object"
+            },
             "Toggle-entry-starredRequest": {
                 "additionalProperties": false,
                 "properties": {
@@ -1001,6 +1109,48 @@
                     }
                 },
                 "summary": "Subscribe to a feed",
+                "tags": [
+                    "feeds"
+                ]
+            }
+        },
+        "/api/v1/feeds/preview": {
+            "post": {
+                "description": "Fetches and parses a feed URL, returning feed metadata and recent entries without persisting anything.",
+                "operationId": "preview-feed",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PreviewFeedInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PreviewFeedBody"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Preview a feed without subscribing",
                 "tags": [
                     "feeds"
                 ]

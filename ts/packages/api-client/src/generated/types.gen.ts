@@ -156,6 +156,37 @@ export type HealthResponse = {
     status: string;
 };
 
+export type PreviewFeedBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    description?: string;
+    favicon_url?: string;
+    feed_url: string;
+    items: Array<PreviewFeedItem> | null;
+    site_url: string;
+    title: string;
+};
+
+export type PreviewFeedInputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    feed_url: string;
+};
+
+export type PreviewFeedItem = {
+    author?: string;
+    content: string;
+    description?: string;
+    published_at: string;
+    tags?: Array<string> | null;
+    title: string;
+    url: string;
+};
+
 export type ToggleEntryStarredRequest = {
     /**
      * A URL to the JSON Schema for this object.
@@ -283,6 +314,19 @@ export type FeedWritable = {
 
 export type HealthResponseWritable = {
     status: string;
+};
+
+export type PreviewFeedBodyWritable = {
+    description?: string;
+    favicon_url?: string;
+    feed_url: string;
+    items: Array<PreviewFeedItem> | null;
+    site_url: string;
+    title: string;
+};
+
+export type PreviewFeedInputBodyWritable = {
+    feed_url: string;
 };
 
 export type ToggleEntryStarredRequestWritable = {
@@ -547,6 +591,31 @@ export type CreateFeedResponses = {
 };
 
 export type CreateFeedResponse = CreateFeedResponses[keyof CreateFeedResponses];
+
+export type PreviewFeedData = {
+    body: PreviewFeedInputBodyWritable;
+    path?: never;
+    query?: never;
+    url: '/api/v1/feeds/preview';
+};
+
+export type PreviewFeedErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type PreviewFeedError = PreviewFeedErrors[keyof PreviewFeedErrors];
+
+export type PreviewFeedResponses = {
+    /**
+     * OK
+     */
+    200: PreviewFeedBody;
+};
+
+export type PreviewFeedResponse = PreviewFeedResponses[keyof PreviewFeedResponses];
 
 export type DeleteFeedData = {
     body?: never;

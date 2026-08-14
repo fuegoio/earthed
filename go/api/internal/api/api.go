@@ -13,19 +13,25 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/fuegoio/planetary/go/api/internal/auth"
+	"github.com/fuegoio/planetary/go/api/internal/reader/fetcher"
+	"github.com/fuegoio/planetary/go/api/internal/reader/parser"
+	"github.com/fuegoio/planetary/go/api/internal/reader/processor"
+	"github.com/fuegoio/planetary/go/api/internal/reader/sanitizer"
 	"github.com/fuegoio/planetary/go/api/internal/store"
 )
 
 // API wires the store and auth to a huma router and registers the REST routes.
 type API struct {
-	huma   huma.API
-	store  *store.Store
-	auth   *auth.Auth
+	huma    huma.API
+	store   *store.Store
+	auth    *auth.Auth
+	fetcher *fetcher.Fetcher
 }
 
-// New returns an API bound to the given huma router, store, and auth.
-func New(humaAPI huma.API, st *store.Store, authInst *auth.Auth) *API {
-	return &API{huma: humaAPI, store: st, auth: authInst}
+// New returns an API bound to the given huma router, store, auth, and fetcher.
+// The fetcher may be nil when only generating the OpenAPI spec (--openapi flag).
+func New(humaAPI huma.API, st *store.Store, authInst *auth.Auth, f *fetcher.Fetcher) *API {
+	return &API{huma: humaAPI, store: st, auth: authInst, fetcher: f}
 }
 
 // OpenAPITags returns the ordered tag list for the OpenAPI spec.
@@ -184,6 +190,35 @@ type FeedListOutput struct {
 	Body []store.Feed
 }
 
+type PreviewFeedInput struct {
+	Body struct {
+		FeedURL string `json:"feed_url" minLength:"1" maxLength:"2048"`
+	}
+}
+
+type PreviewFeedItem struct {
+	Title       string    `json:"title"`
+	URL         string    `json:"url"`
+	Author      string    `json:"author,omitempty"`
+	Description string    `json:"description,omitempty"`
+	Content     string    `json:"content"`
+	PublishedAt time.Time `json:"published_at"`
+	Tags        []string  `json:"tags,omitempty"`
+}
+
+type PreviewFeedBody struct {
+	Title       string           `json:"title"`
+	SiteURL     string           `json:"site_url"`
+	FeedURL     string           `json:"feed_url"`
+	Description string           `json:"description,omitempty"`
+	FaviconURL  string           `json:"favicon_url,omitempty"`
+	Items       []PreviewFeedItem `json:"items"`
+}
+
+type PreviewFeedOutput struct {
+	Body PreviewFeedBody
+}
+
 func (a *API) registerFeedRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "create-feed",
@@ -268,6 +303,78 @@ func (a *API) registerFeedRoutes() {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
 		return nil, nil
+	})
+
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "preview-feed",
+		Method:      http.MethodPost,
+		Path:        "/api/v1/feeds/preview",
+		Summary:     "Preview a feed without subscribing",
+		Description: "Fetches and parses a feed URL, returning feed metadata and recent entries without persisting anything.",
+		Tags:        []string{"feeds"},
+	}, func(ctx context.Context, input *PreviewFeedInput) (*PreviewFeedOutput, error) {
+		if a.fetcher == nil {
+			return nil, huma.Error503ServiceUnavailable("feed fetcher is not available")
+		}
+
+		result, err := a.fetcher.Fetch(ctx, input.Body.FeedURL, "", "")
+		if err != nil {
+			return nil, huma.Error400BadRequest(fmt.Sprintf("could not fetch feed: %s", err.Error()))
+		}
+		if result.NotModified {
+			return nil, huma.Error400BadRequest("feed returned 304 Not Modified — no content to preview")
+		}
+
+		parsed, err := parser.Parse(result.Body, result.ContentType)
+		if err != nil {
+			return nil, huma.Error400BadRequest(fmt.Sprintf("could not parse feed: %s", err.Error()))
+		}
+
+		maxItems := 20
+		if len(parsed.Items) > maxItems {
+			parsed.Items = parsed.Items[:maxItems]
+		}
+
+		items := make([]PreviewFeedItem, 0, len(parsed.Items))
+		for _, item := range parsed.Items {
+			content := item.Content
+			if content == "" {
+				content = item.Description
+			}
+			sanitized, err := sanitizer.Sanitize(content)
+			if err != nil {
+				sanitized = content
+			}
+
+			publishedAt, err := processor.ParseDate(item.PublishedAt)
+			if err != nil {
+				publishedAt = time.Now()
+			}
+
+			items = append(items, PreviewFeedItem{
+				Title:       item.Title,
+				URL:         item.Link,
+				Author:      item.Author,
+				Description: item.Description,
+				Content:     sanitized,
+				PublishedAt: publishedAt,
+				Tags:        item.Tags,
+			})
+		}
+
+		faviconURL := ""
+		if parsed.SiteURL != "" {
+			faviconURL = "https://www.google.com/s2/favicons?domain=" + parsed.SiteURL + "&sz=64"
+		}
+
+		return &PreviewFeedOutput{Body: PreviewFeedBody{
+			Title:       parsed.Title,
+			SiteURL:     parsed.SiteURL,
+			FeedURL:     input.Body.FeedURL,
+			Description: parsed.Description,
+			FaviconURL:  faviconURL,
+			Items:       items,
+		}}, nil
 	})
 }
 
