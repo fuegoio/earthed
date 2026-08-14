@@ -289,11 +289,11 @@ func (a *API) registerEntryRoutes() {
 		Summary:     "List entries",
 		Tags:        []string{"entries"},
 	}, func(ctx context.Context, input *struct {
-		FeedID     *int   `query:"feed_id"`
-		CategoryID *int   `query:"category_id"`
-		Status     string `query:"status" enum:"unread,read,removed"`
-		Starred    *bool  `query:"starred"`
-		Search     string `query:"search"`
+		FeedID     int    `query:"feed_id" omitempty:""`
+		CategoryID int    `query:"category_id" omitempty:""`
+		Status     string `query:"status" enum:"unread,read,removed" omitempty:""`
+		Starred    bool   `query:"starred" omitempty:""`
+		Search     string `query:"search" omitempty:""`
 		Limit      int    `query:"limit" default:"50" maximum:"200"`
 		Offset     int    `query:"offset" default:"0"`
 	}) (*EntryListOutput, error) {
@@ -301,7 +301,19 @@ func (a *API) registerEntryRoutes() {
 		if input.Limit == 0 {
 			input.Limit = 50
 		}
-		entries, err := a.store.ListEntries(ctx, userID, input.FeedID, input.CategoryID, input.Status, input.Starred, input.Search, input.Limit, input.Offset)
+		var feedID *int
+		if input.FeedID > 0 {
+			feedID = &input.FeedID
+		}
+		var categoryID *int
+		if input.CategoryID > 0 {
+			categoryID = &input.CategoryID
+		}
+		var starred *bool
+		if input.Starred {
+			starred = &input.Starred
+		}
+		entries, err := a.store.ListEntries(ctx, userID, feedID, categoryID, input.Status, starred, input.Search, input.Limit, input.Offset)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
