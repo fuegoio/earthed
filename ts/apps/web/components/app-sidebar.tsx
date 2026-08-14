@@ -11,6 +11,7 @@ import {
   Loader2,
 } from "lucide-react"
 import { getClient, listFeeds, listCategories, unwrap } from "@/lib/planetary"
+import { Logo } from "@/components/logo"
 import { cn } from "@workspace/ui/lib/utils"
 import { SidebarSeparator } from "@workspace/ui/components/separator"
 import type { Feed, Category } from "@/lib/types"
@@ -122,7 +123,7 @@ function SidebarContent() {
           href="/"
           className="flex items-center gap-2 font-serif text-lg font-bold"
         >
-          <Rss className="size-5 text-primary" />
+          <Logo className="size-5" />
           Planetary
         </Link>
       </div>
