@@ -1,0 +1,8 @@
+# Binaries
+planetary
+
+# Environment
+.env
+
+# Data
+data/
