@@ -63,7 +63,7 @@ func run() (int, error) {
 		humaConfig.Tags = api.OpenAPITags()
 		humaRouter := humago.New(humaMux, humaConfig)
 
-		apiHandler := api.New(humaRouter, nil, nil)
+		apiHandler := api.New(humaRouter, nil, nil, nil)
 		apiHandler.RegisterRoutes()
 
 		b, err := humaRouter.OpenAPI().MarshalJSON()
@@ -118,7 +118,8 @@ func run() (int, error) {
 	humaConfig.Tags = api.OpenAPITags()
 	humaRouter := humago.New(humaMux, humaConfig)
 
-	apiHandler := api.New(humaRouter, st, authInst)
+	f := fetcher.New(cfg.HTTPTimeout, cfg.HTTPMaxBody, "Planetary/1.0")
+	apiHandler := api.New(humaRouter, st, authInst, f)
 	apiHandler.RegisterRoutes()
 
 	mux := http.NewServeMux()
@@ -129,7 +130,6 @@ func run() (int, error) {
 	mux.Handle("/openapi.json", humaRouter.Adapter())
 
 	if !cfg.DisableSched {
-		f := fetcher.New(cfg.HTTPTimeout, cfg.HTTPMaxBody, "Planetary/1.0")
 		proc := processor.New(st, f)
 		pool := worker.New(proc, cfg.WorkerPool)
 		sched := scheduler.New(st, pool, cfg.PollingFreq, cfg.BatchSize)

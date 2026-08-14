@@ -23,3 +23,13 @@ export const signupSchema = z
 
 export type SigninValues = z.infer<typeof signinSchema>
 export type SignupValues = z.infer<typeof signupSchema>
+
+export const subscribeFeedSchema = z.object({
+  feed_url: z
+    .string()
+    .min(1, "Enter a feed URL")
+    .url("Enter a valid URL")
+    .max(2048, "URL is too long"),
+})
+
+export type SubscribeFeedValues = z.infer<typeof subscribeFeedSchema>

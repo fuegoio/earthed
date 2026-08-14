@@ -464,6 +464,117 @@ export const HealthResponseSchema = {
     type: 'object'
 } as const;
 
+export const PreviewFeedBodySchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/PreviewFeedBody.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        description: {
+            type: 'string'
+        },
+        favicon_url: {
+            type: 'string'
+        },
+        feed_url: {
+            type: 'string'
+        },
+        items: {
+            items: {
+                $ref: '#/components/schemas/PreviewFeedItem'
+            },
+            type: [
+                'array',
+                'null'
+            ]
+        },
+        site_url: {
+            type: 'string'
+        },
+        title: {
+            type: 'string'
+        }
+    },
+    required: [
+        'title',
+        'site_url',
+        'feed_url',
+        'items'
+    ],
+    type: 'object'
+} as const;
+
+export const PreviewFeedInputBodySchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/PreviewFeedInputBody.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        feed_url: {
+            maxLength: 2048,
+            minLength: 1,
+            type: 'string'
+        }
+    },
+    required: [
+        'feed_url'
+    ],
+    type: 'object'
+} as const;
+
+export const PreviewFeedItemSchema = {
+    additionalProperties: false,
+    properties: {
+        author: {
+            type: 'string'
+        },
+        content: {
+            type: 'string'
+        },
+        description: {
+            type: 'string'
+        },
+        published_at: {
+            format: 'date-time',
+            type: 'string'
+        },
+        tags: {
+            items: {
+                type: 'string'
+            },
+            type: [
+                'array',
+                'null'
+            ]
+        },
+        title: {
+            type: 'string'
+        },
+        url: {
+            type: 'string'
+        }
+    },
+    required: [
+        'title',
+        'url',
+        'content',
+        'published_at'
+    ],
+    type: 'object'
+} as const;
+
 export const Toggle_entry_starredRequestSchema = {
     additionalProperties: false,
     properties: {
@@ -901,6 +1012,58 @@ export const HealthResponseWritableSchema = {
     },
     required: [
         'status'
+    ],
+    type: 'object'
+} as const;
+
+export const PreviewFeedBodyWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        description: {
+            type: 'string'
+        },
+        favicon_url: {
+            type: 'string'
+        },
+        feed_url: {
+            type: 'string'
+        },
+        items: {
+            items: {
+                $ref: '#/components/schemas/PreviewFeedItem'
+            },
+            type: [
+                'array',
+                'null'
+            ]
+        },
+        site_url: {
+            type: 'string'
+        },
+        title: {
+            type: 'string'
+        }
+    },
+    required: [
+        'title',
+        'site_url',
+        'feed_url',
+        'items'
+    ],
+    type: 'object'
+} as const;
+
+export const PreviewFeedInputBodyWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        feed_url: {
+            maxLength: 2048,
+            minLength: 1,
+            type: 'string'
+        }
+    },
+    required: [
+        'feed_url'
     ],
     type: 'object'
 } as const;
