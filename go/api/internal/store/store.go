@@ -263,6 +263,9 @@ func (s *Store) ListFeedsDueForRefresh(ctx context.Context, limit int) ([]Feed, 
 // (false when the hash already existed for this feed).
 func (s *Store) CreateEntry(ctx context.Context, userID, feedID int, hash, title, url, commentsURL, author, content, description string, publishedAt time.Time, tags []string) (int64, error) {
 	var id int64
+	if tags == nil {
+		tags = []string{}
+	}
 	tagArr := pq.Array(tags)
 	err := s.DB.QueryRowContext(ctx,
 		`INSERT INTO entries (user_id, feed_id, hash, title, url, comments_url, author, content, description, published_at, tags)
