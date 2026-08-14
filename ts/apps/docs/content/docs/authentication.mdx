@@ -1,0 +1,147 @@
+---
+title: Authentication
+description: Authenticate with the Planetary API using session cookies or bearer tokens.
+---
+
+Planetary uses [Limen](https://github.com/thecodearcher/limen) for
+authentication. All API endpoints under `/api/v1/` require authentication.
+The only exception is `GET /api/v1/health`.
+
+## Two authentication methods
+
+Planetary accepts two types of credentials:
+
+1. **Session cookie** — for browser-based clients (the web frontend).
+   The browser sends the cookie automatically after sign-in.
+
+2. **Bearer token** — for programmatic clients (CLI, scripts, custom
+   integrations). Send the token in the `Authorization` header.
+
+Bearer tokens take precedence. If a request includes both a bearer token
+and a session cookie, the token is used and the cookie is ignored.
+
+## Session authentication
+
+Session auth is handled by Limen at `/api/auth/`. These endpoints are
+not under the `/api/v1/` prefix and do not require authentication.
+
+### Sign up
+
+Create a new account:
+
+```bash
+curl -X POST http://localhost:8080/api/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"your-password"}'
+```
+
+### Sign in
+
+Sign in to get a session cookie:
+
+```bash
+curl -X POST http://localhost:8080/api/auth/signin \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"your-password"}' \
+  -c cookies.txt
+```
+
+The session cookie is stored in `cookies.txt`. Pass it with subsequent
+requests:
+
+```bash
+curl http://localhost:8080/api/v1/me \
+  -b cookies.txt
+```
+
+### Email verification
+
+Email verification tokens are logged to the server output instead of
+being emailed. Check the server logs for the verification token and URL.
+
+### Password reset
+
+Password reset tokens are also logged to the server output. Wire a real
+mailer when deploying to production.
+
+## API tokens
+
+API tokens are bearer tokens prefixed with `pla_`. They are stored as
+SHA-256 hashes — the raw token is shown only once at creation.
+
+### Create a token
+
+Create a token via the API. You need to be authenticated first (via
+session cookie or an existing token):
+
+```bash
+curl -X POST http://localhost:8080/api/v1/tokens \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer pla_existing-token" \
+  -d '{"label":"my-script"}'
+```
+
+```json
+{
+  "id": 1,
+  "label": "my-script",
+  "token": "pla_a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef12345678",
+  "created_at": "2025-08-14T12:00:00Z"
+}
+```
+
+Save the `token` value immediately. It cannot be retrieved later.
+
+### Use a token
+
+Send the token in the `Authorization` header:
+
+```bash
+curl http://localhost:8080/api/v1/feeds \
+  -H "Authorization: Bearer pla_a1b2c3d4e5f6..."
+```
+
+### List tokens
+
+List all tokens. The raw token values are never returned — only labels
+and metadata:
+
+```bash
+curl http://localhost:8080/api/v1/tokens \
+  -H "Authorization: Bearer pla_your-token"
+```
+
+### Delete a token
+
+Revoke a token by ID:
+
+```bash
+curl -X DELETE http://localhost:8080/api/v1/tokens/1 \
+  -H "Authorization: Bearer pla_your-token"
+```
+
+Any requests using the deleted token will fail immediately with a 401
+error.
+
+## Token format
+
+Tokens follow the format `pla_` followed by 64 hex characters (32 random
+bytes). They are 69 characters long.
+
+## Authorization model
+
+All data is scoped per user. Every API request that reads or writes
+data is filtered by the authenticated user's ID. A user can only see
+and modify their own feeds, entries, categories, and tokens.
+
+There are no roles or admin permissions in the current version.
+
+## CORS
+
+The API enables permissive CORS for all origins. When an `Origin`
+header is present in the request, the API reflects it back with
+`Access-Control-Allow-Credentials: true`. When no `Origin` header is
+present, `Access-Control-Allow-Origin: *` is used.
+
+Allowed methods: GET, POST, PUT, PATCH, DELETE, OPTIONS.
+Allowed headers: Accept, Authorization, Content-Type, X-Requested-With.
