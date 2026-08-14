@@ -139,6 +139,8 @@ Set the API URL via environment variables:
 
 ## CI/CD
 
-The repository includes a GitHub Actions workflow (`.github/workflows/api.yml`)
-that builds and pushes the API Docker image to GitHub Container Registry.
-On push to `main`, the image is published as `ghcr.io/<owner>/planetary-api:latest`.
+The repository includes GitHub Actions workflows (`.github/workflows/go.yml`
+and `.github/workflows/ts.yml`) that build and push Docker images to GitHub
+Container Registry. On push to `main`, the API image is published as
+`ghcr.io/<owner>/planetary-api:latest` and the docs image as
+`ghcr.io/<owner>/planetary-docs:latest`.
