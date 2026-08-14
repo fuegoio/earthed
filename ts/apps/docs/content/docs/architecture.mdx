@@ -1,0 +1,129 @@
+---
+title: Architecture
+description: How Planetary works — feed formats, the refresh pipeline, adaptive polling, and HTML sanitization.
+---
+
+Planetary is a self-hosted RSS reader. The API server fetches feeds,
+parses them, sanitizes the content, and stores entries in PostgreSQL.
+A background scheduler keeps everything up to date.
+
+## Supported feed formats
+
+Planetary parses three feed formats:
+
+| Format | Detection |
+| ------ | --------- |
+| RSS 2.0 | XML root element `<rss>` |
+| Atom 1.0 | XML with `http://www.w3.org/2005/Atom` namespace |
+| JSON Feed | Content-Type contains `json`, or body starts with `{` |
+
+Detection is automatic. The parser tries RSS 2.0 first (XML root
+`<rss>`), falls back to Atom 1.0, or switches to JSON Feed based on
+content type or body content.
+
+Each format is normalized into a common structure with title, link,
+content, description, author, publication date, tags, and enclosures.
+
+## The refresh pipeline
+
+When a feed is due for refresh, the scheduler dispatches it to a worker
+pool. Each feed goes through four stages:
+
+### 1. Fetch
+
+The fetcher performs an HTTP GET with conditional request headers:
+
+- `If-None-Match` — sent when the feed has a stored ETag.
+- `If-Modified-Since` — sent when the feed has a stored Last-Modified
+  value.
+- `User-Agent: Planetary/1.0`
+
+If the server responds with 304 Not Modified, the feed is skipped and
+the next check is scheduled in 60 minutes. The fetcher follows up to 10
+redirects and caps the response body at 15 MB (configurable).
+
+### 2. Parse
+
+The response body is parsed into a normalized feed structure. RSS 2.0
+items, Atom entries, and JSON Feed items all map to the same structure.
+
+### 3. Sanitize
+
+Entry HTML content is sanitized through an allowlist before storage.
+This prevents XSS vectors from untrusted feed content.
+
+### 4. Store
+
+Entries are deduplicated by a SHA-256 hash of the link, title, and
+publication date. If the hash already exists for the feed, the entry is
+skipped. New entries are inserted with status `unread`.
+
+Media attachments (podcasts, images) are stored as enclosures linked to
+the entry.
+
+## Adaptive polling
+
+Instead of polling every feed at a fixed interval, Planetary estimates
+the ideal refresh frequency per feed:
+
+1. Collect the publication dates of all items in the feed.
+2. Sort them descending (newest first).
+3. Calculate the average interval between consecutive items.
+4. Clamp the interval to 10 minutes minimum, 24 hours maximum.
+
+If there are fewer than two items with parseable dates, the default
+interval is 60 minutes.
+
+This means a blog that publishes daily is checked roughly every 24
+hours, while a news site that publishes hourly is checked more
+frequently.
+
+### Error backoff
+
+When a fetch or parse fails, the next check is scheduled in 15 minutes
+and the `parsing_error_count` is incremented. On the next success, the
+error is cleared and the count resets to 0.
+
+## HTML sanitization
+
+Entry content is sanitized with an allowlist of HTML tags and
+attributes. Tags not on the list are removed. Attributes not on the
+list are stripped from their parent tag.
+
+### Allowed tags
+
+`a`, `abbr`, `b`, `blockquote`, `br`, `cite`, `code`, `dd`, `del`,
+`div`, `dl`, `dt`, `em`, `figcaption`, `figure`, `h1`–`h6`, `hr`, `i`,
+`img`, `ins`, `kbd`, `li`, `mark`, `ol`, `p`, `pre`, `q`, `s`, `samp`,
+`small`, `span`, `strong`, `sub`, `sup`, `table`, `tbody`, `td`,
+`tfoot`, `th`, `thead`, `tr`, `u`, `ul`, `var`, `video`, `source`.
+
+### Allowed attributes
+
+| Tag | Attributes |
+| --- | ---------- |
+| `a` | `href`, `title`, `rel` |
+| `img` | `src`, `alt`, `title`, `width`, `height` |
+| `video` | `src`, `width`, `height`, `controls` |
+| `source` | `src`, `type` |
+
+All other tags have their attributes stripped entirely.
+
+### Link safety
+
+All `<a>` tags get `rel="noopener noreferrer"` enforced. URLs starting
+with `javascript:` or `data:` are blanked out.
+
+## Full-text search
+
+Entry titles and content are indexed in a PostgreSQL `tsvector` column
+using the English text search configuration. The `search` query
+parameter on `GET /api/v1/entries` runs a `plainto_tsquery` against
+this index, allowing natural-language search across all entries.
+
+## Request logging
+
+Every HTTP request is logged via `slog` with method, path, remote
+address, status code, duration, query string, and a truncated request
+body snippet (up to 4 KB). Configure the log format with
+`PLANETARY_LOG_FORMAT` (`pretty` or `json`).
