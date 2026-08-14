@@ -22,12 +22,15 @@ export function EntryCard({ entry, feed }: { entry: Entry; feed?: Feed }) {
       href={`/entries/${entry.id}`}
       className={cn(
         "group flex gap-3 px-4 py-3 transition-colors hover:bg-muted/50",
-        unread ? "" : "opacity-70"
+        unread ? "" : "opacity-60"
       )}
     >
-      <div className="flex w-1 shrink-0 justify-center pt-1.5">
+      <div className="flex w-5 shrink-0 justify-center pt-1">
         {unread && (
-          <span className="size-2 rounded-full bg-primary" aria-label="Unread" />
+          <span
+            className="size-2 rounded-full bg-primary"
+            aria-label="Unread"
+          />
         )}
       </div>
       <div className="min-w-0 flex-1">
@@ -52,11 +55,7 @@ export function EntryCard({ entry, feed }: { entry: Entry; feed?: Feed }) {
         )}
       </div>
       <div className="flex shrink-0 items-start">
-        <StarToggle
-          entryId={entry.id}
-          starred={entry.starred}
-          size="icon-sm"
-        />
+        <StarToggle entryId={entry.id} starred={entry.starred} size="icon-sm" />
       </div>
     </Link>
   )

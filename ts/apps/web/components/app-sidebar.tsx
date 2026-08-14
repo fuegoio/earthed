@@ -2,10 +2,10 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import {
-  Rss,
   LayoutList,
   Circle,
   Star,
@@ -25,6 +25,7 @@ import {
 } from "@/lib/planetary"
 import { getApiErrorMessage } from "@/lib/errors"
 import { Logo } from "@/components/logo"
+import { FeedIcon } from "@/components/feed-icon"
 import { buttonVariants } from "@workspace/ui/components/button"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { CategoryCreateDialog } from "@/components/category-create-dialog"
@@ -32,7 +33,25 @@ import { cn } from "@workspace/ui/lib/utils"
 import { SidebarSeparator } from "@workspace/ui/components/separator"
 import type { Feed, Category } from "@/lib/types"
 
+/** Shared link class for sidebar nav rows. */
+const navLinkClass = cn(
+  "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium",
+  "text-sidebar-foreground/70 transition-colors",
+  "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+)
+
+/** Active variant — applied when the link matches the current route. */
+const navLinkActiveClass = cn(
+  "bg-sidebar-accent text-sidebar-accent-foreground"
+)
+
+function isActive(pathname: string, href: string): boolean {
+  if (href === "/") return pathname === "/"
+  return pathname === href || pathname.startsWith(href + "/")
+}
+
 function SidebarNav() {
+  const pathname = usePathname()
   const navItems = [
     { href: "/", label: "All", icon: LayoutList },
     { href: "/unread", label: "Unread", icon: Circle },
@@ -42,45 +61,26 @@ function SidebarNav() {
 
   return (
     <nav className="flex flex-col gap-0.5">
-      {navItems.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className={cn(
-            "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium",
-            "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-            "transition-colors"
-          )}
-        >
-          <item.icon className="size-4" />
-          {item.label}
-        </Link>
-      ))}
+      {navItems.map((item) => {
+        const active = isActive(pathname, item.href)
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            aria-current={active ? "page" : undefined}
+            className={cn(navLinkClass, active && navLinkActiveClass)}
+          >
+            <item.icon className={cn("size-4", active && "text-primary")} />
+            {item.label}
+          </Link>
+        )
+      })}
     </nav>
   )
 }
 
-function FeedIcon({ siteUrl }: { siteUrl: string }) {
-  if (siteUrl) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={faviconUrl(siteUrl)}
-        alt=""
-        className="size-3.5 shrink-0 rounded-sm"
-        width={14}
-        height={14}
-      />
-    )
-  }
-  return <Rss className="size-3.5 shrink-0 text-muted-foreground" />
-}
-
-function faviconUrl(siteUrl: string): string {
-  return `https://www.google.com/s2/favicons?domain=${siteUrl}&sz=64`
-}
-
 function FeedList({ feeds }: { feeds: Feed[] }) {
+  const pathname = usePathname()
   if (feeds.length === 0) {
     return (
       <p className="px-3 py-2 text-xs text-muted-foreground">
@@ -91,26 +91,37 @@ function FeedList({ feeds }: { feeds: Feed[] }) {
 
   return (
     <ul className="flex flex-col gap-0.5">
-      {feeds.map((feed) => (
-        <li key={feed.id}>
-          <Link
-            href={`/feeds/${feed.id}`}
-            className={cn(
-              "flex items-center gap-2.5 rounded-md px-3 py-1.5 text-sm",
-              "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              "transition-colors truncate"
-            )}
-          >
-            <FeedIcon siteUrl={feed.site_url ?? ""} />
-            <span className="truncate">{feed.title}</span>
-          </Link>
-        </li>
-      ))}
+      {feeds.map((feed) => {
+        const href = `/feeds/${feed.id}`
+        const active = isActive(pathname, href)
+        return (
+          <li key={feed.id}>
+            <Link
+              href={href}
+              aria-current={active ? "page" : undefined}
+              className={cn(
+                "flex items-center gap-2.5 rounded-md px-3 py-1.5 text-sm",
+                "text-sidebar-foreground/70 transition-colors truncate",
+                active
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                  : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              )}
+            >
+              <FeedIcon
+                siteUrl={feed.site_url}
+                className="size-3.5 shrink-0 rounded-sm"
+              />
+              <span className="truncate">{feed.title}</span>
+            </Link>
+          </li>
+        )
+      })}
     </ul>
   )
 }
 
 function CategoryRow({ category }: { category: Category }) {
+  const pathname = usePathname()
   const queryClient = useQueryClient()
   const [pending, setPending] = useState(false)
 
@@ -132,17 +143,28 @@ function CategoryRow({ category }: { category: Category }) {
     }
   }
 
+  const href = `/categories/${category.id}`
+  const active = isActive(pathname, href)
+
   return (
     <li className="group flex items-center">
       <Link
-        href={`/categories/${category.id}`}
+        href={href}
+        aria-current={active ? "page" : undefined}
         className={cn(
           "flex min-w-0 flex-1 items-center gap-2.5 rounded-md px-3 py-1.5 text-sm",
-          "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-          "transition-colors"
+          "text-sidebar-foreground/70 transition-colors",
+          active
+            ? "bg-sidebar-accent text-sidebar-accent-foreground"
+            : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
         )}
       >
-        <Folder className="size-3.5 shrink-0 text-muted-foreground" />
+        <Folder
+          className={cn(
+            "size-3.5 shrink-0",
+            active ? "text-primary" : "text-muted-foreground"
+          )}
+        />
         <span className="truncate">{category.title}</span>
       </Link>
       <ConfirmDialog
@@ -188,6 +210,7 @@ function CategoryList({ categories }: { categories: Category[] }) {
 }
 
 function SidebarContent() {
+  const pathname = usePathname()
   const { data: feeds, isLoading: feedsLoading } = useQuery<Feed[]>({
     queryKey: ["feeds"],
     queryFn: async () => unwrap(listFeeds({ client: await getClient() })),
@@ -197,8 +220,11 @@ function SidebarContent() {
     Category[]
   >({
     queryKey: ["categories"],
-    queryFn: async () => unwrap(listCategories({ client: await getClient() })),
+    queryFn: async () =>
+      unwrap(listCategories({ client: await getClient() })),
   })
+
+  const tokensActive = isActive(pathname, "/settings/tokens")
 
   return (
     <div className="flex h-full flex-col">
@@ -236,7 +262,7 @@ function SidebarContent() {
           {feedsLoading ? (
             <div className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground">
               <Loader2 className="size-3.5 animate-spin" />
-              Loading feeds...
+              Loading feeds…
             </div>
           ) : (
             <FeedList feeds={feeds ?? []} />
@@ -255,7 +281,7 @@ function SidebarContent() {
           {categoriesLoading ? (
             <div className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground">
               <Loader2 className="size-3.5 animate-spin" />
-              Loading categories...
+              Loading categories…
             </div>
           ) : (
             <CategoryList categories={categories ?? []} />
@@ -266,13 +292,10 @@ function SidebarContent() {
 
         <Link
           href="/settings/tokens"
-          className={cn(
-            "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium",
-            "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-            "transition-colors"
-          )}
+          aria-current={tokensActive ? "page" : undefined}
+          className={cn(navLinkClass, tokensActive && navLinkActiveClass)}
         >
-          <Key className="size-4" />
+          <Key className={cn("size-4", tokensActive && "text-primary")} />
           API tokens
         </Link>
       </div>
@@ -298,11 +321,11 @@ export function AppSidebar({
       {open && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
-            className="absolute inset-0 bg-black/50"
+            className="absolute inset-0 bg-black/50 animate-in fade-in duration-200"
             onClick={onClose}
             aria-hidden="true"
           />
-          <aside className="absolute left-0 top-0 flex h-full w-64 flex-col border-r border-sidebar-border bg-sidebar">
+          <aside className="absolute left-0 top-0 flex h-full w-64 flex-col border-r border-sidebar-border bg-sidebar animate-in slide-in-from-left duration-200">
             <SidebarContent />
           </aside>
         </div>

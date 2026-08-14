@@ -4,7 +4,14 @@ import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import { ListChecks, Plus, Globe, Users, Loader2, Compass } from "lucide-react"
 import { buttonVariants } from "@workspace/ui/components/button"
-import { Empty, EmptyDescription, EmptyTitle } from "@/components/empty"
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/empty"
 import {
   getClient,
   listMyFeedLists,
@@ -60,21 +67,25 @@ export default function FeedListsPage() {
           <LoadingRow />
         ) : (mine ?? []).length === 0 ? (
           <Empty className="py-10">
-            <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10">
-              <ListChecks className="size-6 text-primary" />
-            </div>
-            <EmptyTitle>No lists yet</EmptyTitle>
-            <EmptyDescription>
-              Create a list, add feeds to it, and share it publicly so others
-              can follow.
-            </EmptyDescription>
-            <Link
-              href="/lists/new"
-              className={cn(buttonVariants({ size: "sm" }), "mt-2")}
-            >
-              <Plus className="size-4" />
-              Create a list
-            </Link>
+            <EmptyHeader>
+              <EmptyMedia>
+                <ListChecks className="size-6 text-primary" />
+              </EmptyMedia>
+              <EmptyTitle>No lists yet</EmptyTitle>
+              <EmptyDescription>
+                Create a list, add feeds to it, and share it publicly so others
+                can follow.
+              </EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent>
+              <Link
+                href="/lists/new"
+                className={cn(buttonVariants({ size: "sm" }))}
+              >
+                <Plus className="size-4" />
+                Create a list
+              </Link>
+            </EmptyContent>
           </Empty>
         ) : (
           <div className="flex flex-col gap-2">
@@ -94,13 +105,27 @@ export default function FeedListsPage() {
         {followedLoading ? (
           <LoadingRow />
         ) : (followed ?? []).length === 0 ? (
-          <p className="rounded-lg border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground">
-            You aren&apos;t following any lists yet.{" "}
-            <Link href="/lists/discover" className="text-primary hover:underline">
-              Discover public lists
-            </Link>
-            .
-          </p>
+          <Empty>
+            <EmptyHeader>
+              <EmptyMedia>
+                <Users className="size-6 text-primary" />
+              </EmptyMedia>
+              <EmptyTitle>Not following any lists</EmptyTitle>
+              <EmptyDescription>
+                Discover public lists curated by others and follow them to keep
+                them bookmarked.
+              </EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent>
+              <Link
+                href="/lists/discover"
+                className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+              >
+                <Compass className="size-4" />
+                Discover lists
+              </Link>
+            </EmptyContent>
+          </Empty>
         ) : (
           <div className="flex flex-col gap-2">
             {(followed ?? []).map((list) => (

@@ -1,5 +1,12 @@
 import { Search } from "lucide-react"
 import { EntryTimeline } from "@/components/entry-timeline"
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/empty"
 
 export default async function SearchPage({
   searchParams,
@@ -24,8 +31,19 @@ export default async function SearchPage({
           emptyDescription="No entries matched your search. Try different keywords."
         />
       ) : (
-        <div className="px-4 py-16 text-center text-sm text-muted-foreground">
-          Type in the search box above to find articles across all your feeds.
+        <div className="p-4">
+          <Empty>
+            <EmptyHeader>
+              <EmptyMedia>
+                <Search className="size-6 text-primary" />
+              </EmptyMedia>
+              <EmptyTitle>Search your feeds</EmptyTitle>
+              <EmptyDescription>
+                Type in the search box above to find articles across all your
+                subscriptions. Search matches titles and article content.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         </div>
       )}
     </div>

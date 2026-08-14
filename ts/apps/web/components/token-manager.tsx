@@ -9,7 +9,13 @@ import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { ConfirmDialog } from "@/components/confirm-dialog"
-import { Empty, EmptyDescription, EmptyTitle } from "@/components/empty"
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/empty"
 import {
   getClient,
   listTokens,
@@ -108,14 +114,16 @@ export function TokenManager() {
           </div>
         ) : (tokens ?? []).length === 0 ? (
           <Empty>
-            <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10">
-              <Key className="size-6 text-primary" />
-            </div>
-            <EmptyTitle>No API tokens</EmptyTitle>
-            <EmptyDescription>
-              Create a token to use the Planetary CLI or integrate other
-              clients.
-            </EmptyDescription>
+            <EmptyHeader>
+              <EmptyMedia>
+                <Key className="size-6 text-primary" />
+              </EmptyMedia>
+              <EmptyTitle>No API tokens</EmptyTitle>
+              <EmptyDescription>
+                Create a token to use the Planetary CLI or integrate other
+                clients.
+              </EmptyDescription>
+            </EmptyHeader>
           </Empty>
         ) : (
           (tokens ?? []).map((token) => (

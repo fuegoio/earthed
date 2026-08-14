@@ -7,7 +7,9 @@ The Planetary CLI lets you manage feeds, entries, categories, and API
 tokens from the terminal. The TUI provides an interactive browsing
 experience.
 
-## Building
+## Install
+
+### Build from source
 
 ```bash
 cd go/cli
@@ -15,6 +17,12 @@ make build
 ```
 
 This produces two binaries: `planetary` (CLI) and `planetary-tui` (TUI).
+
+### Pre-built binaries
+
+Download the latest release from the [GitHub releases
+page](https://github.com/planetary-dev/planetary/releases) and add the
+binary to your `PATH`.
 
 ## Configuration
 
@@ -48,8 +56,13 @@ planetary feeds delete <id>       # unsubscribe from a feed
 
 ```bash
 planetary entries list             # list recent entries
+planetary entries list --unread    # list unread only
+planetary entries list --starred   # list starred only
+planetary entries list --feed 1    # filter by feed ID
 planetary entries read <id>        # read a single entry
 ```
+
+Run `planetary entries list --help` to see all available filters.
 
 ### categories
 

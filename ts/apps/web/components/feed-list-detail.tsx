@@ -24,8 +24,15 @@ import Link from "next/link"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
+import { Textarea } from "@workspace/ui/components/textarea"
 import { ConfirmDialog } from "@/components/confirm-dialog"
-import { Empty, EmptyDescription, EmptyTitle } from "@/components/empty"
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/empty"
 import { FeedIcon } from "@/components/feed-icon"
 import {
   getClient,
@@ -319,15 +326,17 @@ export function FeedListDetail({
         </h2>
         {feeds.length === 0 ? (
           <Empty>
-            <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10">
-              <Rss className="size-6 text-primary" />
-            </div>
-            <EmptyTitle>No feeds yet</EmptyTitle>
-            <EmptyDescription>
-              {isOwner
-                ? "Add feed URLs below to build your list."
-                : "This list doesn't have any feeds yet."}
-            </EmptyDescription>
+            <EmptyHeader>
+              <EmptyMedia>
+                <Rss className="size-6 text-primary" />
+              </EmptyMedia>
+              <EmptyTitle>No feeds yet</EmptyTitle>
+              <EmptyDescription>
+                {isOwner
+                  ? "Add feed URLs below to build your list."
+                  : "This list doesn't have any feeds yet."}
+              </EmptyDescription>
+            </EmptyHeader>
           </Empty>
         ) : (
           <ul className="flex flex-col gap-1 rounded-lg border border-border p-2">
@@ -479,17 +488,12 @@ function EditListDialog({
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="edit-desc">Description</Label>
-              <textarea
+              <Textarea
                 id="edit-desc"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 maxLength={2000}
                 rows={3}
-                className={cn(
-                  "w-full resize-y rounded-md border border-input bg-transparent px-3 py-2 text-sm",
-                  "placeholder:text-muted-foreground",
-                  "focus-visible:border-ring focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
-                )}
               />
             </div>
             <label className="flex cursor-pointer items-start gap-3 rounded-md border border-border p-3">

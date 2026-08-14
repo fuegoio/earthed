@@ -9,7 +9,14 @@ import {
 } from "@tanstack/react-query"
 import { Loader2, Rss } from "lucide-react"
 import { EntryCard } from "@/components/entry-card"
-import { Empty, EmptyDescription, EmptyTitle } from "@/components/empty"
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/empty"
 import { getClient, listEntries, listFeeds, unwrap } from "@/lib/planetary"
 import type { Entry, Feed } from "@/lib/types"
 import { buttonVariants } from "@workspace/ui/components/button"
@@ -52,6 +59,7 @@ export function EntryTimeline({
     isFetchingNextPage,
     isLoading,
     error,
+    refetch,
   } = useInfiniteQuery<
     Entry[],
     Error,
@@ -100,8 +108,26 @@ export function EntryTimeline({
 
   if (error) {
     return (
-      <div className="px-4 py-8 text-sm text-muted-foreground">
-        Could not load entries.
+      <div className="p-4">
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia>
+              <Rss className="size-6 text-primary" />
+            </EmptyMedia>
+            <EmptyTitle>Couldn&apos;t load entries</EmptyTitle>
+            <EmptyDescription>
+              Something went wrong fetching your timeline. Try again.
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <button
+              onClick={() => refetch()}
+              className={cn(buttonVariants({ size: "sm" }))}
+            >
+              Retry
+            </button>
+          </EmptyContent>
+        </Empty>
       </div>
     )
   }
@@ -110,17 +136,21 @@ export function EntryTimeline({
     return (
       <div className="p-4">
         <Empty>
-          <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10">
-            <Rss className="size-6 text-primary" />
-          </div>
-          <EmptyTitle>{emptyTitle}</EmptyTitle>
-          <EmptyDescription>{emptyDescription}</EmptyDescription>
-          <Link
-            href="/feeds/new"
-            className={cn(buttonVariants({ size: "sm" }), "mt-2")}
-          >
-            Subscribe to a feed
-          </Link>
+          <EmptyHeader>
+            <EmptyMedia>
+              <Rss className="size-6 text-primary" />
+            </EmptyMedia>
+            <EmptyTitle>{emptyTitle}</EmptyTitle>
+            <EmptyDescription>{emptyDescription}</EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Link
+              href="/feeds/new"
+              className={cn(buttonVariants({ size: "sm" }))}
+            >
+              Subscribe to a feed
+            </Link>
+          </EmptyContent>
         </Empty>
       </div>
     )

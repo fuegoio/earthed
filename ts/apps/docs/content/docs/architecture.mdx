@@ -116,14 +116,13 @@ with `javascript:` or `data:` are blanked out.
 
 ## Full-text search
 
-Entry titles and content are indexed in a PostgreSQL `tsvector` column
-using the English text search configuration. The `search` query
-parameter on `GET /api/v1/entries` runs a `plainto_tsquery` against
-this index, allowing natural-language search across all entries.
+Entry titles and content are indexed in PostgreSQL using a full-text
+search index. The `search` query parameter on `GET /api/v1/entries`
+runs a natural-language search against this index, allowing you to find
+entries across all your feeds.
 
 ## Request logging
 
-Every HTTP request is logged via `slog` with method, path, remote
-address, status code, duration, query string, and a truncated request
-body snippet (up to 4 KB). Configure the log format with
-`PLANETARY_LOG_FORMAT` (`pretty` or `json`).
+Every HTTP request is logged with method, path, remote address, status
+code, duration, and query string. Configure the log format with
+`PLANETARY_LOG_FORMAT` (`pretty` for development, `json` for production).

@@ -1,5 +1,5 @@
 {
   "title": "Documentation",
   "root": true,
-  "pages": ["index", "getting-started", "api-reference", "feeds", "entries", "feed-lists", "cli", "self-hosting"]
+  "pages": ["index", "getting-started", "web-ui", "feeds", "entries", "feed-lists", "authentication", "cli", "api-reference", "self-hosting", "architecture"]
 }

@@ -112,5 +112,5 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --font-serif: var(--font-serif);
-  --font-heading: var(--font-heading);
+  --font-heading: var(--font-serif);
 }

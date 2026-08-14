@@ -8,9 +8,9 @@ import { ArrowLeft, Loader2, ListChecks } from "lucide-react"
 import { Button, buttonVariants } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
+import { Textarea } from "@workspace/ui/components/textarea"
 import { getClient, createFeedList } from "@/lib/planetary"
 import { getApiErrorMessage } from "@/lib/errors"
-import { cn } from "@workspace/ui/lib/utils"
 
 export default function NewFeedListPage() {
   const router = useRouter()
@@ -80,19 +80,13 @@ export default function NewFeedListPage() {
 
         <div className="flex flex-col gap-2">
           <Label htmlFor="description">Description (optional)</Label>
-          <textarea
+          <Textarea
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="What is this list about?"
             maxLength={2000}
             rows={3}
-            className={cn(
-              "w-full resize-y rounded-md border border-input bg-transparent px-3 py-2 text-sm",
-              "placeholder:text-muted-foreground",
-              "focus-visible:border-ring focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/30",
-              "transition-[color,box-shadow]"
-            )}
           />
         </div>
 
@@ -119,7 +113,7 @@ export default function NewFeedListPage() {
           </Button>
           <Link
             href="/lists"
-            className={cn(buttonVariants({ variant: "ghost" }))}
+            className={buttonVariants({ variant: "ghost" })}
           >
             Cancel
           </Link>

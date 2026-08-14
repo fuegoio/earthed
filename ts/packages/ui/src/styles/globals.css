@@ -25,9 +25,9 @@
   }
 
   .typeset-article {
-    --typeset-font-body: var(--font-merriweather);
-    --typeset-font-heading: var(--font-merriweather);
-    --typeset-font-mono: var(--font-geist-mono);
+    --typeset-font-body: var(--font-serif);
+    --typeset-font-heading: var(--font-serif);
+    --typeset-font-mono: var(--font-mono);
     --typeset-size: 15px;
     --typeset-leading: 1.75;
     --typeset-flow: 1.25em;

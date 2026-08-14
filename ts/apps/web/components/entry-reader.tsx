@@ -138,7 +138,7 @@ export function EntryReader({
       )}
 
       <div
-        className="typeset mt-6 max-w-none"
+        className="typeset typeset-article mt-6 max-w-none"
         // Content is sanitized server-side by the API (bluemonday).
         dangerouslySetInnerHTML={{ __html: (entry.content || entry.description) ?? "" }}
       />

@@ -60,6 +60,11 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/api/v1/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
 volumes:
   pgdata:
@@ -160,3 +165,23 @@ Container Registry. On push to `main`:
 - API: `ghcr.io/<owner>/planetary-api:latest`
 - Web: `ghcr.io/<owner>/planetary-web:latest`
 - Docs: `ghcr.io/<owner>/planetary-docs:latest`
+
+## Database backup
+
+Your PostgreSQL database holds all feeds, entries, categories, and feed
+lists. Back it up regularly.
+
+Create a backup:
+
+```bash
+docker compose exec postgres pg_dump -U planetary planetary > backup.sql
+```
+
+Restore from a backup:
+
+```bash
+cat backup.sql | docker compose exec -T postgres psql -U planetary planetary
+```
+
+For automated backups, schedule `pg_dump` with a cron job and store
+backups off-site (e.g., an S3 bucket or other object storage).

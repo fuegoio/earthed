@@ -1,52 +1,52 @@
 ---
 title: Planetary
-description: A self-hosted RSS reader with a Go API, CLI, TUI, and Next.js web frontend.
+description: A modern, self-hostable RSS reader with a clean REST API and interfaces for the web, terminal, and CLI.
 ---
 
 ## What is Planetary
 
-Planetary is a self-hosted RSS reader. It fetches and parses RSS 2.0,
-Atom 1.0, RDF, and JSON Feed subscriptions into a single timeline you can
-browse from the web UI, the terminal CLI, or the interactive TUI.
+Planetary is a modern, self-hostable RSS reader. It fetches RSS 2.0,
+Atom 1.0, and JSON Feed subscriptions into a single timeline you can
+browse from the web, the terminal, or the command line.
 
-## Architecture
+No ads. No tracking. No algorithm. Just the sources you chose, in a calm
+space built for reading.
 
-Planetary is a monorepo with a clear boundary between Go and TypeScript:
+## Three interfaces, one API
 
-```
-planetary/
-├── go/          # Go: API server, generated SDK, CLI + TUI
-│   ├── api/     # HTTP API server (huma, PostgreSQL)
-│   ├── sdk/     # Go client generated from OpenAPI
-│   └── cli/     # planetary (CLI) and planetary-tui (TUI)
-├── ts/          # TypeScript: web frontend and docs site
-│   ├── apps/
-│   │   ├── web/    # Next.js frontend
-│   │   └── docs/   # This documentation site
-│   └── packages/
-│       └── api-client/  # TS client generated from OpenAPI
-└── Makefile     # Cross-ecosystem orchestration
-```
+- **Web app** — a sidebar, a timeline, and a reader view. Keyboard
+  shortcuts, starring, search. Works on desktop and mobile.
+- **Terminal UI** — a full-screen, keyboard-driven reader that runs in
+  your terminal. Vim-style navigation.
+- **CLI** — manage feeds, list entries, mark as read. Scriptable and
+  pipe-friendly.
 
-The OpenAPI spec (`go/api/openapi.json`) is the contract bridge: both the
-Go SDK and the TypeScript client are generated from it.
+All three are backed by the same REST API. Use one, use all three, or
+build your own client.
+
+## Feed lists
+
+Curate collections of feeds around a topic and share them with a link.
+Follow lists made by others to subscribe to all their feeds in one click.
+See [Feed Lists](/docs/feed-lists) for the full guide.
 
 ## Where to start
 
-- [Getting Started](/docs/getting-started) — run Planetary locally with
-  Docker, create an account, subscribe to your first feed, and read
-  entries.
-- [Authentication](/docs/authentication) — session cookies, API tokens,
-  and the Limen identity provider.
-- [Managing Feeds](/docs/feeds) — subscribe to feeds, organize with
-  categories, and understand the refresh pipeline.
+- [Getting Started](/docs/getting-started) — run Planetary locally,
+  create an account, subscribe to your first feed.
+- [Web UI Guide](/docs/web-ui) — how to use the web interface.
+- [Managing Feeds](/docs/feeds) — subscribe, organize with categories,
+  understand the refresh pipeline.
 - [Reading Entries](/docs/entries) — browse, filter, search, and manage
   entry status.
-- [API Reference](/docs/api-reference) — REST endpoints for feeds,
-  entries, categories, tokens, and user management.
-- [Architecture](/docs/architecture) — feed formats, adaptive polling,
-  and HTML sanitization.
+- [Feed Lists](/docs/feed-lists) — curate, share, and follow collections
+  of feeds.
+- [Authentication](/docs/authentication) — session cookies, API tokens,
+  and security.
 - [CLI](/docs/cli) — the `planetary` command-line tool and the
-  `planetary-tui` interactive terminal UI.
-- [Self-Hosting](/docs/self-hosting) — deployment, environment
-  variables, and Docker configuration.
+  `planetary-tui` terminal UI.
+- [API Reference](/docs/api-reference) — all REST endpoints.
+- [Self-Hosting](/docs/self-hosting) — Docker deployment, environment
+  variables, production setup.
+- [Architecture](/docs/architecture) — feed formats, adaptive polling,
+  and content sanitization.

@@ -56,8 +56,10 @@ curl http://localhost:8080/api/v1/me \
 
 ### Email verification
 
-Email verification tokens are logged to the server output instead of
-being emailed. Check the server logs for the verification token and URL.
+> **Important:** Email verification tokens are logged to the server
+> output instead of being emailed. Check the server logs for the
+> verification token and URL. Wire a real mailer before deploying to
+> production.
 
 ### Password reset
 

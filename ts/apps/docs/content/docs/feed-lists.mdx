@@ -4,12 +4,12 @@ description: Curate, share, and follow collections of feeds.
 ---
 
 Feed lists are curated, shareable collections of feeds. You build a list
-from feed URLs, make it public, and other users can follow it or import
-all its feeds into their own subscriptions in one click.
+from feed URLs, make it public, and other users can discover, follow, or
+import all its feeds into their own subscriptions.
 
 A feed list stores feed URLs and a metadata snapshot (title, site URL) —
 it does not reference a specific user's subscriptions, so a list is
-portable and can be followed by anyone.
+portable and can be shared with anyone.
 
 ## Create a feed list
 
@@ -58,6 +58,8 @@ curl -X POST http://localhost:8080/api/v1/feed-lists/1/follow \
 You cannot follow your own list, and you cannot follow a private list.
 Lists you follow are returned by `GET /api/v1/feed-lists/followed`.
 
+Unfollow a list with `DELETE /api/v1/feed-lists/{listId}/follow`.
+
 ## Import a list's feeds
 
 Following a list keeps it bookmarked but does not subscribe you to its
@@ -69,9 +71,40 @@ curl -X POST http://localhost:8080/api/v1/feed-lists/1/import \
 ```
 
 The response reports how many feeds were newly imported, how many you
-already subscribed to (skipped), and any that failed. Importing is
-idempotent — running it again only creates subscriptions for feeds you
-don't already have.
+already subscribed to (skipped), and any that failed:
+
+```json
+{
+  "imported": 8,
+  "skipped": 2,
+  "failed": 0
+}
+```
+
+Importing is idempotent — running it again only creates subscriptions for
+feeds you don't already have.
+
+## Update a feed list
+
+Change the title, description, or visibility of a list:
+
+```bash
+curl -X PATCH http://localhost:8080/api/v1/feed-lists/1 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer pla_your-token" \
+  -d '{"title":"Updated title","is_public":false}'
+```
+
+Only the list owner can update or delete a list.
+
+## Delete a feed list
+
+```bash
+curl -X DELETE http://localhost:8080/api/v1/feed-lists/1 \
+  -H "Authorization: Bearer pla_your-token"
+```
+
+Returns 204 No Content on success.
 
 ## Visibility
 
@@ -83,3 +116,31 @@ A feed list is visible to:
 
 `GET /api/v1/feed-lists/{listId}` returns the list (with its feeds,
 follow status, and owner email) to any user who can see it.
+
+## Data model
+
+### Feed List
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | int | List ID |
+| `user_id` | int | Owning user ID |
+| `title` | string | List title |
+| `description` | string | List description (omitted if empty) |
+| `is_public` | bool | Whether the list is discoverable |
+| `created_at` | string | Creation timestamp |
+| `updated_at` | string | Last update timestamp |
+
+### Feed List Item
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | int | Item ID |
+| `feed_list_id` | int | Parent list ID |
+| `feed_url` | string | Feed URL |
+| `title` | string | Feed title (metadata snapshot) |
+| `site_url` | string | Site URL (metadata snapshot, omitted if empty) |
+| `created_at` | string | Creation timestamp |
+
+See [API Reference](/docs/api-reference#feed-lists) for the full endpoint
+list.

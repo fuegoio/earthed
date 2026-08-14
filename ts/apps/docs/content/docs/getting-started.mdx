@@ -32,11 +32,14 @@ PLANETARY_BASE_URL=http://localhost:8080
 PLANETARY_WEB_URL=http://localhost:3000
 ```
 
-`LIMEN_SECRET` must be exactly 32 bytes. Generate one with:
+`LIMEN_SECRET` is a 32-character hex string used for session signing.
+Generate one with:
 
 ```bash
 openssl rand -hex 16
 ```
+
+This produces 32 hex characters (16 random bytes).
 
 ## 3. Run migrations
 
@@ -81,6 +84,13 @@ curl -X POST http://localhost:8080/api/auth/signin \
   -c cookies.txt
 ```
 
+The session cookie is stored in `cookies.txt`. You will need it to create
+your first API token.
+
+> **Email verification:** If email verification is enabled, the
+> verification token is logged to the server output (check your terminal).
+> Follow the URL in the logs to verify your email before signing in.
+
 ## 6. Create an API token
 
 For programmatic access (CLI, curl, scripts), create an API token:
@@ -88,7 +98,7 @@ For programmatic access (CLI, curl, scripts), create an API token:
 ```bash
 curl -X POST http://localhost:8080/api/v1/tokens \
   -H "Content-Type: application/json" \
-  -H "Cookie: $(cat cookies.txt | grep session | awk '{print $NF}')" \
+  -b cookies.txt \
   -d '{"label":"my-token"}'
 ```
 
@@ -155,10 +165,13 @@ pnpm install
 pnpm dev
 ```
 
-The web app is available at `http://localhost:3000`.
+The web app is available at `http://localhost:3000`. Sign in with the
+account you created in step 5 and start reading.
 
 ## Next steps
 
+- [Web UI Guide](/docs/web-ui) — learn the web interface.
 - [API Reference](/docs/api-reference) — all REST endpoints.
+- [Feed Lists](/docs/feed-lists) — share and follow collections of feeds.
 - [CLI](/docs/cli) — CLI and TUI usage.
 - [Self-Hosting](/docs/self-hosting) — production deployment.

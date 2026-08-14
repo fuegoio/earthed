@@ -339,6 +339,178 @@ curl -X DELETE http://localhost:8080/api/v1/categories/2 \
 
 Returns 204 No Content on success.
 
+## Feed Lists
+
+Feed lists are curated, shareable collections of feeds. See
+[Feed Lists](/docs/feed-lists) for a usage guide.
+
+### GET /api/v1/feed-lists
+
+List feed lists owned by the authenticated user.
+
+```bash
+curl http://localhost:8080/api/v1/feed-lists \
+  -H "Authorization: Bearer pla_your-token"
+```
+
+```json
+[
+  {
+    "id": 1,
+    "user_id": 1,
+    "title": "Best engineering blogs",
+    "description": "A curated set.",
+    "is_public": true,
+    "created_at": "2025-08-14T12:00:00Z",
+    "updated_at": "2025-08-14T12:00:00Z"
+  }
+]
+```
+
+### POST /api/v1/feed-lists
+
+Create a feed list.
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `title` | string | Yes | List title (1-255 chars) |
+| `description` | string | No | List description |
+| `is_public` | bool | No | Whether the list is discoverable (default: false) |
+
+```bash
+curl -X POST http://localhost:8080/api/v1/feed-lists \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer pla_your-token" \
+  -d '{"title":"Best engineering blogs","description":"A curated set.","is_public":true}'
+```
+
+### GET `/api/v1/feed-lists/{listId}`
+
+Get a single feed list with its feeds. Visible to the owner, followers,
+and anyone if the list is public.
+
+```bash
+curl http://localhost:8080/api/v1/feed-lists/1 \
+  -H "Authorization: Bearer pla_your-token"
+```
+
+### PATCH `/api/v1/feed-lists/{listId}`
+
+Update a feed list's title, description, or visibility. Only the owner
+can update.
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `title` | string | No | New title |
+| `description` | string | No | New description |
+| `is_public` | bool | No | New visibility |
+
+```bash
+curl -X PATCH http://localhost:8080/api/v1/feed-lists/1 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer pla_your-token" \
+  -d '{"is_public":false}'
+```
+
+### DELETE `/api/v1/feed-lists/{listId}`
+
+Delete a feed list. Only the owner can delete.
+
+```bash
+curl -X DELETE http://localhost:8080/api/v1/feed-lists/1 \
+  -H "Authorization: Bearer pla_your-token"
+```
+
+Returns 204 No Content on success.
+
+### POST `/api/v1/feed-lists/{listId}/feeds`
+
+Add a feed to a list. Only the list owner can add feeds.
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `feed_url` | string | Yes | Feed URL (1-2048 chars) |
+| `title` | string | No | Optional title override |
+
+```bash
+curl -X POST http://localhost:8080/api/v1/feed-lists/1/feeds \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer pla_your-token" \
+  -d '{"feed_url":"https://blog.golang.org/feeds/posts/default","title":"The Go Blog"}'
+```
+
+Adding the same feed URL twice is a no-op (the existing entry is
+returned).
+
+### DELETE `/api/v1/feed-lists/{listId}/feeds/{itemId}`
+
+Remove a feed from a list.
+
+```bash
+curl -X DELETE http://localhost:8080/api/v1/feed-lists/1/feeds/3 \
+  -H "Authorization: Bearer pla_your-token"
+```
+
+Returns 204 No Content on success.
+
+### GET /api/v1/feed-lists/discover
+
+List public feed lists created by other users.
+
+```bash
+curl http://localhost:8080/api/v1/feed-lists/discover \
+  -H "Authorization: Bearer pla_your-token"
+```
+
+### GET /api/v1/feed-lists/followed
+
+List feed lists the authenticated user follows.
+
+```bash
+curl http://localhost:8080/api/v1/feed-lists/followed \
+  -H "Authorization: Bearer pla_your-token"
+```
+
+### POST `/api/v1/feed-lists/{listId}/follow`
+
+Follow a public feed list. You cannot follow your own list or a private
+list.
+
+```bash
+curl -X POST http://localhost:8080/api/v1/feed-lists/1/follow \
+  -H "Authorization: Bearer pla_your-token"
+```
+
+### DELETE `/api/v1/feed-lists/{listId}/follow`
+
+Unfollow a feed list.
+
+```bash
+curl -X DELETE http://localhost:8080/api/v1/feed-lists/1/follow \
+  -H "Authorization: Bearer pla_your-token"
+```
+
+Returns 204 No Content on success.
+
+### POST `/api/v1/feed-lists/{listId}/import`
+
+Subscribe to every feed in a list. Returns a summary of imported,
+skipped (already subscribed), and failed feeds. Idempotent — running it
+again only creates subscriptions for feeds you don't already have.
+
+```bash
+curl -X POST http://localhost:8080/api/v1/feed-lists/1/import \
+  -H "Authorization: Bearer pla_your-token"
+```
+
+```json
+{
+  "imported": 8,
+  "skipped": 2,
+  "failed": 0
+}
+```
+
 ## API Tokens
 
 ### GET /api/v1/tokens
@@ -464,6 +636,29 @@ Returns 204 No Content on success.
 | `id` | int | Category ID |
 | `user_id` | int | Owning user ID |
 | `title` | string | Category name |
+| `created_at` | string | Creation timestamp |
+
+### Feed List
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | int | List ID |
+| `user_id` | int | Owning user ID |
+| `title` | string | List title |
+| `description` | string | List description (omitted if empty) |
+| `is_public` | bool | Whether the list is discoverable |
+| `created_at` | string | Creation timestamp |
+| `updated_at` | string | Last update timestamp |
+
+### Feed List Item
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | int | Item ID |
+| `feed_list_id` | int | Parent list ID |
+| `feed_url` | string | Feed URL |
+| `title` | string | Feed title (metadata snapshot) |
+| `site_url` | string | Site URL (metadata snapshot, omitted if empty) |
 | `created_at` | string | Creation timestamp |
 
 ### API Token

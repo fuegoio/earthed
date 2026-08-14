@@ -5,7 +5,14 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { Compass, Globe, Loader2, UserPlus, Check } from "lucide-react"
 import { Button, buttonVariants } from "@workspace/ui/components/button"
-import { Empty, EmptyDescription, EmptyTitle } from "@/components/empty"
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/empty"
 import {
   getClient,
   discoverFeedLists,
@@ -61,20 +68,24 @@ export default function DiscoverPage() {
           </div>
         ) : (lists ?? []).length === 0 ? (
           <Empty>
-            <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10">
-              <Globe className="size-6 text-primary" />
-            </div>
-            <EmptyTitle>No public lists yet</EmptyTitle>
-            <EmptyDescription>
-              Be the first — create a list and make it public so others can
-              follow.
-            </EmptyDescription>
-            <Link
-              href="/lists/new"
-              className={cn(buttonVariants({ size: "sm" }), "mt-2")}
-            >
-              Create a list
-            </Link>
+            <EmptyHeader>
+              <EmptyMedia>
+                <Globe className="size-6 text-primary" />
+              </EmptyMedia>
+              <EmptyTitle>No public lists yet</EmptyTitle>
+              <EmptyDescription>
+                Be the first — create a list and make it public so others can
+                follow.
+              </EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent>
+              <Link
+                href="/lists/new"
+                className={cn(buttonVariants({ size: "sm" }))}
+              >
+                Create a list
+              </Link>
+            </EmptyContent>
           </Empty>
         ) : (
           (lists ?? []).map((list) => (
