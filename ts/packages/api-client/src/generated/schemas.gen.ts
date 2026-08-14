@@ -267,9 +267,6 @@ export const EntrySchema = {
         comments_url: {
             type: 'string'
         },
-        content: {
-            type: 'string'
-        },
         description: {
             type: 'string'
         },
@@ -333,7 +330,6 @@ export const EntrySchema = {
         'hash',
         'title',
         'url',
-        'content',
         'status',
         'starred',
         'liked',
@@ -1135,9 +1131,6 @@ export const EntryWritableSchema = {
         comments_url: {
             type: 'string'
         },
-        content: {
-            type: 'string'
-        },
         description: {
             type: 'string'
         },
@@ -1201,7 +1194,6 @@ export const EntryWritableSchema = {
         'hash',
         'title',
         'url',
-        'content',
         'status',
         'starred',
         'liked',

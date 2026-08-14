@@ -84,7 +84,6 @@ export type Entry = {
     author?: string;
     changed_at: string;
     comments_url?: string;
-    content: string;
     description?: string;
     enclosures?: Array<Enclosure> | null;
     feed_id: number;
@@ -345,7 +344,6 @@ export type EntryWritable = {
     author?: string;
     changed_at: string;
     comments_url?: string;
-    content: string;
     description?: string;
     enclosures?: Array<Enclosure> | null;
     feed_id: number;

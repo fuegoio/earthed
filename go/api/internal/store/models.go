@@ -45,7 +45,7 @@ type Entry struct {
 	URL         string      `json:"url"`
 	CommentsURL string      `json:"comments_url,omitempty"`
 	Author      string      `json:"author,omitempty"`
-	Content     string      `json:"content"`
+	Content     string      `json:"-"`
 	Description string      `json:"description,omitempty"`
 	Status      string      `json:"status"`
 	Starred     bool        `json:"starred"`

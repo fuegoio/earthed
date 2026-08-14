@@ -260,9 +260,6 @@
                     "comments_url": {
                         "type": "string"
                     },
-                    "content": {
-                        "type": "string"
-                    },
                     "description": {
                         "type": "string"
                     },
@@ -326,7 +323,6 @@
                     "hash",
                     "title",
                     "url",
-                    "content",
                     "status",
                     "starred",
                     "liked",

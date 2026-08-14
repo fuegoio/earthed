@@ -1,9 +1,9 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useState, useOptimistic, startTransition } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { ExternalLink, ArrowLeft, Circle } from "lucide-react"
+import { ExternalLink, ArrowLeft, Circle, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import { Button, buttonVariants } from "@workspace/ui/components/button"
 import { StarToggle } from "@/components/star-toggle"
@@ -16,9 +16,10 @@ import { cn } from "@workspace/ui/lib/utils"
 import type { Entry, Feed } from "@/lib/types"
 
 /**
- * Reading view for a single entry. Renders sanitized HTML content (the API
- * already sanitizes via bluemonday). Marks the entry read on open if it was
- * unread, and exposes mark-unread + star actions.
+ * Reading view for a single entry. Hacker News-style: just the title,
+ * metadata, and a short description. No full article body is rendered.
+ * Does NOT auto-mark as read on open; the user must explicitly mark or
+ * open the link.
  */
 export function EntryReader({
   entry: initialEntry,
@@ -28,42 +29,31 @@ export function EntryReader({
   feed?: Feed
 }) {
   const queryClient = useQueryClient()
-  const [entry, setEntry] = useState(initialEntry)
-  const markedRef = useRef(false)
+  const [status, setStatus] = useState(initialEntry.status)
+  const [optimisticStatus, setOptimisticStatus] = useOptimistic(status)
+  const [pending, setPending] = useState(false)
 
-  // Mark as read on open (one-time side effect). Idempotent, so StrictMode
-  // double-invoke in dev is harmless.
-  useEffect(() => {
-    if (markedRef.current) return
-    markedRef.current = true
-    if (entry.status !== "unread") return
+  function handleToggleRead() {
+    const next = optimisticStatus === "unread" ? "read" : "unread"
+    startTransition(() => {
+      setOptimisticStatus(next)
+      setPending(true)
+    })
     void (async () => {
       const { error } = await updateEntries({
         client: await getClient(),
-        body: { entry_ids: [entry.id], status: "read" },
+        body: { entry_ids: [initialEntry.id], status: next },
       })
       if (error) {
-        toast.error(getApiErrorMessage(error, "Could not mark as read"))
+        toast.error(getApiErrorMessage(error, "Could not update entry"))
         return
       }
-      setEntry((e) => ({ ...e, status: "read" }))
+      setStatus(next)
       await queryClient.invalidateQueries({ queryKey: ["entries"] })
-    })()
-  }, [entry.id, entry.status, queryClient])
-
-  async function handleMarkUnread() {
-    setEntry((e) => ({ ...e, status: "unread" }))
-    const { error } = await updateEntries({
-      client: await getClient(),
-      body: { entry_ids: [entry.id], status: "unread" },
-    })
-    if (error) {
-      toast.error(getApiErrorMessage(error, "Could not mark as unread"))
-      setEntry((e) => ({ ...e, status: "read" }))
-      return
-    }
-    await queryClient.invalidateQueries({ queryKey: ["entries"] })
+    })().finally(() => setPending(false))
   }
+
+  const isUnread = optimisticStatus === "unread"
 
   return (
     <article className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-6 sm:py-10">
@@ -87,52 +77,61 @@ export function EntryReader({
           )}
         </div>
         <h1 className="font-serif text-2xl font-bold leading-tight tracking-tight sm:text-3xl">
-          {entry.title || "Untitled"}
+          {initialEntry.title || "Untitled"}
         </h1>
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
-          {entry.author && <span>{entry.author}</span>}
-          {entry.author && <span aria-hidden>·</span>}
-          <time>{formatDateTime(entry.published_at)}</time>
+          {initialEntry.author && <span>{initialEntry.author}</span>}
+          {initialEntry.author && <span aria-hidden>·</span>}
+          <time>{formatDateTime(initialEntry.published_at)}</time>
         </div>
         <div className="flex items-center gap-2">
-          {entry.url && (
+          {initialEntry.url && (
             <a
-              href={entry.url}
+              href={initialEntry.url}
               target="_blank"
               rel="noopener noreferrer"
               className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
             >
               <ExternalLink className="size-3.5" />
-              Open original
+              Open
             </a>
           )}
           <Button
             variant="ghost"
             size="sm"
-            onClick={handleMarkUnread}
-            disabled={entry.status === "unread"}
+            onClick={handleToggleRead}
+            disabled={pending}
           >
-            <Circle className="size-3.5" />
-            Mark unread
+            {isUnread ? (
+              <>
+                <Circle className="size-3.5" />
+                Mark as read
+              </>
+            ) : (
+              <>
+                <CheckCircle className="size-3.5" />
+                Mark unread
+              </>
+            )}
           </Button>
           <div className="ml-auto flex items-center gap-0.5">
             <LikeToggle
-              entryId={entry.id}
-              liked={entry.liked}
+              entryId={initialEntry.id}
+              liked={initialEntry.liked}
               size="icon-sm"
             />
             <StarToggle
-              entryId={entry.id}
-              starred={entry.starred}
+              entryId={initialEntry.id}
+              starred={initialEntry.starred}
               size="icon-sm"
             />
           </div>
         </div>
       </header>
 
-      {entry.tags && entry.tags.length > 0 && (
+      {initialEntry.tags && initialEntry.tags.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-1.5">
-          {entry.tags.map((tag) => (
+          {initialEntry.tags.map((tag) => (
             <span
               key={tag}
               className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground"
@@ -143,11 +142,11 @@ export function EntryReader({
         </div>
       )}
 
-      <div
-        className="typeset typeset-article mt-6 max-w-none"
-        // Content is sanitized server-side by the API (bluemonday).
-        dangerouslySetInnerHTML={{ __html: (entry.content || entry.description) ?? "" }}
-      />
+      {initialEntry.description && (
+        <p className="mt-6 text-base leading-relaxed text-muted-foreground">
+          {initialEntry.description}
+        </p>
+      )}
     </article>
   )
 }
