@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useOptimistic } from "react"
+import { useState, useOptimistic, startTransition } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { Heart } from "lucide-react"
@@ -31,8 +31,10 @@ export function LikeToggle({
 
   async function handleToggle() {
     const next = !liked
-    setOptimistic(next)
-    setPending(true)
+    startTransition(() => {
+      setOptimistic(next)
+      setPending(true)
+    })
     try {
       const { error } = await toggleEntryLiked({
         client: await getClient(),

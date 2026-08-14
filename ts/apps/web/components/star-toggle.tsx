@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useOptimistic } from "react"
+import { useState, useOptimistic, startTransition } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { Star } from "lucide-react"
@@ -31,8 +31,10 @@ export function StarToggle({
 
   async function handleToggle() {
     const next = !starred
-    setOptimistic(next)
-    setPending(true)
+    startTransition(() => {
+      setOptimistic(next)
+      setPending(true)
+    })
     try {
       const { error } = await toggleEntryStarred({
         client: await getClient(),
