@@ -1,30 +1,58 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { ExternalLink, Trash2, CheckCheck, Loader2 } from "lucide-react"
+import { ExternalLink, Trash2, CheckCheck, Loader2, RefreshCw } from "lucide-react"
 import { Button, buttonVariants } from "@workspace/ui/components/button"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { FeedIcon } from "@/components/feed-icon"
 import { EntryTimeline } from "@/components/entry-timeline"
-import { getClient, markFeedRead, deleteFeed } from "@/lib/planetary"
+import { getClient, markFeedRead, deleteFeed, refreshFeed } from "@/lib/planetary"
 import { getApiErrorMessage } from "@/lib/errors"
 import { cn } from "@workspace/ui/lib/utils"
 import type { Feed } from "@/lib/types"
 
 /**
- * Feed detail view: header with site link, mark-all-read, and delete actions,
- * plus the feed's entry timeline. Delete and mark-read are client mutations
- * that invalidate the shared ["entries"] and ["feeds"] caches.
+ * Feed detail view: header with site link, mark-all-read, refresh, and delete
+ * actions, plus the feed's entry timeline. The feed is refreshed on mount so
+ * the latest articles are fetched without waiting for the scheduler.
  */
 export function FeedDetail({ feed }: { feed: Feed }) {
   const router = useRouter()
   const queryClient = useQueryClient()
   const [marking, setMarking] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
+  const refreshedRef = useRef(false)
+
+  async function handleRefresh() {
+    setRefreshing(true)
+    try {
+      const { error } = await refreshFeed({
+        client: await getClient(),
+        path: { feedId: feed.id },
+      })
+      if (error) throw error
+      await queryClient.invalidateQueries({ queryKey: ["entries"] })
+      await queryClient.invalidateQueries({ queryKey: ["feeds"] })
+      toast.success("Feed refreshed")
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, "Could not refresh feed"))
+    } finally {
+      setRefreshing(false)
+    }
+  }
+
+  // Auto-refresh on mount (once per component instance)
+  useEffect(() => {
+    if (refreshedRef.current) return
+    refreshedRef.current = true
+    handleRefresh()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function handleMarkAllRead() {
     setMarking(true)
@@ -94,6 +122,19 @@ export function FeedDetail({ feed }: { feed: Feed }) {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={refreshing}
+          >
+            {refreshing ? (
+              <Loader2 className="size-3.5 animate-spin" />
+            ) : (
+              <RefreshCw className="size-3.5" />
+            )}
+            Refresh
+          </Button>
           <Button
             variant="outline"
             size="sm"

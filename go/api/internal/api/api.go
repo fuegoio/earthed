@@ -23,16 +23,21 @@ import (
 
 // API wires the store and auth to a huma router and registers the REST routes.
 type API struct {
-	huma    huma.API
-	store   *store.Store
-	auth    *auth.Auth
-	fetcher *fetcher.Fetcher
+	huma      huma.API
+	store     *store.Store
+	auth      *auth.Auth
+	fetcher   *fetcher.Fetcher
+	processor *processor.Processor
 }
 
 // New returns an API bound to the given huma router, store, auth, and fetcher.
 // The fetcher may be nil when only generating the OpenAPI spec (--openapi flag).
 func New(humaAPI huma.API, st *store.Store, authInst *auth.Auth, f *fetcher.Fetcher) *API {
-	return &API{huma: humaAPI, store: st, auth: authInst, fetcher: f}
+	var proc *processor.Processor
+	if st != nil && f != nil {
+		proc = processor.New(st, f)
+	}
+	return &API{huma: humaAPI, store: st, auth: authInst, fetcher: f, processor: proc}
 }
 
 // OpenAPITags returns the ordered tag list for the OpenAPI spec.
@@ -306,6 +311,40 @@ func (a *API) registerFeedRoutes() {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
 		return nil, nil
+	})
+
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "refresh-feed",
+		Method:      http.MethodPost,
+		Path:        "/api/v1/feeds/{feedId}/refresh",
+		Summary:     "Refresh a feed",
+		Description: "Manually fetch and parse the feed, inserting any new entries. Use this to get the latest articles without waiting for the scheduler.",
+		Tags:        []string{"feeds"},
+	}, func(ctx context.Context, input *struct {
+		FeedID int `path:"feedId"`
+	}) (*FeedOutput, error) {
+		if a.processor == nil {
+			return nil, huma.Error503ServiceUnavailable("feed processor is not available")
+		}
+		userID := auth.UserIDFromCtx(ctx)
+		feed, err := a.store.GetFeedByID(ctx, input.FeedID, userID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if feed == nil {
+			return nil, huma.Error404NotFound("feed not found")
+		}
+		if err := a.processor.ProcessFeed(ctx, feed); err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		feed, err = a.store.GetFeedByID(ctx, input.FeedID, userID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if feed == nil {
+			return nil, huma.Error404NotFound("feed not found")
+		}
+		return &FeedOutput{Body: *feed}, nil
 	})
 
 	huma.Register(a.huma, huma.Operation{

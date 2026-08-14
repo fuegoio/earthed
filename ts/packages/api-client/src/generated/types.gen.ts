@@ -1140,6 +1140,33 @@ export type MarkFeedReadResponses = {
 
 export type MarkFeedReadResponse = MarkFeedReadResponses[keyof MarkFeedReadResponses];
 
+export type RefreshFeedData = {
+    body?: never;
+    path: {
+        feedId: number;
+    };
+    query?: never;
+    url: '/api/v1/feeds/{feedId}/refresh';
+};
+
+export type RefreshFeedErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type RefreshFeedError = RefreshFeedErrors[keyof RefreshFeedErrors];
+
+export type RefreshFeedResponses = {
+    /**
+     * OK
+     */
+    200: Feed;
+};
+
+export type RefreshFeedResponse = RefreshFeedResponses[keyof RefreshFeedResponses];
+
 export type HealthData = {
     body?: never;
     path?: never;
