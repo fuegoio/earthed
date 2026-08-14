@@ -397,6 +397,15 @@ func (s *Store) MarkFeedEntriesRead(ctx context.Context, feedID, userID int) err
 	return err
 }
 
+// CountEntriesByFeed returns the number of entries for the given feed.
+func (s *Store) CountEntriesByFeed(ctx context.Context, feedID int) (int, error) {
+	var count int
+	err := s.DB.QueryRowContext(ctx,
+		`SELECT COUNT(*) FROM entries WHERE feed_id = $1`, feedID,
+	).Scan(&count)
+	return count, err
+}
+
 // --- Enclosures ---
 
 // CreateEnclosure inserts a media attachment for an entry.
