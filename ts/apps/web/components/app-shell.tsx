@@ -14,7 +14,7 @@ export function AppShell({
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="flex min-h-svh">
+    <div className="flex h-svh overflow-hidden">
       <AppSidebar
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -24,7 +24,7 @@ export function AppShell({
           onMenuClick={() => setSidebarOpen(true)}
           userEmail={userEmail}
         />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
   )
