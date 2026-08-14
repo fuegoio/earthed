@@ -12,6 +12,7 @@
     "typecheck": "astro check"
   },
   "dependencies": {
+    "@workspace/ui": "workspace:*",
     "astro": "^5.13.0"
   },
   "devDependencies": {

@@ -163,6 +163,9 @@ importers:
 
   apps/website:
     dependencies:
+      '@workspace/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       astro:
         specifier: ^5.13.0
         version: 5.18.2(@types/node@20.19.41)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.4)(typescript@5.9.3)(yaml@2.9.0)

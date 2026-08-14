@@ -1,15 +1,17 @@
 @import "tailwindcss";
+@import "@workspace/ui/tokens.css";
 
 /*
  * Planetary marketing site — design tokens
- * Brand orange derived from the logo (#FF6923 ≈ oklch(0.702 0.255 78.8)).
- * Hero is a committed dark-dawn sky; the sun IS the light source.
- * Below the fold: warm off-white, reading-first.
+ * Color tokens are shared from @workspace/ui (tokens.css) so every
+ * Planetary surface uses the same palette. The brand orange
+ * (--primary, oklch 0.702 0.255 78.8) is the sun. Marketing-specific
+ * tokens (sky, glow, haze) layer on top for the dawn hero.
  */
 
 @theme {
-  /* Brand */
-  --color-sun: oklch(0.702 0.255 78.8);
+  /* Brand — aliases of the shared --primary token */
+  --color-sun: var(--primary);
   --color-sun-glow: oklch(0.748 0.238 80);
   --color-sun-deep: oklch(0.62 0.248 60);
 
@@ -19,11 +21,11 @@
   --color-sky-warm: oklch(0.22 0.045 60);
   --color-sky-haze: oklch(0.32 0.07 65);
 
-  /* Light surface (below the fold) — true off-white, barely tinted */
-  --color-paper: oklch(0.985 0.002 79);
-  --color-ink: oklch(0.16 0.005 79);
-  --color-ink-soft: oklch(0.42 0.012 79);
-  --color-rule: oklch(0.9 0.006 79);
+  /* Light surface — aliases of shared tokens */
+  --color-paper: var(--background);
+  --color-ink: var(--foreground);
+  --color-ink-soft: var(--muted-foreground);
+  --color-rule: var(--border);
 
   /* Fonts */
   --font-display: "Bricolage Grotesque", system-ui, sans-serif;
@@ -32,11 +34,13 @@
 
 :root {
   color-scheme: light;
-  --sun: oklch(0.702 0.255 78.8);
-  --ink: oklch(0.16 0.005 79);
-  --ink-soft: oklch(0.42 0.012 79);
-  --paper: oklch(0.985 0.002 79);
-  --rule: oklch(0.9 0.006 79);
+
+  /* Marketing aliases — map to shared tokens from @workspace/ui */
+  --sun: var(--primary);
+  --ink: var(--foreground);
+  --ink-soft: var(--muted-foreground);
+  --paper: var(--background);
+  --rule: var(--border);
 }
 
 * {
@@ -61,7 +65,7 @@ body {
 }
 
 ::selection {
-  background-color: oklch(0.702 0.255 78.8 / 0.25);
+  background-color: color-mix(in oklab, var(--primary) 25%, transparent);
   color: var(--ink);
 }
 
@@ -240,10 +244,10 @@ button {
 @keyframes sun-pulse {
   0%,
   100% {
-    filter: drop-shadow(0 0 60px oklch(0.702 0.255 78.8 / 0.35));
+    filter: drop-shadow(0 0 60px color-mix(in oklab, var(--primary) 35%, transparent));
   }
   50% {
-    filter: drop-shadow(0 0 90px oklch(0.748 0.238 80 / 0.5));
+    filter: drop-shadow(0 0 90px color-mix(in oklab, var(--color-sun-glow) 50%, transparent));
   }
 }
 

@@ -143,7 +143,7 @@ const selfHostUrl = "https://github.com/planetary-dev/planetary"
       <div class="footer-brand">
         <span class="footer-mark" aria-hidden="true">
           <svg width="24" height="24" viewBox="0 0 615 615" fill="none">
-            <circle cx="308" cy="307" r="160" fill="oklch(0.702 0.255 78.8)" />
+            <circle cx="308" cy="307" r="160" fill="var(--primary)" />
           </svg>
         </span>
         <span>Planetary</span>
@@ -236,9 +236,9 @@ const selfHostUrl = "https://github.com/planetary-dev/planetary"
     background:
       radial-gradient(
         circle at center,
-        oklch(0.748 0.238 80 / 0.45) 0%,
-        oklch(0.702 0.255 78.8 / 0.25) 30%,
-        oklch(0.62 0.248 60 / 0.1) 55%,
+        color-mix(in oklab, var(--color-sun-glow) 45%, transparent) 0%,
+        color-mix(in oklab, var(--primary) 25%, transparent) 30%,
+        color-mix(in oklab, var(--color-sun-deep) 10%, transparent) 55%,
         transparent 70%
       );
     filter: blur(8px);
@@ -260,7 +260,7 @@ const selfHostUrl = "https://github.com/planetary-dev/planetary"
   .sun-logo-mark {
     width: 100%;
     height: 100%;
-    filter: drop-shadow(0 0 50px oklch(0.702 0.255 78.8 / 0.4));
+    filter: drop-shadow(0 0 50px color-mix(in oklab, var(--primary) 40%, transparent));
   }
 
   /* Content — wordmark, tagline, CTAs */
@@ -325,19 +325,19 @@ const selfHostUrl = "https://github.com/planetary-dev/planetary"
   }
 
   .cta-primary {
-    background-color: oklch(0.702 0.255 78.8);
-    color: oklch(0.15 0.01 79);
+    background-color: var(--primary);
+    color: var(--primary-foreground);
     box-shadow:
-      0 4px 24px oklch(0.702 0.255 78.8 / 0.35),
-      0 1px 2px oklch(0.702 0.255 78.8 / 0.2);
+      0 4px 24px color-mix(in oklab, var(--primary) 35%, transparent),
+      0 1px 2px color-mix(in oklab, var(--primary) 20%, transparent);
   }
 
   .cta-primary:hover {
-    background-color: oklch(0.748 0.238 80);
+    background-color: var(--color-sun-glow);
     transform: translateY(-1px);
     box-shadow:
-      0 6px 32px oklch(0.702 0.255 78.8 / 0.45),
-      0 1px 2px oklch(0.702 0.255 78.8 / 0.3);
+      0 6px 32px color-mix(in oklab, var(--primary) 45%, transparent),
+      0 1px 2px color-mix(in oklab, var(--primary) 30%, transparent);
   }
 
   .cta-primary:active {
@@ -388,7 +388,7 @@ const selfHostUrl = "https://github.com/planetary-dev/planetary"
     font-family: var(--font-display);
     font-weight: 500;
     font-size: 0.875rem;
-    color: oklch(0.62 0.18 78.8);
+    color: color-mix(in oklab, var(--primary) 85%, var(--foreground));
     margin: 0 0 1rem;
     letter-spacing: 0.02em;
   }
@@ -444,7 +444,7 @@ const selfHostUrl = "https://github.com/planetary-dev/planetary"
   /* ── Footer ──────────────────────────────────────────────────── */
 
   .site-footer {
-    background-color: oklch(0.96 0.004 79);
+    background-color: var(--muted);
     border-top: 1px solid var(--rule);
     padding: 3rem 1.5rem;
   }
