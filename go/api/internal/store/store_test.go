@@ -44,7 +44,7 @@ func seedUser(t *testing.T, s *Store, email string) int {
 		t.Fatalf("seed user: %v", err)
 	}
 	t.Cleanup(func() {
-		s.DB.Exec(`DELETE FROM users WHERE id = $1`, id)
+		_, _ = s.DB.Exec(`DELETE FROM users WHERE id = $1`, id)
 	})
 	return id
 }
@@ -61,7 +61,7 @@ func seedFeed(t *testing.T, s *Store, userID int, categoryID *int, title string)
 		t.Fatalf("seed feed: %v", err)
 	}
 	t.Cleanup(func() {
-		s.DB.Exec(`DELETE FROM feeds WHERE id = $1`, id)
+		_, _ = s.DB.Exec(`DELETE FROM feeds WHERE id = $1`, id)
 	})
 	return id
 }
@@ -80,7 +80,7 @@ func seedEntry(t *testing.T, s *Store, userID, feedID int, title, status string,
 		t.Fatalf("seed entry: %v", err)
 	}
 	t.Cleanup(func() {
-		s.DB.Exec(`DELETE FROM entries WHERE id = $1`, id)
+		_, _ = s.DB.Exec(`DELETE FROM entries WHERE id = $1`, id)
 	})
 	return id
 }
@@ -125,7 +125,7 @@ func TestListEntriesByCategoryID(t *testing.T) {
 	if err != nil {
 		t.Fatalf("seed category: %v", err)
 	}
-	t.Cleanup(func() { s.DB.Exec(`DELETE FROM categories WHERE id = $1`, catID) })
+	t.Cleanup(func() { _, _ = s.DB.Exec(`DELETE FROM categories WHERE id = $1`, catID) })
 
 	feedID := seedFeed(t, s, userID, &catID, "Cat Feed")
 	seedEntry(t, s, userID, feedID, "Cat Entry", "unread", false)

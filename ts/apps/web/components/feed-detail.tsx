@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useQueryClient } from "@tanstack/react-query"
@@ -16,9 +16,9 @@ import { cn } from "@workspace/ui/lib/utils"
 import type { Feed } from "@/lib/types"
 
 /**
- * Feed detail view: header with site link, mark-all-read, refresh, and delete
- * actions, plus the feed's entry timeline. The feed is refreshed on mount so
- * the latest articles are fetched without waiting for the scheduler.
+ * Feed detail view: header with site link, refresh, mark-all-read, and delete
+ * actions, plus the feed's entry timeline. The feed is refreshed server-side
+ * before this component renders; the refresh button here is for on-demand use.
  */
 export function FeedDetail({ feed }: { feed: Feed }) {
   const router = useRouter()
@@ -26,7 +26,6 @@ export function FeedDetail({ feed }: { feed: Feed }) {
   const [marking, setMarking] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
-  const refreshedRef = useRef(false)
 
   async function handleRefresh() {
     setRefreshing(true)
@@ -45,14 +44,6 @@ export function FeedDetail({ feed }: { feed: Feed }) {
       setRefreshing(false)
     }
   }
-
-  // Auto-refresh on mount (once per component instance)
-  useEffect(() => {
-    if (refreshedRef.current) return
-    refreshedRef.current = true
-    handleRefresh()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   async function handleMarkAllRead() {
     setMarking(true)

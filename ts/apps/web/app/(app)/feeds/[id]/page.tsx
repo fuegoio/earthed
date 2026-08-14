@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation"
-import { getClient, getFeed } from "@/lib/planetary"
+import { getClient, getFeed, refreshFeed } from "@/lib/planetary"
 import { getApiErrorMessage, apiErrorStatus } from "@/lib/errors"
 import { ApiError } from "@/components/api-error"
 import { FeedDetail } from "@/components/feed-detail"
@@ -50,5 +50,21 @@ export default async function FeedPage({
   }
   if (!feed) notFound()
 
-  return <FeedDetail feed={feed as Feed} />
+  // Refresh the feed server-side so the latest articles are fetched before
+  // the page renders. Errors are non-fatal — the page still renders with
+  // whatever entries were already stored.
+  let refreshedFeed = feed as Feed
+  try {
+    const { data: refreshed, error: refreshError } = await refreshFeed({
+      client,
+      path: { feedId },
+    })
+    if (!refreshError && refreshed) {
+      refreshedFeed = refreshed as Feed
+    }
+  } catch {
+    // refresh is best-effort
+  }
+
+  return <FeedDetail feed={refreshedFeed} />
 }
