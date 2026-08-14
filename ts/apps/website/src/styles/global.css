@@ -1,0 +1,295 @@
+@import "tailwindcss";
+
+/*
+ * Planetary marketing site — design tokens
+ * Brand orange derived from the logo (#FF6923 ≈ oklch(0.702 0.255 78.8)).
+ * Hero is a committed dark-dawn sky; the sun IS the light source.
+ * Below the fold: warm off-white, reading-first.
+ */
+
+@theme {
+  /* Brand */
+  --color-sun: oklch(0.702 0.255 78.8);
+  --color-sun-glow: oklch(0.748 0.238 80);
+  --color-sun-deep: oklch(0.62 0.248 60);
+
+  /* Dawn sky (hero) — deep warm near-black, tinted toward the sun hue */
+  --color-sky-deep: oklch(0.12 0.018 55);
+  --color-sky-mid: oklch(0.16 0.028 55);
+  --color-sky-warm: oklch(0.22 0.045 60);
+  --color-sky-haze: oklch(0.32 0.07 65);
+
+  /* Light surface (below the fold) — true off-white, barely tinted */
+  --color-paper: oklch(0.985 0.002 79);
+  --color-ink: oklch(0.16 0.005 79);
+  --color-ink-soft: oklch(0.42 0.012 79);
+  --color-rule: oklch(0.9 0.006 79);
+
+  /* Fonts */
+  --font-display: "Bricolage Grotesque", system-ui, sans-serif;
+  --font-body: "Hanken Grotesk", system-ui, sans-serif;
+}
+
+:root {
+  color-scheme: light;
+  --sun: oklch(0.702 0.255 78.8);
+  --ink: oklch(0.16 0.005 79);
+  --ink-soft: oklch(0.42 0.012 79);
+  --paper: oklch(0.985 0.002 79);
+  --rule: oklch(0.9 0.006 79);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background-color: var(--paper);
+  color: var(--ink);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: oklch(0.702 0.255 78.8 / 0.25);
+  color: var(--ink);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--sun);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ── Hero animation ──────────────────────────────────────────────
+   One orchestrated sequence on load:
+   1. Sky is dark; a faint haze sits low.
+   2. Sun rises from below the horizon (translateY) with an ease-out-quart.
+   3. As the sun nears its resting position, the glow blooms and the sky
+      warms (the sky tint lifts).
+   4. "Planetary" wordmark fades + lifts in, followed by the tagline
+      and CTAs.
+   Everything is visible by default (no content gated on JS), the
+   animation merely enhances the entrance.
+*/
+
+/*
+ * Sun rises from the left along a circular arc.
+ * Keyframes approximate a quadratic bezier curve from (-520, 200)
+ * to (0, 0) with control point (-260, 50), so the sun always
+ * moves right and up — never overshooting its resting position.
+ */
+@keyframes sun-rise {
+  0% {
+    transform: translate(-520px, 200px);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  25% {
+    transform: translate(-390px, 131px);
+  }
+  50% {
+    transform: translate(-260px, 75px);
+  }
+  75% {
+    transform: translate(-130px, 31px);
+  }
+  100% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes glow-bloom {
+  0%,
+  30% {
+    opacity: 0;
+    transform: translate(-50%, -55%) scale(0.6);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -55%) scale(1);
+  }
+}
+
+@keyframes sky-warm {
+  0% {
+    opacity: 0;
+  }
+  60% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes wordmark-in {
+  0%,
+  55% {
+    opacity: 0;
+    transform: translateY(0.5rem);
+    filter: blur(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes fade-up {
+  0%,
+  68% {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  0%,
+  72% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Staggered CTA row */
+@keyframes cta-in {
+  0%,
+  76% {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sun-wrap {
+  animation: sun-rise 2.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.sun-glow {
+  animation: glow-bloom 3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.4s;
+}
+
+.sky-warm-layer {
+  animation: sky-warm 3.6s ease-out both;
+}
+
+.wordmark {
+  animation: wordmark-in 1.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 1.4s;
+}
+
+.tagline {
+  animation: fade-up 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 2s;
+}
+
+.cta-row > *:nth-child(1) {
+  animation: cta-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 2.4s;
+}
+
+.cta-row > *:nth-child(2) {
+  animation: cta-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 2.55s;
+}
+
+.scroll-cue {
+  animation: fade-in 1.5s ease-out both;
+  animation-delay: 3.2s;
+}
+
+/* The dawn haze drifts very slowly for atmosphere */
+@keyframes haze-drift {
+  0%,
+  100% {
+    transform: translateX(-2%) translateY(0);
+  }
+  50% {
+    transform: translateX(2%) translateY(-1%);
+  }
+}
+
+.haze-layer {
+  animation: haze-drift 24s ease-in-out infinite;
+}
+
+/* Sun subtle pulse after settling — the "living" star */
+@keyframes sun-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 60px oklch(0.702 0.255 78.8 / 0.35));
+  }
+  50% {
+    filter: drop-shadow(0 0 90px oklch(0.748 0.238 80 / 0.5));
+  }
+}
+
+.sun-settled {
+  animation: sun-pulse 6s ease-in-out infinite;
+  animation-delay: 3s;
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────
+   Replace the full sequence with a simple crossfade. Content is
+   visible immediately; no transform-based choreography.
+*/
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .sun-wrap,
+  .sun-glow,
+  .sky-warm-layer,
+  .wordmark,
+  .tagline,
+  .cta-row > *,
+  .scroll-cue,
+  .sun-settled,
+  .haze-layer {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    animation: none !important;
+  }
+}
