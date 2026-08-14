@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Rss } from "lucide-react"
+import { Logo } from "@/components/logo"
 
 export default function AuthLayout({
   children,
@@ -12,7 +12,7 @@ export default function AuthLayout({
         href="/"
         className="flex items-center gap-2 font-serif text-2xl font-bold"
       >
-        <Rss className="size-7 text-primary" />
+        <Logo className="size-8" />
         Planetary
       </Link>
       <div className="w-full max-w-sm">{children}</div>
