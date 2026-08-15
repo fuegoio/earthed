@@ -1,10 +1,10 @@
-import { Geist_Mono, Merriweather, IBM_Plex_Sans } from "next/font/google"
-import { Toaster } from "sonner"
+import { Geist_Mono, Merriweather, IBM_Plex_Sans } from "next/font/google";
+import { Toaster } from "@workspace/ui/components/sonner";
 
-import "@workspace/ui/globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import { QueryProvider } from "@/components/query-provider"
-import { cn } from "@workspace/ui/lib/utils"
+import "@workspace/ui/globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
+import { QueryProvider } from "@/components/query-provider";
+import { cn } from "@workspace/ui/lib/utils";
 
 export const metadata = {
   title: {
@@ -12,47 +12,42 @@ export const metadata = {
     template: "%s — Planetary",
   },
   description: "A modern, self-hostable RSS reader with a clean REST API.",
-}
+};
 
 const ibmPlexSans = IBM_Plex_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
-})
+});
 
 const merriweather = Merriweather({
   subsets: ["latin"],
   variable: "--font-serif",
-})
+});
 
 const geistMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
-})
+});
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn(
-        "antialiased",
-        ibmPlexSans.variable,
-        geistMono.variable,
-        merriweather.variable
-      )}
+      className={cn("antialiased", ibmPlexSans.variable, geistMono.variable, merriweather.variable)}
     >
       <body>
         <ThemeProvider>
           <QueryProvider>
             {children}
-            <Toaster richColors closeButton />
+            <Toaster />
           </QueryProvider>
         </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }
