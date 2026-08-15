@@ -621,6 +621,10 @@ export const FolderSchema = {
         title: {
             type: 'string'
         },
+        updated_at: {
+            format: 'date-time',
+            type: 'string'
+        },
         user_id: {
             format: 'int64',
             type: 'integer'
@@ -631,7 +635,8 @@ export const FolderSchema = {
         'user_id',
         'title',
         'sort_order',
-        'created_at'
+        'created_at',
+        'updated_at'
     ],
     type: 'object'
 } as const;
@@ -1552,6 +1557,10 @@ export const FolderWritableSchema = {
         title: {
             type: 'string'
         },
+        updated_at: {
+            format: 'date-time',
+            type: 'string'
+        },
         user_id: {
             format: 'int64',
             type: 'integer'
@@ -1562,7 +1571,8 @@ export const FolderWritableSchema = {
         'user_id',
         'title',
         'sort_order',
-        'created_at'
+        'created_at',
+        'updated_at'
     ],
     type: 'object'
 } as const;

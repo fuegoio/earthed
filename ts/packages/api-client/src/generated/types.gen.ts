@@ -200,6 +200,7 @@ export type Folder = {
     parent_id?: number;
     sort_order: number;
     title: string;
+    updated_at: string;
     user_id: number;
 };
 
@@ -463,6 +464,7 @@ export type FolderWritable = {
     parent_id?: number;
     sort_order: number;
     title: string;
+    updated_at: string;
     user_id: number;
 };
 

@@ -269,6 +269,7 @@ type Folder struct {
 	ParentId  *int64    `json:"parent_id,omitempty"`
 	SortOrder int64     `json:"sort_order"`
 	Title     string    `json:"title"`
+	UpdatedAt time.Time `json:"updated_at"`
 	UserId    int64     `json:"user_id"`
 }
 

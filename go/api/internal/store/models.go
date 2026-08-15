@@ -14,6 +14,7 @@ type Folder struct {
 	Title     string    `json:"title"`
 	SortOrder int       `json:"sort_order"`
 	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 // Feed represents a single RSS/Atom/JSON Feed subscription owned by a user.

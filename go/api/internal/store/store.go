@@ -34,9 +34,9 @@ func (s *Store) CreateFolder(ctx context.Context, userID int, title string, pare
 	err := s.DB.QueryRowContext(ctx,
 		`INSERT INTO folders (user_id, title, parent_id)
 		 VALUES ($1, $2, $3)
-		 RETURNING id, user_id, parent_id, title, sort_order, created_at`,
+		 RETURNING id, user_id, parent_id, title, sort_order, created_at, updated_at`,
 		userID, title, parentID,
-	).Scan(&f.ID, &f.UserID, &f.ParentID, &f.Title, &f.SortOrder, &f.CreatedAt)
+	).Scan(&f.ID, &f.UserID, &f.ParentID, &f.Title, &f.SortOrder, &f.CreatedAt, &f.UpdatedAt)
 	if err != nil {
 		return nil, fmt.Errorf("create folder: %w", err)
 	}
@@ -46,7 +46,7 @@ func (s *Store) CreateFolder(ctx context.Context, userID int, title string, pare
 // ListFolders returns all folders for the given user, ordered by sort_order then title.
 func (s *Store) ListFolders(ctx context.Context, userID int) ([]Folder, error) {
 	rows, err := s.DB.QueryContext(ctx,
-		`SELECT id, user_id, parent_id, title, sort_order, created_at
+		`SELECT id, user_id, parent_id, title, sort_order, created_at, updated_at
 		 FROM folders WHERE user_id = $1 ORDER BY sort_order ASC, title ASC`, userID)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (s *Store) ListFolders(ctx context.Context, userID int) ([]Folder, error) {
 	var folders []Folder
 	for rows.Next() {
 		var f Folder
-		if err := rows.Scan(&f.ID, &f.UserID, &f.ParentID, &f.Title, &f.SortOrder, &f.CreatedAt); err != nil {
+		if err := rows.Scan(&f.ID, &f.UserID, &f.ParentID, &f.Title, &f.SortOrder, &f.CreatedAt, &f.UpdatedAt); err != nil {
 			return nil, err
 		}
 		folders = append(folders, f)
@@ -67,9 +67,9 @@ func (s *Store) ListFolders(ctx context.Context, userID int) ([]Folder, error) {
 func (s *Store) GetFolderByID(ctx context.Context, id, userID int) (*Folder, error) {
 	var f Folder
 	err := s.DB.QueryRowContext(ctx,
-		`SELECT id, user_id, parent_id, title, sort_order, created_at
+		`SELECT id, user_id, parent_id, title, sort_order, created_at, updated_at
 		 FROM folders WHERE id = $1 AND user_id = $2`, id, userID,
-	).Scan(&f.ID, &f.UserID, &f.ParentID, &f.Title, &f.SortOrder, &f.CreatedAt)
+	).Scan(&f.ID, &f.UserID, &f.ParentID, &f.Title, &f.SortOrder, &f.CreatedAt, &f.UpdatedAt)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -86,9 +86,9 @@ func (s *Store) UpdateFolder(ctx context.Context, id, userID int, title string, 
 	err := s.DB.QueryRowContext(ctx,
 		`UPDATE folders SET title = $3, parent_id = $4, updated_at = NOW()
 		 WHERE id = $1 AND user_id = $2
-		 RETURNING id, user_id, parent_id, title, sort_order, created_at`,
+		 RETURNING id, user_id, parent_id, title, sort_order, created_at, updated_at`,
 		id, userID, title, parentID,
-	).Scan(&f.ID, &f.UserID, &f.ParentID, &f.Title, &f.SortOrder, &f.CreatedAt)
+	).Scan(&f.ID, &f.UserID, &f.ParentID, &f.Title, &f.SortOrder, &f.CreatedAt, &f.UpdatedAt)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
