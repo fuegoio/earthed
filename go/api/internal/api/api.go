@@ -761,6 +761,10 @@ func (a *API) subscribeToFeed(ctx context.Context, userID int, feedURL string, f
 		_ = a.processor.ProcessFeed(ctx, feed)
 	}
 
+	// Mark all entries as read so the user doesn't see a backlog of unread
+	// items from before they subscribed.
+	_ = a.store.MarkFeedEntriesRead(ctx, feed.ID, userID)
+
 	return feed, nil
 }
 
