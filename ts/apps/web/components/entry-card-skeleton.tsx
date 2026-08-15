@@ -3,7 +3,9 @@ import { Skeleton } from "@workspace/ui/components/skeleton"
 /**
  * Loading placeholder that mirrors the EntryCard layout: read/unread dot,
  * metadata row (favicon + feed title + time), two-line title, two-line
- * snippet, and a right-side action button.
+ * snippet, and a right-side action button. Element heights match the real
+ * card's line-heights (text-xs = 16px, text-sm = 20px) so borders don't
+ * jump when data replaces the skeleton.
  */
 export function EntryCardSkeleton() {
   return (
@@ -14,20 +16,21 @@ export function EntryCardSkeleton() {
       </div>
       {/* content */}
       <div className="min-w-0 flex-1">
-        {/* metadata row */}
+        {/* metadata row (text-xs, line-height 1rem) */}
         <div className="flex items-center gap-2">
           <Skeleton className="size-3.5 shrink-0 rounded-sm" />
-          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-4 w-24" />
           <span aria-hidden className="text-xs text-muted-foreground">
             ·
           </span>
-          <Skeleton className="h-3 w-12" />
+          <Skeleton className="h-4 w-12" />
         </div>
-        {/* title */}
-        <Skeleton className="mt-1 h-4 w-3/4" />
-        {/* snippet (two lines) */}
-        <Skeleton className="mt-1 h-3 w-full" />
-        <Skeleton className="mt-1 h-3 w-1/2" />
+        {/* title (text-sm line-clamp-2, ~20px per line) */}
+        <Skeleton className="mt-1 h-5 w-3/4" />
+        <Skeleton className="mt-1 h-5 w-1/2" />
+        {/* snippet (text-sm line-clamp-2, ~20px per line) */}
+        <Skeleton className="mt-1 h-5 w-full" />
+        <Skeleton className="mt-1 h-5 w-2/3" />
       </div>
       {/* right action */}
       <div className="flex shrink-0 items-start gap-0.5">
