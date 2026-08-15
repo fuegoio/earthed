@@ -423,6 +423,9 @@ export const EntrySchema = {
                 'null'
             ]
         },
+        entry_type: {
+            type: 'string'
+        },
         feed_id: {
             format: 'int64',
             type: 'integer'
@@ -471,6 +474,7 @@ export const EntrySchema = {
         'hash',
         'title',
         'url',
+        'entry_type',
         'status',
         'starred',
         'published_at',
@@ -622,6 +626,9 @@ export const FeedSchema = {
         site_url: {
             type: 'string'
         },
+        source: {
+            type: 'string'
+        },
         title: {
             type: 'string'
         },
@@ -640,6 +647,7 @@ export const FeedSchema = {
         'feed_url',
         'site_url',
         'title',
+        'source',
         'parsing_error_count',
         'disabled',
         'crawler',
@@ -1049,6 +1057,104 @@ export const PreviewFeedItemSchema = {
         'url',
         'content',
         'published_at'
+    ],
+    type: 'object'
+} as const;
+
+export const PreviewXFeedBodySchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/PreviewXFeedBody.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        feed_url: {
+            type: 'string'
+        },
+        items: {
+            items: {
+                $ref: '#/components/schemas/PreviewFeedItem'
+            },
+            type: [
+                'array',
+                'null'
+            ]
+        },
+        site_url: {
+            type: 'string'
+        },
+        title: {
+            type: 'string'
+        },
+        username: {
+            type: 'string'
+        }
+    },
+    required: [
+        'title',
+        'site_url',
+        'feed_url',
+        'username',
+        'items'
+    ],
+    type: 'object'
+} as const;
+
+export const PreviewXFeedInputBodySchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/PreviewXFeedInputBody.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        username: {
+            description: 'X @username (with or without the leading @)',
+            maxLength: 255,
+            minLength: 1,
+            type: 'string'
+        }
+    },
+    required: [
+        'username'
+    ],
+    type: 'object'
+} as const;
+
+export const SubscribeXFeedInputBodySchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/SubscribeXFeedInputBody.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        folder_id: {
+            format: 'int64',
+            type: 'integer'
+        },
+        username: {
+            description: 'X @username (with or without the leading @)',
+            maxLength: 255,
+            minLength: 1,
+            type: 'string'
+        }
+    },
+    required: [
+        'username'
     ],
     type: 'object'
 } as const;
@@ -1541,6 +1647,9 @@ export const EntryWritableSchema = {
                 'null'
             ]
         },
+        entry_type: {
+            type: 'string'
+        },
         feed_id: {
             format: 'int64',
             type: 'integer'
@@ -1589,6 +1698,7 @@ export const EntryWritableSchema = {
         'hash',
         'title',
         'url',
+        'entry_type',
         'status',
         'starred',
         'published_at',
@@ -1704,6 +1814,9 @@ export const FeedWritableSchema = {
         site_url: {
             type: 'string'
         },
+        source: {
+            type: 'string'
+        },
         title: {
             type: 'string'
         },
@@ -1722,6 +1835,7 @@ export const FeedWritableSchema = {
         'feed_url',
         'site_url',
         'title',
+        'source',
         'parsing_error_count',
         'disabled',
         'crawler',
@@ -2018,6 +2132,77 @@ export const PreviewFeedInputBodyWritableSchema = {
     },
     required: [
         'feed_url'
+    ],
+    type: 'object'
+} as const;
+
+export const PreviewXFeedBodyWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        feed_url: {
+            type: 'string'
+        },
+        items: {
+            items: {
+                $ref: '#/components/schemas/PreviewFeedItem'
+            },
+            type: [
+                'array',
+                'null'
+            ]
+        },
+        site_url: {
+            type: 'string'
+        },
+        title: {
+            type: 'string'
+        },
+        username: {
+            type: 'string'
+        }
+    },
+    required: [
+        'title',
+        'site_url',
+        'feed_url',
+        'username',
+        'items'
+    ],
+    type: 'object'
+} as const;
+
+export const PreviewXFeedInputBodyWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        username: {
+            description: 'X @username (with or without the leading @)',
+            maxLength: 255,
+            minLength: 1,
+            type: 'string'
+        }
+    },
+    required: [
+        'username'
+    ],
+    type: 'object'
+} as const;
+
+export const SubscribeXFeedInputBodyWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        folder_id: {
+            format: 'int64',
+            type: 'integer'
+        },
+        username: {
+            description: 'X @username (with or without the leading @)',
+            maxLength: 255,
+            minLength: 1,
+            type: 'string'
+        }
+    },
+    required: [
+        'username'
     ],
     type: 'object'
 } as const;

@@ -22,6 +22,7 @@ import (
 	"github.com/fuegoio/earthed/go/api/internal/reader/processor"
 	"github.com/fuegoio/earthed/go/api/internal/reader/sanitizer"
 	"github.com/fuegoio/earthed/go/api/internal/store"
+	"github.com/fuegoio/earthed/go/api/internal/reader/xclient"
 )
 
 // API wires the store and auth to a huma router and registers the REST routes.
@@ -31,18 +32,20 @@ type API struct {
 	auth      *auth.Auth
 	cfg       *config.Config
 	fetcher   *fetcher.Fetcher
+	xclient   *xclient.Client
 	processor *processor.Processor
 }
 
 // New returns an API bound to the given huma router, store, auth, config,
-// and fetcher. The fetcher may be nil when only generating the OpenAPI spec
-// (--openapi flag).
-func New(humaAPI huma.API, st *store.Store, authInst *auth.Auth, cfg *config.Config, f *fetcher.Fetcher) *API {
+// New returns an API bound to the given huma router, store, auth, config,
+// fetcher, and X API client. The fetcher and xclient may be nil when only
+// generating the OpenAPI spec (--openapi flag).
+func New(humaAPI huma.API, st *store.Store, authInst *auth.Auth, cfg *config.Config, f *fetcher.Fetcher, xc *xclient.Client) *API {
 	var proc *processor.Processor
-	if st != nil && f != nil {
-		proc = processor.New(st, f)
+	if st != nil && (f != nil || (xc != nil && xc.Enabled())) {
+		proc = processor.New(st, f, xc)
 	}
-	return &API{huma: humaAPI, store: st, auth: authInst, cfg: cfg, fetcher: f, processor: proc}
+	return &API{huma: humaAPI, store: st, auth: authInst, cfg: cfg, fetcher: f, xclient: xc, processor: proc}
 }
 
 // OpenAPITags returns the ordered tag list for the OpenAPI spec.
@@ -56,6 +59,7 @@ func OpenAPITags() []*huma.Tag {
 		{Name: "opml", Description: "OPML import/export"},
 		{Name: "feed-lists", Description: "Shareable feed list collections"},
 		{Name: "device", Description: "Device-flow login (CLI/TUI)"},
+		{Name: "x", Description: "X (Twitter) timeline subscriptions"},
 	}
 }
 
@@ -68,6 +72,7 @@ func (a *API) RegisterRoutes() {
 	a.registerEntryRoutes()
 	a.registerTokenRoutes()
 	a.registerFeedListRoutes()
+	a.registerXRoutes()
 	a.registerOPMLRoutes()
 	a.registerDeviceRoutes()
 }
@@ -794,7 +799,7 @@ func (a *API) subscribeToFeed(ctx context.Context, userID int, feedURL string, f
 		}
 	}
 
-	feed, err := a.store.CreateFeed(ctx, userID, folderID, feedURL, siteURL, title, description)
+	feed, err := a.store.CreateFeed(ctx, userID, folderID, feedURL, siteURL, title, description, store.SourceRSS)
 	if err != nil {
 		return nil, err
 	}
@@ -1137,6 +1142,157 @@ func (a *API) registerFeedListRoutes() {
 			}
 		}{Body: result}, nil
 	})
+}
+
+// --- X (Twitter) Timelines ---
+
+// SubscribeXFeedInput is the request body for subscribing to an X timeline.
+// The user identifies the X account by @username; the server resolves it to
+// the numeric user ID required by the X API v2.
+type SubscribeXFeedInput struct {
+	Body struct {
+		Username string `json:"username" minLength:"1" maxLength:"255" doc:"X @username (with or without the leading @)"`
+		FolderID *int   `json:"folder_id,omitempty"`
+	}
+}
+
+// PreviewXFeedInput is the request body for previewing an X timeline.
+type PreviewXFeedInput struct {
+	Body struct {
+		Username string `json:"username" minLength:"1" maxLength:"255" doc:"X @username (with or without the leading @)"`
+	}
+}
+
+// PreviewXFeedBody is the preview response for an X timeline.
+type PreviewXFeedBody struct {
+	Title    string            `json:"title"`
+	SiteURL  string            `json:"site_url"`
+	FeedURL  string            `json:"feed_url"`
+	Username string            `json:"username"`
+	Items    []PreviewFeedItem `json:"items"`
+}
+
+// PreviewXFeedOutput wraps the X timeline preview response.
+type PreviewXFeedOutput struct {
+	Body PreviewXFeedBody
+}
+
+func (a *API) registerXRoutes() {
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "subscribe-x-feed",
+		Method:      http.MethodPost,
+		Path:        "/api/v1/feeds/x",
+		Summary:     "Subscribe to an X (Twitter) user timeline",
+		Description: "Subscribes to a person's X timeline via the official X API v2. The username is resolved to a numeric user ID and a feed with source \"x\" is created. Entries are stored with entry_type \"post\" so consumers can render them differently from RSS articles.",
+		Tags:        []string{"x"},
+	}, func(ctx context.Context, input *SubscribeXFeedInput) (*FeedOutput, error) {
+		if a.xclient == nil || !a.xclient.Enabled() {
+			return nil, huma.Error503ServiceUnavailable("X API is not configured (set X_API_BEARER_TOKEN)")
+		}
+		userID := auth.UserIDFromCtx(ctx)
+		feed, err := a.subscribeToXFeed(ctx, userID, input.Body.Username, input.Body.FolderID)
+		if err != nil {
+			return nil, huma.Error400BadRequest(err.Error())
+		}
+		return &FeedOutput{Body: *feed}, nil
+	})
+
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "preview-x-feed",
+		Method:      http.MethodPost,
+		Path:        "/api/v1/feeds/x/preview",
+		Summary:     "Preview an X (Twitter) user timeline",
+		Description: "Fetches a person's recent X posts via the official X API v2 without persisting anything.",
+		Tags:        []string{"x"},
+	}, func(ctx context.Context, input *PreviewXFeedInput) (*PreviewXFeedOutput, error) {
+		if a.xclient == nil || !a.xclient.Enabled() {
+			return nil, huma.Error503ServiceUnavailable("X API is not configured (set X_API_BEARER_TOKEN)")
+		}
+		user, err := a.xclient.ResolveUsername(ctx, input.Body.Username)
+		if err != nil {
+			return nil, huma.Error400BadRequest(fmt.Sprintf("could not resolve X user: %s", err.Error()))
+		}
+		parsed, err := a.xclient.FetchTimeline(ctx, user.ID)
+		if err != nil {
+			return nil, huma.Error400BadRequest(fmt.Sprintf("could not fetch X timeline: %s", err.Error()))
+		}
+
+		maxItems := 20
+		if len(parsed.Items) > maxItems {
+			parsed.Items = parsed.Items[:maxItems]
+		}
+
+		items := make([]PreviewFeedItem, 0, len(parsed.Items))
+		for _, item := range parsed.Items {
+			sanitized, err := sanitizer.Sanitize(item.Content)
+			if err != nil {
+				sanitized = item.Content
+			}
+			publishedAt, err := processor.ParseDate(item.PublishedAt)
+			if err != nil {
+				publishedAt = time.Now()
+			}
+			items = append(items, PreviewFeedItem{
+				Title:       item.Title,
+				URL:         item.Link,
+				Author:      item.Author,
+				Description: sanitizer.StripHTML(item.Description),
+				Content:     sanitized,
+				PublishedAt: publishedAt,
+				Tags:        item.Tags,
+			})
+		}
+
+		return &PreviewXFeedOutput{Body: PreviewXFeedBody{
+			Title:    parsed.Title,
+			SiteURL:  parsed.SiteURL,
+			FeedURL:  user.ID,
+			Username: user.Username,
+			Items:    items,
+		}}, nil
+	})
+}
+
+// subscribeToXFeed resolves an X username to a numeric user ID, creates an
+// X-source feed, and processes it immediately so posts are persisted on
+// subscribe. The feed_url stores the numeric X user ID; the site_url stores
+// the canonical x.com profile URL. If the user already subscribes to this X
+// user, the existing feed is returned (idempotent).
+func (a *API) subscribeToXFeed(ctx context.Context, userID int, username string, folderID *int) (*store.Feed, error) {
+	user, err := a.xclient.ResolveUsername(ctx, username)
+	if err != nil {
+		return nil, err
+	}
+
+	// Idempotent: if the user already subscribes to this X user ID, return it.
+	if existing, err := a.store.GetFeedByURL(ctx, user.ID, userID); err != nil {
+		return nil, err
+	} else if existing != nil {
+		return existing, nil
+	}
+
+	siteURL := "https://x.com/" + user.Username
+	title := user.Name
+	if title == "" {
+		title = "@" + user.Username
+	}
+
+	feed, err := a.store.CreateFeed(ctx, userID, folderID, user.ID, siteURL, title, user.Name, store.SourceX)
+	if err != nil {
+		return nil, err
+	}
+
+	// Process the feed immediately so entries are persisted on subscribe.
+	// Best-effort: the scheduler will retry on failure.
+	if a.processor != nil {
+		_ = a.processor.ProcessFeed(ctx, feed)
+	}
+
+	// Mark all entries as read so the user doesn't see a backlog of unread
+	// posts from before they subscribed.
+	_ = a.store.MarkFeedEntriesRead(ctx, feed.ID, userID)
+
+	return feed, nil
 }
 
 // --- OPML ---
