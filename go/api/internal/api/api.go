@@ -399,7 +399,7 @@ func (a *API) registerFeedRoutes() {
 				Title:       item.Title,
 				URL:         item.Link,
 				Author:      item.Author,
-				Description: item.Description,
+				Description: sanitizer.StripHTML(item.Description),
 				Content:     sanitized,
 				PublishedAt: publishedAt,
 				Tags:        item.Tags,

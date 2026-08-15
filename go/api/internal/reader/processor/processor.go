@@ -87,7 +87,8 @@ func (p *Processor) ProcessFeed(ctx context.Context, feed *store.Feed) error {
 		}
 
 		hash := hashItem(item)
-		entryID, err := p.store.CreateEntry(ctx, feed.UserID, feed.ID, hash, item.Title, item.Link, "", item.Author, sanitized, item.Description, publishedAt, item.Tags)
+		description := truncate(sanitizer.StripHTML(item.Description), 400)
+		entryID, err := p.store.CreateEntry(ctx, feed.UserID, feed.ID, hash, item.Title, item.Link, "", item.Author, sanitized, description, publishedAt, item.Tags)
 		if err != nil {
 			slog.Error("create entry failed", "feed_id", feed.ID, "hash", hash, "err", err)
 			continue
@@ -197,4 +198,16 @@ func computeNextCheck(items []parser.Item) time.Time {
 	}
 
 	return time.Now().Add(avgInterval)
+}
+
+// truncate caps s at maxLen characters, appending an ellipsis if truncation
+// occurred. If s is already maxLen or shorter it is returned unchanged.
+func truncate(s string, maxLen int) string {
+	if len(s) <= maxLen {
+		return s
+	}
+	if maxLen <= 1 {
+		return s[:maxLen]
+	}
+	return s[:maxLen-1] + "…"
 }

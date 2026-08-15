@@ -5,6 +5,7 @@ package sanitizer
 import (
 	"bytes"
 	"fmt"
+	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -109,6 +110,46 @@ func Sanitize(html string) (string, error) {
 		return "", fmt.Errorf("render html: %w", err)
 	}
 	return out, nil
+}
+
+// StripHTML removes all HTML tags and returns plain text. It collapses
+// whitespace and unescapes common HTML entities. Used for entry
+// descriptions where we want a clean text snippet, not rendered HTML.
+func StripHTML(html string) string {
+	if html == "" {
+		return ""
+	}
+	doc, err := goquery.NewDocumentFromReader(bytes.NewReader([]byte(html)))
+	if err != nil {
+		// If parsing fails, return the raw string stripped of tags
+		// via a simple regex fallback.
+		return stripHTMLFallback(html)
+	}
+	text := doc.Find("body").Text()
+	return strings.TrimSpace(normalizeWhitespace(text))
+}
+
+// stripHTMLFallback is a naive tag stripper used when goquery fails to
+// parse the input as HTML.
+func stripHTMLFallback(s string) string {
+	var b strings.Builder
+	inTag := false
+	for _, r := range s {
+		switch {
+		case r == '<':
+			inTag = true
+		case r == '>':
+			inTag = false
+		case !inTag:
+			b.WriteRune(r)
+		}
+	}
+	return strings.TrimSpace(normalizeWhitespace(b.String()))
+}
+
+// normalizeWhitespace collapses runs of whitespace into single spaces.
+func normalizeWhitespace(s string) string {
+	return strings.Join(strings.Fields(s), " ")
 }
 
 func sanitizeURL(u string) string {
