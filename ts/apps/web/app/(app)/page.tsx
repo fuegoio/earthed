@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/page-header"
 import { EntryTimeline } from "@/components/entry-timeline"
 
 export const metadata = { title: "Timeline" }
@@ -5,11 +6,7 @@ export const metadata = { title: "Timeline" }
 export default function HomePage() {
   return (
     <div className="mx-auto w-full max-w-3xl">
-      <div className="flex items-center justify-between border-b border-border px-4 py-3">
-        <h1 className="font-serif text-lg font-bold tracking-tight">
-          Timeline
-        </h1>
-      </div>
+      <PageHeader title="Timeline" />
       <EntryTimeline
         filter={{}}
         emptyTitle="Your timeline is empty"

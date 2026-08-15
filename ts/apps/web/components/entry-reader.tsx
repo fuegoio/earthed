@@ -3,12 +3,12 @@
 import { useState, useOptimistic, startTransition } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { ExternalLink, ArrowLeft, Circle, CheckCircle } from "lucide-react"
-import Link from "next/link"
+import { ExternalLink, Circle, CheckCircle } from "lucide-react"
 import { Button, buttonVariants } from "@workspace/ui/components/button"
 import { StarToggle } from "@/components/star-toggle"
 import { LikeToggle } from "@/components/like-toggle"
 import { FeedIcon } from "@/components/feed-icon"
+import { PageHeader } from "@/components/page-header"
 import { getClient, updateEntries } from "@/lib/planetary"
 import { getApiErrorMessage } from "@/lib/errors"
 import { formatDateTime } from "@/lib/format"
@@ -56,81 +56,83 @@ export function EntryReader({
   const isUnread = optimisticStatus === "unread"
 
   return (
-    <article className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-6 sm:py-10">
-      <Link
-        href="/"
-        className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-      >
-        <ArrowLeft className="size-3.5" />
-        Back
-      </Link>
-
-      <header className="flex flex-col gap-3">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          {feed && (
-            <>
-              <FeedIcon siteUrl={feed.site_url} className="size-4 rounded-sm" />
-              <span className="truncate font-medium text-foreground">
-                {feed.title}
-              </span>
-            </>
-          )}
-        </div>
-        <h1 className="font-serif text-2xl font-bold leading-tight tracking-tight sm:text-3xl">
-          {initialEntry.title || "Untitled"}
-        </h1>
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
-          {initialEntry.author && <span>{initialEntry.author}</span>}
-          {initialEntry.author && <span aria-hidden>·</span>}
-          <time>{formatDateTime(initialEntry.published_at)}</time>
-        </div>
-        <div className="flex items-center gap-2">
-          {initialEntry.url && (
-            <a
-              href={initialEntry.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
-            >
-              <ExternalLink className="size-3.5" />
-              Open
-            </a>
-          )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleToggleRead}
-            disabled={pending}
-          >
-            {isUnread ? (
-              <>
-                <Circle className="size-3.5" />
-                Mark as read
-              </>
-            ) : (
-              <>
-                <CheckCircle className="size-3.5" />
-                Mark unread
-              </>
+    <article className="mx-auto w-full max-w-3xl">
+      <PageHeader
+        title={initialEntry.title || "Untitled"}
+        actions={
+          <>
+            {initialEntry.url && (
+              <a
+                href={initialEntry.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+              >
+                <ExternalLink className="size-3.5" />
+                Open
+              </a>
             )}
-          </Button>
-          <div className="ml-auto flex items-center gap-0.5">
-            <LikeToggle
-              entryId={initialEntry.id}
-              liked={initialEntry.liked}
-              size="icon-sm"
-            />
-            <StarToggle
-              entryId={initialEntry.id}
-              starred={initialEntry.starred}
-              size="icon-sm"
-            />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleToggleRead}
+              disabled={pending}
+            >
+              {isUnread ? (
+                <>
+                  <Circle className="size-3.5" />
+                  Mark as read
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="size-3.5" />
+                  Mark unread
+                </>
+              )}
+            </Button>
+            <div className="flex items-center gap-0.5">
+              <LikeToggle
+                entryId={initialEntry.id}
+                liked={initialEntry.liked}
+                size="icon-sm"
+              />
+              <StarToggle
+                entryId={initialEntry.id}
+                starred={initialEntry.starred}
+                size="icon-sm"
+              />
+            </div>
+          </>
+        }
+        metadata={
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            {feed && (
+              <span className="inline-flex items-center gap-1">
+                <FeedIcon
+                  siteUrl={feed.site_url}
+                  className="size-3.5 rounded-sm"
+                />
+                <span className="truncate font-medium text-foreground">
+                  {feed.title}
+                </span>
+              </span>
+            )}
+            {feed && (initialEntry.author || initialEntry.published_at) && (
+              <span aria-hidden>·</span>
+            )}
+            {initialEntry.author && <span>{initialEntry.author}</span>}
+            {initialEntry.author && initialEntry.published_at && (
+              <span aria-hidden>·</span>
+            )}
+            {initialEntry.published_at && (
+              <time>{formatDateTime(initialEntry.published_at)}</time>
+            )}
           </div>
-        </div>
-      </header>
+        }
+      />
 
       {initialEntry.tags && initialEntry.tags.length > 0 && (
-        <div className="mt-4 flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-1.5 px-4 pt-4">
           {initialEntry.tags.map((tag) => (
             <span
               key={tag}
@@ -143,7 +145,7 @@ export function EntryReader({
       )}
 
       {initialEntry.description && (
-        <p className="mt-6 text-base leading-relaxed text-muted-foreground">
+        <p className="px-4 py-4 text-base leading-relaxed text-muted-foreground">
           {initialEntry.description}
         </p>
       )}

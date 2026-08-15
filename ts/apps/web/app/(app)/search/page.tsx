@@ -1,5 +1,6 @@
 import { Search } from "lucide-react"
 import { EntryTimeline } from "@/components/entry-timeline"
+import { PageHeader } from "@/components/page-header"
 import {
   Empty,
   EmptyDescription,
@@ -20,12 +21,10 @@ export default async function SearchPage({
 
   return (
     <div className="mx-auto w-full max-w-3xl">
-      <div className="flex items-center gap-2 border-b border-border px-4 py-3">
-        <Search className="size-4 text-muted-foreground" />
-        <h1 className="font-serif text-lg font-bold tracking-tight">
-          {query ? `Results for “${query}”` : "Search"}
-        </h1>
-      </div>
+      <PageHeader
+        title={query ? `Results for “${query}”` : "Search"}
+        icon={<Search className="size-4 text-muted-foreground" />}
+      />
       {query ? (
         <EntryTimeline
           filter={{ search: query }}

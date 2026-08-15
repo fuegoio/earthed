@@ -3,6 +3,7 @@ import { getClient, listCategories } from "@/lib/planetary"
 import { getApiErrorMessage, apiErrorStatus } from "@/lib/errors"
 import { ApiError } from "@/components/api-error"
 import { EntryTimeline } from "@/components/entry-timeline"
+import { PageHeader } from "@/components/page-header"
 import { Folder } from "lucide-react"
 import type { Metadata } from "next"
 import type { Category } from "@/lib/types"
@@ -54,12 +55,10 @@ export default async function CategoryPage({
 
   return (
     <div className="mx-auto w-full max-w-3xl">
-      <div className="flex items-center justify-between border-b border-border px-4 py-3">
-        <h1 className="flex items-center gap-2 font-serif text-lg font-bold tracking-tight">
-          <Folder className="size-4 text-muted-foreground" />
-          {category.title}
-        </h1>
-      </div>
+      <PageHeader
+        title={category.title}
+        icon={<Folder className="size-4 text-muted-foreground" />}
+      />
       <EntryTimeline
         filter={{ category_id: category.id }}
         emptyTitle="No articles in this category"

@@ -6,7 +6,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { Dialog } from "@base-ui/react/dialog"
 import {
-  ArrowLeft,
   Globe,
   Lock,
   Plus,
@@ -22,12 +21,12 @@ import {
   Search,
   Link as LinkIcon,
 } from "lucide-react"
-import Link from "next/link"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Textarea } from "@workspace/ui/components/textarea"
 import { ConfirmDialog } from "@/components/confirm-dialog"
+import { PageHeader } from "@/components/page-header"
 import {
   Empty,
   EmptyDescription,
@@ -250,133 +249,120 @@ export function FeedListDetail({
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6">
-      <Link
-        href="/lists"
-        className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-      >
-        <ArrowLeft className="size-3.5" />
-        Back to lists
-      </Link>
-
-      {/* Header */}
-      <div className="flex items-start gap-4">
-        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-          <Rss className="size-6 text-primary" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="font-serif text-2xl font-bold tracking-tight">
-              {list?.title}
-            </h1>
-            <span className="flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-              {list?.is_public ? (
-                <>
-                  <Globe className="size-3" />
-                  Public
-                </>
-              ) : (
-                <>
-                  <Lock className="size-3" />
-                  Private
-                </>
-              )}
-            </span>
-          </div>
-          {list?.description && (
-            <p className="mt-1 text-sm text-muted-foreground">
-              {list.description}
-            </p>
-          )}
-          <p className="mt-1 text-xs text-muted-foreground">
-            {feeds.length} {feeds.length === 1 ? "feed" : "feeds"}
-            {!isOwner && list?.owner_email ? ` · by ${list.owner_email}` : ""}
-          </p>
-        </div>
-      </div>
-
-      {/* Actions */}
-      <div className="mt-5 flex flex-wrap items-center gap-2">
-        {isOwner ? (
-          <>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setEditOpen(true)}
-            >
-              <Pencil className="size-3.5" />
-              Edit
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleShare}
-              disabled={!list?.is_public}
-            >
-              {shareCopied ? (
-                <Check className="size-3.5" />
-              ) : (
-                <Share2 className="size-3.5" />
-              )}
-              Share
-            </Button>
-            <ConfirmDialog
-              trigger={
-                <Button variant="destructive" size="sm">
-                  <Trash2 className="size-3.5" />
-                  Delete
-                </Button>
-              }
-              title="Delete feed list?"
-              description={`"${list?.title}" and its ${feeds.length} feed${feeds.length === 1 ? "" : "s"} will be removed. Subscriptions are not affected.`}
-              confirmLabel="Delete"
-              onConfirm={handleDelete}
-            />
-          </>
-        ) : (
-          <>
-            {isFollowing ? (
+    <div className="mx-auto w-full max-w-3xl">
+      <PageHeader
+        title={list?.title}
+        icon={<Rss className="size-4 text-primary" />}
+        actions={
+          isOwner ? (
+            <>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handleUnfollow}
-                disabled={followPending}
+                onClick={() => setEditOpen(true)}
               >
-                <UserCheck className="size-3.5" />
-                Unfollow
+                <Pencil className="size-3.5" />
+                Edit
               </Button>
-            ) : (
               <Button
+                variant="outline"
                 size="sm"
-                onClick={handleFollow}
-                disabled={followPending}
+                onClick={handleShare}
+                disabled={!list?.is_public}
               >
-                <UserPlus className="size-3.5" />
-                Follow
+                {shareCopied ? (
+                  <Check className="size-3.5" />
+                ) : (
+                  <Share2 className="size-3.5" />
+                )}
+                Share
               </Button>
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleImport}
-              disabled={importing}
-            >
-              {importing ? (
-                <Loader2 className="size-3.5 animate-spin" />
+              <ConfirmDialog
+                trigger={
+                  <Button variant="destructive" size="sm">
+                    <Trash2 className="size-3.5" />
+                    Delete
+                  </Button>
+                }
+                title="Delete feed list?"
+                description={`"${list?.title}" and its ${feeds.length} feed${feeds.length === 1 ? "" : "s"} will be removed. Subscriptions are not affected.`}
+                confirmLabel="Delete"
+                onConfirm={handleDelete}
+              />
+            </>
+          ) : (
+            <>
+              {isFollowing ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleUnfollow}
+                  disabled={followPending}
+                >
+                  <UserCheck className="size-3.5" />
+                  Unfollow
+                </Button>
               ) : (
-                <Download className="size-3.5" />
+                <Button
+                  size="sm"
+                  onClick={handleFollow}
+                  disabled={followPending}
+                >
+                  <UserPlus className="size-3.5" />
+                  Follow
+                </Button>
               )}
-              Import all feeds
-            </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleImport}
+                disabled={importing}
+              >
+                {importing ? (
+                  <Loader2 className="size-3.5 animate-spin" />
+                ) : (
+                  <Download className="size-3.5" />
+                )}
+                Import all feeds
+              </Button>
+            </>
+          )
+        }
+        metadata={
+          <>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs">
+                {list?.is_public ? (
+                  <>
+                    <Globe className="size-3" />
+                    Public
+                  </>
+                ) : (
+                  <>
+                    <Lock className="size-3" />
+                    Private
+                  </>
+                )}
+              </span>
+              <span>
+                {feeds.length} {feeds.length === 1 ? "feed" : "feeds"}
+              </span>
+              {!isOwner && list?.owner_email && (
+                <>
+                  <span aria-hidden>·</span>
+                  <span>by {list.owner_email}</span>
+                </>
+              )}
+            </div>
+            {list?.description && (
+              <p className="mt-1">{list.description}</p>
+            )}
           </>
-        )}
-      </div>
+        }
+      />
 
-      {/* Feeds */}
-      <div className="mt-8">
-        <h2 className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Feeds in this list
-        </h2>
+      <div className="p-4">
+        {/* Feeds */}
         {feeds.length === 0 ? (
           <Empty>
             <EmptyHeader>
@@ -431,96 +417,96 @@ export function FeedListDetail({
             ))}
           </ul>
         )}
-      </div>
 
-      {/* Add feed (owner only) */}
-      {isOwner && (
-        <div className="mt-6 rounded-lg border border-border p-4">
-          <h3 className="text-sm font-medium">Add a feed</h3>
+        {/* Add feed (owner only) */}
+        {isOwner && (
+          <div className="mt-6 rounded-lg border border-border p-4">
+            <h3 className="text-sm font-medium">Add a feed</h3>
 
-          {/* Feed picker from subscriptions */}
-          <div className="mt-3">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={feedSearch}
-                onChange={(e) => setFeedSearch(e.target.value)}
-                placeholder="Search your subscriptions..."
-                className="pl-8"
-              />
-            </div>
-            {availableFeeds.length === 0 ? (
-              <p className="mt-2 text-xs text-muted-foreground">
-                {feeds.length > 0 && availableFeeds.length === 0
-                  ? "All your subscriptions are already in this list."
-                  : "You don't have any subscriptions yet."}
-              </p>
-            ) : (
-              <ul className="mt-2 max-h-48 overflow-y-auto rounded-md border border-border">
-                {filteredFeeds.map((feed) => (
-                  <li key={feed.id}>
-                    <button
-                      type="button"
-                      onClick={() => handleAddFromSubscription(feed)}
-                      disabled={adding}
-                      className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-sm hover:bg-muted/50 disabled:opacity-50"
-                    >
-                      <FeedIcon
-                        siteUrl={feed.site_url}
-                        className="size-4 shrink-0 rounded-sm"
-                      />
-                      <span className="min-w-0 flex-1 truncate">
-                        {feed.title}
-                      </span>
-                      <Plus className="size-3.5 shrink-0 text-muted-foreground" />
-                    </button>
-                  </li>
-                ))}
-                {filteredFeeds.length === 0 && feedSearch.trim() && (
-                  <li className="px-2 py-1.5 text-xs text-muted-foreground">
-                    No matches.
-                  </li>
-                )}
-              </ul>
-            )}
-          </div>
-
-          {/* Divider */}
-          <div className="my-3 flex items-center gap-3">
-            <div className="h-px flex-1 bg-border" />
-            <span className="flex items-center gap-1 text-xs text-muted-foreground">
-              <LinkIcon className="size-3" />
-              or add by URL
-            </span>
-            <div className="h-px flex-1 bg-border" />
-          </div>
-
-          {/* Add by URL */}
-          <form onSubmit={handleAddFeed} className="flex flex-col gap-2 sm:flex-row">
-            <Input
-              value={addUrl}
-              onChange={(e) => setAddUrl(e.target.value)}
-              placeholder="https://example.com/feed.xml"
-              type="url"
-              className="flex-1"
-            />
-            <Input
-              value={addTitle}
-              onChange={(e) => setAddTitle(e.target.value)}
-              placeholder="Title (optional)"
-              className="flex-1"
-            />
-            <Button type="submit" disabled={adding || !addUrl.trim()}>
-              {adding ? (
-                <Loader2 className="size-4 animate-spin" />
+            {/* Feed picker from subscriptions */}
+            <div className="mt-3">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={feedSearch}
+                  onChange={(e) => setFeedSearch(e.target.value)}
+                  placeholder="Search your subscriptions..."
+                  className="pl-8"
+                />
+              </div>
+              {availableFeeds.length === 0 ? (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {feeds.length > 0 && availableFeeds.length === 0
+                    ? "All your subscriptions are already in this list."
+                    : "You don't have any subscriptions yet."}
+                </p>
               ) : (
-                <Plus className="size-4" />
+                <ul className="mt-2 max-h-48 overflow-y-auto rounded-md border border-border">
+                  {filteredFeeds.map((feed) => (
+                    <li key={feed.id}>
+                      <button
+                        type="button"
+                        onClick={() => handleAddFromSubscription(feed)}
+                        disabled={adding}
+                        className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-sm hover:bg-muted/50 disabled:opacity-50"
+                      >
+                        <FeedIcon
+                          siteUrl={feed.site_url}
+                          className="size-4 shrink-0 rounded-sm"
+                        />
+                        <span className="min-w-0 flex-1 truncate">
+                          {feed.title}
+                        </span>
+                        <Plus className="size-3.5 shrink-0 text-muted-foreground" />
+                      </button>
+                    </li>
+                  ))}
+                  {filteredFeeds.length === 0 && feedSearch.trim() && (
+                    <li className="px-2 py-1.5 text-xs text-muted-foreground">
+                      No matches.
+                    </li>
+                  )}
+                </ul>
               )}
-              Add
-            </Button>
-          </form>
-        </div>
-      )}
+            </div>
+
+            {/* Divider */}
+            <div className="my-3 flex items-center gap-3">
+              <div className="h-px flex-1 bg-border" />
+              <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                <LinkIcon className="size-3" />
+                or add by URL
+              </span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+
+            {/* Add by URL */}
+            <form onSubmit={handleAddFeed} className="flex flex-col gap-2 sm:flex-row">
+              <Input
+                value={addUrl}
+                onChange={(e) => setAddUrl(e.target.value)}
+                placeholder="https://example.com/feed.xml"
+                type="url"
+                className="flex-1"
+              />
+              <Input
+                value={addTitle}
+                onChange={(e) => setAddTitle(e.target.value)}
+                placeholder="Title (optional)"
+                className="flex-1"
+              />
+              <Button type="submit" disabled={adding || !addUrl.trim()}>
+                {adding ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Plus className="size-4" />
+                )}
+                Add
+              </Button>
+            </form>
+          </div>
+        )}
+      </div>
 
       <EditListDialog
         open={editOpen}
