@@ -99,6 +99,7 @@ export function FeedDetail({ feed }: { feed: Feed }) {
       })
       if (error) throw error
       await queryClient.invalidateQueries({ queryKey: ["feeds"] })
+      await queryClient.invalidateQueries({ queryKey: ["entries"] })
       toast.success("Feed moved")
     } catch (err) {
       toast.error(getApiErrorMessage(err, "Could not move feed"))

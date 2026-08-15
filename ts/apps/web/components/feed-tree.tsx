@@ -323,6 +323,7 @@ export function FeedTree({ feeds, folders }: { feeds: Feed[]; folders: Folder[] 
           })
           if (error) throw error
           await queryClient.invalidateQueries({ queryKey: ["feeds"] })
+          await queryClient.invalidateQueries({ queryKey: ["entries"] })
         } else {
           // Moving a folder — need to update both title and parent_id
           const folder = folders.find((f) => f.id === data.id)
@@ -338,6 +339,8 @@ export function FeedTree({ feeds, folders }: { feeds: Feed[]; folders: Folder[] 
           })
           if (error) throw error
           await queryClient.invalidateQueries({ queryKey: ["folders"] })
+          await queryClient.invalidateQueries({ queryKey: ["feeds"] })
+          await queryClient.invalidateQueries({ queryKey: ["entries"] })
         }
       } catch (err) {
         toast.error(getApiErrorMessage(err, "Could not move item"))
