@@ -5,7 +5,7 @@
  * Planetary marketing site — design tokens
  * Color tokens are shared from @workspace/ui (tokens.css) so every
  * Planetary surface uses the same palette. The brand orange
- * (--primary, oklch 0.702 0.255 78.8) is the sun. Marketing-specific
+ * (--primary, oklch 0.735 0.22 39) is the sun. Marketing-specific
  * tokens (sky, glow, haze) layer on top for the dawn hero.
  */
 
