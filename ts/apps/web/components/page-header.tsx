@@ -24,7 +24,7 @@ export function PageHeader({
   className?: string
 }) {
   return (
-    <div className={cn("border-b border-border px-4 py-3", className)}>
+    <div className={cn("sticky top-0 z-10 border-b border-border bg-background px-4 py-3", className)}>
       <div className="flex items-center justify-between gap-3">
         <h1 className={cn(
           "flex min-w-0 items-center gap-2 font-serif text-lg font-bold tracking-tight",

@@ -109,92 +109,93 @@ export function FeedDetail({ feed }: { feed: Feed }) {
 
   return (
     <div className="mx-auto w-full max-w-3xl">
-      <PageHeader
-        title={feed.title || "Untitled feed"}
-        icon={
-          <FeedIcon
-            siteUrl={feed.site_url}
-            className="size-5 shrink-0 rounded-md"
-          />
-        }
-        actions={
-          <div className="flex items-center gap-1">
-            <Menu.Root>
-              <Menu.Trigger
-                disabled={movingFolder}
-                aria-label="Move to folder"
-                className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }))}
-              >
-                {movingFolder ? (
-                  <Loader2 className="size-3.5 animate-spin" />
-                ) : (
-                  <FolderOpen className="size-3.5" />
-                )}
-              </Menu.Trigger>
-              <Menu.Portal>
-                <Menu.Positioner
-                  className={cn(
-                    "z-50 min-w-48 overflow-hidden rounded-md border border-border bg-popover p-1",
-                    "shadow-md"
-                  )}
-                  align="end"
+      <div className="sticky top-0 z-10 bg-background">
+        <PageHeader
+          title={feed.title || "Untitled feed"}
+          icon={
+            <FeedIcon
+              siteUrl={feed.site_url}
+              className="size-5 shrink-0 rounded-md"
+            />
+          }
+          actions={
+            <div className="flex items-center gap-1">
+              <Menu.Root>
+                <Menu.Trigger
+                  disabled={movingFolder}
+                  aria-label="Move to folder"
+                  className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }))}
                 >
-                  <Menu.Popup>
-                    <Menu.Item
-                      className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
-                      onClick={() => handleMoveFolder(undefined)}
-                    >
-                      No folder
-                    </Menu.Item>
-                    {folders?.map((f) => (
+                  {movingFolder ? (
+                    <Loader2 className="size-3.5 animate-spin" />
+                  ) : (
+                    <FolderOpen className="size-3.5" />
+                  )}
+                </Menu.Trigger>
+                <Menu.Portal>
+                  <Menu.Positioner
+                    className={cn(
+                      "z-50 min-w-48 overflow-hidden rounded-md border border-border bg-popover p-1",
+                      "shadow-md"
+                    )}
+                    align="end"
+                  >
+                    <Menu.Popup>
                       <Menu.Item
-                        key={f.id}
                         className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
-                        onClick={() => handleMoveFolder(f.id)}
+                        onClick={() => handleMoveFolder(undefined)}
                       >
-                        {f.title}
+                        No folder
                       </Menu.Item>
-                    ))}
-                  </Menu.Popup>
-                </Menu.Positioner>
-              </Menu.Portal>
-            </Menu.Root>
-            {feed.site_url && (
-              <a
-                href={feed.site_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Open website"
-                className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }))}
-              >
-                <ExternalLink className="size-3.5" />
-              </a>
-            )}
-            {feed.feed_url && (
-              <a
-                href={feed.feed_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Open feed XML"
-                className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }))}
-              >
-                <Rss className="size-3.5" />
-              </a>
-            )}
-          </div>
-        }
-        metadata={
-          <>
-            {feed.description && <p>{feed.description}</p>}
-            {feed.parsing_error && (
-              <p className="mt-1 text-destructive">
-                Last parse error: {feed.parsing_error}
-              </p>
-            )}
-          </>
-        }
-      />
-      <div className="flex items-center gap-2 border-b border-border px-4 py-2">
+                      {folders?.map((f) => (
+                        <Menu.Item
+                          key={f.id}
+                          className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
+                          onClick={() => handleMoveFolder(f.id)}
+                        >
+                          {f.title}
+                        </Menu.Item>
+                      ))}
+                    </Menu.Popup>
+                  </Menu.Positioner>
+                </Menu.Portal>
+              </Menu.Root>
+              {feed.site_url && (
+                <a
+                  href={feed.site_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Open website"
+                  className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }))}
+                >
+                  <ExternalLink className="size-3.5" />
+                </a>
+              )}
+              {feed.feed_url && (
+                <a
+                  href={feed.feed_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Open feed XML"
+                  className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }))}
+                >
+                  <Rss className="size-3.5" />
+                </a>
+              )}
+            </div>
+          }
+          metadata={
+            <>
+              {feed.description && <p>{feed.description}</p>}
+              {feed.parsing_error && (
+                <p className="mt-1 text-destructive">
+                  Last parse error: {feed.parsing_error}
+                </p>
+              )}
+            </>
+          }
+        />
+        <div className="flex items-center gap-2 border-b border-border px-4 py-2">
         <Button
           variant="outline"
           size="xs"
@@ -237,6 +238,7 @@ export function FeedDetail({ feed }: { feed: Feed }) {
           confirmLabel="Unsubscribe"
           onConfirm={handleDelete}
         />
+      </div>
       </div>
       <EntryTimeline
         filter={{ feed_id: feed.id }}
