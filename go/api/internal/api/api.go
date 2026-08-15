@@ -15,6 +15,7 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 
 	"github.com/fuegoio/planetary/go/api/internal/auth"
+	"github.com/fuegoio/planetary/go/api/internal/reader/discoverer"
 	"github.com/fuegoio/planetary/go/api/internal/reader/fetcher"
 	"github.com/fuegoio/planetary/go/api/internal/reader/parser"
 	"github.com/fuegoio/planetary/go/api/internal/reader/processor"
@@ -431,7 +432,16 @@ func (a *API) registerFeedRoutes() {
 			return nil, huma.Error503ServiceUnavailable("feed fetcher is not available")
 		}
 
-		result, err := a.fetcher.Fetch(ctx, input.Body.FeedURL, "", "")
+		// Try to discover the feed URL. If the input is already a feed URL,
+		// discovery returns it as-is. If the input is an HTML page, discovery
+		// parses <link rel="alternate"> tags to find the feed URL.
+		discovery, err := discoverer.Discover(ctx, a.fetcher, input.Body.FeedURL)
+		if err != nil {
+			return nil, huma.Error400BadRequest(fmt.Sprintf("could not discover feed: %s", err.Error()))
+		}
+
+		feedURL := discovery.FeedURL
+		result, err := a.fetcher.Fetch(ctx, feedURL, "", "")
 		if err != nil {
 			return nil, huma.Error400BadRequest(fmt.Sprintf("could not fetch feed: %s", err.Error()))
 		}
@@ -484,7 +494,7 @@ func (a *API) registerFeedRoutes() {
 		return &PreviewFeedOutput{Body: PreviewFeedBody{
 			Title:       parsed.Title,
 			SiteURL:     parsed.SiteURL,
-			FeedURL:     input.Body.FeedURL,
+			FeedURL:     feedURL,
 			Description: parsed.Description,
 			FaviconURL:  faviconURL,
 			Items:       items,
@@ -712,18 +722,30 @@ func (a *API) subscribeToFeed(ctx context.Context, userID int, feedURL string, f
 	title := feedURL
 	description := ""
 
-	// Fetch and parse the feed to populate the real site URL and title.
-	// If this fails, fall back to creating the feed with the URL as the title.
+	// Discover the actual feed URL. If the input is already a feed URL,
+	// discovery returns it as-is. If the input is an HTML page, discovery
+	// parses <link rel="alternate"> tags to find the feed URL.
 	if a.fetcher != nil {
-		if result, err := a.fetcher.Fetch(ctx, feedURL, "", ""); err == nil && !result.NotModified {
-			if parsed, err := parser.Parse(result.Body, result.ContentType); err == nil {
-				if parsed.SiteURL != "" {
-					siteURL = parsed.SiteURL
+		if discovery, err := discoverer.Discover(ctx, a.fetcher, feedURL); err == nil {
+			feedURL = discovery.FeedURL
+			if discovery.SiteURL != "" {
+				siteURL = discovery.SiteURL
+			}
+			// Check if we already subscribe to the discovered feed URL.
+			if existing, err := a.store.GetFeedByURL(ctx, feedURL, userID); err == nil && existing != nil {
+				return existing, nil
+			}
+			// Fetch and parse the feed to populate the real title and description.
+			if result, err := a.fetcher.Fetch(ctx, feedURL, "", ""); err == nil && !result.NotModified {
+				if parsed, err := parser.Parse(result.Body, result.ContentType); err == nil {
+					if parsed.SiteURL != "" {
+						siteURL = parsed.SiteURL
+					}
+					if parsed.Title != "" {
+						title = parsed.Title
+					}
+					description = parsed.Description
 				}
-				if parsed.Title != "" {
-					title = parsed.Title
-				}
-				description = parsed.Description
 			}
 		}
 	}

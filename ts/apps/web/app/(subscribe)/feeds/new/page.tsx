@@ -21,7 +21,7 @@ import {
   createFeed,
 } from "@/lib/planetary"
 import { getApiErrorMessage } from "@/lib/errors"
-import { subscribeFeedSchema } from "@/lib/schemas"
+import { subscribeFeedSchema, normalizeFeedURL } from "@/lib/schemas"
 import type { PreviewFeedBody } from "@/lib/types"
 
 export default function SubscribeFeedPage() {
@@ -41,17 +41,18 @@ export default function SubscribeFeedPage() {
     feed_url: debouncedUrl,
   })
   const isUrlValid = urlValidation.success
+  const normalizedUrl = isUrlValid ? normalizeFeedURL(debouncedUrl) : ""
 
   const {
     data: preview,
     error: previewError,
     isFetching: isPreviewFetching,
   } = useQuery<PreviewFeedBody>({
-    queryKey: ["previewFeed", debouncedUrl],
+    queryKey: ["previewFeed", normalizedUrl],
     queryFn: async () => {
       const result = await previewFeed({
         client: await getClient(),
-        body: { feed_url: debouncedUrl },
+        body: { feed_url: normalizedUrl },
       })
       if (result.error) throw result.error
       return result.data as PreviewFeedBody
@@ -106,17 +107,18 @@ export default function SubscribeFeedPage() {
             Subscribe to a feed
           </h1>
           <p className="max-w-md text-sm text-muted-foreground">
-            Paste the URL of any RSS, Atom, or JSON feed. We&apos;ll fetch it
-            and show you what you&apos;ll get before you subscribe.
+            Paste any website URL or feed link. We&apos;ll discover the RSS
+            feed automatically and show you what you&apos;ll get before you
+            subscribe.
           </p>
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="feed_url">Feed URL</Label>
+          <Label htmlFor="feed_url">Website or feed URL</Label>
           <Input
             id="feed_url"
             type="url"
-            placeholder="https://example.com/feed.xml"
+            placeholder="https://example.com"
             autoComplete="url"
             spellCheck={false}
             value={url}

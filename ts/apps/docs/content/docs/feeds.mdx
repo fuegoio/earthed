@@ -9,14 +9,33 @@ with adaptive polling.
 
 ## Subscribe to a feed
 
-Create a feed subscription by providing the feed URL:
+Create a feed subscription by providing a URL. If the URL is already a
+feed, it is used directly. If the URL is a website, Planetary discovers
+the feed by parsing `<link rel="alternate">` tags in the HTML head:
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/feeds \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer pla_your-token" \
-  -d '{"feed_url":"https://blog.golang.org/feeds/posts/default"}'
+  -d '{"feed_url":"https://blog.golang.org"}'
 ```
+
+Planetary will fetch the page, find the RSS or Atom feed link, and
+subscribe to it. You can also pass a direct feed URL.
+
+## Preview a feed
+
+Preview a feed without subscribing. This also supports auto-discovery:
+
+```bash
+curl -X POST http://localhost:8080/api/v1/feeds/preview \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer pla_your-token" \
+  -d '{"feed_url":"https://blog.golang.org"}'
+```
+
+The response includes the discovered `feed_url`, feed metadata, and the
+20 most recent entries.
 
 When you subscribe, the `site_url` and `title` are temporarily set to
 the feed URL. After the first refresh, they are updated to the real

@@ -108,18 +108,20 @@ Returns an empty array `[]` when no feeds are subscribed.
 
 ### POST /api/v1/feeds
 
-Subscribe to a feed.
+Subscribe to a feed. If the URL is a website (not a direct feed URL),
+Planetary discovers the feed by parsing `<link rel="alternate">` tags
+in the HTML head.
 
 | Field | Type | Required | Description |
 | ----- | ---- | -------- | ----------- |
-| `feed_url` | string | Yes | URL of the RSS/Atom/JSON feed (1-2048 chars) |
+| `feed_url` | string | Yes | URL of a website or RSS/Atom/JSON feed (1-2048 chars) |
 | `folder_id` | int | No | Folder to assign the feed to |
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/feeds \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer pla_your-token" \
-  -d '{"feed_url":"https://blog.golang.org/feeds/posts/default","folder_id":2}'
+  -d '{"feed_url":"https://blog.golang.org","folder_id":2}'
 ```
 
 ```json
@@ -144,6 +146,25 @@ the feed.
 
 Duplicate subscriptions (same `feed_url` for the same user) return a 400
 error.
+
+### POST `/api/v1/feeds/preview`
+
+Preview a feed without subscribing. Supports auto-discovery — pass a
+website URL and Planetary will find the feed.
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `feed_url` | string | Yes | URL of a website or RSS/Atom/JSON feed (1-2048 chars) |
+
+```bash
+curl -X POST http://localhost:8080/api/v1/feeds/preview \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer pla_your-token" \
+  -d '{"feed_url":"https://blog.golang.org"}'
+```
+
+Returns feed metadata, the discovered `feed_url`, favicon, and up to 20
+recent entries.
 
 ### GET `/api/v1/feeds/{feedId}`
 
