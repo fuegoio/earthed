@@ -158,7 +158,7 @@ export function FeedDetail({ feed }: { feed: Feed }) {
         </Button>
         <ConfirmDialog
           trigger={
-            <Button variant="destructive" size="xs" disabled={deleting}>
+            <Button variant="destructive" size="xs" disabled={deleting} className="ml-auto">
               {deleting ? (
                 <Loader2 className="animate-spin" />
               ) : (
