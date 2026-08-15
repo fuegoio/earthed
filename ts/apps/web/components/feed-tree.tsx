@@ -118,7 +118,7 @@ function FeedNode({
       aria-current={active ? "page" : undefined}
       className={cn(
         "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm",
-        "text-sidebar-foreground/70 transition-colors cursor-grab active:cursor-grabbing",
+        "text-sidebar-foreground/70 transition-colors cursor-pointer active:cursor-grabbing",
         active
           ? "bg-sidebar-accent text-sidebar-accent-foreground"
           : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
@@ -196,7 +196,7 @@ function FolderNode({
         }}
         className={cn(
           "group flex items-center gap-2.5 rounded-md px-3 py-2 text-sm",
-          "text-sidebar-foreground/70 transition-colors cursor-grab active:cursor-grabbing",
+          "text-sidebar-foreground/70 transition-colors cursor-pointer active:cursor-grabbing",
           active
             ? "bg-sidebar-accent text-sidebar-accent-foreground"
             : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
