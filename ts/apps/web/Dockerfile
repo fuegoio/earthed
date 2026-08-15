@@ -27,16 +27,20 @@ RUN pnpm run build
 
 # ---- runtime stage ----
 FROM node:22-alpine AS runner
-WORKDIR /app/apps/web
+WORKDIR /app
 
 ENV NODE_ENV=production
 
 RUN addgroup -g 10001 -S nodejs \
  && adduser -S nextjs -u 10001 -G nodejs
 
+# Next.js standalone output mirrors the monorepo layout, so server.js lives at
+# .next/standalone/apps/web/server.js and resolves _next/static relative to its
+# own directory. Copy the app subtree so server.js, .next/static, and public sit
+# next to each other where the server expects them.
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
 
 USER nextjs
 EXPOSE 3000
