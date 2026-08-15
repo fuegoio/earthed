@@ -261,7 +261,12 @@ export function AppSidebar({
             onClick={onClose}
             aria-hidden="true"
           />
-          <aside className="absolute left-0 top-0 flex h-full w-64 flex-col border-r border-sidebar-border bg-sidebar animate-in slide-in-from-left duration-200">
+          <aside
+            className="absolute left-0 top-0 flex h-full w-64 flex-col border-r border-sidebar-border bg-sidebar animate-in slide-in-from-left duration-200"
+            onClick={(e) => {
+              if ((e.target as HTMLElement).closest("a")) onClose()
+            }}
+          >
             <SidebarContent userEmail={userEmail} />
           </aside>
         </div>
