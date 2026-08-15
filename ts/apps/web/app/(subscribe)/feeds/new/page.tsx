@@ -85,6 +85,7 @@ export default function SubscribeFeedPage() {
       })
       if (error) throw error
       await queryClient.invalidateQueries({ queryKey: ["feeds"] })
+      await queryClient.invalidateQueries({ queryKey: ["entries"] })
       toast.success(`Subscribed to "${preview.title}"`)
       router.push("/")
       router.refresh()
