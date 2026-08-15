@@ -659,6 +659,7 @@ func (a *API) subscribeToFeed(ctx context.Context, userID int, feedURL string, c
 
 	siteURL := ""
 	title := feedURL
+	description := ""
 
 	// Fetch and parse the feed to populate the real site URL and title.
 	// If this fails, fall back to creating the feed with the URL as the title.
@@ -671,11 +672,12 @@ func (a *API) subscribeToFeed(ctx context.Context, userID int, feedURL string, c
 				if parsed.Title != "" {
 					title = parsed.Title
 				}
+				description = parsed.Description
 			}
 		}
 	}
 
-	feed, err := a.store.CreateFeed(ctx, userID, categoryID, feedURL, siteURL, title)
+	feed, err := a.store.CreateFeed(ctx, userID, categoryID, feedURL, siteURL, title, description)
 	if err != nil {
 		return nil, err
 	}

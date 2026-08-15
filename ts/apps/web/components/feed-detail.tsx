@@ -4,14 +4,15 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { ExternalLink, Trash2, CheckCheck, Loader2, RefreshCw } from "lucide-react"
-import { Button } from "@workspace/ui/components/button"
+import { ExternalLink, Trash2, CheckCheck, Loader2, RefreshCw, Rss } from "lucide-react"
+import { Button, buttonVariants } from "@workspace/ui/components/button"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { FeedIcon } from "@/components/feed-icon"
 import { PageHeader } from "@/components/page-header"
 import { EntryTimeline } from "@/components/entry-timeline"
 import { getClient, markFeedRead, deleteFeed, refreshFeed } from "@/lib/planetary"
 import { getApiErrorMessage } from "@/lib/errors"
+import { cn } from "@workspace/ui/lib/utils"
 import type { Feed } from "@/lib/types"
 
 /**
@@ -92,64 +93,34 @@ export function FeedDetail({ feed }: { feed: Feed }) {
           />
         }
         actions={
-          <>
-            <Button
-              variant="outline"
-              size="xs"
-              onClick={handleRefresh}
-              disabled={refreshing}
-            >
-              {refreshing ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                <RefreshCw />
-              )}
-              Refresh
-            </Button>
-            <Button
-              variant="outline"
-              size="xs"
-              onClick={handleMarkAllRead}
-              disabled={marking}
-            >
-              {marking ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                <CheckCheck />
-              )}
-              Mark all as read
-            </Button>
-            <ConfirmDialog
-              trigger={
-                <Button variant="destructive" size="xs" disabled={deleting}>
-                  {deleting ? (
-                    <Loader2 className="animate-spin" />
-                  ) : (
-                    <Trash2 />
-                  )}
-                  Unsubscribe
-                </Button>
-              }
-              title="Unsubscribe from feed?"
-              description={`This removes "${feed.title}" and all its entries. This cannot be undone.`}
-              confirmLabel="Unsubscribe"
-              onConfirm={handleDelete}
-            />
-          </>
-        }
-        metadata={
-          <>
+          <div className="flex items-center gap-1">
             {feed.site_url && (
               <a
                 href={feed.site_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
+                aria-label="Open website"
+                className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }))}
               >
-                <span className="truncate">{feed.site_url}</span>
-                <ExternalLink className="size-3 shrink-0" />
+                <ExternalLink className="size-3.5" />
               </a>
             )}
+            {feed.feed_url && (
+              <a
+                href={feed.feed_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Open feed XML"
+                className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }))}
+              >
+                <Rss className="size-3.5" />
+              </a>
+            )}
+          </div>
+        }
+        metadata={
+          <>
+            {feed.description && <p>{feed.description}</p>}
             {feed.parsing_error && (
               <p className="mt-1 text-destructive">
                 Last parse error: {feed.parsing_error}
@@ -158,6 +129,50 @@ export function FeedDetail({ feed }: { feed: Feed }) {
           </>
         }
       />
+      <div className="flex items-center gap-2 border-b border-border px-4 py-2">
+        <Button
+          variant="outline"
+          size="xs"
+          onClick={handleMarkAllRead}
+          disabled={marking}
+        >
+          {marking ? (
+            <Loader2 className="animate-spin" />
+          ) : (
+            <CheckCheck />
+          )}
+          Mark all as read
+        </Button>
+        <Button
+          variant="outline"
+          size="xs"
+          onClick={handleRefresh}
+          disabled={refreshing}
+        >
+          {refreshing ? (
+            <Loader2 className="animate-spin" />
+          ) : (
+            <RefreshCw />
+          )}
+          Refresh
+        </Button>
+        <ConfirmDialog
+          trigger={
+            <Button variant="destructive" size="xs" disabled={deleting}>
+              {deleting ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                <Trash2 />
+              )}
+              Unsubscribe
+            </Button>
+          }
+          title="Unsubscribe from feed?"
+          description={`This removes "${feed.title}" and all its entries. This cannot be undone.`}
+          confirmLabel="Unsubscribe"
+          onConfirm={handleDelete}
+        />
+      </div>
       <EntryTimeline
         filter={{ feed_id: feed.id }}
         emptyTitle="No articles yet"

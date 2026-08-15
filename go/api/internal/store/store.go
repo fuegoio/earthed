@@ -103,17 +103,17 @@ func (s *Store) DeleteCategory(ctx context.Context, id, userID int) error {
 // --- Feeds ---
 
 // CreateFeed inserts a new feed subscription for the given user.
-func (s *Store) CreateFeed(ctx context.Context, userID int, categoryID *int, feedURL, siteURL, title string) (*Feed, error) {
+func (s *Store) CreateFeed(ctx context.Context, userID int, categoryID *int, feedURL, siteURL, title, description string) (*Feed, error) {
 	var f Feed
 	err := s.DB.QueryRowContext(ctx,
-		`INSERT INTO feeds (user_id, category_id, feed_url, site_url, title)
-		 VALUES ($1, $2, $3, $4, $5)
-		 RETURNING id, user_id, category_id, feed_url, site_url, title,
+		`INSERT INTO feeds (user_id, category_id, feed_url, site_url, title, description)
+		 VALUES ($1, $2, $3, $4, $5, $6)
+		 RETURNING id, user_id, category_id, feed_url, site_url, title, description,
 		           etag_header, last_modified_header, parsing_error, parsing_error_count,
 		           disabled, scraper_rules, rewrite_rules, crawler,
 		           next_check_at, last_fetch_at, created_at, updated_at`,
-		userID, categoryID, feedURL, siteURL, title,
-	).Scan(&f.ID, &f.UserID, &f.CategoryID, &f.FeedURL, &f.SiteURL, &f.Title,
+		userID, categoryID, feedURL, siteURL, title, description,
+	).Scan(&f.ID, &f.UserID, &f.CategoryID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
 		&f.EtagHeader, &f.LastModified, &f.ParsingError, &f.ParsingErrorCount,
 		&f.Disabled, &f.ScraperRules, &f.RewriteRules, &f.Crawler,
 		&f.NextCheckAt, &f.LastFetchAt, &f.CreatedAt, &f.UpdatedAt)
@@ -126,7 +126,7 @@ func (s *Store) CreateFeed(ctx context.Context, userID int, categoryID *int, fee
 // ListFeeds returns all feeds for the given user.
 func (s *Store) ListFeeds(ctx context.Context, userID int) ([]Feed, error) {
 	rows, err := s.DB.QueryContext(ctx,
-		`SELECT id, user_id, category_id, feed_url, site_url, title,
+		`SELECT id, user_id, category_id, feed_url, site_url, title, description,
 		        etag_header, last_modified_header, parsing_error, parsing_error_count,
 		        disabled, scraper_rules, rewrite_rules, crawler,
 		        next_check_at, last_fetch_at, created_at, updated_at
@@ -150,12 +150,12 @@ func (s *Store) ListFeeds(ctx context.Context, userID int) ([]Feed, error) {
 func (s *Store) GetFeedByID(ctx context.Context, id, userID int) (*Feed, error) {
 	var f Feed
 	err := s.DB.QueryRowContext(ctx,
-		`SELECT id, user_id, category_id, feed_url, site_url, title,
+		`SELECT id, user_id, category_id, feed_url, site_url, title, description,
 		        etag_header, last_modified_header, parsing_error, parsing_error_count,
 		        disabled, scraper_rules, rewrite_rules, crawler,
 		        next_check_at, last_fetch_at, created_at, updated_at
 		 FROM feeds WHERE id = $1 AND user_id = $2`, id, userID,
-	).Scan(&f.ID, &f.UserID, &f.CategoryID, &f.FeedURL, &f.SiteURL, &f.Title,
+	).Scan(&f.ID, &f.UserID, &f.CategoryID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
 		&f.EtagHeader, &f.LastModified, &f.ParsingError, &f.ParsingErrorCount,
 		&f.Disabled, &f.ScraperRules, &f.RewriteRules, &f.Crawler,
 		&f.NextCheckAt, &f.LastFetchAt, &f.CreatedAt, &f.UpdatedAt)
@@ -172,12 +172,12 @@ func (s *Store) GetFeedByID(ctx context.Context, id, userID int) (*Feed, error) 
 func (s *Store) GetFeedByURL(ctx context.Context, feedURL string, userID int) (*Feed, error) {
 	var f Feed
 	err := s.DB.QueryRowContext(ctx,
-		`SELECT id, user_id, category_id, feed_url, site_url, title,
+		`SELECT id, user_id, category_id, feed_url, site_url, title, description,
 		        etag_header, last_modified_header, parsing_error, parsing_error_count,
 		        disabled, scraper_rules, rewrite_rules, crawler,
 		        next_check_at, last_fetch_at, created_at, updated_at
 		 FROM feeds WHERE feed_url = $1 AND user_id = $2`, feedURL, userID,
-	).Scan(&f.ID, &f.UserID, &f.CategoryID, &f.FeedURL, &f.SiteURL, &f.Title,
+	).Scan(&f.ID, &f.UserID, &f.CategoryID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
 		&f.EtagHeader, &f.LastModified, &f.ParsingError, &f.ParsingErrorCount,
 		&f.Disabled, &f.ScraperRules, &f.RewriteRules, &f.Crawler,
 		&f.NextCheckAt, &f.LastFetchAt, &f.CreatedAt, &f.UpdatedAt)
@@ -197,12 +197,12 @@ func (s *Store) UpdateFeed(ctx context.Context, id, userID int, categoryID *int,
 		`UPDATE feeds SET category_id = $3, title = $4, scraper_rules = $5,
 		         rewrite_rules = $6, disabled = $7, crawler = $8, updated_at = NOW()
 		 WHERE id = $1 AND user_id = $2
-		 RETURNING id, user_id, category_id, feed_url, site_url, title,
+		 RETURNING id, user_id, category_id, feed_url, site_url, title, description,
 		           etag_header, last_modified_header, parsing_error, parsing_error_count,
 		           disabled, scraper_rules, rewrite_rules, crawler,
 		           next_check_at, last_fetch_at, created_at, updated_at`,
 		id, userID, categoryID, title, scraperRules, rewriteRules, disabled, crawler,
-	).Scan(&f.ID, &f.UserID, &f.CategoryID, &f.FeedURL, &f.SiteURL, &f.Title,
+	).Scan(&f.ID, &f.UserID, &f.CategoryID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
 		&f.EtagHeader, &f.LastModified, &f.ParsingError, &f.ParsingErrorCount,
 		&f.Disabled, &f.ScraperRules, &f.RewriteRules, &f.Crawler,
 		&f.NextCheckAt, &f.LastFetchAt, &f.CreatedAt, &f.UpdatedAt)
@@ -222,8 +222,19 @@ func (s *Store) DeleteFeed(ctx context.Context, id, userID int) error {
 }
 
 // UpdateFeedFetchState stores the ETag/Last-Modified headers and sets
-// last_fetch_at + next_check_at after a refresh.
-func (s *Store) UpdateFeedFetchState(ctx context.Context, feedID int, etag, lastModified string, parsingError string, errorCount int, nextCheckAt time.Time) error {
+// last_fetch_at + next_check_at after a refresh. If description is non-empty,
+// it also updates the feed's description from the freshly parsed feed.
+func (s *Store) UpdateFeedFetchState(ctx context.Context, feedID int, etag, lastModified string, parsingError string, errorCount int, nextCheckAt time.Time, description string) error {
+	if description != "" {
+		_, err := s.DB.ExecContext(ctx,
+			`UPDATE feeds SET etag_header = $2, last_modified_header = $3,
+			         parsing_error = $4, parsing_error_count = $5,
+			         last_fetch_at = NOW(), next_check_at = $6, updated_at = NOW(),
+			         description = $7
+			 WHERE id = $1`,
+			feedID, etag, lastModified, parsingError, errorCount, nextCheckAt, description)
+		return err
+	}
 	_, err := s.DB.ExecContext(ctx,
 		`UPDATE feeds SET etag_header = $2, last_modified_header = $3,
 		         parsing_error = $4, parsing_error_count = $5,
@@ -792,7 +803,7 @@ func (s *Store) IsFeedListOwner(ctx context.Context, listID, userID int) (bool, 
 // --- scan helper ---
 
 func scanFeed(rows *sql.Rows, f *Feed) error {
-	return rows.Scan(&f.ID, &f.UserID, &f.CategoryID, &f.FeedURL, &f.SiteURL, &f.Title,
+	return rows.Scan(&f.ID, &f.UserID, &f.CategoryID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
 		&f.EtagHeader, &f.LastModified, &f.ParsingError, &f.ParsingErrorCount,
 		&f.Disabled, &f.ScraperRules, &f.RewriteRules, &f.Crawler,
 		&f.NextCheckAt, &f.LastFetchAt, &f.CreatedAt, &f.UpdatedAt)

@@ -21,6 +21,7 @@ type Feed struct {
 	FeedURL           string     `json:"feed_url"`
 	SiteURL           string     `json:"site_url"`
 	Title             string     `json:"title"`
+	Description       string     `json:"description,omitempty"`
 	EtagHeader        string     `json:"-"`
 	LastModified      string     `json:"-"`
 	ParsingError      string     `json:"parsing_error,omitempty"`

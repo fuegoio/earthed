@@ -445,6 +445,9 @@ export const FeedSchema = {
             format: 'date-time',
             type: 'string'
         },
+        description: {
+            type: 'string'
+        },
         disabled: {
             type: 'boolean'
         },
@@ -1324,6 +1327,9 @@ export const FeedWritableSchema = {
         },
         created_at: {
             format: 'date-time',
+            type: 'string'
+        },
+        description: {
             type: 'string'
         },
         disabled: {

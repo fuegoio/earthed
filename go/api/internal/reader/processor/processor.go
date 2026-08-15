@@ -32,7 +32,7 @@ func New(st *store.Store, f *fetcher.Fetcher) *Processor {
 func (p *Processor) ProcessFeed(ctx context.Context, feed *store.Feed) error {
 	result, err := p.fetcher.Fetch(ctx, feed.FeedURL, feed.EtagHeader, feed.LastModified)
 	if err != nil {
-		_ = p.store.UpdateFeedFetchState(ctx, feed.ID, feed.EtagHeader, feed.LastModified, err.Error(), feed.ParsingErrorCount+1, time.Now().Add(15*time.Minute))
+		_ = p.store.UpdateFeedFetchState(ctx, feed.ID, feed.EtagHeader, feed.LastModified, err.Error(), feed.ParsingErrorCount+1, time.Now().Add(15*time.Minute), "")
 		return fmt.Errorf("fetch feed %d: %w", feed.ID, err)
 	}
 
@@ -45,12 +45,12 @@ func (p *Processor) ProcessFeed(ctx context.Context, feed *store.Feed) error {
 			slog.Info("feed not modified but has no entries, forcing unconditional fetch", "feed_id", feed.ID, "url", feed.FeedURL)
 			result, err = p.fetcher.Fetch(ctx, feed.FeedURL, "", "")
 			if err != nil {
-				_ = p.store.UpdateFeedFetchState(ctx, feed.ID, feed.EtagHeader, feed.LastModified, err.Error(), feed.ParsingErrorCount+1, time.Now().Add(15*time.Minute))
+				_ = p.store.UpdateFeedFetchState(ctx, feed.ID, feed.EtagHeader, feed.LastModified, err.Error(), feed.ParsingErrorCount+1, time.Now().Add(15*time.Minute), "")
 				return fmt.Errorf("fetch feed %d: %w", feed.ID, err)
 			}
 		} else {
 			nextCheck := time.Now().Add(60 * time.Minute)
-			_ = p.store.UpdateFeedFetchState(ctx, feed.ID, feed.EtagHeader, feed.LastModified, "", feed.ParsingErrorCount, nextCheck)
+			_ = p.store.UpdateFeedFetchState(ctx, feed.ID, feed.EtagHeader, feed.LastModified, "", feed.ParsingErrorCount, nextCheck, "")
 			slog.Info("feed not modified", "feed_id", feed.ID, "url", feed.FeedURL)
 			return nil
 		}
@@ -58,14 +58,14 @@ func (p *Processor) ProcessFeed(ctx context.Context, feed *store.Feed) error {
 
 	if result.NotModified {
 		nextCheck := time.Now().Add(60 * time.Minute)
-		_ = p.store.UpdateFeedFetchState(ctx, feed.ID, feed.EtagHeader, feed.LastModified, "", feed.ParsingErrorCount, nextCheck)
+		_ = p.store.UpdateFeedFetchState(ctx, feed.ID, feed.EtagHeader, feed.LastModified, "", feed.ParsingErrorCount, nextCheck, "")
 		slog.Info("feed not modified (unconditional fetch also returned 304)", "feed_id", feed.ID, "url", feed.FeedURL)
 		return nil
 	}
 
 	parsed, err := parser.Parse(result.Body, result.ContentType)
 	if err != nil {
-		_ = p.store.UpdateFeedFetchState(ctx, feed.ID, feed.EtagHeader, feed.LastModified, err.Error(), feed.ParsingErrorCount+1, time.Now().Add(15*time.Minute))
+		_ = p.store.UpdateFeedFetchState(ctx, feed.ID, feed.EtagHeader, feed.LastModified, err.Error(), feed.ParsingErrorCount+1, time.Now().Add(15*time.Minute), "")
 		return fmt.Errorf("parse feed %d: %w", feed.ID, err)
 	}
 
@@ -104,7 +104,7 @@ func (p *Processor) ProcessFeed(ctx context.Context, feed *store.Feed) error {
 	}
 
 	nextCheck := computeNextCheck(parsed.Items)
-	_ = p.store.UpdateFeedFetchState(ctx, feed.ID, result.ETag, result.LastModified, "", 0, nextCheck)
+	_ = p.store.UpdateFeedFetchState(ctx, feed.ID, result.ETag, result.LastModified, "", 0, nextCheck, parsed.Description)
 	slog.Info("feed refreshed", "feed_id", feed.ID, "url", feed.FeedURL, "items", len(parsed.Items))
 
 	return nil

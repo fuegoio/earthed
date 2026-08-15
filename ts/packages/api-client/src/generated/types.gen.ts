@@ -153,6 +153,7 @@ export type Feed = {
     category_id?: number;
     crawler: boolean;
     created_at: string;
+    description?: string;
     disabled: boolean;
     feed_url: string;
     id: number;
@@ -402,6 +403,7 @@ export type FeedWritable = {
     category_id?: number;
     crawler: boolean;
     created_at: string;
+    description?: string;
     disabled: boolean;
     feed_url: string;
     id: number;
