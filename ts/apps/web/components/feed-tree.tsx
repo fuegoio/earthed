@@ -5,16 +5,14 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { ChevronRight, Trash2, FolderOpen, Folder as FolderIcon } from "lucide-react"
+import { ChevronRight, FolderOpen, Folder as FolderIcon } from "lucide-react"
 import {
   getClient,
   updateFeed,
   updateFolder,
-  deleteFolder,
 } from "@/lib/planetary"
 import { getApiErrorMessage } from "@/lib/errors"
 import { FeedIcon } from "@/components/feed-icon"
-import { ConfirmDialog } from "@/components/confirm-dialog"
 import { cn } from "@workspace/ui/lib/utils"
 import type { Feed, Folder } from "@/lib/types"
 
@@ -160,9 +158,7 @@ function FolderNode({
   depth: number
 }) {
   const pathname = usePathname()
-  const queryClient = useQueryClient()
   const [open, setOpen] = useState(true)
-  const [pending, setPending] = useState(false)
 
   const href = `/folders/${folder.id}`
   const active = isActive(pathname, href)
@@ -173,24 +169,6 @@ function FolderNode({
       dragData.kind === "folder" &&
       (dragData.id === folder.id || isDescendant(folders, folder.id, dragData.id))
     )
-
-  async function handleDelete() {
-    setPending(true)
-    try {
-      const { error } = await deleteFolder({
-        client: await getClient(),
-        path: { folderId: folder.id },
-      })
-      if (error) throw error
-      await queryClient.invalidateQueries({ queryKey: ["folders"] })
-      await queryClient.invalidateQueries({ queryKey: ["feeds"] })
-      toast.success(`Deleted folder "${folder.title}"`)
-    } catch (err) {
-      toast.error(getApiErrorMessage(err, "Could not delete folder"))
-    } finally {
-      setPending(false)
-    }
-  }
 
   return (
     <div>
@@ -218,23 +196,6 @@ function FolderNode({
         )}
         style={{ paddingLeft: `${depth * 16}px` }}
       >
-        <button
-          type="button"
-          onClick={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            setOpen((o) => !o)
-          }}
-          className="flex size-5 shrink-0 items-center justify-center text-muted-foreground hover:text-foreground"
-          aria-label={open ? "Collapse" : "Expand"}
-        >
-          <ChevronRight
-            className={cn(
-              "size-3.5 transition-transform duration-150",
-              open && "rotate-90"
-            )}
-          />
-        </button>
         <Link
           href={href}
           aria-current={active ? "page" : undefined}
@@ -263,27 +224,23 @@ function FolderNode({
           )}
           <span className="truncate">{folder.title}</span>
         </Link>
-        <ConfirmDialog
-          trigger={
-            <button
-              type="button"
-              aria-label={`Delete folder ${folder.title}`}
-              disabled={pending}
-              className={cn(
-                "flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground",
-                "opacity-0 transition-opacity duration-150",
-                "hover:bg-destructive/10 hover:text-destructive",
-                "group-hover:opacity-100 group-focus-within:opacity-100"
-              )}
-            >
-              <Trash2 className="size-3" />
-            </button>
-          }
-          title="Delete folder?"
-          description={`"${folder.title}" will be removed. Feeds in it are kept but unassigned.`}
-          confirmLabel="Delete"
-          onConfirm={handleDelete}
-        />
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            setOpen((o) => !o)
+          }}
+          className="flex size-5 shrink-0 items-center justify-center text-muted-foreground hover:text-foreground"
+          aria-label={open ? "Collapse" : "Expand"}
+        >
+          <ChevronRight
+            className={cn(
+              "size-3.5 transition-transform duration-150",
+              open && "rotate-90"
+            )}
+          />
+        </button>
       </div>
       {open && (
         <div className="flex flex-col gap-0.5">

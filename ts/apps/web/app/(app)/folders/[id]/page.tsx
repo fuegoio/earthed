@@ -4,6 +4,7 @@ import { getApiErrorMessage, apiErrorStatus } from "@/lib/errors"
 import { ApiError } from "@/components/api-error"
 import { EntryTimeline } from "@/components/entry-timeline"
 import { PageHeader } from "@/components/page-header"
+import { FolderDeleteButton } from "@/components/folder-delete-button"
 import { FolderIcon } from "lucide-react"
 import type { Metadata } from "next"
 import type { Folder } from "@/lib/types"
@@ -58,6 +59,7 @@ export default async function FolderPage({
       <PageHeader
         title={folder.title}
         icon={<FolderIcon className="size-4 text-muted-foreground" />}
+        actions={<FolderDeleteButton folder={folder} />}
       />
       <EntryTimeline
         filter={{ folder_id: folder.id }}
