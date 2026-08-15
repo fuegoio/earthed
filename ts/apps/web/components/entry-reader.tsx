@@ -6,7 +6,6 @@ import { toast } from "sonner"
 import { ExternalLink, Circle, CheckCircle } from "lucide-react"
 import { Button, buttonVariants } from "@workspace/ui/components/button"
 import { StarToggle } from "@/components/star-toggle"
-import { LikeToggle } from "@/components/like-toggle"
 import { FeedIcon } from "@/components/feed-icon"
 import { PageHeader } from "@/components/page-header"
 import { getClient, updateEntries } from "@/lib/planetary"
@@ -91,11 +90,6 @@ export function EntryReader({
               )}
             </Button>
             <div className="flex items-center gap-0.5">
-              <LikeToggle
-                entryId={initialEntry.id}
-                liked={initialEntry.liked}
-                size="icon-sm"
-              />
               <StarToggle
                 entryId={initialEntry.id}
                 starred={initialEntry.starred}

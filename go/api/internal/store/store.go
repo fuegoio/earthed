@@ -304,7 +304,7 @@ func (s *Store) CreateEntry(ctx context.Context, userID, feedID int, hash, title
 // folder, status, and starred. Results are paginated.
 func (s *Store) ListEntries(ctx context.Context, userID int, feedID *int, folderID *int, status string, starred *bool, search string, limit, offset int) ([]Entry, error) {
 	q := `SELECT e.id, e.user_id, e.feed_id, e.hash, e.title, e.url, e.comments_url,
-	             e.author, '' AS content, LEFT(e.description, 400) AS description, e.status, e.starred, e.liked,
+	             e.author, '' AS content, LEFT(e.description, 400) AS description, e.status, e.starred,
 	             e.published_at, e.changed_at, e.tags
 	      FROM entries e`
 	args := []interface{}{userID}
@@ -351,7 +351,7 @@ func (s *Store) ListEntries(ctx context.Context, userID int, feedID *int, folder
 	for rows.Next() {
 		var e Entry
 		if err := rows.Scan(&e.ID, &e.UserID, &e.FeedID, &e.Hash, &e.Title, &e.URL, &e.CommentsURL,
-			&e.Author, &e.Content, &e.Description, &e.Status, &e.Starred, &e.Liked,
+			&e.Author, &e.Content, &e.Description, &e.Status, &e.Starred,
 			&e.PublishedAt, &e.ChangedAt, pq.Array(&e.Tags)); err != nil {
 			return nil, err
 		}
@@ -365,11 +365,11 @@ func (s *Store) GetEntryByID(ctx context.Context, id int64, userID int) (*Entry,
 	var e Entry
 	err := s.DB.QueryRowContext(ctx,
 		`SELECT id, user_id, feed_id, hash, title, url, comments_url,
-		        author, '' AS content, LEFT(description, 400) AS description, status, starred, liked,
+		        author, '' AS content, LEFT(description, 400) AS description, status, starred,
 		        published_at, changed_at, tags
 		 FROM entries WHERE id = $1 AND user_id = $2`, id, userID,
 	).Scan(&e.ID, &e.UserID, &e.FeedID, &e.Hash, &e.Title, &e.URL, &e.CommentsURL,
-		&e.Author, &e.Content, &e.Description, &e.Status, &e.Starred, &e.Liked,
+		&e.Author, &e.Content, &e.Description, &e.Status, &e.Starred,
 		&e.PublishedAt, &e.ChangedAt, pq.Array(&e.Tags))
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -397,14 +397,6 @@ func (s *Store) ToggleEntryStarred(ctx context.Context, id int64, userID int, st
 	_, err := s.DB.ExecContext(ctx,
 		`UPDATE entries SET starred = $3, changed_at = NOW() WHERE id = $1 AND user_id = $2`,
 		id, userID, starred)
-	return err
-}
-
-// ToggleEntryLiked flips the liked flag on a single entry.
-func (s *Store) ToggleEntryLiked(ctx context.Context, id int64, userID int, liked bool) error {
-	_, err := s.DB.ExecContext(ctx,
-		`UPDATE entries SET liked = $3, changed_at = NOW() WHERE id = $1 AND user_id = $2`,
-		id, userID, liked)
 	return err
 }
 

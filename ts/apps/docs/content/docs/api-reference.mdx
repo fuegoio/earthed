@@ -285,23 +285,6 @@ curl -X PUT http://localhost:8080/api/v1/entries/42/starred \
 
 Returns 204 No Content on success.
 
-### PUT `/api/v1/entries/{entryId}/liked`
-
-Set the liked flag on an entry.
-
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `liked` | bool | Yes | `true` to like, `false` to unlike |
-
-```bash
-curl -X PUT http://localhost:8080/api/v1/entries/42/liked \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer pla_your-token" \
-  -d '{"liked":true}'
-```
-
-Returns 204 No Content on success.
-
 ## Folders
 
 ### GET /api/v1/folders
@@ -643,7 +626,6 @@ Returns 204 No Content on success.
 | `description` | string | Short description / summary (omitted if empty) |
 | `status` | string | `unread`, `read`, or `removed` |
 | `starred` | bool | Whether the entry is starred |
-| `liked` | bool | Whether the entry is liked |
 | `published_at` | string | Publication timestamp |
 | `changed_at` | string | Last status change timestamp |
 | `tags` | string[] | Feed-assigned tags (omitted if empty) |

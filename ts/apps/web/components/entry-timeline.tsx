@@ -8,8 +8,8 @@ import {
   type InfiniteData,
 } from "@tanstack/react-query"
 import { Rss } from "lucide-react"
-import { Skeleton } from "@workspace/ui/components/skeleton"
 import { EntryCard } from "@/components/entry-card"
+import { EntryCardSkeleton } from "@/components/entry-card-skeleton"
 import {
   Empty,
   EmptyContent,
@@ -102,13 +102,7 @@ export function EntryTimeline({
     return (
       <div className="divide-y divide-border">
         {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="flex gap-3 px-4 py-3">
-            <Skeleton className="size-10 shrink-0 rounded-lg" />
-            <div className="min-w-0 flex-1 space-y-2">
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-3 w-1/2" />
-            </div>
-          </div>
+          <EntryCardSkeleton key={i} />
         ))}
       </div>
     )
@@ -177,13 +171,7 @@ export function EntryTimeline({
       {isFetchingNextPage && (
         <div className="divide-y divide-border">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="flex gap-3 px-4 py-3">
-              <Skeleton className="size-10 shrink-0 rounded-lg" />
-              <div className="min-w-0 flex-1 space-y-2">
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-3 w-1/2" />
-              </div>
-            </div>
+            <EntryCardSkeleton key={i} />
           ))}
         </div>
       )}

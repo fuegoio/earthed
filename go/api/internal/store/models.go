@@ -54,7 +54,6 @@ type Entry struct {
 	Description string      `json:"description,omitempty"`
 	Status      string      `json:"status"`
 	Starred     bool        `json:"starred"`
-	Liked       bool        `json:"liked"`
 	PublishedAt time.Time   `json:"published_at"`
 	ChangedAt   time.Time   `json:"changed_at"`
 	Tags        []string    `json:"tags,omitempty"`

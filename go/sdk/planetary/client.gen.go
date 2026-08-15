@@ -142,7 +142,6 @@ type Entry struct {
 	FeedId      int64        `json:"feed_id"`
 	Hash        string       `json:"hash"`
 	Id          int64        `json:"id"`
-	Liked       bool         `json:"liked"`
 	PublishedAt time.Time    `json:"published_at"`
 	Starred     bool         `json:"starred"`
 	Status      string       `json:"status"`
@@ -342,15 +341,6 @@ type PreviewFeedItem struct {
 	Url         string    `json:"url"`
 }
 
-// ToggleEntryLikedRequest defines model for Toggle-entry-likedRequest.
-type ToggleEntryLikedRequest struct {
-	// Schema A URL to the JSON Schema for this object.
-	//
-	// Examples: /api/schemas/Toggle-entry-likedRequest.json
-	Schema *string `json:"$schema,omitempty"`
-	Liked  bool    `json:"liked"`
-}
-
 // ToggleEntryStarredRequest defines model for Toggle-entry-starredRequest.
 type ToggleEntryStarredRequest struct {
 	// Schema A URL to the JSON Schema for this object.
@@ -451,9 +441,6 @@ type DiscoverFeedListsParams struct {
 
 // UpdateEntriesJSONRequestBody defines body for UpdateEntries for application/json ContentType.
 type UpdateEntriesJSONRequestBody = UpdateEntriesRequest
-
-// ToggleEntryLikedJSONRequestBody defines body for ToggleEntryLiked for application/json ContentType.
-type ToggleEntryLikedJSONRequestBody = ToggleEntryLikedRequest
 
 // ToggleEntryStarredJSONRequestBody defines body for ToggleEntryStarred for application/json ContentType.
 type ToggleEntryStarredJSONRequestBody = ToggleEntryStarredRequest
@@ -582,20 +569,6 @@ type ClientInterface interface {
 	//
 	// Corresponds with GET /api/v1/entries/{entryId} (the `GetEntry` operationId).
 	GetEntry(ctx context.Context, entryId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ToggleEntryLikedWithBody Toggle liked on an entry
-	//
-	// Takes any type of body and a specified content type.
-	//
-	// Corresponds with PUT /api/v1/entries/{entryId}/liked (the `ToggleEntryLiked` operationId).
-	ToggleEntryLikedWithBody(ctx context.Context, entryId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ToggleEntryLiked Toggle liked on an entry
-	//
-	// Takes a body of the `application/json` content type.
-	//
-	// Corresponds with PUT /api/v1/entries/{entryId}/liked (the `ToggleEntryLiked` operationId).
-	ToggleEntryLiked(ctx context.Context, entryId int64, body ToggleEntryLikedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ToggleEntryStarredWithBody Toggle starred on an entry
 	//
@@ -922,40 +895,6 @@ func (c *Client) UpdateEntries(ctx context.Context, body UpdateEntriesJSONReques
 // Corresponds with GET /api/v1/entries/{entryId} (the `GetEntry` operationId).
 func (c *Client) GetEntry(ctx context.Context, entryId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetEntryRequest(c.Server, entryId)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-// ToggleEntryLikedWithBody Toggle liked on an entry
-//
-// Takes any type of body and a specified content type.
-//
-// Corresponds with PUT /api/v1/entries/{entryId}/liked (the `ToggleEntryLiked` operationId).
-func (c *Client) ToggleEntryLikedWithBody(ctx context.Context, entryId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewToggleEntryLikedRequestWithBody(c.Server, entryId, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-// ToggleEntryLiked Toggle liked on an entry
-//
-// Takes a body of the `application/json` content type.
-//
-// Corresponds with PUT /api/v1/entries/{entryId}/liked (the `ToggleEntryLiked` operationId).
-func (c *Client) ToggleEntryLiked(ctx context.Context, entryId int64, body ToggleEntryLikedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewToggleEntryLikedRequest(c.Server, entryId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1852,53 +1791,6 @@ func NewGetEntryRequest(server string, entryId int64) (*http.Request, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	return req, nil
-}
-
-// NewToggleEntryLikedRequest calls the generic ToggleEntryLiked builder with application/json body
-func NewToggleEntryLikedRequest(server string, entryId int64, body ToggleEntryLikedJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewToggleEntryLikedRequestWithBody(server, entryId, "application/json", bodyReader)
-}
-
-// NewToggleEntryLikedRequestWithBody constructs an http.Request for the ToggleEntryLiked method, with any body, and a specified content type
-func NewToggleEntryLikedRequestWithBody(server string, entryId int64, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "entryId", entryId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "integer", Format: "int64"})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/entries/%s/liked", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(http.MethodPut, queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -3136,20 +3028,6 @@ type ClientWithResponsesInterface interface {
 	// Corresponds with GET /api/v1/entries/{entryId} (the `GetEntry` operationId).
 	GetEntryWithResponse(ctx context.Context, entryId int64, reqEditors ...RequestEditorFn) (*GetEntryResp, error)
 
-	// ToggleEntryLikedWithBodyWithResponse Toggle liked on an entry
-	//
-	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
-	//
-	// Corresponds with PUT /api/v1/entries/{entryId}/liked (the `ToggleEntryLiked` operationId).
-	ToggleEntryLikedWithBodyWithResponse(ctx context.Context, entryId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ToggleEntryLikedResp, error)
-
-	// ToggleEntryLikedWithResponse Toggle liked on an entry
-	//
-	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
-	//
-	// Corresponds with PUT /api/v1/entries/{entryId}/liked (the `ToggleEntryLiked` operationId).
-	ToggleEntryLikedWithResponse(ctx context.Context, entryId int64, body ToggleEntryLikedJSONRequestBody, reqEditors ...RequestEditorFn) (*ToggleEntryLikedResp, error)
-
 	// ToggleEntryStarredWithBodyWithResponse Toggle starred on an entry
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
@@ -3594,47 +3472,6 @@ func (r GetEntryResp) StatusCode() int {
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
 func (r GetEntryResp) ContentType() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Header.Get("Content-Type")
-	}
-	return ""
-}
-
-type ToggleEntryLikedResp struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
-	ApplicationproblemJSONDefault *ErrorModel
-}
-
-// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
-func (r ToggleEntryLikedResp) GetApplicationproblemJSONDefault() *ErrorModel {
-	return r.ApplicationproblemJSONDefault
-}
-
-// GetBody returns the raw response body bytes
-func (r ToggleEntryLikedResp) GetBody() []byte {
-	return r.Body
-}
-
-// Status returns HTTPResponse.Status
-func (r ToggleEntryLikedResp) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ToggleEntryLikedResp) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r ToggleEntryLikedResp) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
@@ -5166,32 +5003,6 @@ func (c *ClientWithResponses) GetEntryWithResponse(ctx context.Context, entryId 
 	return ParseGetEntryResp(rsp)
 }
 
-// ToggleEntryLikedWithBodyWithResponse Toggle liked on an entry
-//
-// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
-//
-// Corresponds with PUT /api/v1/entries/{entryId}/liked (the `ToggleEntryLiked` operationId).
-func (c *ClientWithResponses) ToggleEntryLikedWithBodyWithResponse(ctx context.Context, entryId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ToggleEntryLikedResp, error) {
-	rsp, err := c.ToggleEntryLikedWithBody(ctx, entryId, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseToggleEntryLikedResp(rsp)
-}
-
-// ToggleEntryLikedWithResponse Toggle liked on an entry
-//
-// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
-//
-// Corresponds with PUT /api/v1/entries/{entryId}/liked (the `ToggleEntryLiked` operationId).
-func (c *ClientWithResponses) ToggleEntryLikedWithResponse(ctx context.Context, entryId int64, body ToggleEntryLikedJSONRequestBody, reqEditors ...RequestEditorFn) (*ToggleEntryLikedResp, error) {
-	rsp, err := c.ToggleEntryLiked(ctx, entryId, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseToggleEntryLikedResp(rsp)
-}
-
 // ToggleEntryStarredWithBodyWithResponse Toggle starred on an entry
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
@@ -5838,35 +5649,6 @@ func ParseGetEntryResp(rsp *http.Response) (*GetEntryResp, error) {
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest ErrorModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseToggleEntryLikedResp parses an HTTP response from a ToggleEntryLikedWithResponse call
-func ParseToggleEntryLikedResp(rsp *http.Response) (*ToggleEntryLikedResp, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ToggleEntryLikedResp{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case rsp.StatusCode == 204:
-		break // No content-type
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
 		var dest ErrorModel

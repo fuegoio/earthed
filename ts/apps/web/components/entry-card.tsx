@@ -4,7 +4,6 @@ import { useState, useOptimistic, startTransition } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { StarToggle } from "@/components/star-toggle"
-import { LikeToggle } from "@/components/like-toggle"
 import { FeedIcon } from "@/components/feed-icon"
 import { getClient, updateEntries } from "@/lib/planetary"
 import { getApiErrorMessage } from "@/lib/errors"
@@ -122,7 +121,6 @@ export function EntryCard({ entry, feed }: { entry: Entry; feed?: Feed }) {
         className="flex shrink-0 items-start gap-0.5"
         onClick={(e) => e.stopPropagation()}
       >
-        <LikeToggle entryId={entry.id} liked={entry.liked} size="icon-sm" />
         <StarToggle entryId={entry.id} starred={entry.starred} size="icon-sm" />
       </div>
     </a>

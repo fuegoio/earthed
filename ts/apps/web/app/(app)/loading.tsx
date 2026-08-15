@@ -1,4 +1,5 @@
 import { Skeleton } from "@workspace/ui/components/skeleton"
+import { EntryCardSkeleton } from "@/components/entry-card-skeleton"
 
 export default function Loading() {
   return (
@@ -12,13 +13,7 @@ export default function Loading() {
       </div>
       <div className="mt-6 flex flex-col divide-y divide-border">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="flex gap-3 py-4">
-            <Skeleton className="size-10 shrink-0 rounded-lg" />
-            <div className="min-w-0 flex-1 space-y-2">
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-3 w-1/2" />
-            </div>
-          </div>
+          <EntryCardSkeleton key={i} />
         ))}
       </div>
     </div>
