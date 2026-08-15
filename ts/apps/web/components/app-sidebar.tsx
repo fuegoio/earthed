@@ -28,6 +28,7 @@ import {
 } from "@/lib/planetary"
 import { signout } from "@/lib/auth"
 import { Logo } from "@/components/logo"
+import { OfflineBadge } from "@/components/offline-badge"
 import { FeedTree } from "@/components/feed-tree"
 import { SearchBox } from "@/components/search-box"
 import { buttonVariants } from "@workspace/ui/components/button"
@@ -204,6 +205,7 @@ function SidebarContent({ userEmail }: { userEmail: string }) {
         >
           <Logo className="size-5" />
           Planetary
+          <OfflineBadge />
         </Link>
       </div>
 
