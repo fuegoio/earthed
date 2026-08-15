@@ -26,7 +26,10 @@ export function PageHeader({
   return (
     <div className={cn("border-b border-border px-4 py-3", className)}>
       <div className="flex items-center justify-between gap-3">
-        <h1 className="flex min-w-0 items-center gap-2 font-serif text-lg font-bold tracking-tight">
+        <h1 className={cn(
+          "flex min-w-0 items-center gap-2 font-serif text-lg font-bold tracking-tight",
+          !icon && "pl-8"
+        )}>
           {icon}
           <span className="truncate">{title}</span>
         </h1>
