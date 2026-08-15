@@ -125,6 +125,7 @@ func run() (int, error) {
 	mux := http.NewServeMux()
 
 	mux.Handle("/api/auth/", authInst.Handler())
+	mux.Handle("/api/v1/health", humaMux)
 	mux.Handle("/api/", authInst.Middleware(humaMux))
 	mux.Handle("/docs", humaRouter.Adapter())
 	mux.Handle("/openapi.json", humaRouter.Adapter())
