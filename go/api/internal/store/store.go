@@ -313,7 +313,7 @@ func (s *Store) ListEntries(ctx context.Context, userID int, feedID *int, folder
 	q += " WHERE e.user_id = $1"
 
 	if folderID != nil {
-		q += fmt.Sprintf(" AND e.feed_id IN (SELECT f.id FROM feeds f WHERE f.user_id = $1 AND f.folder_id = $%d)", argIdx)
+		q += fmt.Sprintf(" AND e.feed_id IN (SELECT f.id FROM feeds f WHERE f.user_id = $1 AND f.folder_id IN (WITH RECURSIVE folder_tree AS (SELECT id FROM folders WHERE id = $%d AND user_id = $1 UNION ALL SELECT child.id FROM folders child JOIN folder_tree ft ON child.parent_id = ft.id) SELECT id FROM folder_tree))", argIdx)
 		args = append(args, *folderID)
 		argIdx++
 	}
