@@ -1,4 +1,4 @@
-import { Skeleton } from "@workspace/ui/components/skeleton"
+import { Skeleton } from "@workspace/ui/components/skeleton";
 
 /**
  * Loading placeholder that mirrors the EntryCard layout: read/unread dot,
@@ -27,15 +27,14 @@ export function EntryCardSkeleton() {
         </div>
         {/* title (text-sm line-clamp-2, ~20px per line) */}
         <Skeleton className="mt-1 h-5 w-3/4" />
-        <Skeleton className="mt-1 h-5 w-1/2" />
         {/* snippet (text-sm line-clamp-2, ~20px per line) */}
-        <Skeleton className="mt-1 h-5 w-full" />
-        <Skeleton className="mt-1 h-5 w-2/3" />
+        <Skeleton className="mt-1 h-4 w-full" />
+        <Skeleton className="mt-1 h-4 w-2/3 mb-1" />
       </div>
       {/* right action */}
       <div className="flex shrink-0 items-start gap-0.5">
         <Skeleton className="size-8 rounded-md" />
       </div>
     </div>
-  )
+  );
 }
