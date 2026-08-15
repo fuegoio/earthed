@@ -143,6 +143,7 @@ function FolderNode({
   onDragEnd,
   dragData,
   isDropTarget,
+  dropTarget,
   setDropTarget,
   onDrop,
   depth,
@@ -155,6 +156,7 @@ function FolderNode({
   onDragEnd: () => void
   dragData: DragData | null
   isDropTarget: boolean
+  dropTarget: number | null
   setDropTarget: (id: number | null) => void
   onDrop: (e: DragEvent, targetFolderId: number | null) => void
   depth: number
@@ -255,7 +257,8 @@ function FolderNode({
                 onDragStart={onDragStart}
                 onDragEnd={onDragEnd}
                 dragData={dragData}
-                isDropTarget={false}
+                isDropTarget={dropTarget === child.folder.id}
+                dropTarget={dropTarget}
                 setDropTarget={setDropTarget}
                 onDrop={onDrop}
                 depth={depth + 1}
@@ -357,6 +360,7 @@ export function FeedTree({ feeds, folders }: { feeds: Feed[]; folders: Folder[] 
             onDragEnd={handleDragEnd}
             dragData={dragData}
             isDropTarget={dropTarget === node.folder.id}
+            dropTarget={dropTarget}
             setDropTarget={setDropTarget}
             onDrop={handleDrop}
             depth={0}
