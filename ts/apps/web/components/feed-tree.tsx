@@ -117,12 +117,12 @@ function FeedNode({
       }}
       onDrop={(e) => onDrop(e, null)}
       className={cn(
-        "flex items-center gap-2.5 rounded-md px-3 py-1.5 text-sm",
+        "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm",
         "text-sidebar-foreground/70 transition-colors cursor-grab active:cursor-grabbing",
         active
           ? "bg-sidebar-accent text-sidebar-accent-foreground"
           : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-        isDropTarget && "ring-2 ring-primary ring-inset"
+        isDropTarget && "ring-1 ring-primary/50 ring-inset"
       )}
     >
       <FeedIcon
@@ -214,9 +214,9 @@ function FolderNode({
         }}
         className={cn(
           "group flex items-center rounded-md text-sm transition-colors cursor-grab active:cursor-grabbing",
-          isDropTarget && "ring-2 ring-primary ring-inset"
+          isDropTarget && "ring-1 ring-primary/50 ring-inset"
         )}
-        style={{ paddingLeft: `${depth * 12}px` }}
+        style={{ paddingLeft: `${depth * 16}px` }}
       >
         <button
           type="button"
@@ -225,12 +225,12 @@ function FolderNode({
             e.stopPropagation()
             setOpen((o) => !o)
           }}
-          className="flex size-5 shrink-0 items-center justify-center text-muted-foreground"
+          className="flex size-5 shrink-0 items-center justify-center text-muted-foreground hover:text-foreground"
           aria-label={open ? "Collapse" : "Expand"}
         >
           <ChevronRight
             className={cn(
-              "size-3.5 transition-transform",
+              "size-3.5 transition-transform duration-150",
               open && "rotate-90"
             )}
           />
@@ -239,7 +239,7 @@ function FolderNode({
           href={href}
           aria-current={active ? "page" : undefined}
           className={cn(
-            "flex min-w-0 flex-1 items-center gap-2.5 rounded-md py-1.5 pr-2",
+            "flex min-w-0 flex-1 items-center gap-2.5 rounded-md py-2 pr-2",
             "text-sidebar-foreground/70 transition-colors",
             active
               ? "bg-sidebar-accent text-sidebar-accent-foreground"
@@ -270,12 +270,13 @@ function FolderNode({
               aria-label={`Delete folder ${folder.title}`}
               disabled={pending}
               className={cn(
-                "mr-1 hidden size-6 shrink-0 items-center justify-center rounded-sm text-muted-foreground",
-                "hover:bg-sidebar-accent hover:text-destructive",
-                "group-hover:flex"
+                "flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground",
+                "opacity-0 transition-opacity duration-150",
+                "hover:bg-destructive/10 hover:text-destructive",
+                "group-hover:opacity-100 group-focus-within:opacity-100"
               )}
             >
-              <Trash2 className="size-3.5" />
+              <Trash2 className="size-3" />
             </button>
           }
           title="Delete folder?"
@@ -303,7 +304,7 @@ function FolderNode({
                 depth={depth + 1}
               />
             ) : (
-              <div key={`feed-${child.feed.id}`} style={{ paddingLeft: `${(depth + 1) * 12}px` }}>
+              <div key={`feed-${child.feed.id}`} style={{ paddingLeft: `${(depth + 1) * 16}px` }}>
                 <FeedNode
                   feed={child.feed}
                   onDragStart={(e, feedId) =>

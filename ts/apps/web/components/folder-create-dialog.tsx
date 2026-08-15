@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { Dialog } from "@base-ui/react/dialog"
-import { Plus, Loader2 } from "lucide-react"
+import { Loader2, FolderPlus } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
@@ -49,7 +49,7 @@ export function FolderCreateDialog() {
             aria-label="New folder"
             className="text-muted-foreground hover:text-foreground"
           >
-            <Plus className="size-3.5" />
+            <FolderPlus className="size-3.5" />
           </Button>
         }
       />

@@ -236,7 +236,7 @@ function SidebarContent({ userEmail }: { userEmail: string }) {
           {isLoading ? (
             <div className="flex flex-col gap-0.5">
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-2.5 px-3 py-1.5">
+                <div key={i} className="flex items-center gap-2.5 px-3 py-2">
                   <Skeleton className="size-3.5 shrink-0 rounded-sm" />
                   <Skeleton className="h-3 flex-1" />
                 </div>
