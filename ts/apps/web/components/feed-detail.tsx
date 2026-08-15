@@ -95,37 +95,37 @@ export function FeedDetail({ feed }: { feed: Feed }) {
           <>
             <Button
               variant="outline"
-              size="sm"
+              size="xs"
               onClick={handleRefresh}
               disabled={refreshing}
             >
               {refreshing ? (
-                <Loader2 className="size-3.5 animate-spin" />
+                <Loader2 className="animate-spin" />
               ) : (
-                <RefreshCw className="size-3.5" />
+                <RefreshCw />
               )}
               Refresh
             </Button>
             <Button
               variant="outline"
-              size="sm"
+              size="xs"
               onClick={handleMarkAllRead}
               disabled={marking}
             >
               {marking ? (
-                <Loader2 className="size-3.5 animate-spin" />
+                <Loader2 className="animate-spin" />
               ) : (
-                <CheckCheck className="size-3.5" />
+                <CheckCheck />
               )}
               Mark all as read
             </Button>
             <ConfirmDialog
               trigger={
-                <Button variant="destructive" size="sm" disabled={deleting}>
+                <Button variant="destructive" size="xs" disabled={deleting}>
                   {deleting ? (
-                    <Loader2 className="size-3.5 animate-spin" />
+                    <Loader2 className="animate-spin" />
                   ) : (
-                    <Trash2 className="size-3.5" />
+                    <Trash2 />
                   )}
                   Unsubscribe
                 </Button>

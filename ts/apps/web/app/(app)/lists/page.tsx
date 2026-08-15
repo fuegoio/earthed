@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query"
 import { ListChecks, Plus, Globe, Users, Compass } from "lucide-react"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 import { buttonVariants } from "@workspace/ui/components/button"
+import { PageHeader } from "@/components/page-header"
 import {
   Empty,
   EmptyContent,
@@ -35,32 +36,30 @@ export default function FeedListsPage() {
   })
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-6">
-      <div className="flex items-center justify-between">
-        <h1 className="flex items-center gap-2 font-serif text-2xl font-bold tracking-tight">
-          <ListChecks className="size-5" />
-          Feed lists
-        </h1>
-        <div className="flex gap-2">
-          <Link
-            href="/lists/discover"
-            className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
-          >
-            <Compass className="size-4" />
-            Discover
-          </Link>
-          <Link href="/lists/new" className={cn(buttonVariants({ size: "sm" }))}>
-            <Plus className="size-4" />
-            New list
-          </Link>
-        </div>
-      </div>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Curated collections of feeds you can share and follow.
-      </p>
+    <div className="mx-auto w-full max-w-3xl">
+      <PageHeader
+        title="Feed lists"
+        icon={<ListChecks className="size-4 text-muted-foreground" />}
+        actions={
+          <>
+            <Link
+              href="/lists/discover"
+              className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+            >
+              <Compass className="size-4" />
+              Discover
+            </Link>
+            <Link href="/lists/new" className={cn(buttonVariants({ size: "sm" }))}>
+              <Plus className="size-4" />
+              New list
+            </Link>
+          </>
+        }
+        metadata="Curated collections of feeds you can share and follow."
+      />
 
       {/* My lists */}
-      <section className="mt-8">
+      <section className="p-4">
         <h2 className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
           My lists
         </h2>
@@ -98,7 +97,7 @@ export default function FeedListsPage() {
       </section>
 
       {/* Followed lists */}
-      <section className="mt-8">
+      <section className="p-4 pt-0">
         <h2 className="mb-2 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
           <Users className="size-3.5" />
           Lists you follow
