@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
-import { useQuery } from "@tanstack/react-query"
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import {
   LayoutList,
   Circle,
@@ -15,56 +15,49 @@ import {
   Upload,
   Sun,
   Moon,
-} from "lucide-react"
-import { useTheme } from "next-themes"
-import { Menu } from "@base-ui/react/menu"
-import { Avatar } from "@base-ui/react/avatar"
-import { Skeleton } from "@workspace/ui/components/skeleton"
-import {
-  getClient,
-  listFeeds,
-  listFolders,
-  unwrap,
-} from "@/lib/planetary"
-import { signout } from "@/lib/auth"
-import { Logo } from "@/components/logo"
-import { OfflineBadge } from "@/components/offline-badge"
-import { FeedTree } from "@/components/feed-tree"
-import { SearchBox } from "@/components/search-box"
-import { buttonVariants } from "@workspace/ui/components/button"
-import { FolderCreateDialog } from "@/components/folder-create-dialog"
-import { cn } from "@workspace/ui/lib/utils"
-import { SidebarSeparator } from "@workspace/ui/components/separator"
-import type { Feed, Folder } from "@/lib/types"
+} from "lucide-react";
+import { useTheme } from "next-themes";
+import { Menu } from "@base-ui/react/menu";
+import { Avatar } from "@base-ui/react/avatar";
+import { Skeleton } from "@workspace/ui/components/skeleton";
+import { getClient, listFeeds, listFolders, unwrap } from "@/lib/planetary";
+import { signout } from "@/lib/auth";
+import { Logo } from "@/components/logo";
+import { OfflineBadge } from "@/components/offline-badge";
+import { FeedTree } from "@/components/feed-tree";
+import { SearchBox } from "@/components/search-box";
+import { buttonVariants } from "@workspace/ui/components/button";
+import { FolderCreateDialog } from "@/components/folder-create-dialog";
+import { cn } from "@workspace/ui/lib/utils";
+import { SidebarSeparator } from "@workspace/ui/components/separator";
+import type { Feed, Folder } from "@/lib/types";
 
 const navLinkClass = cn(
   "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium",
   "text-sidebar-foreground/70 transition-colors",
-  "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-)
+  "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+);
 
-const navLinkActiveClass = cn(
-  "bg-sidebar-accent text-sidebar-accent-foreground"
-)
+const navLinkActiveClass = cn("bg-sidebar-accent text-sidebar-accent-foreground");
 
 function isActive(pathname: string, href: string): boolean {
-  if (href === "/") return pathname === "/"
-  return pathname === href || pathname.startsWith(href + "/")
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(href + "/");
 }
 
 function SidebarNav() {
-  const pathname = usePathname()
+  const pathname = usePathname();
   const navItems = [
     { href: "/", label: "All", icon: LayoutList },
     { href: "/unread", label: "Unread", icon: Circle },
     { href: "/starred", label: "Starred", icon: Star },
     { href: "/lists", label: "Feed lists", icon: ListChecks },
-  ]
+  ];
 
   return (
     <nav className="flex flex-col gap-0.5">
       {navItems.map((item) => {
-        const active = isActive(pathname, item.href)
+        const active = isActive(pathname, item.href);
         return (
           <Link
             key={item.href}
@@ -75,29 +68,29 @@ function SidebarNav() {
             <item.icon className={cn("size-4", active && "text-primary")} />
             {item.label}
           </Link>
-        )
+        );
       })}
     </nav>
-  )
+  );
 }
 
 function AccountButton({ userEmail }: { userEmail: string }) {
-  const router = useRouter()
-  const { resolvedTheme, setTheme } = useTheme()
+  const router = useRouter();
+  const { resolvedTheme, setTheme } = useTheme();
 
   async function handleSignout() {
-    await signout()
-    router.push("/login")
-    router.refresh()
+    await signout();
+    router.push("/login");
+    router.refresh();
   }
 
-  const isDark = resolvedTheme === "dark"
+  const isDark = resolvedTheme === "dark";
 
   const menuItemClass = cn(
     "flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm",
     "hover:bg-accent hover:text-accent-foreground transition-colors",
-    "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
-  )
+    "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/30",
+  );
 
   return (
     <Menu.Root>
@@ -105,24 +98,20 @@ function AccountButton({ userEmail }: { userEmail: string }) {
         className={cn(
           "flex min-w-0 flex-1 items-center gap-2 rounded-md py-1.5 pl-1.5 pr-2",
           "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors",
-          "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
+          "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/30",
         )}
         aria-label="Account menu"
       >
         <Avatar.Root className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
-          <Avatar.Fallback>
-            {userEmail.charAt(0).toUpperCase()}
-          </Avatar.Fallback>
+          <Avatar.Fallback>{userEmail.charAt(0).toUpperCase()}</Avatar.Fallback>
         </Avatar.Root>
-        <span className="hidden truncate text-sm font-medium sm:inline">
-          {userEmail}
-        </span>
+        <span className="hidden truncate text-sm font-medium sm:inline">{userEmail}</span>
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner
           className={cn(
             "z-50 min-w-48 overflow-hidden rounded-md border border-border bg-popover p-1",
-            "shadow-md"
+            "shadow-md",
           )}
           align="start"
           side="top"
@@ -132,25 +121,16 @@ function AccountButton({ userEmail }: { userEmail: string }) {
               <p className="text-sm font-medium truncate">{userEmail}</p>
             </div>
             <div className="my-1 h-px bg-border" />
-            <Menu.Item
-              className={menuItemClass}
-              render={<Link href="/settings/tokens" />}
-            >
+            <Menu.Item className={menuItemClass} render={<Link href="/settings/tokens" />}>
               <Key className="size-4" />
               API tokens
             </Menu.Item>
             <div className="my-1 h-px bg-border" />
-            <Menu.Item
-              className={menuItemClass}
-              render={<Link href="/settings/opml" />}
-            >
+            <Menu.Item className={menuItemClass} render={<Link href="/settings/opml" />}>
               <Upload className="size-4" />
               Import OPML
             </Menu.Item>
-            <Menu.Item
-              className={menuItemClass}
-              render={<Link href="/settings/opml" />}
-            >
+            <Menu.Item className={menuItemClass} render={<Link href="/settings/opml" />}>
               <FileDown className="size-4" />
               Export OPML
             </Menu.Item>
@@ -180,33 +160,31 @@ function AccountButton({ userEmail }: { userEmail: string }) {
         </Menu.Positioner>
       </Menu.Portal>
     </Menu.Root>
-  )
+  );
 }
 
 function SidebarContent({ userEmail }: { userEmail: string }) {
   const { data: feeds, isLoading: feedsLoading } = useQuery<Feed[]>({
     queryKey: ["feeds"],
     queryFn: async () => unwrap(listFeeds({ client: await getClient() })),
-  })
+  });
 
   const { data: folders, isLoading: foldersLoading } = useQuery<Folder[]>({
     queryKey: ["folders"],
     queryFn: async () => unwrap(listFolders({ client: await getClient() })),
-  })
+  });
 
-  const isLoading = feedsLoading || foldersLoading
+  const isLoading = feedsLoading || foldersLoading;
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex h-14 shrink-0 items-center gap-2 px-4">
-        <Link
-          href="/"
-          className="flex items-center gap-2 font-serif text-lg font-bold"
-        >
+      <div className="flex h-14 shrink-0 items-center gap-2 px-4 w-full">
+        <Link href="/" className="flex items-center gap-2 font-serif text-lg font-bold">
           <Logo className="size-5" />
           Planetary
-          <OfflineBadge />
         </Link>
+        <div className="flex-1" />
+        <OfflineBadge />
       </div>
 
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-3">
@@ -228,7 +206,7 @@ function SidebarContent({ userEmail }: { userEmail: string }) {
                 aria-label="Subscribe to a feed"
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "icon-xs" }),
-                  "text-muted-foreground hover:text-foreground"
+                  "text-muted-foreground hover:text-foreground",
                 )}
               >
                 <Plus className="size-3.5" />
@@ -258,7 +236,7 @@ function SidebarContent({ userEmail }: { userEmail: string }) {
         <AccountButton userEmail={userEmail} />
       </div>
     </div>
-  )
+  );
 }
 
 export function AppSidebar({
@@ -266,9 +244,9 @@ export function AppSidebar({
   onClose,
   userEmail,
 }: {
-  open: boolean
-  onClose: () => void
-  userEmail: string
+  open: boolean;
+  onClose: () => void;
+  userEmail: string;
 }) {
   return (
     <>
@@ -289,5 +267,5 @@ export function AppSidebar({
         </div>
       )}
     </>
-  )
+  );
 }
