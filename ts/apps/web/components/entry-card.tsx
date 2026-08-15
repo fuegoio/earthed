@@ -110,10 +110,12 @@ export function EntryCard({ entry, feed }: { entry: Entry; feed?: Feed }) {
         >
           {entry.title || "Untitled"}
         </h3>
-        {snippet && (
+        {snippet ? (
           <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
             {snippet}
           </p>
+        ) : (
+          <div className="mt-1 h-10" aria-hidden />
         )}
       </div>
       <div
