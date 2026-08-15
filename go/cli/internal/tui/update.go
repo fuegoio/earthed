@@ -208,7 +208,10 @@ func (m Model) renderEntry() string {
 	s += dimStyle.Render(e.PublishedAt.Format("2006-01-02 15:04")) + "\n"
 	s += dimStyle.Render(e.Url) + "\n\n"
 
-	content := e.Content
+	content := ""
+	if e.Description != nil {
+		content = *e.Description
+	}
 	if len(content) > 2000 {
 		content = content[:2000] + "..."
 	}

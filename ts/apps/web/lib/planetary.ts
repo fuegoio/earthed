@@ -14,8 +14,8 @@ const fetchNoStore: typeof fetch = (input, init) =>
  * `ErrorModel` body on failure so `getApiErrorMessage(query.error)` keeps
  * working in components.
  *
- *   const categories = await unwrap(
- *     listCategories({ client: await getClient() }),
+ *   const folders = await unwrap(
+ *     listFolders({ client: await getClient() }),
  *   );
  */
 export async function unwrap<T>(

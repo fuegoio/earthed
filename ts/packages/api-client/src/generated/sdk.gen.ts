@@ -2,7 +2,7 @@
 
 import { client } from './client.gen';
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client/index';
-import type { AddFeedListFeedData, AddFeedListFeedErrors, AddFeedListFeedResponses, CreateCategoryData, CreateCategoryErrors, CreateCategoryResponses, CreateFeedData, CreateFeedErrors, CreateFeedListData, CreateFeedListErrors, CreateFeedListResponses, CreateFeedResponses, CreateTokenData, CreateTokenErrors, CreateTokenResponses, DeleteCategoryData, DeleteCategoryErrors, DeleteCategoryResponses, DeleteFeedData, DeleteFeedErrors, DeleteFeedListData, DeleteFeedListErrors, DeleteFeedListResponses, DeleteFeedResponses, DeleteTokenData, DeleteTokenErrors, DeleteTokenResponses, DiscoverFeedListsData, DiscoverFeedListsErrors, DiscoverFeedListsResponses, ExportOpmlData, ExportOpmlErrors, ExportOpmlResponses, FollowFeedListData, FollowFeedListErrors, FollowFeedListResponses, GetEntryData, GetEntryErrors, GetEntryResponses, GetFeedData, GetFeedErrors, GetFeedListData, GetFeedListErrors, GetFeedListResponses, GetFeedResponses, GetMeData, GetMeErrors, GetMeResponses, HealthData, HealthErrors, HealthResponses, ImportFeedListData, ImportFeedListErrors, ImportFeedListResponses, ImportOpmlData, ImportOpmlErrors, ImportOpmlResponses, ListCategoriesData, ListCategoriesErrors, ListCategoriesResponses, ListEntriesData, ListEntriesErrors, ListEntriesResponses, ListFeedsData, ListFeedsErrors, ListFeedsResponses, ListFollowedFeedListsData, ListFollowedFeedListsErrors, ListFollowedFeedListsResponses, ListMyFeedListsData, ListMyFeedListsErrors, ListMyFeedListsResponses, ListTokensData, ListTokensErrors, ListTokensResponses, MarkFeedReadData, MarkFeedReadErrors, MarkFeedReadResponses, PreviewFeedData, PreviewFeedErrors, PreviewFeedResponses, RefreshFeedData, RefreshFeedErrors, RefreshFeedResponses, RemoveFeedListFeedData, RemoveFeedListFeedErrors, RemoveFeedListFeedResponses, ToggleEntryLikedData, ToggleEntryLikedErrors, ToggleEntryLikedResponses, ToggleEntryStarredData, ToggleEntryStarredErrors, ToggleEntryStarredResponses, UnfollowFeedListData, UnfollowFeedListErrors, UnfollowFeedListResponses, UpdateEntriesData, UpdateEntriesErrors, UpdateEntriesResponses, UpdateFeedListData, UpdateFeedListErrors, UpdateFeedListResponses } from './types.gen';
+import type { AddFeedListFeedData, AddFeedListFeedErrors, AddFeedListFeedResponses, CreateFeedData, CreateFeedErrors, CreateFeedListData, CreateFeedListErrors, CreateFeedListResponses, CreateFeedResponses, CreateFolderData, CreateFolderErrors, CreateFolderResponses, CreateTokenData, CreateTokenErrors, CreateTokenResponses, DeleteFeedData, DeleteFeedErrors, DeleteFeedListData, DeleteFeedListErrors, DeleteFeedListResponses, DeleteFeedResponses, DeleteFolderData, DeleteFolderErrors, DeleteFolderResponses, DeleteTokenData, DeleteTokenErrors, DeleteTokenResponses, DiscoverFeedListsData, DiscoverFeedListsErrors, DiscoverFeedListsResponses, ExportOpmlData, ExportOpmlErrors, ExportOpmlResponses, FollowFeedListData, FollowFeedListErrors, FollowFeedListResponses, GetEntryData, GetEntryErrors, GetEntryResponses, GetFeedData, GetFeedErrors, GetFeedListData, GetFeedListErrors, GetFeedListResponses, GetFeedResponses, GetMeData, GetMeErrors, GetMeResponses, HealthData, HealthErrors, HealthResponses, ImportFeedListData, ImportFeedListErrors, ImportFeedListResponses, ImportOpmlData, ImportOpmlErrors, ImportOpmlResponses, ListEntriesData, ListEntriesErrors, ListEntriesResponses, ListFeedsData, ListFeedsErrors, ListFeedsResponses, ListFoldersData, ListFoldersErrors, ListFoldersResponses, ListFollowedFeedListsData, ListFollowedFeedListsErrors, ListFollowedFeedListsResponses, ListMyFeedListsData, ListMyFeedListsErrors, ListMyFeedListsResponses, ListTokensData, ListTokensErrors, ListTokensResponses, MarkFeedReadData, MarkFeedReadErrors, MarkFeedReadResponses, PreviewFeedData, PreviewFeedErrors, PreviewFeedResponses, RefreshFeedData, RefreshFeedErrors, RefreshFeedResponses, RemoveFeedListFeedData, RemoveFeedListFeedErrors, RemoveFeedListFeedResponses, ToggleEntryLikedData, ToggleEntryLikedErrors, ToggleEntryLikedResponses, ToggleEntryStarredData, ToggleEntryStarredErrors, ToggleEntryStarredResponses, UnfollowFeedListData, UnfollowFeedListErrors, UnfollowFeedListResponses, UpdateEntriesData, UpdateEntriesErrors, UpdateEntriesResponses, UpdateFeedData, UpdateFeedErrors, UpdateFeedListData, UpdateFeedListErrors, UpdateFeedListResponses, UpdateFeedResponses, UpdateFolderData, UpdateFolderErrors, UpdateFolderResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -17,28 +17,6 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
      */
     meta?: keyof ClientMeta extends never ? Record<string, unknown> : ClientMeta;
 };
-
-/**
- * List categories
- */
-export const listCategories = <ThrowOnError extends boolean = false>(options?: Options<ListCategoriesData, ThrowOnError>): RequestResult<ListCategoriesResponses, ListCategoriesErrors, ThrowOnError> => (options?.client ?? client).get<ListCategoriesResponses, ListCategoriesErrors, ThrowOnError>({ url: '/api/v1/categories', ...options });
-
-/**
- * Create a category
- */
-export const createCategory = <ThrowOnError extends boolean = false>(options: Options<CreateCategoryData, ThrowOnError>): RequestResult<CreateCategoryResponses, CreateCategoryErrors, ThrowOnError> => (options.client ?? client).post<CreateCategoryResponses, CreateCategoryErrors, ThrowOnError>({
-    url: '/api/v1/categories',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Delete a category
- */
-export const deleteCategory = <ThrowOnError extends boolean = false>(options: Options<DeleteCategoryData, ThrowOnError>): RequestResult<DeleteCategoryResponses, DeleteCategoryErrors, ThrowOnError> => (options.client ?? client).delete<DeleteCategoryResponses, DeleteCategoryErrors, ThrowOnError>({ url: '/api/v1/categories/{categoryId}', ...options });
 
 /**
  * List entries
@@ -209,6 +187,20 @@ export const deleteFeed = <ThrowOnError extends boolean = false>(options: Option
 export const getFeed = <ThrowOnError extends boolean = false>(options: Options<GetFeedData, ThrowOnError>): RequestResult<GetFeedResponses, GetFeedErrors, ThrowOnError> => (options.client ?? client).get<GetFeedResponses, GetFeedErrors, ThrowOnError>({ url: '/api/v1/feeds/{feedId}', ...options });
 
 /**
+ * Update a feed
+ *
+ * Update the folder assignment and/or title of a feed.
+ */
+export const updateFeed = <ThrowOnError extends boolean = false>(options: Options<UpdateFeedData, ThrowOnError>): RequestResult<UpdateFeedResponses, UpdateFeedErrors, ThrowOnError> => (options.client ?? client).patch<UpdateFeedResponses, UpdateFeedErrors, ThrowOnError>({
+    url: '/api/v1/feeds/{feedId}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
  * Mark all entries in a feed as read
  */
 export const markFeedRead = <ThrowOnError extends boolean = false>(options: Options<MarkFeedReadData, ThrowOnError>): RequestResult<MarkFeedReadResponses, MarkFeedReadErrors, ThrowOnError> => (options.client ?? client).post<MarkFeedReadResponses, MarkFeedReadErrors, ThrowOnError>({ url: '/api/v1/feeds/{feedId}/mark-all-read', ...options });
@@ -219,6 +211,42 @@ export const markFeedRead = <ThrowOnError extends boolean = false>(options: Opti
  * Manually fetch and parse the feed, inserting any new entries. Use this to get the latest articles without waiting for the scheduler.
  */
 export const refreshFeed = <ThrowOnError extends boolean = false>(options: Options<RefreshFeedData, ThrowOnError>): RequestResult<RefreshFeedResponses, RefreshFeedErrors, ThrowOnError> => (options.client ?? client).post<RefreshFeedResponses, RefreshFeedErrors, ThrowOnError>({ url: '/api/v1/feeds/{feedId}/refresh', ...options });
+
+/**
+ * List folders
+ */
+export const listFolders = <ThrowOnError extends boolean = false>(options?: Options<ListFoldersData, ThrowOnError>): RequestResult<ListFoldersResponses, ListFoldersErrors, ThrowOnError> => (options?.client ?? client).get<ListFoldersResponses, ListFoldersErrors, ThrowOnError>({ url: '/api/v1/folders', ...options });
+
+/**
+ * Create a folder
+ */
+export const createFolder = <ThrowOnError extends boolean = false>(options: Options<CreateFolderData, ThrowOnError>): RequestResult<CreateFolderResponses, CreateFolderErrors, ThrowOnError> => (options.client ?? client).post<CreateFolderResponses, CreateFolderErrors, ThrowOnError>({
+    url: '/api/v1/folders',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete a folder
+ */
+export const deleteFolder = <ThrowOnError extends boolean = false>(options: Options<DeleteFolderData, ThrowOnError>): RequestResult<DeleteFolderResponses, DeleteFolderErrors, ThrowOnError> => (options.client ?? client).delete<DeleteFolderResponses, DeleteFolderErrors, ThrowOnError>({ url: '/api/v1/folders/{folderId}', ...options });
+
+/**
+ * Update a folder
+ *
+ * Update the title and/or parent folder of a folder. Set parent_id to move or nest the folder.
+ */
+export const updateFolder = <ThrowOnError extends boolean = false>(options: Options<UpdateFolderData, ThrowOnError>): RequestResult<UpdateFolderResponses, UpdateFolderErrors, ThrowOnError> => (options.client ?? client).patch<UpdateFolderResponses, UpdateFolderErrors, ThrowOnError>({
+    url: '/api/v1/folders/{folderId}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Health check
@@ -233,14 +261,14 @@ export const getMe = <ThrowOnError extends boolean = false>(options?: Options<Ge
 /**
  * Export feeds as OPML
  *
- * Returns all feed subscriptions and categories as an OPML XML document.
+ * Returns all feed subscriptions and folders as an OPML XML document.
  */
 export const exportOpml = <ThrowOnError extends boolean = false>(options?: Options<ExportOpmlData, ThrowOnError>): RequestResult<ExportOpmlResponses, ExportOpmlErrors, ThrowOnError> => (options?.client ?? client).get<ExportOpmlResponses, ExportOpmlErrors, ThrowOnError>({ url: '/api/v1/opml/export', ...options });
 
 /**
  * Import feeds from an OPML file
  *
- * Parses an OPML XML document and subscribes the user to all feeds found. Categories are created as needed. Existing subscriptions are skipped.
+ * Parses an OPML XML document and subscribes the user to all feeds found. Folders are created as needed. Existing subscriptions are skipped.
  */
 export const importOpml = <ThrowOnError extends boolean = false>(options: Options<ImportOpmlData, ThrowOnError>): RequestResult<ImportOpmlResponses, ImportOpmlErrors, ThrowOnError> => (options.client ?? client).post<ImportOpmlResponses, ImportOpmlErrors, ThrowOnError>({
     bodySerializer: null,

@@ -8,12 +8,12 @@ import { Plus, Loader2 } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
-import { getClient, createCategory } from "@/lib/planetary"
+import { getClient, createFolder } from "@/lib/planetary"
 import { getApiErrorMessage } from "@/lib/errors"
 import { cn } from "@workspace/ui/lib/utils"
 
-/** Dialog for creating a new category. Invalidates ["categories"] on success. */
-export function CategoryCreateDialog() {
+/** Dialog for creating a new folder. Invalidates ["folders"] on success. */
+export function FolderCreateDialog() {
   const queryClient = useQueryClient()
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState("")
@@ -24,16 +24,16 @@ export function CategoryCreateDialog() {
     if (!title.trim()) return
     setPending(true)
     try {
-      const { error } = await createCategory({
+      const { error } = await createFolder({
         client: await getClient(),
         body: { title: title.trim() },
       })
       if (error) throw error
-      await queryClient.invalidateQueries({ queryKey: ["categories"] })
+      await queryClient.invalidateQueries({ queryKey: ["folders"] })
       setTitle("")
       setOpen(false)
     } catch (err) {
-      toast.error(getApiErrorMessage(err, "Could not create category"))
+      toast.error(getApiErrorMessage(err, "Could not create folder"))
     } finally {
       setPending(false)
     }
@@ -46,7 +46,7 @@ export function CategoryCreateDialog() {
           <Button
             variant="ghost"
             size="icon-xs"
-            aria-label="New category"
+            aria-label="New folder"
             className="text-muted-foreground hover:text-foreground"
           >
             <Plus className="size-3.5" />
@@ -62,16 +62,16 @@ export function CategoryCreateDialog() {
           )}
         >
           <Dialog.Title className="font-serif text-lg font-bold tracking-tight">
-            New category
+            New folder
           </Dialog.Title>
           <Dialog.Description className="mt-1 text-sm text-muted-foreground">
             Group related feeds together.
           </Dialog.Description>
           <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="cat-title">Title</Label>
+              <Label htmlFor="folder-title">Title</Label>
               <Input
-                id="cat-title"
+                id="folder-title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Tech, News, Design"

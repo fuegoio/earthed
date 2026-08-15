@@ -74,7 +74,9 @@ var entriesReadCmd = &cobra.Command{
 		fmt.Printf("URL: %s\n", e.Url)
 		fmt.Printf("Published: %s\n", e.PublishedAt.Format("2006-01-02 15:04"))
 		fmt.Printf("Status: %s\n\n", e.Status)
-		fmt.Println(e.Content)
+		if e.Description != nil {
+			fmt.Println(*e.Description)
+		}
 	},
 }
 

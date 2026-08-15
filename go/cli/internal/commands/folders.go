@@ -10,17 +10,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var categoriesCmd = &cobra.Command{
-	Use:   "categories",
-	Short: "Manage feed categories",
+var foldersCmd = &cobra.Command{
+	Use:   "folders",
+	Short: "Manage feed folders",
 }
 
-var categoriesListCmd = &cobra.Command{
+var foldersListCmd = &cobra.Command{
 	Use:   "list",
-	Short: "List all categories",
+	Short: "List all folders",
 	Run: func(cmd *cobra.Command, _ []string) {
 		_, c := mustClient()
-		resp, err := c.ListCategoriesWithResponse(context.Background())
+		resp, err := c.ListFoldersWithResponse(context.Background())
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error: %v\n", err)
 			os.Exit(1)
@@ -32,20 +32,20 @@ var categoriesListCmd = &cobra.Command{
 
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 		fmt.Fprintln(w, "ID\tTITLE")
-		for _, cat := range *resp.JSON200 {
-			fmt.Fprintf(w, "%d\t%s\n", cat.Id, cat.Title)
+		for _, fo := range *resp.JSON200 {
+			fmt.Fprintf(w, "%d\t%s\n", fo.Id, fo.Title)
 		}
 		w.Flush()
 	},
 }
 
-var categoriesCreateCmd = &cobra.Command{
+var foldersCreateCmd = &cobra.Command{
 	Use:   "create <title>",
-	Short: "Create a category",
+	Short: "Create a folder",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		_, c := mustClient()
-		resp, err := c.CreateCategoryWithResponse(context.Background(), planetary.CreateCategoryJSONRequestBody{
+		resp, err := c.CreateFolderWithResponse(context.Background(), planetary.CreateFolderJSONRequestBody{
 			Title: args[0],
 		})
 		if err != nil {
@@ -56,14 +56,14 @@ var categoriesCreateCmd = &cobra.Command{
 			printError(resp.HTTPResponse.StatusCode, resp.ApplicationproblemJSONDefault)
 			os.Exit(1)
 		}
-		cat := *resp.JSON200
-		fmt.Printf("Created category %d: %s\n", cat.Id, cat.Title)
+		fo := *resp.JSON200
+		fmt.Printf("Created folder %d: %s\n", fo.Id, fo.Title)
 	},
 }
 
-var categoriesDeleteCmd = &cobra.Command{
+var foldersDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
-	Short: "Delete a category",
+	Short: "Delete a folder",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		_, c := mustClient()
@@ -72,7 +72,7 @@ var categoriesDeleteCmd = &cobra.Command{
 			fmt.Fprintf(os.Stderr, "error: invalid id: %v\n", err)
 			os.Exit(1)
 		}
-		resp, err := c.DeleteCategoryWithResponse(context.Background(), id)
+		resp, err := c.DeleteFolderWithResponse(context.Background(), id)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error: %v\n", err)
 			os.Exit(1)
@@ -81,11 +81,11 @@ var categoriesDeleteCmd = &cobra.Command{
 			printError(resp.HTTPResponse.StatusCode, resp.ApplicationproblemJSONDefault)
 			os.Exit(1)
 		}
-		fmt.Printf("Deleted category %d\n", id)
+		fmt.Printf("Deleted folder %d\n", id)
 	},
 }
 
 func init() {
-	categoriesCmd.AddCommand(categoriesListCmd, categoriesCreateCmd, categoriesDeleteCmd)
-	rootCmd.AddCommand(categoriesCmd)
+	foldersCmd.AddCommand(foldersListCmd, foldersCreateCmd, foldersDeleteCmd)
+	rootCmd.AddCommand(foldersCmd)
 }

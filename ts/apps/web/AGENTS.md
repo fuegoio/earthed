@@ -14,23 +14,23 @@ All data fetching and mutations go through the **`@planetary/api-client`** typed
 
   ```ts
   import { useQuery } from "@tanstack/react-query";
-  import { getClient, listCategories, unwrap } from "@/lib/planetary";
+  import { getClient, listFolders, unwrap } from "@/lib/planetary";
 
   const {
-    data: categories,
+    data: folders,
     error,
     isLoading,
     refetch,
-  } = useQuery<Category[]>({
-    queryKey: ["categories"],
-    queryFn: async () => unwrap(listCategories({ client: await getClient() })),
+  } = useQuery<Folder[]>({
+    queryKey: ["folders"],
+    queryFn: async () => unwrap(listFolders({ client: await getClient() })),
   });
   ```
 
   On error, `unwrap()` throws the parsed huma `ErrorModel` body so `getApiErrorMessage(error)` keeps working in the component. `isLoading` is true only on the first fetch with no cached data — background refetches keep the stale data visible, which is what prevents flicker on navigation.
 
-- **Server components** still call `getClient()` directly and `await` the SDK call (`const { data, error } = await listCategories({ client, ... })`), since `useQuery` is client-only. Render `<ApiError />` on failure as below.
-- **Client-side mutations** (forms, delete actions, etc.) stay as event handlers calling the SDK directly (`const { error } = await createCategory({ client, ... })`) — not `useMutation` unless you need its cache/optimistic machinery. After a successful mutation, call `queryClient.invalidateQueries({ queryKey: [...] })` (or `router.refresh()`) to refetch affected reads.
+- **Server components** still call `getClient()` directly and `await` the SDK call (`const { data, error } = await listFolders({ client, ... })`), since `useQuery` is client-only. Render `<ApiError />` on failure as below.
+- **Client-side mutations** (forms, delete actions, etc.) stay as event handlers calling the SDK directly (`const { error } = await createFolder({ client, ... })`) — not `useMutation` unless you need its cache/optimistic machinery. After a successful mutation, call `queryClient.invalidateQueries({ queryKey: [...] })` (or `router.refresh()`) to refetch affected reads.
 - `getClient()` is isomorphic: on the server it forwards cookies via `next/headers` (dynamically imported to keep it out of the client bundle) and uses `env.PLANETARY_API_URL`; on the client it relies on the browser sending cookies automatically (`credentials: "include"`) and uses `env.NEXT_PUBLIC_PLANETARY_API_URL`.
 - The `QueryClient` is provided once at the root via `components/query-provider.tsx` (mounted in `app/layout.tsx`). Do not instantiate `QueryClient` per-component; use `useQueryClient()` if you need imperative access from a child.
 - Never use `fetch`, `axios`, or raw API calls in components, hooks, or pages. Go through `lib/planetary.ts`. The only layer allowed to import `@planetary/api-client` is `lib/planetary.ts`.
@@ -61,7 +61,7 @@ All forms use **react-hook-form** with **@hookform/resolvers/zod** for schema va
 
 Destructive delete actions use the **shadcn `AlertDialog`** (from `components/ui/alert-dialog.tsx`) composed directly inside the business component that owns the resource — never a shared half-DS `DeleteButton` wrapper.
 
-- Each component that can delete a resource renders its own `AlertDialog` with the trigger `Button` (`variant="destructive"`) and the confirm/cancel actions inline. The mutation call (`deleteCategory`, `deleteFeed`, `deleteToken`, … from `lib/planetary.ts`) lives in the same component.
+- Each component that can delete a resource renders its own `AlertDialog` with the trigger `Button` (`variant="destructive"`) and the confirm/cancel actions inline. The mutation call (`deleteFolder`, `deleteFeed`, `deleteToken`, … from `lib/planetary.ts`) lives in the same component.
 - Do **not** add a generic `components/delete-button.tsx` that takes a `kind` discriminator and switches on resource type. This does not scale beyond a couple of resources, hides the mutation behind a prop API, and forces every new resource to extend a union. Composing the `AlertDialog` inline keeps each delete flow local to its resource.
 - Error handling follows the client-mutation rule above: `const { error } = await sdk(...)` then `toast.error(getApiErrorMessage(error))`. Use `router.refresh()` (or an optimistic update) after success.
 
@@ -71,7 +71,7 @@ Empty states use the **shadcn `Empty`** component family from `components/ui/emp
 
 - Compose following the shadcn outline: `Empty > EmptyHeader > { EmptyMedia (variant="icon" with a lucide-react icon), EmptyTitle, EmptyDescription }` then `EmptyContent` for the primary action (usually a `Button` or `buttonVariants()` link).
 - Prefer the `border` utility on `Empty` (outlined style) to match the surrounding surface density.
-- Icons come from `lucide-react` (the only icon library in the app); pick a semantically relevant icon (e.g. `Rss` for feeds, `Folder` for categories, `Key` for tokens).
+- Icons come from `lucide-react` (the only icon library in the app); pick a semantically relevant icon (e.g. `Rss` for feeds, `Folder` for folders, `Key` for tokens).
 - The empty state owns the primary CTA for that view — if a "New X" button already lives in the page header, the `EmptyContent` CTA should link to the same destination so users can act from either place.
 
 ## Errors and logging

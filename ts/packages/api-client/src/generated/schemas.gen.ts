@@ -68,67 +68,6 @@ export const AddFeedListFeedInputBodySchema = {
     type: 'object'
 } as const;
 
-export const CategorySchema = {
-    additionalProperties: false,
-    properties: {
-        $schema: {
-            description: 'A URL to the JSON Schema for this object.',
-            examples: [
-                '/api/schemas/Category.json'
-            ],
-            format: 'uri',
-            readOnly: true,
-            type: 'string'
-        },
-        created_at: {
-            format: 'date-time',
-            type: 'string'
-        },
-        id: {
-            format: 'int64',
-            type: 'integer'
-        },
-        title: {
-            type: 'string'
-        },
-        user_id: {
-            format: 'int64',
-            type: 'integer'
-        }
-    },
-    required: [
-        'id',
-        'user_id',
-        'title',
-        'created_at'
-    ],
-    type: 'object'
-} as const;
-
-export const CreateCategoryInputBodySchema = {
-    additionalProperties: false,
-    properties: {
-        $schema: {
-            description: 'A URL to the JSON Schema for this object.',
-            examples: [
-                '/api/schemas/CreateCategoryInputBody.json'
-            ],
-            format: 'uri',
-            readOnly: true,
-            type: 'string'
-        },
-        title: {
-            maxLength: 255,
-            minLength: 1,
-            type: 'string'
-        }
-    },
-    required: [
-        'title'
-    ],
-    type: 'object'
-} as const;
-
 export const CreateFeedInputBodySchema = {
     additionalProperties: false,
     properties: {
@@ -141,14 +80,14 @@ export const CreateFeedInputBodySchema = {
             readOnly: true,
             type: 'string'
         },
-        category_id: {
-            format: 'int64',
-            type: 'integer'
-        },
         feed_url: {
             maxLength: 2048,
             minLength: 1,
             type: 'string'
+        },
+        folder_id: {
+            format: 'int64',
+            type: 'integer'
         }
     },
     required: [
@@ -185,6 +124,34 @@ export const CreateFeedListInputBodySchema = {
     required: [
         'title',
         'is_public'
+    ],
+    type: 'object'
+} as const;
+
+export const CreateFolderInputBodySchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/CreateFolderInputBody.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        parent_id: {
+            format: 'int64',
+            type: 'integer'
+        },
+        title: {
+            maxLength: 255,
+            minLength: 1,
+            type: 'string'
+        }
+    },
+    required: [
+        'title'
     ],
     type: 'object'
 } as const;
@@ -434,10 +401,6 @@ export const FeedSchema = {
             readOnly: true,
             type: 'string'
         },
-        category_id: {
-            format: 'int64',
-            type: 'integer'
-        },
         crawler: {
             type: 'boolean'
         },
@@ -453,6 +416,10 @@ export const FeedSchema = {
         },
         feed_url: {
             type: 'string'
+        },
+        folder_id: {
+            format: 'int64',
+            type: 'integer'
         },
         id: {
             format: 'int64',
@@ -619,6 +586,52 @@ export const FeedListFeedSchema = {
         'site_url',
         'title',
         'position'
+    ],
+    type: 'object'
+} as const;
+
+export const FolderSchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/Folder.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        created_at: {
+            format: 'date-time',
+            type: 'string'
+        },
+        id: {
+            format: 'int64',
+            type: 'integer'
+        },
+        parent_id: {
+            format: 'int64',
+            type: 'integer'
+        },
+        sort_order: {
+            format: 'int64',
+            type: 'integer'
+        },
+        title: {
+            type: 'string'
+        },
+        user_id: {
+            format: 'int64',
+            type: 'integer'
+        }
+    },
+    required: [
+        'id',
+        'user_id',
+        'title',
+        'sort_order',
+        'created_at'
     ],
     type: 'object'
 } as const;
@@ -980,6 +993,30 @@ export const Update_entriesRequestSchema = {
     type: 'object'
 } as const;
 
+export const UpdateFeedInputBodySchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/UpdateFeedInputBody.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        folder_id: {
+            format: 'int64',
+            type: 'integer'
+        },
+        title: {
+            maxLength: 512,
+            type: 'string'
+        }
+    },
+    type: 'object'
+} as const;
+
 export const UpdateFeedListInputBodySchema = {
     additionalProperties: false,
     properties: {
@@ -1008,6 +1045,34 @@ export const UpdateFeedListInputBodySchema = {
     required: [
         'title',
         'is_public'
+    ],
+    type: 'object'
+} as const;
+
+export const UpdateFolderInputBodySchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/UpdateFolderInputBody.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        parent_id: {
+            format: 'int64',
+            type: 'integer'
+        },
+        title: {
+            maxLength: 255,
+            minLength: 1,
+            type: 'string'
+        }
+    },
+    required: [
+        'title'
     ],
     type: 'object'
 } as const;
@@ -1074,60 +1139,17 @@ export const AddFeedListFeedInputBodyWritableSchema = {
     type: 'object'
 } as const;
 
-export const CategoryWritableSchema = {
-    additionalProperties: false,
-    properties: {
-        created_at: {
-            format: 'date-time',
-            type: 'string'
-        },
-        id: {
-            format: 'int64',
-            type: 'integer'
-        },
-        title: {
-            type: 'string'
-        },
-        user_id: {
-            format: 'int64',
-            type: 'integer'
-        }
-    },
-    required: [
-        'id',
-        'user_id',
-        'title',
-        'created_at'
-    ],
-    type: 'object'
-} as const;
-
-export const CreateCategoryInputBodyWritableSchema = {
-    additionalProperties: false,
-    properties: {
-        title: {
-            maxLength: 255,
-            minLength: 1,
-            type: 'string'
-        }
-    },
-    required: [
-        'title'
-    ],
-    type: 'object'
-} as const;
-
 export const CreateFeedInputBodyWritableSchema = {
     additionalProperties: false,
     properties: {
-        category_id: {
-            format: 'int64',
-            type: 'integer'
-        },
         feed_url: {
             maxLength: 2048,
             minLength: 1,
             type: 'string'
+        },
+        folder_id: {
+            format: 'int64',
+            type: 'integer'
         }
     },
     required: [
@@ -1155,6 +1177,25 @@ export const CreateFeedListInputBodyWritableSchema = {
     required: [
         'title',
         'is_public'
+    ],
+    type: 'object'
+} as const;
+
+export const CreateFolderInputBodyWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        parent_id: {
+            format: 'int64',
+            type: 'integer'
+        },
+        title: {
+            maxLength: 255,
+            minLength: 1,
+            type: 'string'
+        }
+    },
+    required: [
+        'title'
     ],
     type: 'object'
 } as const;
@@ -1318,10 +1359,6 @@ export const ErrorModelWritableSchema = {
 export const FeedWritableSchema = {
     additionalProperties: false,
     properties: {
-        category_id: {
-            format: 'int64',
-            type: 'integer'
-        },
         crawler: {
             type: 'boolean'
         },
@@ -1337,6 +1374,10 @@ export const FeedWritableSchema = {
         },
         feed_url: {
             type: 'string'
+        },
+        folder_id: {
+            format: 'int64',
+            type: 'integer'
         },
         id: {
             format: 'int64',
@@ -1485,6 +1526,43 @@ export const FeedListFeedWritableSchema = {
         'site_url',
         'title',
         'position'
+    ],
+    type: 'object'
+} as const;
+
+export const FolderWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        created_at: {
+            format: 'date-time',
+            type: 'string'
+        },
+        id: {
+            format: 'int64',
+            type: 'integer'
+        },
+        parent_id: {
+            format: 'int64',
+            type: 'integer'
+        },
+        sort_order: {
+            format: 'int64',
+            type: 'integer'
+        },
+        title: {
+            type: 'string'
+        },
+        user_id: {
+            format: 'int64',
+            type: 'integer'
+        }
+    },
+    required: [
+        'id',
+        'user_id',
+        'title',
+        'sort_order',
+        'created_at'
     ],
     type: 'object'
 } as const;
@@ -1724,6 +1802,21 @@ export const Update_entriesRequestWritableSchema = {
     type: 'object'
 } as const;
 
+export const UpdateFeedInputBodyWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        folder_id: {
+            format: 'int64',
+            type: 'integer'
+        },
+        title: {
+            maxLength: 512,
+            type: 'string'
+        }
+    },
+    type: 'object'
+} as const;
+
 export const UpdateFeedListInputBodyWritableSchema = {
     additionalProperties: false,
     properties: {
@@ -1743,6 +1836,25 @@ export const UpdateFeedListInputBodyWritableSchema = {
     required: [
         'title',
         'is_public'
+    ],
+    type: 'object'
+} as const;
+
+export const UpdateFolderInputBodyWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        parent_id: {
+            format: 'int64',
+            type: 'integer'
+        },
+        title: {
+            maxLength: 255,
+            minLength: 1,
+            type: 'string'
+        }
+    },
+    required: [
+        'title'
     ],
     type: 'object'
 } as const;

@@ -2,18 +2,19 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useQueryClient } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { ExternalLink, Trash2, CheckCheck, Loader2, RefreshCw, Rss } from "lucide-react"
+import { ExternalLink, Trash2, CheckCheck, Loader2, RefreshCw, Rss, FolderOpen } from "lucide-react"
+import { Menu } from "@base-ui/react/menu"
 import { Button, buttonVariants } from "@workspace/ui/components/button"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { FeedIcon } from "@/components/feed-icon"
 import { PageHeader } from "@/components/page-header"
 import { EntryTimeline } from "@/components/entry-timeline"
-import { getClient, markFeedRead, deleteFeed, refreshFeed } from "@/lib/planetary"
+import { getClient, markFeedRead, deleteFeed, refreshFeed, updateFeed, listFolders, unwrap } from "@/lib/planetary"
 import { getApiErrorMessage } from "@/lib/errors"
 import { cn } from "@workspace/ui/lib/utils"
-import type { Feed } from "@/lib/types"
+import type { Feed, Folder } from "@/lib/types"
 
 /**
  * Feed detail view: header with site link, refresh, mark-all-read, and delete
@@ -26,6 +27,12 @@ export function FeedDetail({ feed }: { feed: Feed }) {
   const [marking, setMarking] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
+  const [movingFolder, setMovingFolder] = useState(false)
+
+  const { data: folders } = useQuery<Folder[]>({
+    queryKey: ["folders"],
+    queryFn: async () => unwrap(listFolders({ client: await getClient() })),
+  })
 
   async function handleRefresh() {
     setRefreshing(true)
@@ -82,6 +89,24 @@ export function FeedDetail({ feed }: { feed: Feed }) {
     }
   }
 
+  async function handleMoveFolder(folderId: number | undefined) {
+    setMovingFolder(true)
+    try {
+      const { error } = await updateFeed({
+        client: await getClient(),
+        path: { feedId: feed.id },
+        body: { folder_id: folderId },
+      })
+      if (error) throw error
+      await queryClient.invalidateQueries({ queryKey: ["feeds"] })
+      toast.success("Feed moved")
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, "Could not move feed"))
+    } finally {
+      setMovingFolder(false)
+    }
+  }
+
   return (
     <div className="mx-auto w-full max-w-3xl">
       <PageHeader
@@ -94,6 +119,46 @@ export function FeedDetail({ feed }: { feed: Feed }) {
         }
         actions={
           <div className="flex items-center gap-1">
+            <Menu.Root>
+              <Menu.Trigger
+                disabled={movingFolder}
+                aria-label="Move to folder"
+                className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }))}
+              >
+                {movingFolder ? (
+                  <Loader2 className="size-3.5 animate-spin" />
+                ) : (
+                  <FolderOpen className="size-3.5" />
+                )}
+              </Menu.Trigger>
+              <Menu.Portal>
+                <Menu.Positioner
+                  className={cn(
+                    "z-50 min-w-48 overflow-hidden rounded-md border border-border bg-popover p-1",
+                    "shadow-md"
+                  )}
+                  align="end"
+                >
+                  <Menu.Popup>
+                    <Menu.Item
+                      className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
+                      onClick={() => handleMoveFolder(undefined)}
+                    >
+                      No folder
+                    </Menu.Item>
+                    {folders?.map((f) => (
+                      <Menu.Item
+                        key={f.id}
+                        className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
+                        onClick={() => handleMoveFolder(f.id)}
+                      >
+                        {f.title}
+                      </Menu.Item>
+                    ))}
+                  </Menu.Popup>
+                </Menu.Positioner>
+              </Menu.Portal>
+            </Menu.Root>
             {feed.site_url && (
               <a
                 href={feed.site_url}

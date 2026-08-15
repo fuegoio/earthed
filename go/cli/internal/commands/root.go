@@ -13,7 +13,7 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "planetary",
 	Short: "Planetary RSS reader CLI",
-	Long:  "Planetary is a self-hosted RSS reader. This CLI lets you manage feeds, entries, categories, and API tokens from the terminal.",
+	Long:  "Planetary is a self-hosted RSS reader. This CLI lets you manage feeds, entries, folders, and API tokens from the terminal.",
 }
 
 // Execute runs the root command.

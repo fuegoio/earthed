@@ -67,65 +67,6 @@
                 ],
                 "type": "object"
             },
-            "Category": {
-                "additionalProperties": false,
-                "properties": {
-                    "$schema": {
-                        "description": "A URL to the JSON Schema for this object.",
-                        "examples": [
-                            "/api/schemas/Category.json"
-                        ],
-                        "format": "uri",
-                        "readOnly": true,
-                        "type": "string"
-                    },
-                    "created_at": {
-                        "format": "date-time",
-                        "type": "string"
-                    },
-                    "id": {
-                        "format": "int64",
-                        "type": "integer"
-                    },
-                    "title": {
-                        "type": "string"
-                    },
-                    "user_id": {
-                        "format": "int64",
-                        "type": "integer"
-                    }
-                },
-                "required": [
-                    "id",
-                    "user_id",
-                    "title",
-                    "created_at"
-                ],
-                "type": "object"
-            },
-            "CreateCategoryInputBody": {
-                "additionalProperties": false,
-                "properties": {
-                    "$schema": {
-                        "description": "A URL to the JSON Schema for this object.",
-                        "examples": [
-                            "/api/schemas/CreateCategoryInputBody.json"
-                        ],
-                        "format": "uri",
-                        "readOnly": true,
-                        "type": "string"
-                    },
-                    "title": {
-                        "maxLength": 255,
-                        "minLength": 1,
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "title"
-                ],
-                "type": "object"
-            },
             "CreateFeedInputBody": {
                 "additionalProperties": false,
                 "properties": {
@@ -138,14 +79,14 @@
                         "readOnly": true,
                         "type": "string"
                     },
-                    "category_id": {
-                        "format": "int64",
-                        "type": "integer"
-                    },
                     "feed_url": {
                         "maxLength": 2048,
                         "minLength": 1,
                         "type": "string"
+                    },
+                    "folder_id": {
+                        "format": "int64",
+                        "type": "integer"
                     }
                 },
                 "required": [
@@ -181,6 +122,33 @@
                 "required": [
                     "title",
                     "is_public"
+                ],
+                "type": "object"
+            },
+            "CreateFolderInputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/CreateFolderInputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "parent_id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "maxLength": 255,
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "title"
                 ],
                 "type": "object"
             },
@@ -424,10 +392,6 @@
                         "readOnly": true,
                         "type": "string"
                     },
-                    "category_id": {
-                        "format": "int64",
-                        "type": "integer"
-                    },
                     "crawler": {
                         "type": "boolean"
                     },
@@ -443,6 +407,10 @@
                     },
                     "feed_url": {
                         "type": "string"
+                    },
+                    "folder_id": {
+                        "format": "int64",
+                        "type": "integer"
                     },
                     "id": {
                         "format": "int64",
@@ -607,6 +575,51 @@
                     "site_url",
                     "title",
                     "position"
+                ],
+                "type": "object"
+            },
+            "Folder": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/Folder.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "parent_id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "sort_order": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "user_id": {
+                        "format": "int64",
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "id",
+                    "user_id",
+                    "title",
+                    "sort_order",
+                    "created_at"
                 ],
                 "type": "object"
             },
@@ -957,6 +970,29 @@
                 ],
                 "type": "object"
             },
+            "UpdateFeedInputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/UpdateFeedInputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "folder_id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "maxLength": 512,
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
             "UpdateFeedListInputBody": {
                 "additionalProperties": false,
                 "properties": {
@@ -985,6 +1021,33 @@
                 "required": [
                     "title",
                     "is_public"
+                ],
+                "type": "object"
+            },
+            "UpdateFolderInputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/UpdateFolderInputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "parent_id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "maxLength": 255,
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "title"
                 ],
                 "type": "object"
             },
@@ -1034,117 +1097,6 @@
     },
     "openapi": "3.1.0",
     "paths": {
-        "/api/v1/categories": {
-            "get": {
-                "operationId": "list-categories",
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "items": {
-                                        "$ref": "#/components/schemas/Category"
-                                    },
-                                    "type": [
-                                        "array",
-                                        "null"
-                                    ]
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "List categories",
-                "tags": [
-                    "categories"
-                ]
-            },
-            "post": {
-                "operationId": "create-category",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateCategoryInputBody"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Category"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Create a category",
-                "tags": [
-                    "categories"
-                ]
-            }
-        },
-        "/api/v1/categories/{categoryId}": {
-            "delete": {
-                "operationId": "delete-category",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "categoryId",
-                        "required": true,
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Delete a category",
-                "tags": [
-                    "categories"
-                ]
-            }
-        },
         "/api/v1/entries": {
             "get": {
                 "operationId": "list-entries",
@@ -1161,7 +1113,7 @@
                     {
                         "explode": false,
                         "in": "query",
-                        "name": "category_id",
+                        "name": "folder_id",
                         "schema": {
                             "format": "int64",
                             "type": "integer"
@@ -2111,6 +2063,57 @@
                 "tags": [
                     "feeds"
                 ]
+            },
+            "patch": {
+                "description": "Update the folder assignment and/or title of a feed.",
+                "operationId": "update-feed",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "feedId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateFeedInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Feed"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Update a feed",
+                "tags": [
+                    "feeds"
+                ]
             }
         },
         "/api/v1/feeds/{feedId}/mark-all-read": {
@@ -2191,6 +2194,168 @@
                 ]
             }
         },
+        "/api/v1/folders": {
+            "get": {
+                "operationId": "list-folders",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/Folder"
+                                    },
+                                    "type": [
+                                        "array",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "List folders",
+                "tags": [
+                    "folders"
+                ]
+            },
+            "post": {
+                "operationId": "create-folder",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateFolderInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Folder"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Create a folder",
+                "tags": [
+                    "folders"
+                ]
+            }
+        },
+        "/api/v1/folders/{folderId}": {
+            "delete": {
+                "operationId": "delete-folder",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "folderId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Delete a folder",
+                "tags": [
+                    "folders"
+                ]
+            },
+            "patch": {
+                "description": "Update the title and/or parent folder of a folder. Set parent_id to move or nest the folder.",
+                "operationId": "update-folder",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "folderId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateFolderInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Folder"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Update a folder",
+                "tags": [
+                    "folders"
+                ]
+            }
+        },
         "/api/v1/health": {
             "get": {
                 "operationId": "health",
@@ -2255,7 +2420,7 @@
         },
         "/api/v1/opml/export": {
             "get": {
-                "description": "Returns all feed subscriptions and categories as an OPML XML document.",
+                "description": "Returns all feed subscriptions and folders as an OPML XML document.",
                 "operationId": "export-opml",
                 "responses": {
                     "200": {
@@ -2288,7 +2453,7 @@
         },
         "/api/v1/opml/import": {
             "post": {
-                "description": "Parses an OPML XML document and subscribes the user to all feeds found. Categories are created as needed. Existing subscriptions are skipped.",
+                "description": "Parses an OPML XML document and subscribes the user to all feeds found. Folders are created as needed. Existing subscriptions are skipped.",
                 "operationId": "import-opml",
                 "requestBody": {
                     "content": {
@@ -2457,8 +2622,8 @@
             "name": "entries"
         },
         {
-            "description": "Feed categories",
-            "name": "categories"
+            "description": "Feed folders",
+            "name": "folders"
         },
         {
             "description": "User accounts",

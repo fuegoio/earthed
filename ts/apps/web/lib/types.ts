@@ -2,8 +2,6 @@ import type { ApiToken, TokenOutputBody } from "@planetary/api-client"
 
 export type {
   ApiToken,
-  Category,
-  CategoryWritable,
   Enclosure,
   Entry,
   EntryWritable,
@@ -14,6 +12,7 @@ export type {
   FeedListFeed,
   FeedListWritable,
   FeedWritable,
+  Folder,
   ImportFeedListResponse,
   PreviewFeedBody,
   PreviewFeedItem,

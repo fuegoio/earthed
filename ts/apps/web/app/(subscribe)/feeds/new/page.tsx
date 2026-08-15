@@ -17,15 +17,12 @@ import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import {
   getClient,
-  listCategories,
   previewFeed,
   createFeed,
-  unwrap,
 } from "@/lib/planetary"
 import { getApiErrorMessage } from "@/lib/errors"
 import { subscribeFeedSchema } from "@/lib/schemas"
-import type { PreviewFeedBody, Category } from "@/lib/types"
-import { cn } from "@workspace/ui/lib/utils"
+import type { PreviewFeedBody } from "@/lib/types"
 
 export default function SubscribeFeedPage() {
   const router = useRouter()
@@ -33,13 +30,6 @@ export default function SubscribeFeedPage() {
   const [url, setUrl] = useState("")
   const [debouncedUrl, setDebouncedUrl] = useState("")
   const [subscribing, setSubscribing] = useState(false)
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | "">("")
-
-  const { data: categories } = useQuery<Category[]>({
-    queryKey: ["categories"],
-    queryFn: async () =>
-      unwrap(listCategories({ client: await getClient() })),
-  })
 
   // Debounce the URL so we only fetch after the user pauses typing.
   useEffect(() => {
@@ -74,13 +64,10 @@ export default function SubscribeFeedPage() {
     if (!preview) return
     setSubscribing(true)
     try {
-      const categoryId =
-        selectedCategoryId === "" ? undefined : Number(selectedCategoryId)
       const { error } = await createFeed({
         client: await getClient(),
         body: {
           feed_url: preview.feed_url,
-          ...(categoryId ? { category_id: categoryId } : {}),
         },
       })
       if (error) throw error
@@ -170,9 +157,6 @@ export default function SubscribeFeedPage() {
         {showPreview && !subscribing && (
           <PreviewContent
             preview={preview}
-            categories={categories ?? []}
-            selectedCategoryId={selectedCategoryId}
-            onSelectCategory={setSelectedCategoryId}
             onSubscribe={handleSubscribe}
           />
         )}
@@ -192,15 +176,9 @@ export default function SubscribeFeedPage() {
 
 function PreviewContent({
   preview,
-  categories,
-  selectedCategoryId,
-  onSelectCategory,
   onSubscribe,
 }: {
   preview: PreviewFeedBody
-  categories: Category[]
-  selectedCategoryId: number | ""
-  onSelectCategory: (id: number | "") => void
   onSubscribe: () => void
 }) {
   const items = preview.items ?? []
@@ -297,35 +275,8 @@ function PreviewContent({
         )}
       </div>
 
-      {/* Category selector + subscribe */}
+      {/* Subscribe */}
       <div className="flex flex-col gap-4">
-        {categories.length > 0 && (
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="category">Category (optional)</Label>
-            <select
-              id="category"
-              value={selectedCategoryId}
-              onChange={(e) =>
-                onSelectCategory(
-                  e.target.value === "" ? "" : Number(e.target.value)
-                )
-              }
-              className={cn(
-                "h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm",
-                "focus-visible:border-ring focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/30",
-                "transition-[color,box-shadow]"
-              )}
-            >
-              <option value="">No category</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.title}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
         <Button onClick={onSubscribe} size="lg">
           <Plus className="size-4" />
           Subscribe to this feed

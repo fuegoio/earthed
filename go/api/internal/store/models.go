@@ -5,11 +5,14 @@ import (
 	"time"
 )
 
-// Category groups a user's feeds for organisational purposes.
-type Category struct {
+// Folder groups a user's feeds for organisational purposes. Folders can be
+// nested via ParentID and ordered via SortOrder.
+type Folder struct {
 	ID        int       `json:"id"`
 	UserID    int       `json:"user_id"`
+	ParentID  *int      `json:"parent_id,omitempty"`
 	Title     string    `json:"title"`
+	SortOrder int       `json:"sort_order"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
@@ -17,7 +20,7 @@ type Category struct {
 type Feed struct {
 	ID                int        `json:"id"`
 	UserID            int        `json:"user_id"`
-	CategoryID        *int       `json:"category_id,omitempty"`
+	FolderID          *int       `json:"folder_id,omitempty"`
 	FeedURL           string     `json:"feed_url"`
 	SiteURL           string     `json:"site_url"`
 	Title             string     `json:"title"`

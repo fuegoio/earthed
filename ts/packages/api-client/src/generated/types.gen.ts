@@ -22,32 +22,13 @@ export type AddFeedListFeedInputBody = {
     title?: string;
 };
 
-export type Category = {
-    /**
-     * A URL to the JSON Schema for this object.
-     */
-    readonly $schema?: string;
-    created_at: string;
-    id: number;
-    title: string;
-    user_id: number;
-};
-
-export type CreateCategoryInputBody = {
-    /**
-     * A URL to the JSON Schema for this object.
-     */
-    readonly $schema?: string;
-    title: string;
-};
-
 export type CreateFeedInputBody = {
     /**
      * A URL to the JSON Schema for this object.
      */
     readonly $schema?: string;
-    category_id?: number;
     feed_url: string;
+    folder_id?: number;
 };
 
 export type CreateFeedListInputBody = {
@@ -57,6 +38,15 @@ export type CreateFeedListInputBody = {
     readonly $schema?: string;
     description?: string;
     is_public: boolean;
+    title: string;
+};
+
+export type CreateFolderInputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    parent_id?: number;
     title: string;
 };
 
@@ -150,12 +140,12 @@ export type Feed = {
      * A URL to the JSON Schema for this object.
      */
     readonly $schema?: string;
-    category_id?: number;
     crawler: boolean;
     created_at: string;
     description?: string;
     disabled: boolean;
     feed_url: string;
+    folder_id?: number;
     id: number;
     last_fetch_at?: string;
     next_check_at?: string;
@@ -198,6 +188,19 @@ export type FeedListFeed = {
     position: number;
     site_url: string;
     title: string;
+};
+
+export type Folder = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    created_at: string;
+    id: number;
+    parent_id?: number;
+    sort_order: number;
+    title: string;
+    user_id: number;
 };
 
 export type HealthResponse = {
@@ -299,6 +302,15 @@ export type UpdateEntriesRequest = {
     status: 'unread' | 'read' | 'removed';
 };
 
+export type UpdateFeedInputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    folder_id?: number;
+    title?: string;
+};
+
 export type UpdateFeedListInputBody = {
     /**
      * A URL to the JSON Schema for this object.
@@ -306,6 +318,15 @@ export type UpdateFeedListInputBody = {
     readonly $schema?: string;
     description?: string;
     is_public: boolean;
+    title: string;
+};
+
+export type UpdateFolderInputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    parent_id?: number;
     title: string;
 };
 
@@ -327,25 +348,19 @@ export type AddFeedListFeedInputBodyWritable = {
     title?: string;
 };
 
-export type CategoryWritable = {
-    created_at: string;
-    id: number;
-    title: string;
-    user_id: number;
-};
-
-export type CreateCategoryInputBodyWritable = {
-    title: string;
-};
-
 export type CreateFeedInputBodyWritable = {
-    category_id?: number;
     feed_url: string;
+    folder_id?: number;
 };
 
 export type CreateFeedListInputBodyWritable = {
     description?: string;
     is_public: boolean;
+    title: string;
+};
+
+export type CreateFolderInputBodyWritable = {
+    parent_id?: number;
     title: string;
 };
 
@@ -400,12 +415,12 @@ export type ErrorModelWritable = {
 };
 
 export type FeedWritable = {
-    category_id?: number;
     crawler: boolean;
     created_at: string;
     description?: string;
     disabled: boolean;
     feed_url: string;
+    folder_id?: number;
     id: number;
     last_fetch_at?: string;
     next_check_at?: string;
@@ -440,6 +455,15 @@ export type FeedListFeedWritable = {
     position: number;
     site_url: string;
     title: string;
+};
+
+export type FolderWritable = {
+    created_at: string;
+    id: number;
+    parent_id?: number;
+    sort_order: number;
+    title: string;
+    user_id: number;
 };
 
 export type HealthResponseWritable = {
@@ -495,9 +519,19 @@ export type UpdateEntriesRequestWritable = {
     status: 'unread' | 'read' | 'removed';
 };
 
+export type UpdateFeedInputBodyWritable = {
+    folder_id?: number;
+    title?: string;
+};
+
 export type UpdateFeedListInputBodyWritable = {
     description?: string;
     is_public: boolean;
+    title: string;
+};
+
+export type UpdateFolderInputBodyWritable = {
+    parent_id?: number;
     title: string;
 };
 
@@ -509,89 +543,12 @@ export type UserWritable = {
     is_admin: boolean;
 };
 
-export type ListCategoriesData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/v1/categories';
-};
-
-export type ListCategoriesErrors = {
-    /**
-     * Error
-     */
-    default: ErrorModel;
-};
-
-export type ListCategoriesError = ListCategoriesErrors[keyof ListCategoriesErrors];
-
-export type ListCategoriesResponses = {
-    /**
-     * OK
-     */
-    200: Array<Category> | null;
-};
-
-export type ListCategoriesResponse = ListCategoriesResponses[keyof ListCategoriesResponses];
-
-export type CreateCategoryData = {
-    body: CreateCategoryInputBodyWritable;
-    path?: never;
-    query?: never;
-    url: '/api/v1/categories';
-};
-
-export type CreateCategoryErrors = {
-    /**
-     * Error
-     */
-    default: ErrorModel;
-};
-
-export type CreateCategoryError = CreateCategoryErrors[keyof CreateCategoryErrors];
-
-export type CreateCategoryResponses = {
-    /**
-     * OK
-     */
-    200: Category;
-};
-
-export type CreateCategoryResponse = CreateCategoryResponses[keyof CreateCategoryResponses];
-
-export type DeleteCategoryData = {
-    body?: never;
-    path: {
-        categoryId: number;
-    };
-    query?: never;
-    url: '/api/v1/categories/{categoryId}';
-};
-
-export type DeleteCategoryErrors = {
-    /**
-     * Error
-     */
-    default: ErrorModel;
-};
-
-export type DeleteCategoryError = DeleteCategoryErrors[keyof DeleteCategoryErrors];
-
-export type DeleteCategoryResponses = {
-    /**
-     * No Content
-     */
-    204: void;
-};
-
-export type DeleteCategoryResponse = DeleteCategoryResponses[keyof DeleteCategoryResponses];
-
 export type ListEntriesData = {
     body?: never;
     path?: never;
     query?: {
         feed_id?: number;
-        category_id?: number;
+        folder_id?: number;
         status?: 'unread' | 'read' | 'removed';
         starred?: boolean;
         search?: string;
@@ -1174,6 +1131,33 @@ export type GetFeedResponses = {
 
 export type GetFeedResponse = GetFeedResponses[keyof GetFeedResponses];
 
+export type UpdateFeedData = {
+    body: UpdateFeedInputBodyWritable;
+    path: {
+        feedId: number;
+    };
+    query?: never;
+    url: '/api/v1/feeds/{feedId}';
+};
+
+export type UpdateFeedErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type UpdateFeedError = UpdateFeedErrors[keyof UpdateFeedErrors];
+
+export type UpdateFeedResponses = {
+    /**
+     * OK
+     */
+    200: Feed;
+};
+
+export type UpdateFeedResponse = UpdateFeedResponses[keyof UpdateFeedResponses];
+
 export type MarkFeedReadData = {
     body?: never;
     path: {
@@ -1227,6 +1211,110 @@ export type RefreshFeedResponses = {
 };
 
 export type RefreshFeedResponse = RefreshFeedResponses[keyof RefreshFeedResponses];
+
+export type ListFoldersData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/folders';
+};
+
+export type ListFoldersErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type ListFoldersError = ListFoldersErrors[keyof ListFoldersErrors];
+
+export type ListFoldersResponses = {
+    /**
+     * OK
+     */
+    200: Array<Folder> | null;
+};
+
+export type ListFoldersResponse = ListFoldersResponses[keyof ListFoldersResponses];
+
+export type CreateFolderData = {
+    body: CreateFolderInputBodyWritable;
+    path?: never;
+    query?: never;
+    url: '/api/v1/folders';
+};
+
+export type CreateFolderErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type CreateFolderError = CreateFolderErrors[keyof CreateFolderErrors];
+
+export type CreateFolderResponses = {
+    /**
+     * OK
+     */
+    200: Folder;
+};
+
+export type CreateFolderResponse = CreateFolderResponses[keyof CreateFolderResponses];
+
+export type DeleteFolderData = {
+    body?: never;
+    path: {
+        folderId: number;
+    };
+    query?: never;
+    url: '/api/v1/folders/{folderId}';
+};
+
+export type DeleteFolderErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type DeleteFolderError = DeleteFolderErrors[keyof DeleteFolderErrors];
+
+export type DeleteFolderResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type DeleteFolderResponse = DeleteFolderResponses[keyof DeleteFolderResponses];
+
+export type UpdateFolderData = {
+    body: UpdateFolderInputBodyWritable;
+    path: {
+        folderId: number;
+    };
+    query?: never;
+    url: '/api/v1/folders/{folderId}';
+};
+
+export type UpdateFolderErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type UpdateFolderError = UpdateFolderErrors[keyof UpdateFolderErrors];
+
+export type UpdateFolderResponses = {
+    /**
+     * OK
+     */
+    200: Folder;
+};
+
+export type UpdateFolderResponse = UpdateFolderResponses[keyof UpdateFolderResponses];
 
 export type HealthData = {
     body?: never;

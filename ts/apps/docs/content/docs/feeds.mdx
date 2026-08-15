@@ -1,6 +1,6 @@
 ---
 title: Managing Feeds
-description: Subscribe to feeds, organize them with categories, and understand how the refresh pipeline works.
+description: Subscribe to feeds, organize them with folders, and understand how the refresh pipeline works.
 ---
 
 Feeds are RSS, Atom, or JSON Feed subscriptions. Planetary fetches and
@@ -22,13 +22,13 @@ When you subscribe, the `site_url` and `title` are temporarily set to
 the feed URL. After the first refresh, they are updated to the real
 values from the feed content.
 
-You can assign a feed to a category at creation time:
+You can assign a feed to a folder at creation time:
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/feeds \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer pla_your-token" \
-  -d '{"feed_url":"https://blog.golang.org/feeds/posts/default","category_id":2}'
+  -d '{"feed_url":"https://blog.golang.org/feeds/posts/default","folder_id":2}'
 ```
 
 Duplicate subscriptions (same URL for the same user) return a 400 error.
@@ -72,29 +72,29 @@ curl -X POST http://localhost:8080/api/v1/feeds/1/mark-all-read \
   -H "Authorization: Bearer pla_your-token"
 ```
 
-## Categories
+## Folders
 
-Categories organize feeds into groups. Create a category:
+Folders organize feeds into groups. Create a folder:
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/categories \
+curl -X POST http://localhost:8080/api/v1/folders \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer pla_your-token" \
   -d '{"title":"Technology"}'
 ```
 
-List categories:
+List folders:
 
 ```bash
-curl http://localhost:8080/api/v1/categories \
+curl http://localhost:8080/api/v1/folders \
   -H "Authorization: Bearer pla_your-token"
 ```
 
-Delete a category. Feeds in the deleted category are not deleted — they
-become uncategorized:
+Delete a folder. Feeds in the deleted folder are not deleted — they
+become ungrouped:
 
 ```bash
-curl -X DELETE http://localhost:8080/api/v1/categories/2 \
+curl -X DELETE http://localhost:8080/api/v1/folders/2 \
   -H "Authorization: Bearer pla_your-token"
 ```
 

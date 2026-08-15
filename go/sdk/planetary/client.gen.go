@@ -68,25 +68,15 @@ type APIToken struct {
 	UserId     int64      `json:"user_id"`
 }
 
-// Category defines model for Category.
-type Category struct {
+// AddFeedListFeedInputBody defines model for AddFeedListFeedInputBody.
+type AddFeedListFeedInputBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/Category.json
-	Schema    *string   `json:"$schema,omitempty"`
-	CreatedAt time.Time `json:"created_at"`
-	Id        int64     `json:"id"`
-	Title     string    `json:"title"`
-	UserId    int64     `json:"user_id"`
-}
-
-// CreateCategoryInputBody defines model for CreateCategoryInputBody.
-type CreateCategoryInputBody struct {
-	// Schema A URL to the JSON Schema for this object.
-	//
-	// Examples: /api/schemas/CreateCategoryInputBody.json
-	Schema *string `json:"$schema,omitempty"`
-	Title  string  `json:"title"`
+	// Examples: /api/schemas/AddFeedListFeedInputBody.json
+	Schema  *string `json:"$schema,omitempty"`
+	FeedUrl string  `json:"feed_url"`
+	SiteUrl *string `json:"site_url,omitempty"`
+	Title   *string `json:"title,omitempty"`
 }
 
 // CreateFeedInputBody defines model for CreateFeedInputBody.
@@ -94,9 +84,30 @@ type CreateFeedInputBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
 	// Examples: /api/schemas/CreateFeedInputBody.json
-	Schema     *string `json:"$schema,omitempty"`
-	CategoryId *int64  `json:"category_id,omitempty"`
-	FeedUrl    string  `json:"feed_url"`
+	Schema   *string `json:"$schema,omitempty"`
+	FeedUrl  string  `json:"feed_url"`
+	FolderId *int64  `json:"folder_id,omitempty"`
+}
+
+// CreateFeedListInputBody defines model for CreateFeedListInputBody.
+type CreateFeedListInputBody struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: /api/schemas/CreateFeedListInputBody.json
+	Schema      *string `json:"$schema,omitempty"`
+	Description *string `json:"description,omitempty"`
+	IsPublic    bool    `json:"is_public"`
+	Title       string  `json:"title"`
+}
+
+// CreateFolderInputBody defines model for CreateFolderInputBody.
+type CreateFolderInputBody struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: /api/schemas/CreateFolderInputBody.json
+	Schema   *string `json:"$schema,omitempty"`
+	ParentId *int64  `json:"parent_id,omitempty"`
+	Title    string  `json:"title"`
 }
 
 // CreateTokenInputBody defines model for CreateTokenInputBody.
@@ -126,12 +137,12 @@ type Entry struct {
 	Author      *string      `json:"author,omitempty"`
 	ChangedAt   time.Time    `json:"changed_at"`
 	CommentsUrl *string      `json:"comments_url,omitempty"`
-	Content     string       `json:"content"`
 	Description *string      `json:"description,omitempty"`
 	Enclosures  *[]Enclosure `json:"enclosures,omitempty"`
 	FeedId      int64        `json:"feed_id"`
 	Hash        string       `json:"hash"`
 	Id          int64        `json:"id"`
+	Liked       bool         `json:"liked"`
 	PublishedAt time.Time    `json:"published_at"`
 	Starred     bool         `json:"starred"`
 	Status      string       `json:"status"`
@@ -195,11 +206,12 @@ type Feed struct {
 	//
 	// Examples: /api/schemas/Feed.json
 	Schema            *string    `json:"$schema,omitempty"`
-	CategoryId        *int64     `json:"category_id,omitempty"`
 	Crawler           bool       `json:"crawler"`
 	CreatedAt         time.Time  `json:"created_at"`
+	Description       *string    `json:"description,omitempty"`
 	Disabled          bool       `json:"disabled"`
 	FeedUrl           string     `json:"feed_url"`
+	FolderId          *int64     `json:"folder_id,omitempty"`
 	Id                int64      `json:"id"`
 	LastFetchAt       *time.Time `json:"last_fetch_at,omitempty"`
 	NextCheckAt       *time.Time `json:"next_check_at,omitempty"`
@@ -213,6 +225,53 @@ type Feed struct {
 	UserId            int64      `json:"user_id"`
 }
 
+// FeedList defines model for FeedList.
+type FeedList struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: /api/schemas/FeedList.json
+	Schema      *string         `json:"$schema,omitempty"`
+	CreatedAt   time.Time       `json:"created_at"`
+	Description *string         `json:"description,omitempty"`
+	FeedCount   int64           `json:"feed_count"`
+	Feeds       *[]FeedListFeed `json:"feeds,omitempty"`
+	Id          int64           `json:"id"`
+	IsFollowing *bool           `json:"is_following,omitempty"`
+	IsPublic    bool            `json:"is_public"`
+	OwnerEmail  *string         `json:"owner_email,omitempty"`
+	Title       string          `json:"title"`
+	UpdatedAt   time.Time       `json:"updated_at"`
+	UserId      int64           `json:"user_id"`
+}
+
+// FeedListFeed defines model for FeedListFeed.
+type FeedListFeed struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: /api/schemas/FeedListFeed.json
+	Schema     *string `json:"$schema,omitempty"`
+	FeedListId int64   `json:"feed_list_id"`
+	FeedUrl    string  `json:"feed_url"`
+	Id         int64   `json:"id"`
+	Position   int64   `json:"position"`
+	SiteUrl    string  `json:"site_url"`
+	Title      string  `json:"title"`
+}
+
+// Folder defines model for Folder.
+type Folder struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: /api/schemas/Folder.json
+	Schema    *string   `json:"$schema,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
+	Id        int64     `json:"id"`
+	ParentId  *int64    `json:"parent_id,omitempty"`
+	SortOrder int64     `json:"sort_order"`
+	Title     string    `json:"title"`
+	UserId    int64     `json:"user_id"`
+}
+
 // HealthResponse defines model for HealthResponse.
 type HealthResponse struct {
 	// Schema A URL to the JSON Schema for this object.
@@ -220,6 +279,75 @@ type HealthResponse struct {
 	// Examples: /api/schemas/HealthResponse.json
 	Schema *string `json:"$schema,omitempty"`
 	Status string  `json:"status"`
+}
+
+// ImportFeedListResponse defines model for Import-feed-listResponse.
+type ImportFeedListResponse struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: /api/schemas/Import-feed-listResponse.json
+	Schema   *string   `json:"$schema,omitempty"`
+	Errors   *[]string `json:"errors,omitempty"`
+	Failed   int64     `json:"failed"`
+	FeedIds  *[]int64  `json:"feed_ids"`
+	Imported int64     `json:"imported"`
+	Skipped  int64     `json:"skipped"`
+}
+
+// OPMLImportResultBody defines model for OPMLImportResultBody.
+type OPMLImportResultBody struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: /api/schemas/OPMLImportResultBody.json
+	Schema   *string   `json:"$schema,omitempty"`
+	Errors   *[]string `json:"errors,omitempty"`
+	Failed   int64     `json:"failed"`
+	FeedIds  *[]int64  `json:"feed_ids"`
+	Imported int64     `json:"imported"`
+	Skipped  int64     `json:"skipped"`
+}
+
+// PreviewFeedBody defines model for PreviewFeedBody.
+type PreviewFeedBody struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: /api/schemas/PreviewFeedBody.json
+	Schema      *string            `json:"$schema,omitempty"`
+	Description *string            `json:"description,omitempty"`
+	FaviconUrl  *string            `json:"favicon_url,omitempty"`
+	FeedUrl     string             `json:"feed_url"`
+	Items       *[]PreviewFeedItem `json:"items"`
+	SiteUrl     string             `json:"site_url"`
+	Title       string             `json:"title"`
+}
+
+// PreviewFeedInputBody defines model for PreviewFeedInputBody.
+type PreviewFeedInputBody struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: /api/schemas/PreviewFeedInputBody.json
+	Schema  *string `json:"$schema,omitempty"`
+	FeedUrl string  `json:"feed_url"`
+}
+
+// PreviewFeedItem defines model for PreviewFeedItem.
+type PreviewFeedItem struct {
+	Author      *string   `json:"author,omitempty"`
+	Content     string    `json:"content"`
+	Description *string   `json:"description,omitempty"`
+	PublishedAt time.Time `json:"published_at"`
+	Tags        *[]string `json:"tags,omitempty"`
+	Title       string    `json:"title"`
+	Url         string    `json:"url"`
+}
+
+// ToggleEntryLikedRequest defines model for Toggle-entry-likedRequest.
+type ToggleEntryLikedRequest struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: /api/schemas/Toggle-entry-likedRequest.json
+	Schema *string `json:"$schema,omitempty"`
+	Liked  bool    `json:"liked"`
 }
 
 // ToggleEntryStarredRequest defines model for Toggle-entry-starredRequest.
@@ -256,6 +384,37 @@ type UpdateEntriesRequest struct {
 // UpdateEntriesRequestStatus defines model for UpdateEntriesRequest.Status.
 type UpdateEntriesRequestStatus string
 
+// UpdateFeedInputBody defines model for UpdateFeedInputBody.
+type UpdateFeedInputBody struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: /api/schemas/UpdateFeedInputBody.json
+	Schema   *string `json:"$schema,omitempty"`
+	FolderId *int64  `json:"folder_id,omitempty"`
+	Title    *string `json:"title,omitempty"`
+}
+
+// UpdateFeedListInputBody defines model for UpdateFeedListInputBody.
+type UpdateFeedListInputBody struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: /api/schemas/UpdateFeedListInputBody.json
+	Schema      *string `json:"$schema,omitempty"`
+	Description *string `json:"description,omitempty"`
+	IsPublic    bool    `json:"is_public"`
+	Title       string  `json:"title"`
+}
+
+// UpdateFolderInputBody defines model for UpdateFolderInputBody.
+type UpdateFolderInputBody struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: /api/schemas/UpdateFolderInputBody.json
+	Schema   *string `json:"$schema,omitempty"`
+	ParentId *int64  `json:"parent_id,omitempty"`
+	Title    string  `json:"title"`
+}
+
 // User defines model for User.
 type User struct {
 	// Schema A URL to the JSON Schema for this object.
@@ -271,29 +430,56 @@ type User struct {
 
 // ListEntriesParams defines parameters for ListEntries.
 type ListEntriesParams struct {
-	FeedId     *int64                   `form:"feed_id,omitempty" json:"feed_id,omitempty"`
-	CategoryId *int64                   `form:"category_id,omitempty" json:"category_id,omitempty"`
-	Status     *ListEntriesParamsStatus `form:"status,omitempty" json:"status,omitempty"`
-	Starred    *bool                    `form:"starred,omitempty" json:"starred,omitempty"`
-	Search     *string                  `form:"search,omitempty" json:"search,omitempty"`
-	Limit      *int64                   `form:"limit,omitempty" json:"limit,omitempty"`
-	Offset     *int64                   `form:"offset,omitempty" json:"offset,omitempty"`
+	FeedId   *int64                   `form:"feed_id,omitempty" json:"feed_id,omitempty"`
+	FolderId *int64                   `form:"folder_id,omitempty" json:"folder_id,omitempty"`
+	Status   *ListEntriesParamsStatus `form:"status,omitempty" json:"status,omitempty"`
+	Starred  *bool                    `form:"starred,omitempty" json:"starred,omitempty"`
+	Search   *string                  `form:"search,omitempty" json:"search,omitempty"`
+	Limit    *int64                   `form:"limit,omitempty" json:"limit,omitempty"`
+	Offset   *int64                   `form:"offset,omitempty" json:"offset,omitempty"`
 }
 
 // ListEntriesParamsStatus defines parameters for ListEntries.
 type ListEntriesParamsStatus string
 
-// CreateCategoryJSONRequestBody defines body for CreateCategory for application/json ContentType.
-type CreateCategoryJSONRequestBody = CreateCategoryInputBody
+// DiscoverFeedListsParams defines parameters for DiscoverFeedLists.
+type DiscoverFeedListsParams struct {
+	Limit  *int64 `form:"limit,omitempty" json:"limit,omitempty"`
+	Offset *int64 `form:"offset,omitempty" json:"offset,omitempty"`
+}
 
 // UpdateEntriesJSONRequestBody defines body for UpdateEntries for application/json ContentType.
 type UpdateEntriesJSONRequestBody = UpdateEntriesRequest
 
+// ToggleEntryLikedJSONRequestBody defines body for ToggleEntryLiked for application/json ContentType.
+type ToggleEntryLikedJSONRequestBody = ToggleEntryLikedRequest
+
 // ToggleEntryStarredJSONRequestBody defines body for ToggleEntryStarred for application/json ContentType.
 type ToggleEntryStarredJSONRequestBody = ToggleEntryStarredRequest
 
+// CreateFeedListJSONRequestBody defines body for CreateFeedList for application/json ContentType.
+type CreateFeedListJSONRequestBody = CreateFeedListInputBody
+
+// UpdateFeedListJSONRequestBody defines body for UpdateFeedList for application/json ContentType.
+type UpdateFeedListJSONRequestBody = UpdateFeedListInputBody
+
+// AddFeedListFeedJSONRequestBody defines body for AddFeedListFeed for application/json ContentType.
+type AddFeedListFeedJSONRequestBody = AddFeedListFeedInputBody
+
 // CreateFeedJSONRequestBody defines body for CreateFeed for application/json ContentType.
 type CreateFeedJSONRequestBody = CreateFeedInputBody
+
+// PreviewFeedJSONRequestBody defines body for PreviewFeed for application/json ContentType.
+type PreviewFeedJSONRequestBody = PreviewFeedInputBody
+
+// UpdateFeedJSONRequestBody defines body for UpdateFeed for application/json ContentType.
+type UpdateFeedJSONRequestBody = UpdateFeedInputBody
+
+// CreateFolderJSONRequestBody defines body for CreateFolder for application/json ContentType.
+type CreateFolderJSONRequestBody = CreateFolderInputBody
+
+// UpdateFolderJSONRequestBody defines body for UpdateFolder for application/json ContentType.
+type UpdateFolderJSONRequestBody = UpdateFolderInputBody
 
 // CreateTokenJSONRequestBody defines body for CreateToken for application/json ContentType.
 type CreateTokenJSONRequestBody = CreateTokenInputBody
@@ -372,30 +558,6 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 // The interface specification for the client above.
 type ClientInterface interface {
 
-	// ListCategories List categories
-	//
-	// Corresponds with GET /api/v1/categories (the `ListCategories` operationId).
-	ListCategories(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// CreateCategoryWithBody Create a category
-	//
-	// Takes any type of body and a specified content type.
-	//
-	// Corresponds with POST /api/v1/categories (the `CreateCategory` operationId).
-	CreateCategoryWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// CreateCategory Create a category
-	//
-	// Takes a body of the `application/json` content type.
-	//
-	// Corresponds with POST /api/v1/categories (the `CreateCategory` operationId).
-	CreateCategory(ctx context.Context, body CreateCategoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// DeleteCategory Delete a category
-	//
-	// Corresponds with DELETE /api/v1/categories/{categoryId} (the `DeleteCategory` operationId).
-	DeleteCategory(ctx context.Context, categoryId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// ListEntries List entries
 	//
 	// Corresponds with GET /api/v1/entries (the `ListEntries` operationId).
@@ -420,6 +582,20 @@ type ClientInterface interface {
 	// Corresponds with GET /api/v1/entries/{entryId} (the `GetEntry` operationId).
 	GetEntry(ctx context.Context, entryId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// ToggleEntryLikedWithBody Toggle liked on an entry
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with PUT /api/v1/entries/{entryId}/liked (the `ToggleEntryLiked` operationId).
+	ToggleEntryLikedWithBody(ctx context.Context, entryId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ToggleEntryLiked Toggle liked on an entry
+	//
+	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with PUT /api/v1/entries/{entryId}/liked (the `ToggleEntryLiked` operationId).
+	ToggleEntryLiked(ctx context.Context, entryId int64, body ToggleEntryLikedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// ToggleEntryStarredWithBody Toggle starred on an entry
 	//
 	// Takes any type of body and a specified content type.
@@ -433,6 +609,93 @@ type ClientInterface interface {
 	//
 	// Corresponds with PUT /api/v1/entries/{entryId}/starred (the `ToggleEntryStarred` operationId).
 	ToggleEntryStarred(ctx context.Context, entryId int64, body ToggleEntryStarredJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListMyFeedLists List my feed lists
+	//
+	// Corresponds with GET /api/v1/feed-lists (the `ListMyFeedLists` operationId).
+	ListMyFeedLists(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateFeedListWithBody Create a feed list
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with POST /api/v1/feed-lists (the `CreateFeedList` operationId).
+	CreateFeedListWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateFeedList Create a feed list
+	//
+	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with POST /api/v1/feed-lists (the `CreateFeedList` operationId).
+	CreateFeedList(ctx context.Context, body CreateFeedListJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DiscoverFeedLists Discover public feed lists
+	//
+	// Corresponds with GET /api/v1/feed-lists/discover (the `DiscoverFeedLists` operationId).
+	DiscoverFeedLists(ctx context.Context, params *DiscoverFeedListsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListFollowedFeedLists List feed lists I follow
+	//
+	// Corresponds with GET /api/v1/feed-lists/followed (the `ListFollowedFeedLists` operationId).
+	ListFollowedFeedLists(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteFeedList Delete a feed list
+	//
+	// Corresponds with DELETE /api/v1/feed-lists/{listId} (the `DeleteFeedList` operationId).
+	DeleteFeedList(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetFeedList Get a feed list
+	//
+	// Corresponds with GET /api/v1/feed-lists/{listId} (the `GetFeedList` operationId).
+	GetFeedList(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateFeedListWithBody Update a feed list
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with PATCH /api/v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
+	UpdateFeedListWithBody(ctx context.Context, listId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateFeedList Update a feed list
+	//
+	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with PATCH /api/v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
+	UpdateFeedList(ctx context.Context, listId int64, body UpdateFeedListJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AddFeedListFeedWithBody Add a feed to a feed list
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with POST /api/v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
+	AddFeedListFeedWithBody(ctx context.Context, listId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AddFeedListFeed Add a feed to a feed list
+	//
+	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with POST /api/v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
+	AddFeedListFeed(ctx context.Context, listId int64, body AddFeedListFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RemoveFeedListFeed Remove a feed from a feed list
+	//
+	// Corresponds with DELETE /api/v1/feed-lists/{listId}/feeds/{itemId} (the `RemoveFeedListFeed` operationId).
+	RemoveFeedListFeed(ctx context.Context, listId int64, itemId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UnfollowFeedList Unfollow a feed list
+	//
+	// Corresponds with DELETE /api/v1/feed-lists/{listId}/follow (the `UnfollowFeedList` operationId).
+	UnfollowFeedList(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// FollowFeedList Follow a feed list
+	//
+	// Corresponds with POST /api/v1/feed-lists/{listId}/follow (the `FollowFeedList` operationId).
+	FollowFeedList(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ImportFeedList Subscribe to all feeds in a feed list
+	//
+	// Corresponds with POST /api/v1/feed-lists/{listId}/import (the `ImportFeedList` operationId).
+	ImportFeedList(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListFeeds List feeds
 	//
@@ -453,6 +716,24 @@ type ClientInterface interface {
 	// Corresponds with POST /api/v1/feeds (the `CreateFeed` operationId).
 	CreateFeed(ctx context.Context, body CreateFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// PreviewFeedWithBody Preview a feed without subscribing
+	//
+	// Fetches and parses a feed URL, returning feed metadata and recent entries without persisting anything.
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with POST /api/v1/feeds/preview (the `PreviewFeed` operationId).
+	PreviewFeedWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PreviewFeed Preview a feed without subscribing
+	//
+	// Fetches and parses a feed URL, returning feed metadata and recent entries without persisting anything.
+	//
+	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with POST /api/v1/feeds/preview (the `PreviewFeed` operationId).
+	PreviewFeed(ctx context.Context, body PreviewFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// DeleteFeed Delete a feed
 	//
 	// Corresponds with DELETE /api/v1/feeds/{feedId} (the `DeleteFeed` operationId).
@@ -463,10 +744,77 @@ type ClientInterface interface {
 	// Corresponds with GET /api/v1/feeds/{feedId} (the `GetFeed` operationId).
 	GetFeed(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// UpdateFeedWithBody Update a feed
+	//
+	// Update the folder assignment and/or title of a feed.
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with PATCH /api/v1/feeds/{feedId} (the `UpdateFeed` operationId).
+	UpdateFeedWithBody(ctx context.Context, feedId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateFeed Update a feed
+	//
+	// Update the folder assignment and/or title of a feed.
+	//
+	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with PATCH /api/v1/feeds/{feedId} (the `UpdateFeed` operationId).
+	UpdateFeed(ctx context.Context, feedId int64, body UpdateFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// MarkFeedRead Mark all entries in a feed as read
 	//
 	// Corresponds with POST /api/v1/feeds/{feedId}/mark-all-read (the `MarkFeedRead` operationId).
 	MarkFeedRead(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RefreshFeed Refresh a feed
+	//
+	// Manually fetch and parse the feed, inserting any new entries. Use this to get the latest articles without waiting for the scheduler.
+	//
+	// Corresponds with POST /api/v1/feeds/{feedId}/refresh (the `RefreshFeed` operationId).
+	RefreshFeed(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListFolders List folders
+	//
+	// Corresponds with GET /api/v1/folders (the `ListFolders` operationId).
+	ListFolders(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateFolderWithBody Create a folder
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with POST /api/v1/folders (the `CreateFolder` operationId).
+	CreateFolderWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateFolder Create a folder
+	//
+	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with POST /api/v1/folders (the `CreateFolder` operationId).
+	CreateFolder(ctx context.Context, body CreateFolderJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteFolder Delete a folder
+	//
+	// Corresponds with DELETE /api/v1/folders/{folderId} (the `DeleteFolder` operationId).
+	DeleteFolder(ctx context.Context, folderId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateFolderWithBody Update a folder
+	//
+	// Update the title and/or parent folder of a folder. Set parent_id to move or nest the folder.
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with PATCH /api/v1/folders/{folderId} (the `UpdateFolder` operationId).
+	UpdateFolderWithBody(ctx context.Context, folderId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateFolder Update a folder
+	//
+	// Update the title and/or parent folder of a folder. Set parent_id to move or nest the folder.
+	//
+	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with PATCH /api/v1/folders/{folderId} (the `UpdateFolder` operationId).
+	UpdateFolder(ctx context.Context, folderId int64, body UpdateFolderJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Health Health check
 	//
@@ -477,6 +825,22 @@ type ClientInterface interface {
 	//
 	// Corresponds with GET /api/v1/me (the `GetMe` operationId).
 	GetMe(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ExportOpml Export feeds as OPML
+	//
+	// Returns all feed subscriptions and folders as an OPML XML document.
+	//
+	// Corresponds with GET /api/v1/opml/export (the `ExportOpml` operationId).
+	ExportOpml(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ImportOpmlWithBody Import feeds from an OPML file
+	//
+	// Parses an OPML XML document and subscribes the user to all feeds found. Folders are created as needed. Existing subscriptions are skipped.
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with POST /api/v1/opml/import (the `ImportOpml` operationId).
+	ImportOpmlWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListTokens List API tokens
 	//
@@ -501,70 +865,6 @@ type ClientInterface interface {
 	//
 	// Corresponds with DELETE /api/v1/tokens/{tokenId} (the `DeleteToken` operationId).
 	DeleteToken(ctx context.Context, tokenId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
-}
-
-// ListCategories List categories
-//
-// Corresponds with GET /api/v1/categories (the `ListCategories` operationId).
-func (c *Client) ListCategories(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListCategoriesRequest(c.Server)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-// CreateCategoryWithBody Create a category
-//
-// Takes any type of body and a specified content type.
-//
-// Corresponds with POST /api/v1/categories (the `CreateCategory` operationId).
-func (c *Client) CreateCategoryWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateCategoryRequestWithBody(c.Server, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-// CreateCategory Create a category
-//
-// Takes a body of the `application/json` content type.
-//
-// Corresponds with POST /api/v1/categories (the `CreateCategory` operationId).
-func (c *Client) CreateCategory(ctx context.Context, body CreateCategoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateCategoryRequest(c.Server, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-// DeleteCategory Delete a category
-//
-// Corresponds with DELETE /api/v1/categories/{categoryId} (the `DeleteCategory` operationId).
-func (c *Client) DeleteCategory(ctx context.Context, categoryId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteCategoryRequest(c.Server, categoryId)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
 }
 
 // ListEntries List entries
@@ -631,6 +931,40 @@ func (c *Client) GetEntry(ctx context.Context, entryId int64, reqEditors ...Requ
 	return c.Client.Do(req)
 }
 
+// ToggleEntryLikedWithBody Toggle liked on an entry
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with PUT /api/v1/entries/{entryId}/liked (the `ToggleEntryLiked` operationId).
+func (c *Client) ToggleEntryLikedWithBody(ctx context.Context, entryId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewToggleEntryLikedRequestWithBody(c.Server, entryId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// ToggleEntryLiked Toggle liked on an entry
+//
+// Takes a body of the `application/json` content type.
+//
+// Corresponds with PUT /api/v1/entries/{entryId}/liked (the `ToggleEntryLiked` operationId).
+func (c *Client) ToggleEntryLiked(ctx context.Context, entryId int64, body ToggleEntryLikedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewToggleEntryLikedRequest(c.Server, entryId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 // ToggleEntryStarredWithBody Toggle starred on an entry
 //
 // Takes any type of body and a specified content type.
@@ -655,6 +989,243 @@ func (c *Client) ToggleEntryStarredWithBody(ctx context.Context, entryId int64, 
 // Corresponds with PUT /api/v1/entries/{entryId}/starred (the `ToggleEntryStarred` operationId).
 func (c *Client) ToggleEntryStarred(ctx context.Context, entryId int64, body ToggleEntryStarredJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewToggleEntryStarredRequest(c.Server, entryId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// ListMyFeedLists List my feed lists
+//
+// Corresponds with GET /api/v1/feed-lists (the `ListMyFeedLists` operationId).
+func (c *Client) ListMyFeedLists(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListMyFeedListsRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// CreateFeedListWithBody Create a feed list
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with POST /api/v1/feed-lists (the `CreateFeedList` operationId).
+func (c *Client) CreateFeedListWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateFeedListRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// CreateFeedList Create a feed list
+//
+// Takes a body of the `application/json` content type.
+//
+// Corresponds with POST /api/v1/feed-lists (the `CreateFeedList` operationId).
+func (c *Client) CreateFeedList(ctx context.Context, body CreateFeedListJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateFeedListRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// DiscoverFeedLists Discover public feed lists
+//
+// Corresponds with GET /api/v1/feed-lists/discover (the `DiscoverFeedLists` operationId).
+func (c *Client) DiscoverFeedLists(ctx context.Context, params *DiscoverFeedListsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDiscoverFeedListsRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// ListFollowedFeedLists List feed lists I follow
+//
+// Corresponds with GET /api/v1/feed-lists/followed (the `ListFollowedFeedLists` operationId).
+func (c *Client) ListFollowedFeedLists(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListFollowedFeedListsRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// DeleteFeedList Delete a feed list
+//
+// Corresponds with DELETE /api/v1/feed-lists/{listId} (the `DeleteFeedList` operationId).
+func (c *Client) DeleteFeedList(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteFeedListRequest(c.Server, listId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// GetFeedList Get a feed list
+//
+// Corresponds with GET /api/v1/feed-lists/{listId} (the `GetFeedList` operationId).
+func (c *Client) GetFeedList(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetFeedListRequest(c.Server, listId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// UpdateFeedListWithBody Update a feed list
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with PATCH /api/v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
+func (c *Client) UpdateFeedListWithBody(ctx context.Context, listId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateFeedListRequestWithBody(c.Server, listId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// UpdateFeedList Update a feed list
+//
+// Takes a body of the `application/json` content type.
+//
+// Corresponds with PATCH /api/v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
+func (c *Client) UpdateFeedList(ctx context.Context, listId int64, body UpdateFeedListJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateFeedListRequest(c.Server, listId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// AddFeedListFeedWithBody Add a feed to a feed list
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with POST /api/v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
+func (c *Client) AddFeedListFeedWithBody(ctx context.Context, listId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAddFeedListFeedRequestWithBody(c.Server, listId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// AddFeedListFeed Add a feed to a feed list
+//
+// Takes a body of the `application/json` content type.
+//
+// Corresponds with POST /api/v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
+func (c *Client) AddFeedListFeed(ctx context.Context, listId int64, body AddFeedListFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAddFeedListFeedRequest(c.Server, listId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// RemoveFeedListFeed Remove a feed from a feed list
+//
+// Corresponds with DELETE /api/v1/feed-lists/{listId}/feeds/{itemId} (the `RemoveFeedListFeed` operationId).
+func (c *Client) RemoveFeedListFeed(ctx context.Context, listId int64, itemId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRemoveFeedListFeedRequest(c.Server, listId, itemId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// UnfollowFeedList Unfollow a feed list
+//
+// Corresponds with DELETE /api/v1/feed-lists/{listId}/follow (the `UnfollowFeedList` operationId).
+func (c *Client) UnfollowFeedList(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnfollowFeedListRequest(c.Server, listId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// FollowFeedList Follow a feed list
+//
+// Corresponds with POST /api/v1/feed-lists/{listId}/follow (the `FollowFeedList` operationId).
+func (c *Client) FollowFeedList(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewFollowFeedListRequest(c.Server, listId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// ImportFeedList Subscribe to all feeds in a feed list
+//
+// Corresponds with POST /api/v1/feed-lists/{listId}/import (the `ImportFeedList` operationId).
+func (c *Client) ImportFeedList(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewImportFeedListRequest(c.Server, listId)
 	if err != nil {
 		return nil, err
 	}
@@ -714,6 +1285,44 @@ func (c *Client) CreateFeed(ctx context.Context, body CreateFeedJSONRequestBody,
 	return c.Client.Do(req)
 }
 
+// PreviewFeedWithBody Preview a feed without subscribing
+//
+// Fetches and parses a feed URL, returning feed metadata and recent entries without persisting anything.
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with POST /api/v1/feeds/preview (the `PreviewFeed` operationId).
+func (c *Client) PreviewFeedWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPreviewFeedRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// PreviewFeed Preview a feed without subscribing
+//
+// Fetches and parses a feed URL, returning feed metadata and recent entries without persisting anything.
+//
+// Takes a body of the `application/json` content type.
+//
+// Corresponds with POST /api/v1/feeds/preview (the `PreviewFeed` operationId).
+func (c *Client) PreviewFeed(ctx context.Context, body PreviewFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPreviewFeedRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 // DeleteFeed Delete a feed
 //
 // Corresponds with DELETE /api/v1/feeds/{feedId} (the `DeleteFeed` operationId).
@@ -744,11 +1353,168 @@ func (c *Client) GetFeed(ctx context.Context, feedId int64, reqEditors ...Reques
 	return c.Client.Do(req)
 }
 
+// UpdateFeedWithBody Update a feed
+//
+// Update the folder assignment and/or title of a feed.
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with PATCH /api/v1/feeds/{feedId} (the `UpdateFeed` operationId).
+func (c *Client) UpdateFeedWithBody(ctx context.Context, feedId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateFeedRequestWithBody(c.Server, feedId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// UpdateFeed Update a feed
+//
+// Update the folder assignment and/or title of a feed.
+//
+// Takes a body of the `application/json` content type.
+//
+// Corresponds with PATCH /api/v1/feeds/{feedId} (the `UpdateFeed` operationId).
+func (c *Client) UpdateFeed(ctx context.Context, feedId int64, body UpdateFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateFeedRequest(c.Server, feedId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 // MarkFeedRead Mark all entries in a feed as read
 //
 // Corresponds with POST /api/v1/feeds/{feedId}/mark-all-read (the `MarkFeedRead` operationId).
 func (c *Client) MarkFeedRead(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewMarkFeedReadRequest(c.Server, feedId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// RefreshFeed Refresh a feed
+//
+// Manually fetch and parse the feed, inserting any new entries. Use this to get the latest articles without waiting for the scheduler.
+//
+// Corresponds with POST /api/v1/feeds/{feedId}/refresh (the `RefreshFeed` operationId).
+func (c *Client) RefreshFeed(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRefreshFeedRequest(c.Server, feedId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// ListFolders List folders
+//
+// Corresponds with GET /api/v1/folders (the `ListFolders` operationId).
+func (c *Client) ListFolders(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListFoldersRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// CreateFolderWithBody Create a folder
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with POST /api/v1/folders (the `CreateFolder` operationId).
+func (c *Client) CreateFolderWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateFolderRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// CreateFolder Create a folder
+//
+// Takes a body of the `application/json` content type.
+//
+// Corresponds with POST /api/v1/folders (the `CreateFolder` operationId).
+func (c *Client) CreateFolder(ctx context.Context, body CreateFolderJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateFolderRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// DeleteFolder Delete a folder
+//
+// Corresponds with DELETE /api/v1/folders/{folderId} (the `DeleteFolder` operationId).
+func (c *Client) DeleteFolder(ctx context.Context, folderId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteFolderRequest(c.Server, folderId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// UpdateFolderWithBody Update a folder
+//
+// Update the title and/or parent folder of a folder. Set parent_id to move or nest the folder.
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with PATCH /api/v1/folders/{folderId} (the `UpdateFolder` operationId).
+func (c *Client) UpdateFolderWithBody(ctx context.Context, folderId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateFolderRequestWithBody(c.Server, folderId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// UpdateFolder Update a folder
+//
+// Update the title and/or parent folder of a folder. Set parent_id to move or nest the folder.
+//
+// Takes a body of the `application/json` content type.
+//
+// Corresponds with PATCH /api/v1/folders/{folderId} (the `UpdateFolder` operationId).
+func (c *Client) UpdateFolder(ctx context.Context, folderId int64, body UpdateFolderJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateFolderRequest(c.Server, folderId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -779,6 +1545,42 @@ func (c *Client) Health(ctx context.Context, reqEditors ...RequestEditorFn) (*ht
 // Corresponds with GET /api/v1/me (the `GetMe` operationId).
 func (c *Client) GetMe(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetMeRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// ExportOpml Export feeds as OPML
+//
+// Returns all feed subscriptions and folders as an OPML XML document.
+//
+// Corresponds with GET /api/v1/opml/export (the `ExportOpml` operationId).
+func (c *Client) ExportOpml(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewExportOpmlRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// ImportOpmlWithBody Import feeds from an OPML file
+//
+// Parses an OPML XML document and subscribes the user to all feeds found. Folders are created as needed. Existing subscriptions are skipped.
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with POST /api/v1/opml/import (the `ImportOpml` operationId).
+func (c *Client) ImportOpmlWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewImportOpmlRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -853,107 +1655,6 @@ func (c *Client) DeleteToken(ctx context.Context, tokenId int64, reqEditors ...R
 	return c.Client.Do(req)
 }
 
-// NewListCategoriesRequest constructs an http.Request for the ListCategories method
-func NewListCategoriesRequest(server string) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/categories")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewCreateCategoryRequest calls the generic CreateCategory builder with application/json body
-func NewCreateCategoryRequest(server string, body CreateCategoryJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewCreateCategoryRequestWithBody(server, "application/json", bodyReader)
-}
-
-// NewCreateCategoryRequestWithBody constructs an http.Request for the CreateCategory method, with any body, and a specified content type
-func NewCreateCategoryRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/categories")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewDeleteCategoryRequest constructs an http.Request for the DeleteCategory method
-func NewDeleteCategoryRequest(server string, categoryId int64) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "categoryId", categoryId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "integer", Format: "int64"})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/categories/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(http.MethodDelete, queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
 // NewListEntriesRequest constructs an http.Request for the ListEntries method
 func NewListEntriesRequest(server string, params *ListEntriesParams) (*http.Request, error) {
 	var err error
@@ -994,9 +1695,9 @@ func NewListEntriesRequest(server string, params *ListEntriesParams) (*http.Requ
 
 		}
 
-		if params.CategoryId != nil {
+		if params.FolderId != nil {
 
-			if queryFrag, err := runtime.StyleParamWithOptions("form", false, "category_id", *params.CategoryId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: "int64"}); err != nil {
+			if queryFrag, err := runtime.StyleParamWithOptions("form", false, "folder_id", *params.FolderId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: "int64"}); err != nil {
 				return nil, err
 			} else {
 				for _, qp := range strings.Split(queryFrag, "&") {
@@ -1154,6 +1855,53 @@ func NewGetEntryRequest(server string, entryId int64) (*http.Request, error) {
 	return req, nil
 }
 
+// NewToggleEntryLikedRequest calls the generic ToggleEntryLiked builder with application/json body
+func NewToggleEntryLikedRequest(server string, entryId int64, body ToggleEntryLikedJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewToggleEntryLikedRequestWithBody(server, entryId, "application/json", bodyReader)
+}
+
+// NewToggleEntryLikedRequestWithBody constructs an http.Request for the ToggleEntryLiked method, with any body, and a specified content type
+func NewToggleEntryLikedRequestWithBody(server string, entryId int64, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "entryId", entryId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "integer", Format: "int64"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/entries/%s/liked", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPut, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewToggleEntryStarredRequest calls the generic ToggleEntryStarred builder with application/json body
 func NewToggleEntryStarredRequest(server string, entryId int64, body ToggleEntryStarredJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
@@ -1197,6 +1945,471 @@ func NewToggleEntryStarredRequestWithBody(server string, entryId int64, contentT
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewListMyFeedListsRequest constructs an http.Request for the ListMyFeedLists method
+func NewListMyFeedListsRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/feed-lists")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateFeedListRequest calls the generic CreateFeedList builder with application/json body
+func NewCreateFeedListRequest(server string, body CreateFeedListJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateFeedListRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateFeedListRequestWithBody constructs an http.Request for the CreateFeedList method, with any body, and a specified content type
+func NewCreateFeedListRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/feed-lists")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDiscoverFeedListsRequest constructs an http.Request for the DiscoverFeedLists method
+func NewDiscoverFeedListsRequest(server string, params *DiscoverFeedListsParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/feed-lists/discover")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		// queryValues collects non-styled parameters (passthrough, JSON)
+		// that are safe to round-trip through url.Values.Encode().
+		queryValues := queryURL.Query()
+		// rawQueryFragments collects pre-encoded query fragments from
+		// styled parameters, preserving literal commas as delimiters
+		// per the OpenAPI spec (e.g. "color=blue,black,brown").
+		var rawQueryFragments []string
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", false, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: "int64"}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.Offset != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", false, "offset", *params.Offset, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: "int64"}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if encoded := queryValues.Encode(); encoded != "" {
+			rawQueryFragments = append(rawQueryFragments, encoded)
+		}
+		queryURL.RawQuery = strings.Join(rawQueryFragments, "&")
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewListFollowedFeedListsRequest constructs an http.Request for the ListFollowedFeedLists method
+func NewListFollowedFeedListsRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/feed-lists/followed")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewDeleteFeedListRequest constructs an http.Request for the DeleteFeedList method
+func NewDeleteFeedListRequest(server string, listId int64) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "listId", listId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "integer", Format: "int64"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/feed-lists/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodDelete, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetFeedListRequest constructs an http.Request for the GetFeedList method
+func NewGetFeedListRequest(server string, listId int64) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "listId", listId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "integer", Format: "int64"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/feed-lists/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdateFeedListRequest calls the generic UpdateFeedList builder with application/json body
+func NewUpdateFeedListRequest(server string, listId int64, body UpdateFeedListJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateFeedListRequestWithBody(server, listId, "application/json", bodyReader)
+}
+
+// NewUpdateFeedListRequestWithBody constructs an http.Request for the UpdateFeedList method, with any body, and a specified content type
+func NewUpdateFeedListRequestWithBody(server string, listId int64, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "listId", listId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "integer", Format: "int64"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/feed-lists/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPatch, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewAddFeedListFeedRequest calls the generic AddFeedListFeed builder with application/json body
+func NewAddFeedListFeedRequest(server string, listId int64, body AddFeedListFeedJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAddFeedListFeedRequestWithBody(server, listId, "application/json", bodyReader)
+}
+
+// NewAddFeedListFeedRequestWithBody constructs an http.Request for the AddFeedListFeed method, with any body, and a specified content type
+func NewAddFeedListFeedRequestWithBody(server string, listId int64, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "listId", listId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "integer", Format: "int64"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/feed-lists/%s/feeds", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewRemoveFeedListFeedRequest constructs an http.Request for the RemoveFeedListFeed method
+func NewRemoveFeedListFeedRequest(server string, listId int64, itemId int64) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "listId", listId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "integer", Format: "int64"})
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithOptions("simple", false, "itemId", itemId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "integer", Format: "int64"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/feed-lists/%s/feeds/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodDelete, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUnfollowFeedListRequest constructs an http.Request for the UnfollowFeedList method
+func NewUnfollowFeedListRequest(server string, listId int64) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "listId", listId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "integer", Format: "int64"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/feed-lists/%s/follow", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodDelete, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewFollowFeedListRequest constructs an http.Request for the FollowFeedList method
+func NewFollowFeedListRequest(server string, listId int64) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "listId", listId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "integer", Format: "int64"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/feed-lists/%s/follow", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewImportFeedListRequest constructs an http.Request for the ImportFeedList method
+func NewImportFeedListRequest(server string, listId int64) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "listId", listId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "integer", Format: "int64"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/feed-lists/%s/import", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }
@@ -1249,6 +2462,46 @@ func NewCreateFeedRequestWithBody(server string, contentType string, body io.Rea
 	}
 
 	operationPath := fmt.Sprintf("/api/v1/feeds")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPreviewFeedRequest calls the generic PreviewFeed builder with application/json body
+func NewPreviewFeedRequest(server string, body PreviewFeedJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPreviewFeedRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPreviewFeedRequestWithBody constructs an http.Request for the PreviewFeed method, with any body, and a specified content type
+func NewPreviewFeedRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/feeds/preview")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1336,6 +2589,53 @@ func NewGetFeedRequest(server string, feedId int64) (*http.Request, error) {
 	return req, nil
 }
 
+// NewUpdateFeedRequest calls the generic UpdateFeed builder with application/json body
+func NewUpdateFeedRequest(server string, feedId int64, body UpdateFeedJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateFeedRequestWithBody(server, feedId, "application/json", bodyReader)
+}
+
+// NewUpdateFeedRequestWithBody constructs an http.Request for the UpdateFeed method, with any body, and a specified content type
+func NewUpdateFeedRequestWithBody(server string, feedId int64, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "feedId", feedId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "integer", Format: "int64"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/feeds/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPatch, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewMarkFeedReadRequest constructs an http.Request for the MarkFeedRead method
 func NewMarkFeedReadRequest(server string, feedId int64) (*http.Request, error) {
 	var err error
@@ -1366,6 +2666,188 @@ func NewMarkFeedReadRequest(server string, feedId int64) (*http.Request, error) 
 	if err != nil {
 		return nil, err
 	}
+
+	return req, nil
+}
+
+// NewRefreshFeedRequest constructs an http.Request for the RefreshFeed method
+func NewRefreshFeedRequest(server string, feedId int64) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "feedId", feedId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "integer", Format: "int64"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/feeds/%s/refresh", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewListFoldersRequest constructs an http.Request for the ListFolders method
+func NewListFoldersRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/folders")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateFolderRequest calls the generic CreateFolder builder with application/json body
+func NewCreateFolderRequest(server string, body CreateFolderJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateFolderRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateFolderRequestWithBody constructs an http.Request for the CreateFolder method, with any body, and a specified content type
+func NewCreateFolderRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/folders")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteFolderRequest constructs an http.Request for the DeleteFolder method
+func NewDeleteFolderRequest(server string, folderId int64) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "folderId", folderId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "integer", Format: "int64"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/folders/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodDelete, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdateFolderRequest calls the generic UpdateFolder builder with application/json body
+func NewUpdateFolderRequest(server string, folderId int64, body UpdateFolderJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateFolderRequestWithBody(server, folderId, "application/json", bodyReader)
+}
+
+// NewUpdateFolderRequestWithBody constructs an http.Request for the UpdateFolder method, with any body, and a specified content type
+func NewUpdateFolderRequestWithBody(server string, folderId int64, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "folderId", folderId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "integer", Format: "int64"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/folders/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPatch, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -1420,6 +2902,62 @@ func NewGetMeRequest(server string) (*http.Request, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	return req, nil
+}
+
+// NewExportOpmlRequest constructs an http.Request for the ExportOpml method
+func NewExportOpmlRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/opml/export")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewImportOpmlRequestWithBody constructs an http.Request for the ImportOpml method, with any body, and a specified content type
+func NewImportOpmlRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/opml/import")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -1569,34 +3107,6 @@ func WithBaseURL(baseURL string) ClientOption {
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
 
-	// ListCategoriesWithResponse List categories
-	//
-	// Returns a wrapper object for the known response body format(s).
-	//
-	// Corresponds with GET /api/v1/categories (the `ListCategories` operationId).
-	ListCategoriesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListCategoriesResp, error)
-
-	// CreateCategoryWithBodyWithResponse Create a category
-	//
-	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
-	//
-	// Corresponds with POST /api/v1/categories (the `CreateCategory` operationId).
-	CreateCategoryWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateCategoryResp, error)
-
-	// CreateCategoryWithResponse Create a category
-	//
-	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
-	//
-	// Corresponds with POST /api/v1/categories (the `CreateCategory` operationId).
-	CreateCategoryWithResponse(ctx context.Context, body CreateCategoryJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateCategoryResp, error)
-
-	// DeleteCategoryWithResponse Delete a category
-	//
-	// Returns a wrapper object for the known response body format(s).
-	//
-	// Corresponds with DELETE /api/v1/categories/{categoryId} (the `DeleteCategory` operationId).
-	DeleteCategoryWithResponse(ctx context.Context, categoryId int64, reqEditors ...RequestEditorFn) (*DeleteCategoryResp, error)
-
 	// ListEntriesWithResponse List entries
 	//
 	// Returns a wrapper object for the known response body format(s).
@@ -1625,6 +3135,20 @@ type ClientWithResponsesInterface interface {
 	// Corresponds with GET /api/v1/entries/{entryId} (the `GetEntry` operationId).
 	GetEntryWithResponse(ctx context.Context, entryId int64, reqEditors ...RequestEditorFn) (*GetEntryResp, error)
 
+	// ToggleEntryLikedWithBodyWithResponse Toggle liked on an entry
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with PUT /api/v1/entries/{entryId}/liked (the `ToggleEntryLiked` operationId).
+	ToggleEntryLikedWithBodyWithResponse(ctx context.Context, entryId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ToggleEntryLikedResp, error)
+
+	// ToggleEntryLikedWithResponse Toggle liked on an entry
+	//
+	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with PUT /api/v1/entries/{entryId}/liked (the `ToggleEntryLiked` operationId).
+	ToggleEntryLikedWithResponse(ctx context.Context, entryId int64, body ToggleEntryLikedJSONRequestBody, reqEditors ...RequestEditorFn) (*ToggleEntryLikedResp, error)
+
 	// ToggleEntryStarredWithBodyWithResponse Toggle starred on an entry
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
@@ -1638,6 +3162,111 @@ type ClientWithResponsesInterface interface {
 	//
 	// Corresponds with PUT /api/v1/entries/{entryId}/starred (the `ToggleEntryStarred` operationId).
 	ToggleEntryStarredWithResponse(ctx context.Context, entryId int64, body ToggleEntryStarredJSONRequestBody, reqEditors ...RequestEditorFn) (*ToggleEntryStarredResp, error)
+
+	// ListMyFeedListsWithResponse List my feed lists
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /api/v1/feed-lists (the `ListMyFeedLists` operationId).
+	ListMyFeedListsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListMyFeedListsResp, error)
+
+	// CreateFeedListWithBodyWithResponse Create a feed list
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v1/feed-lists (the `CreateFeedList` operationId).
+	CreateFeedListWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateFeedListResp, error)
+
+	// CreateFeedListWithResponse Create a feed list
+	//
+	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v1/feed-lists (the `CreateFeedList` operationId).
+	CreateFeedListWithResponse(ctx context.Context, body CreateFeedListJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateFeedListResp, error)
+
+	// DiscoverFeedListsWithResponse Discover public feed lists
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /api/v1/feed-lists/discover (the `DiscoverFeedLists` operationId).
+	DiscoverFeedListsWithResponse(ctx context.Context, params *DiscoverFeedListsParams, reqEditors ...RequestEditorFn) (*DiscoverFeedListsResp, error)
+
+	// ListFollowedFeedListsWithResponse List feed lists I follow
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /api/v1/feed-lists/followed (the `ListFollowedFeedLists` operationId).
+	ListFollowedFeedListsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListFollowedFeedListsResp, error)
+
+	// DeleteFeedListWithResponse Delete a feed list
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with DELETE /api/v1/feed-lists/{listId} (the `DeleteFeedList` operationId).
+	DeleteFeedListWithResponse(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*DeleteFeedListResp, error)
+
+	// GetFeedListWithResponse Get a feed list
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /api/v1/feed-lists/{listId} (the `GetFeedList` operationId).
+	GetFeedListWithResponse(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*GetFeedListResp, error)
+
+	// UpdateFeedListWithBodyWithResponse Update a feed list
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with PATCH /api/v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
+	UpdateFeedListWithBodyWithResponse(ctx context.Context, listId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateFeedListResp, error)
+
+	// UpdateFeedListWithResponse Update a feed list
+	//
+	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with PATCH /api/v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
+	UpdateFeedListWithResponse(ctx context.Context, listId int64, body UpdateFeedListJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateFeedListResp, error)
+
+	// AddFeedListFeedWithBodyWithResponse Add a feed to a feed list
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
+	AddFeedListFeedWithBodyWithResponse(ctx context.Context, listId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddFeedListFeedResp, error)
+
+	// AddFeedListFeedWithResponse Add a feed to a feed list
+	//
+	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
+	AddFeedListFeedWithResponse(ctx context.Context, listId int64, body AddFeedListFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*AddFeedListFeedResp, error)
+
+	// RemoveFeedListFeedWithResponse Remove a feed from a feed list
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with DELETE /api/v1/feed-lists/{listId}/feeds/{itemId} (the `RemoveFeedListFeed` operationId).
+	RemoveFeedListFeedWithResponse(ctx context.Context, listId int64, itemId int64, reqEditors ...RequestEditorFn) (*RemoveFeedListFeedResp, error)
+
+	// UnfollowFeedListWithResponse Unfollow a feed list
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with DELETE /api/v1/feed-lists/{listId}/follow (the `UnfollowFeedList` operationId).
+	UnfollowFeedListWithResponse(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*UnfollowFeedListResp, error)
+
+	// FollowFeedListWithResponse Follow a feed list
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v1/feed-lists/{listId}/follow (the `FollowFeedList` operationId).
+	FollowFeedListWithResponse(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*FollowFeedListResp, error)
+
+	// ImportFeedListWithResponse Subscribe to all feeds in a feed list
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v1/feed-lists/{listId}/import (the `ImportFeedList` operationId).
+	ImportFeedListWithResponse(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*ImportFeedListResp, error)
 
 	// ListFeedsWithResponse List feeds
 	//
@@ -1660,6 +3289,24 @@ type ClientWithResponsesInterface interface {
 	// Corresponds with POST /api/v1/feeds (the `CreateFeed` operationId).
 	CreateFeedWithResponse(ctx context.Context, body CreateFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateFeedResp, error)
 
+	// PreviewFeedWithBodyWithResponse Preview a feed without subscribing
+	//
+	// Fetches and parses a feed URL, returning feed metadata and recent entries without persisting anything.
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v1/feeds/preview (the `PreviewFeed` operationId).
+	PreviewFeedWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PreviewFeedResp, error)
+
+	// PreviewFeedWithResponse Preview a feed without subscribing
+	//
+	// Fetches and parses a feed URL, returning feed metadata and recent entries without persisting anything.
+	//
+	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v1/feeds/preview (the `PreviewFeed` operationId).
+	PreviewFeedWithResponse(ctx context.Context, body PreviewFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*PreviewFeedResp, error)
+
 	// DeleteFeedWithResponse Delete a feed
 	//
 	// Returns a wrapper object for the known response body format(s).
@@ -1674,12 +3321,85 @@ type ClientWithResponsesInterface interface {
 	// Corresponds with GET /api/v1/feeds/{feedId} (the `GetFeed` operationId).
 	GetFeedWithResponse(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*GetFeedResp, error)
 
+	// UpdateFeedWithBodyWithResponse Update a feed
+	//
+	// Update the folder assignment and/or title of a feed.
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with PATCH /api/v1/feeds/{feedId} (the `UpdateFeed` operationId).
+	UpdateFeedWithBodyWithResponse(ctx context.Context, feedId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateFeedResp, error)
+
+	// UpdateFeedWithResponse Update a feed
+	//
+	// Update the folder assignment and/or title of a feed.
+	//
+	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with PATCH /api/v1/feeds/{feedId} (the `UpdateFeed` operationId).
+	UpdateFeedWithResponse(ctx context.Context, feedId int64, body UpdateFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateFeedResp, error)
+
 	// MarkFeedReadWithResponse Mark all entries in a feed as read
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
 	// Corresponds with POST /api/v1/feeds/{feedId}/mark-all-read (the `MarkFeedRead` operationId).
 	MarkFeedReadWithResponse(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*MarkFeedReadResp, error)
+
+	// RefreshFeedWithResponse Refresh a feed
+	//
+	// Manually fetch and parse the feed, inserting any new entries. Use this to get the latest articles without waiting for the scheduler.
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v1/feeds/{feedId}/refresh (the `RefreshFeed` operationId).
+	RefreshFeedWithResponse(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*RefreshFeedResp, error)
+
+	// ListFoldersWithResponse List folders
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /api/v1/folders (the `ListFolders` operationId).
+	ListFoldersWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListFoldersResp, error)
+
+	// CreateFolderWithBodyWithResponse Create a folder
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v1/folders (the `CreateFolder` operationId).
+	CreateFolderWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateFolderResp, error)
+
+	// CreateFolderWithResponse Create a folder
+	//
+	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v1/folders (the `CreateFolder` operationId).
+	CreateFolderWithResponse(ctx context.Context, body CreateFolderJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateFolderResp, error)
+
+	// DeleteFolderWithResponse Delete a folder
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with DELETE /api/v1/folders/{folderId} (the `DeleteFolder` operationId).
+	DeleteFolderWithResponse(ctx context.Context, folderId int64, reqEditors ...RequestEditorFn) (*DeleteFolderResp, error)
+
+	// UpdateFolderWithBodyWithResponse Update a folder
+	//
+	// Update the title and/or parent folder of a folder. Set parent_id to move or nest the folder.
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with PATCH /api/v1/folders/{folderId} (the `UpdateFolder` operationId).
+	UpdateFolderWithBodyWithResponse(ctx context.Context, folderId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateFolderResp, error)
+
+	// UpdateFolderWithResponse Update a folder
+	//
+	// Update the title and/or parent folder of a folder. Set parent_id to move or nest the folder.
+	//
+	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with PATCH /api/v1/folders/{folderId} (the `UpdateFolder` operationId).
+	UpdateFolderWithResponse(ctx context.Context, folderId int64, body UpdateFolderJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateFolderResp, error)
 
 	// HealthWithResponse Health check
 	//
@@ -1694,6 +3414,24 @@ type ClientWithResponsesInterface interface {
 	//
 	// Corresponds with GET /api/v1/me (the `GetMe` operationId).
 	GetMeWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetMeResp, error)
+
+	// ExportOpmlWithResponse Export feeds as OPML
+	//
+	// Returns all feed subscriptions and folders as an OPML XML document.
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /api/v1/opml/export (the `ExportOpml` operationId).
+	ExportOpmlWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ExportOpmlResp, error)
+
+	// ImportOpmlWithBodyWithResponse Import feeds from an OPML file
+	//
+	// Parses an OPML XML document and subscribes the user to all feeds found. Folders are created as needed. Existing subscriptions are skipped.
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v1/opml/import (the `ImportOpml` operationId).
+	ImportOpmlWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ImportOpmlResp, error)
 
 	// ListTokensWithResponse List API tokens
 	//
@@ -1722,143 +3460,6 @@ type ClientWithResponsesInterface interface {
 	//
 	// Corresponds with DELETE /api/v1/tokens/{tokenId} (the `DeleteToken` operationId).
 	DeleteTokenWithResponse(ctx context.Context, tokenId int64, reqEditors ...RequestEditorFn) (*DeleteTokenResp, error)
-}
-
-type ListCategoriesResp struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	// JSON200 the response for an HTTP 200 `application/json` response
-	JSON200 *[]Category
-	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
-	ApplicationproblemJSONDefault *ErrorModel
-}
-
-// GetJSON200 returns the response for an HTTP 200 `application/json` response
-func (r ListCategoriesResp) GetJSON200() *[]Category {
-	return r.JSON200
-}
-
-// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
-func (r ListCategoriesResp) GetApplicationproblemJSONDefault() *ErrorModel {
-	return r.ApplicationproblemJSONDefault
-}
-
-// GetBody returns the raw response body bytes
-func (r ListCategoriesResp) GetBody() []byte {
-	return r.Body
-}
-
-// Status returns HTTPResponse.Status
-func (r ListCategoriesResp) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ListCategoriesResp) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r ListCategoriesResp) ContentType() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Header.Get("Content-Type")
-	}
-	return ""
-}
-
-type CreateCategoryResp struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	// JSON200 the response for an HTTP 200 `application/json` response
-	JSON200 *Category
-	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
-	ApplicationproblemJSONDefault *ErrorModel
-}
-
-// GetJSON200 returns the response for an HTTP 200 `application/json` response
-func (r CreateCategoryResp) GetJSON200() *Category {
-	return r.JSON200
-}
-
-// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
-func (r CreateCategoryResp) GetApplicationproblemJSONDefault() *ErrorModel {
-	return r.ApplicationproblemJSONDefault
-}
-
-// GetBody returns the raw response body bytes
-func (r CreateCategoryResp) GetBody() []byte {
-	return r.Body
-}
-
-// Status returns HTTPResponse.Status
-func (r CreateCategoryResp) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r CreateCategoryResp) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r CreateCategoryResp) ContentType() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Header.Get("Content-Type")
-	}
-	return ""
-}
-
-type DeleteCategoryResp struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
-	ApplicationproblemJSONDefault *ErrorModel
-}
-
-// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
-func (r DeleteCategoryResp) GetApplicationproblemJSONDefault() *ErrorModel {
-	return r.ApplicationproblemJSONDefault
-}
-
-// GetBody returns the raw response body bytes
-func (r DeleteCategoryResp) GetBody() []byte {
-	return r.Body
-}
-
-// Status returns HTTPResponse.Status
-func (r DeleteCategoryResp) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r DeleteCategoryResp) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r DeleteCategoryResp) ContentType() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Header.Get("Content-Type")
-	}
-	return ""
 }
 
 type ListEntriesResp struct {
@@ -1998,6 +3599,47 @@ func (r GetEntryResp) ContentType() string {
 	return ""
 }
 
+type ToggleEntryLikedResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r ToggleEntryLikedResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r ToggleEntryLikedResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r ToggleEntryLikedResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ToggleEntryLikedResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r ToggleEntryLikedResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
 type ToggleEntryStarredResp struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -2033,6 +3675,554 @@ func (r ToggleEntryStarredResp) StatusCode() int {
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
 func (r ToggleEntryStarredResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type ListMyFeedListsResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *[]FeedList
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r ListMyFeedListsResp) GetJSON200() *[]FeedList {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r ListMyFeedListsResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r ListMyFeedListsResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r ListMyFeedListsResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListMyFeedListsResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r ListMyFeedListsResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type CreateFeedListResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *FeedList
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r CreateFeedListResp) GetJSON200() *FeedList {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r CreateFeedListResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r CreateFeedListResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateFeedListResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateFeedListResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r CreateFeedListResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type DiscoverFeedListsResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *[]FeedList
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r DiscoverFeedListsResp) GetJSON200() *[]FeedList {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r DiscoverFeedListsResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r DiscoverFeedListsResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r DiscoverFeedListsResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DiscoverFeedListsResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r DiscoverFeedListsResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type ListFollowedFeedListsResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *[]FeedList
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r ListFollowedFeedListsResp) GetJSON200() *[]FeedList {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r ListFollowedFeedListsResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r ListFollowedFeedListsResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r ListFollowedFeedListsResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListFollowedFeedListsResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r ListFollowedFeedListsResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type DeleteFeedListResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r DeleteFeedListResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r DeleteFeedListResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteFeedListResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteFeedListResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r DeleteFeedListResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type GetFeedListResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *FeedList
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r GetFeedListResp) GetJSON200() *FeedList {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r GetFeedListResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r GetFeedListResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r GetFeedListResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetFeedListResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r GetFeedListResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type UpdateFeedListResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *FeedList
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r UpdateFeedListResp) GetJSON200() *FeedList {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r UpdateFeedListResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r UpdateFeedListResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateFeedListResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateFeedListResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r UpdateFeedListResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type AddFeedListFeedResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *FeedListFeed
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r AddFeedListFeedResp) GetJSON200() *FeedListFeed {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r AddFeedListFeedResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r AddFeedListFeedResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r AddFeedListFeedResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AddFeedListFeedResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r AddFeedListFeedResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type RemoveFeedListFeedResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r RemoveFeedListFeedResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r RemoveFeedListFeedResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r RemoveFeedListFeedResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RemoveFeedListFeedResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r RemoveFeedListFeedResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type UnfollowFeedListResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r UnfollowFeedListResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r UnfollowFeedListResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r UnfollowFeedListResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UnfollowFeedListResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r UnfollowFeedListResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type FollowFeedListResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r FollowFeedListResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r FollowFeedListResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r FollowFeedListResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r FollowFeedListResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r FollowFeedListResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type ImportFeedListResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *ImportFeedListResponse
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r ImportFeedListResp) GetJSON200() *ImportFeedListResponse {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r ImportFeedListResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r ImportFeedListResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r ImportFeedListResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ImportFeedListResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r ImportFeedListResp) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
@@ -2135,6 +4325,54 @@ func (r CreateFeedResp) ContentType() string {
 	return ""
 }
 
+type PreviewFeedResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *PreviewFeedBody
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r PreviewFeedResp) GetJSON200() *PreviewFeedBody {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r PreviewFeedResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r PreviewFeedResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r PreviewFeedResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PreviewFeedResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r PreviewFeedResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
 type DeleteFeedResp struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -2224,6 +4462,54 @@ func (r GetFeedResp) ContentType() string {
 	return ""
 }
 
+type UpdateFeedResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *Feed
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r UpdateFeedResp) GetJSON200() *Feed {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r UpdateFeedResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r UpdateFeedResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateFeedResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateFeedResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r UpdateFeedResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
 type MarkFeedReadResp struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -2259,6 +4545,239 @@ func (r MarkFeedReadResp) StatusCode() int {
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
 func (r MarkFeedReadResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type RefreshFeedResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *Feed
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r RefreshFeedResp) GetJSON200() *Feed {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r RefreshFeedResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r RefreshFeedResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r RefreshFeedResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RefreshFeedResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r RefreshFeedResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type ListFoldersResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *[]Folder
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r ListFoldersResp) GetJSON200() *[]Folder {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r ListFoldersResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r ListFoldersResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r ListFoldersResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListFoldersResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r ListFoldersResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type CreateFolderResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *Folder
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r CreateFolderResp) GetJSON200() *Folder {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r CreateFolderResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r CreateFolderResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateFolderResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateFolderResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r CreateFolderResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type DeleteFolderResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r DeleteFolderResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r DeleteFolderResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteFolderResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteFolderResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r DeleteFolderResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type UpdateFolderResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *Folder
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r UpdateFolderResp) GetJSON200() *Folder {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r UpdateFolderResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r UpdateFolderResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateFolderResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateFolderResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r UpdateFolderResp) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
@@ -2355,6 +4874,102 @@ func (r GetMeResp) StatusCode() int {
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
 func (r GetMeResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type ExportOpmlResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *[]byte
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r ExportOpmlResp) GetJSON200() *[]byte {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r ExportOpmlResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r ExportOpmlResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r ExportOpmlResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ExportOpmlResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r ExportOpmlResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type ImportOpmlResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *OPMLImportResultBody
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r ImportOpmlResp) GetJSON200() *OPMLImportResultBody {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r ImportOpmlResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r ImportOpmlResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r ImportOpmlResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ImportOpmlResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r ImportOpmlResp) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
@@ -2498,58 +5113,6 @@ func (r DeleteTokenResp) ContentType() string {
 	return ""
 }
 
-// ListCategoriesWithResponse List categories
-//
-// Returns a wrapper object for the known response body format(s).
-//
-// Corresponds with GET /api/v1/categories (the `ListCategories` operationId).
-func (c *ClientWithResponses) ListCategoriesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListCategoriesResp, error) {
-	rsp, err := c.ListCategories(ctx, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseListCategoriesResp(rsp)
-}
-
-// CreateCategoryWithBodyWithResponse Create a category
-//
-// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
-//
-// Corresponds with POST /api/v1/categories (the `CreateCategory` operationId).
-func (c *ClientWithResponses) CreateCategoryWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateCategoryResp, error) {
-	rsp, err := c.CreateCategoryWithBody(ctx, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseCreateCategoryResp(rsp)
-}
-
-// CreateCategoryWithResponse Create a category
-//
-// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
-//
-// Corresponds with POST /api/v1/categories (the `CreateCategory` operationId).
-func (c *ClientWithResponses) CreateCategoryWithResponse(ctx context.Context, body CreateCategoryJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateCategoryResp, error) {
-	rsp, err := c.CreateCategory(ctx, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseCreateCategoryResp(rsp)
-}
-
-// DeleteCategoryWithResponse Delete a category
-//
-// Returns a wrapper object for the known response body format(s).
-//
-// Corresponds with DELETE /api/v1/categories/{categoryId} (the `DeleteCategory` operationId).
-func (c *ClientWithResponses) DeleteCategoryWithResponse(ctx context.Context, categoryId int64, reqEditors ...RequestEditorFn) (*DeleteCategoryResp, error) {
-	rsp, err := c.DeleteCategory(ctx, categoryId, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseDeleteCategoryResp(rsp)
-}
-
 // ListEntriesWithResponse List entries
 //
 // Returns a wrapper object for the known response body format(s).
@@ -2602,6 +5165,32 @@ func (c *ClientWithResponses) GetEntryWithResponse(ctx context.Context, entryId 
 	return ParseGetEntryResp(rsp)
 }
 
+// ToggleEntryLikedWithBodyWithResponse Toggle liked on an entry
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with PUT /api/v1/entries/{entryId}/liked (the `ToggleEntryLiked` operationId).
+func (c *ClientWithResponses) ToggleEntryLikedWithBodyWithResponse(ctx context.Context, entryId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ToggleEntryLikedResp, error) {
+	rsp, err := c.ToggleEntryLikedWithBody(ctx, entryId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseToggleEntryLikedResp(rsp)
+}
+
+// ToggleEntryLikedWithResponse Toggle liked on an entry
+//
+// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with PUT /api/v1/entries/{entryId}/liked (the `ToggleEntryLiked` operationId).
+func (c *ClientWithResponses) ToggleEntryLikedWithResponse(ctx context.Context, entryId int64, body ToggleEntryLikedJSONRequestBody, reqEditors ...RequestEditorFn) (*ToggleEntryLikedResp, error) {
+	rsp, err := c.ToggleEntryLiked(ctx, entryId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseToggleEntryLikedResp(rsp)
+}
+
 // ToggleEntryStarredWithBodyWithResponse Toggle starred on an entry
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
@@ -2626,6 +5215,201 @@ func (c *ClientWithResponses) ToggleEntryStarredWithResponse(ctx context.Context
 		return nil, err
 	}
 	return ParseToggleEntryStarredResp(rsp)
+}
+
+// ListMyFeedListsWithResponse List my feed lists
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /api/v1/feed-lists (the `ListMyFeedLists` operationId).
+func (c *ClientWithResponses) ListMyFeedListsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListMyFeedListsResp, error) {
+	rsp, err := c.ListMyFeedLists(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListMyFeedListsResp(rsp)
+}
+
+// CreateFeedListWithBodyWithResponse Create a feed list
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v1/feed-lists (the `CreateFeedList` operationId).
+func (c *ClientWithResponses) CreateFeedListWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateFeedListResp, error) {
+	rsp, err := c.CreateFeedListWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateFeedListResp(rsp)
+}
+
+// CreateFeedListWithResponse Create a feed list
+//
+// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v1/feed-lists (the `CreateFeedList` operationId).
+func (c *ClientWithResponses) CreateFeedListWithResponse(ctx context.Context, body CreateFeedListJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateFeedListResp, error) {
+	rsp, err := c.CreateFeedList(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateFeedListResp(rsp)
+}
+
+// DiscoverFeedListsWithResponse Discover public feed lists
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /api/v1/feed-lists/discover (the `DiscoverFeedLists` operationId).
+func (c *ClientWithResponses) DiscoverFeedListsWithResponse(ctx context.Context, params *DiscoverFeedListsParams, reqEditors ...RequestEditorFn) (*DiscoverFeedListsResp, error) {
+	rsp, err := c.DiscoverFeedLists(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDiscoverFeedListsResp(rsp)
+}
+
+// ListFollowedFeedListsWithResponse List feed lists I follow
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /api/v1/feed-lists/followed (the `ListFollowedFeedLists` operationId).
+func (c *ClientWithResponses) ListFollowedFeedListsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListFollowedFeedListsResp, error) {
+	rsp, err := c.ListFollowedFeedLists(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListFollowedFeedListsResp(rsp)
+}
+
+// DeleteFeedListWithResponse Delete a feed list
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with DELETE /api/v1/feed-lists/{listId} (the `DeleteFeedList` operationId).
+func (c *ClientWithResponses) DeleteFeedListWithResponse(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*DeleteFeedListResp, error) {
+	rsp, err := c.DeleteFeedList(ctx, listId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteFeedListResp(rsp)
+}
+
+// GetFeedListWithResponse Get a feed list
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /api/v1/feed-lists/{listId} (the `GetFeedList` operationId).
+func (c *ClientWithResponses) GetFeedListWithResponse(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*GetFeedListResp, error) {
+	rsp, err := c.GetFeedList(ctx, listId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetFeedListResp(rsp)
+}
+
+// UpdateFeedListWithBodyWithResponse Update a feed list
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with PATCH /api/v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
+func (c *ClientWithResponses) UpdateFeedListWithBodyWithResponse(ctx context.Context, listId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateFeedListResp, error) {
+	rsp, err := c.UpdateFeedListWithBody(ctx, listId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateFeedListResp(rsp)
+}
+
+// UpdateFeedListWithResponse Update a feed list
+//
+// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with PATCH /api/v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
+func (c *ClientWithResponses) UpdateFeedListWithResponse(ctx context.Context, listId int64, body UpdateFeedListJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateFeedListResp, error) {
+	rsp, err := c.UpdateFeedList(ctx, listId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateFeedListResp(rsp)
+}
+
+// AddFeedListFeedWithBodyWithResponse Add a feed to a feed list
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
+func (c *ClientWithResponses) AddFeedListFeedWithBodyWithResponse(ctx context.Context, listId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddFeedListFeedResp, error) {
+	rsp, err := c.AddFeedListFeedWithBody(ctx, listId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAddFeedListFeedResp(rsp)
+}
+
+// AddFeedListFeedWithResponse Add a feed to a feed list
+//
+// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
+func (c *ClientWithResponses) AddFeedListFeedWithResponse(ctx context.Context, listId int64, body AddFeedListFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*AddFeedListFeedResp, error) {
+	rsp, err := c.AddFeedListFeed(ctx, listId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAddFeedListFeedResp(rsp)
+}
+
+// RemoveFeedListFeedWithResponse Remove a feed from a feed list
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with DELETE /api/v1/feed-lists/{listId}/feeds/{itemId} (the `RemoveFeedListFeed` operationId).
+func (c *ClientWithResponses) RemoveFeedListFeedWithResponse(ctx context.Context, listId int64, itemId int64, reqEditors ...RequestEditorFn) (*RemoveFeedListFeedResp, error) {
+	rsp, err := c.RemoveFeedListFeed(ctx, listId, itemId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRemoveFeedListFeedResp(rsp)
+}
+
+// UnfollowFeedListWithResponse Unfollow a feed list
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with DELETE /api/v1/feed-lists/{listId}/follow (the `UnfollowFeedList` operationId).
+func (c *ClientWithResponses) UnfollowFeedListWithResponse(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*UnfollowFeedListResp, error) {
+	rsp, err := c.UnfollowFeedList(ctx, listId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUnfollowFeedListResp(rsp)
+}
+
+// FollowFeedListWithResponse Follow a feed list
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v1/feed-lists/{listId}/follow (the `FollowFeedList` operationId).
+func (c *ClientWithResponses) FollowFeedListWithResponse(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*FollowFeedListResp, error) {
+	rsp, err := c.FollowFeedList(ctx, listId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseFollowFeedListResp(rsp)
+}
+
+// ImportFeedListWithResponse Subscribe to all feeds in a feed list
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v1/feed-lists/{listId}/import (the `ImportFeedList` operationId).
+func (c *ClientWithResponses) ImportFeedListWithResponse(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*ImportFeedListResp, error) {
+	rsp, err := c.ImportFeedList(ctx, listId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseImportFeedListResp(rsp)
 }
 
 // ListFeedsWithResponse List feeds
@@ -2667,6 +5451,36 @@ func (c *ClientWithResponses) CreateFeedWithResponse(ctx context.Context, body C
 	return ParseCreateFeedResp(rsp)
 }
 
+// PreviewFeedWithBodyWithResponse Preview a feed without subscribing
+//
+// Fetches and parses a feed URL, returning feed metadata and recent entries without persisting anything.
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v1/feeds/preview (the `PreviewFeed` operationId).
+func (c *ClientWithResponses) PreviewFeedWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PreviewFeedResp, error) {
+	rsp, err := c.PreviewFeedWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePreviewFeedResp(rsp)
+}
+
+// PreviewFeedWithResponse Preview a feed without subscribing
+//
+// Fetches and parses a feed URL, returning feed metadata and recent entries without persisting anything.
+//
+// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v1/feeds/preview (the `PreviewFeed` operationId).
+func (c *ClientWithResponses) PreviewFeedWithResponse(ctx context.Context, body PreviewFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*PreviewFeedResp, error) {
+	rsp, err := c.PreviewFeed(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePreviewFeedResp(rsp)
+}
+
 // DeleteFeedWithResponse Delete a feed
 //
 // Returns a wrapper object for the known response body format(s).
@@ -2693,6 +5507,36 @@ func (c *ClientWithResponses) GetFeedWithResponse(ctx context.Context, feedId in
 	return ParseGetFeedResp(rsp)
 }
 
+// UpdateFeedWithBodyWithResponse Update a feed
+//
+// Update the folder assignment and/or title of a feed.
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with PATCH /api/v1/feeds/{feedId} (the `UpdateFeed` operationId).
+func (c *ClientWithResponses) UpdateFeedWithBodyWithResponse(ctx context.Context, feedId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateFeedResp, error) {
+	rsp, err := c.UpdateFeedWithBody(ctx, feedId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateFeedResp(rsp)
+}
+
+// UpdateFeedWithResponse Update a feed
+//
+// Update the folder assignment and/or title of a feed.
+//
+// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with PATCH /api/v1/feeds/{feedId} (the `UpdateFeed` operationId).
+func (c *ClientWithResponses) UpdateFeedWithResponse(ctx context.Context, feedId int64, body UpdateFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateFeedResp, error) {
+	rsp, err := c.UpdateFeed(ctx, feedId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateFeedResp(rsp)
+}
+
 // MarkFeedReadWithResponse Mark all entries in a feed as read
 //
 // Returns a wrapper object for the known response body format(s).
@@ -2704,6 +5548,103 @@ func (c *ClientWithResponses) MarkFeedReadWithResponse(ctx context.Context, feed
 		return nil, err
 	}
 	return ParseMarkFeedReadResp(rsp)
+}
+
+// RefreshFeedWithResponse Refresh a feed
+//
+// Manually fetch and parse the feed, inserting any new entries. Use this to get the latest articles without waiting for the scheduler.
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v1/feeds/{feedId}/refresh (the `RefreshFeed` operationId).
+func (c *ClientWithResponses) RefreshFeedWithResponse(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*RefreshFeedResp, error) {
+	rsp, err := c.RefreshFeed(ctx, feedId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRefreshFeedResp(rsp)
+}
+
+// ListFoldersWithResponse List folders
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /api/v1/folders (the `ListFolders` operationId).
+func (c *ClientWithResponses) ListFoldersWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListFoldersResp, error) {
+	rsp, err := c.ListFolders(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListFoldersResp(rsp)
+}
+
+// CreateFolderWithBodyWithResponse Create a folder
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v1/folders (the `CreateFolder` operationId).
+func (c *ClientWithResponses) CreateFolderWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateFolderResp, error) {
+	rsp, err := c.CreateFolderWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateFolderResp(rsp)
+}
+
+// CreateFolderWithResponse Create a folder
+//
+// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v1/folders (the `CreateFolder` operationId).
+func (c *ClientWithResponses) CreateFolderWithResponse(ctx context.Context, body CreateFolderJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateFolderResp, error) {
+	rsp, err := c.CreateFolder(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateFolderResp(rsp)
+}
+
+// DeleteFolderWithResponse Delete a folder
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with DELETE /api/v1/folders/{folderId} (the `DeleteFolder` operationId).
+func (c *ClientWithResponses) DeleteFolderWithResponse(ctx context.Context, folderId int64, reqEditors ...RequestEditorFn) (*DeleteFolderResp, error) {
+	rsp, err := c.DeleteFolder(ctx, folderId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteFolderResp(rsp)
+}
+
+// UpdateFolderWithBodyWithResponse Update a folder
+//
+// Update the title and/or parent folder of a folder. Set parent_id to move or nest the folder.
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with PATCH /api/v1/folders/{folderId} (the `UpdateFolder` operationId).
+func (c *ClientWithResponses) UpdateFolderWithBodyWithResponse(ctx context.Context, folderId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateFolderResp, error) {
+	rsp, err := c.UpdateFolderWithBody(ctx, folderId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateFolderResp(rsp)
+}
+
+// UpdateFolderWithResponse Update a folder
+//
+// Update the title and/or parent folder of a folder. Set parent_id to move or nest the folder.
+//
+// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with PATCH /api/v1/folders/{folderId} (the `UpdateFolder` operationId).
+func (c *ClientWithResponses) UpdateFolderWithResponse(ctx context.Context, folderId int64, body UpdateFolderJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateFolderResp, error) {
+	rsp, err := c.UpdateFolder(ctx, folderId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateFolderResp(rsp)
 }
 
 // HealthWithResponse Health check
@@ -2730,6 +5671,36 @@ func (c *ClientWithResponses) GetMeWithResponse(ctx context.Context, reqEditors 
 		return nil, err
 	}
 	return ParseGetMeResp(rsp)
+}
+
+// ExportOpmlWithResponse Export feeds as OPML
+//
+// Returns all feed subscriptions and folders as an OPML XML document.
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /api/v1/opml/export (the `ExportOpml` operationId).
+func (c *ClientWithResponses) ExportOpmlWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ExportOpmlResp, error) {
+	rsp, err := c.ExportOpml(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseExportOpmlResp(rsp)
+}
+
+// ImportOpmlWithBodyWithResponse Import feeds from an OPML file
+//
+// Parses an OPML XML document and subscribes the user to all feeds found. Folders are created as needed. Existing subscriptions are skipped.
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v1/opml/import (the `ImportOpml` operationId).
+func (c *ClientWithResponses) ImportOpmlWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ImportOpmlResp, error) {
+	rsp, err := c.ImportOpmlWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseImportOpmlResp(rsp)
 }
 
 // ListTokensWithResponse List API tokens
@@ -2782,101 +5753,6 @@ func (c *ClientWithResponses) DeleteTokenWithResponse(ctx context.Context, token
 		return nil, err
 	}
 	return ParseDeleteTokenResp(rsp)
-}
-
-// ParseListCategoriesResp parses an HTTP response from a ListCategoriesWithResponse call
-func ParseListCategoriesResp(rsp *http.Response) (*ListCategoriesResp, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ListCategoriesResp{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest []Category
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest ErrorModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseCreateCategoryResp parses an HTTP response from a CreateCategoryWithResponse call
-func ParseCreateCategoryResp(rsp *http.Response) (*CreateCategoryResp, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &CreateCategoryResp{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest Category
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest ErrorModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseDeleteCategoryResp parses an HTTP response from a DeleteCategoryWithResponse call
-func ParseDeleteCategoryResp(rsp *http.Response) (*DeleteCategoryResp, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &DeleteCategoryResp{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case rsp.StatusCode == 204:
-		break // No content-type
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest ErrorModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSONDefault = &dest
-
-	}
-
-	return response, nil
 }
 
 // ParseListEntriesResp parses an HTTP response from a ListEntriesWithResponse call
@@ -2974,6 +5850,35 @@ func ParseGetEntryResp(rsp *http.Response) (*GetEntryResp, error) {
 	return response, nil
 }
 
+// ParseToggleEntryLikedResp parses an HTTP response from a ToggleEntryLikedWithResponse call
+func ParseToggleEntryLikedResp(rsp *http.Response) (*ToggleEntryLikedResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ToggleEntryLikedResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case rsp.StatusCode == 204:
+		break // No content-type
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseToggleEntryStarredResp parses an HTTP response from a ToggleEntryStarredWithResponse call
 func ParseToggleEntryStarredResp(rsp *http.Response) (*ToggleEntryStarredResp, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -2990,6 +5895,386 @@ func ParseToggleEntryStarredResp(rsp *http.Response) (*ToggleEntryStarredResp, e
 	switch {
 	case rsp.StatusCode == 204:
 		break // No content-type
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListMyFeedListsResp parses an HTTP response from a ListMyFeedListsWithResponse call
+func ParseListMyFeedListsResp(rsp *http.Response) (*ListMyFeedListsResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListMyFeedListsResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []FeedList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateFeedListResp parses an HTTP response from a CreateFeedListWithResponse call
+func ParseCreateFeedListResp(rsp *http.Response) (*CreateFeedListResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateFeedListResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest FeedList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDiscoverFeedListsResp parses an HTTP response from a DiscoverFeedListsWithResponse call
+func ParseDiscoverFeedListsResp(rsp *http.Response) (*DiscoverFeedListsResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DiscoverFeedListsResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []FeedList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListFollowedFeedListsResp parses an HTTP response from a ListFollowedFeedListsWithResponse call
+func ParseListFollowedFeedListsResp(rsp *http.Response) (*ListFollowedFeedListsResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListFollowedFeedListsResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []FeedList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteFeedListResp parses an HTTP response from a DeleteFeedListWithResponse call
+func ParseDeleteFeedListResp(rsp *http.Response) (*DeleteFeedListResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteFeedListResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case rsp.StatusCode == 204:
+		break // No content-type
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetFeedListResp parses an HTTP response from a GetFeedListWithResponse call
+func ParseGetFeedListResp(rsp *http.Response) (*GetFeedListResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetFeedListResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest FeedList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateFeedListResp parses an HTTP response from a UpdateFeedListWithResponse call
+func ParseUpdateFeedListResp(rsp *http.Response) (*UpdateFeedListResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateFeedListResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest FeedList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAddFeedListFeedResp parses an HTTP response from a AddFeedListFeedWithResponse call
+func ParseAddFeedListFeedResp(rsp *http.Response) (*AddFeedListFeedResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AddFeedListFeedResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest FeedListFeed
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRemoveFeedListFeedResp parses an HTTP response from a RemoveFeedListFeedWithResponse call
+func ParseRemoveFeedListFeedResp(rsp *http.Response) (*RemoveFeedListFeedResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RemoveFeedListFeedResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case rsp.StatusCode == 204:
+		break // No content-type
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUnfollowFeedListResp parses an HTTP response from a UnfollowFeedListWithResponse call
+func ParseUnfollowFeedListResp(rsp *http.Response) (*UnfollowFeedListResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UnfollowFeedListResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case rsp.StatusCode == 204:
+		break // No content-type
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseFollowFeedListResp parses an HTTP response from a FollowFeedListWithResponse call
+func ParseFollowFeedListResp(rsp *http.Response) (*FollowFeedListResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &FollowFeedListResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case rsp.StatusCode == 204:
+		break // No content-type
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseImportFeedListResp parses an HTTP response from a ImportFeedListWithResponse call
+func ParseImportFeedListResp(rsp *http.Response) (*ImportFeedListResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ImportFeedListResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ImportFeedListResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
 		var dest ErrorModel
@@ -3069,6 +6354,39 @@ func ParseCreateFeedResp(rsp *http.Response) (*CreateFeedResp, error) {
 	return response, nil
 }
 
+// ParsePreviewFeedResp parses an HTTP response from a PreviewFeedWithResponse call
+func ParsePreviewFeedResp(rsp *http.Response) (*PreviewFeedResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PreviewFeedResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PreviewFeedBody
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseDeleteFeedResp parses an HTTP response from a DeleteFeedWithResponse call
 func ParseDeleteFeedResp(rsp *http.Response) (*DeleteFeedResp, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -3131,6 +6449,39 @@ func ParseGetFeedResp(rsp *http.Response) (*GetFeedResp, error) {
 	return response, nil
 }
 
+// ParseUpdateFeedResp parses an HTTP response from a UpdateFeedWithResponse call
+func ParseUpdateFeedResp(rsp *http.Response) (*UpdateFeedResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateFeedResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Feed
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseMarkFeedReadResp parses an HTTP response from a MarkFeedReadWithResponse call
 func ParseMarkFeedReadResp(rsp *http.Response) (*MarkFeedReadResp, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -3147,6 +6498,167 @@ func ParseMarkFeedReadResp(rsp *http.Response) (*MarkFeedReadResp, error) {
 	switch {
 	case rsp.StatusCode == 204:
 		break // No content-type
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRefreshFeedResp parses an HTTP response from a RefreshFeedWithResponse call
+func ParseRefreshFeedResp(rsp *http.Response) (*RefreshFeedResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RefreshFeedResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Feed
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListFoldersResp parses an HTTP response from a ListFoldersWithResponse call
+func ParseListFoldersResp(rsp *http.Response) (*ListFoldersResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListFoldersResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []Folder
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateFolderResp parses an HTTP response from a CreateFolderWithResponse call
+func ParseCreateFolderResp(rsp *http.Response) (*CreateFolderResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateFolderResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Folder
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteFolderResp parses an HTTP response from a DeleteFolderWithResponse call
+func ParseDeleteFolderResp(rsp *http.Response) (*DeleteFolderResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteFolderResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case rsp.StatusCode == 204:
+		break // No content-type
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateFolderResp parses an HTTP response from a UpdateFolderWithResponse call
+func ParseUpdateFolderResp(rsp *http.Response) (*UpdateFolderResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateFolderResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Folder
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
 		var dest ErrorModel
@@ -3209,6 +6721,72 @@ func ParseGetMeResp(rsp *http.Response) (*GetMeResp, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest User
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseExportOpmlResp parses an HTTP response from a ExportOpmlWithResponse call
+func ParseExportOpmlResp(rsp *http.Response) (*ExportOpmlResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ExportOpmlResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []byte
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseImportOpmlResp parses an HTTP response from a ImportOpmlWithResponse call
+func ParseImportOpmlResp(rsp *http.Response) (*ImportOpmlResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ImportOpmlResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OPMLImportResultBody
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

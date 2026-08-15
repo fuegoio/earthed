@@ -25,7 +25,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 export type EntryFilter = {
   feed_id?: number
-  category_id?: number
+  folder_id?: number
   status?: "unread" | "read" | "removed"
   starred?: boolean
   search?: string

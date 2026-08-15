@@ -26,94 +26,100 @@ var ErrFeedListOwnList = fmt.Errorf("cannot follow your own list")
 // ErrFeedListNotPublic is returned when a user tries to follow a private list.
 var ErrFeedListNotPublic = fmt.Errorf("feed list is not public")
 
-// --- Categories ---
+// --- Folders ---
 
-// CreateCategory inserts a new category for the given user.
-func (s *Store) CreateCategory(ctx context.Context, userID int, title string) (*Category, error) {
-	var c Category
+// CreateFolder inserts a new folder for the given user.
+func (s *Store) CreateFolder(ctx context.Context, userID int, title string, parentID *int) (*Folder, error) {
+	var f Folder
 	err := s.DB.QueryRowContext(ctx,
-		`INSERT INTO categories (user_id, title) VALUES ($1, $2)
-		 RETURNING id, user_id, title, created_at`,
-		userID, title,
-	).Scan(&c.ID, &c.UserID, &c.Title, &c.CreatedAt)
+		`INSERT INTO folders (user_id, title, parent_id)
+		 VALUES ($1, $2, $3)
+		 RETURNING id, user_id, parent_id, title, sort_order, created_at`,
+		userID, title, parentID,
+	).Scan(&f.ID, &f.UserID, &f.ParentID, &f.Title, &f.SortOrder, &f.CreatedAt)
 	if err != nil {
-		return nil, fmt.Errorf("create category: %w", err)
+		return nil, fmt.Errorf("create folder: %w", err)
 	}
-	return &c, nil
+	return &f, nil
 }
 
-// ListCategories returns all categories for the given user.
-func (s *Store) ListCategories(ctx context.Context, userID int) ([]Category, error) {
+// ListFolders returns all folders for the given user, ordered by sort_order then title.
+func (s *Store) ListFolders(ctx context.Context, userID int) ([]Folder, error) {
 	rows, err := s.DB.QueryContext(ctx,
-		`SELECT id, user_id, title, created_at FROM categories WHERE user_id = $1 ORDER BY title`, userID)
+		`SELECT id, user_id, parent_id, title, sort_order, created_at
+		 FROM folders WHERE user_id = $1 ORDER BY sort_order ASC, title ASC`, userID)
 	if err != nil {
 		return nil, err
 	}
 	defer func() { _ = rows.Close() }()
-	var cats []Category
+	var folders []Folder
 	for rows.Next() {
-		var c Category
-		if err := rows.Scan(&c.ID, &c.UserID, &c.Title, &c.CreatedAt); err != nil {
+		var f Folder
+		if err := rows.Scan(&f.ID, &f.UserID, &f.ParentID, &f.Title, &f.SortOrder, &f.CreatedAt); err != nil {
 			return nil, err
 		}
-		cats = append(cats, c)
+		folders = append(folders, f)
 	}
-	return cats, rows.Err()
+	return folders, rows.Err()
 }
 
-// GetCategoryByID returns the category with the given id scoped to userID, or nil.
-func (s *Store) GetCategoryByID(ctx context.Context, id, userID int) (*Category, error) {
-	var c Category
+// GetFolderByID returns the folder with the given id scoped to userID, or nil.
+func (s *Store) GetFolderByID(ctx context.Context, id, userID int) (*Folder, error) {
+	var f Folder
 	err := s.DB.QueryRowContext(ctx,
-		`SELECT id, user_id, title, created_at FROM categories WHERE id = $1 AND user_id = $2`, id, userID,
-	).Scan(&c.ID, &c.UserID, &c.Title, &c.CreatedAt)
+		`SELECT id, user_id, parent_id, title, sort_order, created_at
+		 FROM folders WHERE id = $1 AND user_id = $2`, id, userID,
+	).Scan(&f.ID, &f.UserID, &f.ParentID, &f.Title, &f.SortOrder, &f.CreatedAt)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
 	if err != nil {
 		return nil, err
 	}
-	return &c, nil
+	return &f, nil
 }
 
-// UpdateCategory sets the title of the given category.
-func (s *Store) UpdateCategory(ctx context.Context, id, userID int, title string) (*Category, error) {
-	var c Category
+// UpdateFolder updates the title and/or parent_id of a folder. parentID can be
+// nil to move the folder to the root, or point to another folder to nest it.
+func (s *Store) UpdateFolder(ctx context.Context, id, userID int, title string, parentID *int) (*Folder, error) {
+	var f Folder
 	err := s.DB.QueryRowContext(ctx,
-		`UPDATE categories SET title = $3 WHERE id = $1 AND user_id = $2
-		 RETURNING id, user_id, title, created_at`,
-		id, userID, title,
-	).Scan(&c.ID, &c.UserID, &c.Title, &c.CreatedAt)
+		`UPDATE folders SET title = $3, parent_id = $4, updated_at = NOW()
+		 WHERE id = $1 AND user_id = $2
+		 RETURNING id, user_id, parent_id, title, sort_order, created_at`,
+		id, userID, title, parentID,
+	).Scan(&f.ID, &f.UserID, &f.ParentID, &f.Title, &f.SortOrder, &f.CreatedAt)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
 	if err != nil {
-		return nil, fmt.Errorf("update category: %w", err)
+		return nil, fmt.Errorf("update folder: %w", err)
 	}
-	return &c, nil
+	return &f, nil
 }
 
-// DeleteCategory removes a category. Feeds in the category are re-assigned to
-// NULL category_id via ON DELETE SET NULL.
-func (s *Store) DeleteCategory(ctx context.Context, id, userID int) error {
-	_, err := s.DB.ExecContext(ctx, `DELETE FROM categories WHERE id = $1 AND user_id = $2`, id, userID)
+// DeleteFolder removes a folder. Feeds in the folder are re-assigned to
+// NULL folder_id via ON DELETE SET NULL. Child folders are also re-assigned
+// to NULL parent_id via ON DELETE SET NULL.
+func (s *Store) DeleteFolder(ctx context.Context, id, userID int) error {
+	_, err := s.DB.ExecContext(ctx, `DELETE FROM folders WHERE id = $1 AND user_id = $2`, id, userID)
 	return err
 }
 
 // --- Feeds ---
 
 // CreateFeed inserts a new feed subscription for the given user.
-func (s *Store) CreateFeed(ctx context.Context, userID int, categoryID *int, feedURL, siteURL, title, description string) (*Feed, error) {
+func (s *Store) CreateFeed(ctx context.Context, userID int, folderID *int, feedURL, siteURL, title, description string) (*Feed, error) {
 	var f Feed
 	err := s.DB.QueryRowContext(ctx,
-		`INSERT INTO feeds (user_id, category_id, feed_url, site_url, title, description)
+		`INSERT INTO feeds (user_id, folder_id, feed_url, site_url, title, description)
 		 VALUES ($1, $2, $3, $4, $5, $6)
-		 RETURNING id, user_id, category_id, feed_url, site_url, title, description,
+		 RETURNING id, user_id, folder_id, feed_url, site_url, title, description,
 		           etag_header, last_modified_header, parsing_error, parsing_error_count,
 		           disabled, scraper_rules, rewrite_rules, crawler,
 		           next_check_at, last_fetch_at, created_at, updated_at`,
-		userID, categoryID, feedURL, siteURL, title, description,
-	).Scan(&f.ID, &f.UserID, &f.CategoryID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
+		userID, folderID, feedURL, siteURL, title, description,
+	).Scan(&f.ID, &f.UserID, &f.FolderID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
 		&f.EtagHeader, &f.LastModified, &f.ParsingError, &f.ParsingErrorCount,
 		&f.Disabled, &f.ScraperRules, &f.RewriteRules, &f.Crawler,
 		&f.NextCheckAt, &f.LastFetchAt, &f.CreatedAt, &f.UpdatedAt)
@@ -126,11 +132,11 @@ func (s *Store) CreateFeed(ctx context.Context, userID int, categoryID *int, fee
 // ListFeeds returns all feeds for the given user.
 func (s *Store) ListFeeds(ctx context.Context, userID int) ([]Feed, error) {
 	rows, err := s.DB.QueryContext(ctx,
-		`SELECT id, user_id, category_id, feed_url, site_url, title, description,
+		`SELECT id, user_id, folder_id, feed_url, site_url, title, description,
 		        etag_header, last_modified_header, parsing_error, parsing_error_count,
 		        disabled, scraper_rules, rewrite_rules, crawler,
 		        next_check_at, last_fetch_at, created_at, updated_at
-		 FROM feeds WHERE user_id = $1 ORDER BY title`, userID)
+		 FROM feeds WHERE user_id = $1 ORDER BY sort_order ASC, title ASC`, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -150,12 +156,12 @@ func (s *Store) ListFeeds(ctx context.Context, userID int) ([]Feed, error) {
 func (s *Store) GetFeedByID(ctx context.Context, id, userID int) (*Feed, error) {
 	var f Feed
 	err := s.DB.QueryRowContext(ctx,
-		`SELECT id, user_id, category_id, feed_url, site_url, title, description,
+		`SELECT id, user_id, folder_id, feed_url, site_url, title, description,
 		        etag_header, last_modified_header, parsing_error, parsing_error_count,
 		        disabled, scraper_rules, rewrite_rules, crawler,
 		        next_check_at, last_fetch_at, created_at, updated_at
 		 FROM feeds WHERE id = $1 AND user_id = $2`, id, userID,
-	).Scan(&f.ID, &f.UserID, &f.CategoryID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
+	).Scan(&f.ID, &f.UserID, &f.FolderID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
 		&f.EtagHeader, &f.LastModified, &f.ParsingError, &f.ParsingErrorCount,
 		&f.Disabled, &f.ScraperRules, &f.RewriteRules, &f.Crawler,
 		&f.NextCheckAt, &f.LastFetchAt, &f.CreatedAt, &f.UpdatedAt)
@@ -172,12 +178,12 @@ func (s *Store) GetFeedByID(ctx context.Context, id, userID int) (*Feed, error) 
 func (s *Store) GetFeedByURL(ctx context.Context, feedURL string, userID int) (*Feed, error) {
 	var f Feed
 	err := s.DB.QueryRowContext(ctx,
-		`SELECT id, user_id, category_id, feed_url, site_url, title, description,
+		`SELECT id, user_id, folder_id, feed_url, site_url, title, description,
 		        etag_header, last_modified_header, parsing_error, parsing_error_count,
 		        disabled, scraper_rules, rewrite_rules, crawler,
 		        next_check_at, last_fetch_at, created_at, updated_at
 		 FROM feeds WHERE feed_url = $1 AND user_id = $2`, feedURL, userID,
-	).Scan(&f.ID, &f.UserID, &f.CategoryID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
+	).Scan(&f.ID, &f.UserID, &f.FolderID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
 		&f.EtagHeader, &f.LastModified, &f.ParsingError, &f.ParsingErrorCount,
 		&f.Disabled, &f.ScraperRules, &f.RewriteRules, &f.Crawler,
 		&f.NextCheckAt, &f.LastFetchAt, &f.CreatedAt, &f.UpdatedAt)
@@ -191,18 +197,18 @@ func (s *Store) GetFeedByURL(ctx context.Context, feedURL string, userID int) (*
 }
 
 // UpdateFeed updates mutable fields on the given feed.
-func (s *Store) UpdateFeed(ctx context.Context, id, userID int, categoryID *int, title, scraperRules, rewriteRules string, disabled, crawler bool) (*Feed, error) {
+func (s *Store) UpdateFeed(ctx context.Context, id, userID int, folderID *int, title, scraperRules, rewriteRules string, disabled, crawler bool) (*Feed, error) {
 	var f Feed
 	err := s.DB.QueryRowContext(ctx,
-		`UPDATE feeds SET category_id = $3, title = $4, scraper_rules = $5,
+		`UPDATE feeds SET folder_id = $3, title = $4, scraper_rules = $5,
 		         rewrite_rules = $6, disabled = $7, crawler = $8, updated_at = NOW()
 		 WHERE id = $1 AND user_id = $2
-		 RETURNING id, user_id, category_id, feed_url, site_url, title, description,
+		 RETURNING id, user_id, folder_id, feed_url, site_url, title, description,
 		           etag_header, last_modified_header, parsing_error, parsing_error_count,
 		           disabled, scraper_rules, rewrite_rules, crawler,
 		           next_check_at, last_fetch_at, created_at, updated_at`,
-		id, userID, categoryID, title, scraperRules, rewriteRules, disabled, crawler,
-	).Scan(&f.ID, &f.UserID, &f.CategoryID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
+		id, userID, folderID, title, scraperRules, rewriteRules, disabled, crawler,
+	).Scan(&f.ID, &f.UserID, &f.FolderID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
 		&f.EtagHeader, &f.LastModified, &f.ParsingError, &f.ParsingErrorCount,
 		&f.Disabled, &f.ScraperRules, &f.RewriteRules, &f.Crawler,
 		&f.NextCheckAt, &f.LastFetchAt, &f.CreatedAt, &f.UpdatedAt)
@@ -247,7 +253,7 @@ func (s *Store) UpdateFeedFetchState(ctx context.Context, feedID int, etag, last
 // ListFeedsDueForRefresh returns up to limit feeds whose next_check_at <= now.
 func (s *Store) ListFeedsDueForRefresh(ctx context.Context, limit int) ([]Feed, error) {
 	rows, err := s.DB.QueryContext(ctx,
-		`SELECT id, user_id, category_id, feed_url, site_url, title,
+		`SELECT id, user_id, folder_id, feed_url, site_url, title,
 		        etag_header, last_modified_header, parsing_error, parsing_error_count,
 		        disabled, scraper_rules, rewrite_rules, crawler,
 		        next_check_at, last_fetch_at, created_at, updated_at
@@ -295,8 +301,8 @@ func (s *Store) CreateEntry(ctx context.Context, userID, feedID int, hash, title
 }
 
 // ListEntries returns entries for the given user, optionally filtered by feed,
-// category, status, and starred. Results are paginated.
-func (s *Store) ListEntries(ctx context.Context, userID int, feedID *int, categoryID *int, status string, starred *bool, search string, limit, offset int) ([]Entry, error) {
+// folder, status, and starred. Results are paginated.
+func (s *Store) ListEntries(ctx context.Context, userID int, feedID *int, folderID *int, status string, starred *bool, search string, limit, offset int) ([]Entry, error) {
 	q := `SELECT e.id, e.user_id, e.feed_id, e.hash, e.title, e.url, e.comments_url,
 	             e.author, '' AS content, LEFT(e.description, 400) AS description, e.status, e.starred, e.liked,
 	             e.published_at, e.changed_at, e.tags
@@ -306,9 +312,9 @@ func (s *Store) ListEntries(ctx context.Context, userID int, feedID *int, catego
 
 	q += " WHERE e.user_id = $1"
 
-	if categoryID != nil {
-		q += fmt.Sprintf(" AND e.feed_id IN (SELECT f.id FROM feeds f WHERE f.user_id = $1 AND f.category_id = $%d)", argIdx)
-		args = append(args, *categoryID)
+	if folderID != nil {
+		q += fmt.Sprintf(" AND e.feed_id IN (SELECT f.id FROM feeds f WHERE f.user_id = $1 AND f.folder_id = $%d)", argIdx)
+		args = append(args, *folderID)
 		argIdx++
 	}
 	if feedID != nil {
@@ -803,7 +809,7 @@ func (s *Store) IsFeedListOwner(ctx context.Context, listID, userID int) (bool, 
 // --- scan helper ---
 
 func scanFeed(rows *sql.Rows, f *Feed) error {
-	return rows.Scan(&f.ID, &f.UserID, &f.CategoryID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
+	return rows.Scan(&f.ID, &f.UserID, &f.FolderID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
 		&f.EtagHeader, &f.LastModified, &f.ParsingError, &f.ParsingErrorCount,
 		&f.Disabled, &f.ScraperRules, &f.RewriteRules, &f.Crawler,
 		&f.NextCheckAt, &f.LastFetchAt, &f.CreatedAt, &f.UpdatedAt)

@@ -46,7 +46,7 @@ func OpenAPITags() []*huma.Tag {
 	return []*huma.Tag{
 		{Name: "feeds", Description: "Feed subscriptions"},
 		{Name: "entries", Description: "Feed entries/articles"},
-		{Name: "categories", Description: "Feed categories"},
+		{Name: "folders", Description: "Feed folders"},
 		{Name: "users", Description: "User accounts"},
 		{Name: "tokens", Description: "API tokens"},
 		{Name: "opml", Description: "OPML import/export"},
@@ -58,7 +58,7 @@ func OpenAPITags() []*huma.Tag {
 func (a *API) RegisterRoutes() {
 	a.registerHealthRoutes()
 	a.registerMeRoutes()
-	a.registerCategoryRoutes()
+	a.registerFolderRoutes()
 	a.registerFeedRoutes()
 	a.registerEntryRoutes()
 	a.registerTokenRoutes()
@@ -116,67 +116,95 @@ func (a *API) registerMeRoutes() {
 	})
 }
 
-// --- Categories ---
+// --- Folders ---
 
-type CreateCategoryInput struct {
+type CreateFolderInput struct {
 	Body struct {
-		Title string `json:"title" minLength:"1" maxLength:"255"`
+		Title    string `json:"title" minLength:"1" maxLength:"255"`
+		ParentID *int   `json:"parent_id,omitempty"`
 	}
 }
 
-type CategoryOutput struct {
-	Body store.Category
+type UpdateFolderInput struct {
+	FolderID int `path:"folderId"`
+	Body     struct {
+		Title    string `json:"title" minLength:"1" maxLength:"255"`
+		ParentID *int   `json:"parent_id,omitempty"`
+	}
 }
 
-type CategoryListOutput struct {
-	Body []store.Category
+type FolderOutput struct {
+	Body store.Folder
 }
 
-func (a *API) registerCategoryRoutes() {
+type FolderListOutput struct {
+	Body []store.Folder
+}
+
+func (a *API) registerFolderRoutes() {
 	huma.Register(a.huma, huma.Operation{
-		OperationID: "create-category",
+		OperationID: "create-folder",
 		Method:      http.MethodPost,
-		Path:        "/api/v1/categories",
-		Summary:     "Create a category",
-		Tags:        []string{"categories"},
-	}, func(ctx context.Context, input *CreateCategoryInput) (*CategoryOutput, error) {
+		Path:        "/api/v1/folders",
+		Summary:     "Create a folder",
+		Tags:        []string{"folders"},
+	}, func(ctx context.Context, input *CreateFolderInput) (*FolderOutput, error) {
 		userID := auth.UserIDFromCtx(ctx)
-		cat, err := a.store.CreateCategory(ctx, userID, input.Body.Title)
+		folder, err := a.store.CreateFolder(ctx, userID, input.Body.Title, input.Body.ParentID)
 		if err != nil {
 			return nil, huma.Error400BadRequest(err.Error())
 		}
-		return &CategoryOutput{Body: *cat}, nil
+		return &FolderOutput{Body: *folder}, nil
 	})
 
 	huma.Register(a.huma, huma.Operation{
-		OperationID: "list-categories",
+		OperationID: "list-folders",
 		Method:      http.MethodGet,
-		Path:        "/api/v1/categories",
-		Summary:     "List categories",
-		Tags:        []string{"categories"},
-	}, func(ctx context.Context, _ *struct{}) (*CategoryListOutput, error) {
+		Path:        "/api/v1/folders",
+		Summary:     "List folders",
+		Tags:        []string{"folders"},
+	}, func(ctx context.Context, _ *struct{}) (*FolderListOutput, error) {
 		userID := auth.UserIDFromCtx(ctx)
-		cats, err := a.store.ListCategories(ctx, userID)
+		folders, err := a.store.ListFolders(ctx, userID)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
-		if cats == nil {
-			cats = []store.Category{}
+		if folders == nil {
+			folders = []store.Folder{}
 		}
-		return &CategoryListOutput{Body: cats}, nil
+		return &FolderListOutput{Body: folders}, nil
 	})
 
 	huma.Register(a.huma, huma.Operation{
-		OperationID: "delete-category",
+		OperationID: "update-folder",
+		Method:      http.MethodPatch,
+		Path:        "/api/v1/folders/{folderId}",
+		Summary:     "Update a folder",
+		Description: "Update the title and/or parent folder of a folder. Set parent_id to move or nest the folder.",
+		Tags:        []string{"folders"},
+	}, func(ctx context.Context, input *UpdateFolderInput) (*FolderOutput, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		folder, err := a.store.UpdateFolder(ctx, input.FolderID, userID, input.Body.Title, input.Body.ParentID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if folder == nil {
+			return nil, huma.Error404NotFound("folder not found")
+		}
+		return &FolderOutput{Body: *folder}, nil
+	})
+
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "delete-folder",
 		Method:      http.MethodDelete,
-		Path:        "/api/v1/categories/{categoryId}",
-		Summary:     "Delete a category",
-		Tags:        []string{"categories"},
+		Path:        "/api/v1/folders/{folderId}",
+		Summary:     "Delete a folder",
+		Tags:        []string{"folders"},
 	}, func(ctx context.Context, input *struct {
-		CategoryID int `path:"categoryId"`
+		FolderID int `path:"folderId"`
 	}) (*struct{}, error) {
 		userID := auth.UserIDFromCtx(ctx)
-		if err := a.store.DeleteCategory(ctx, input.CategoryID, userID); err != nil {
+		if err := a.store.DeleteFolder(ctx, input.FolderID, userID); err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
 		return nil, nil
@@ -187,8 +215,16 @@ func (a *API) registerCategoryRoutes() {
 
 type CreateFeedInput struct {
 	Body struct {
-		FeedURL    string `json:"feed_url" minLength:"1" maxLength:"2048"`
-		CategoryID *int   `json:"category_id,omitempty"`
+		FeedURL  string `json:"feed_url" minLength:"1" maxLength:"2048"`
+		FolderID *int   `json:"folder_id,omitempty"`
+	}
+}
+
+type UpdateFeedInput struct {
+	FeedID int `path:"feedId"`
+	Body   struct {
+		FolderID *int   `json:"folder_id,omitempty"`
+		Title    string `json:"title,omitempty" maxLength:"512"`
 	}
 }
 
@@ -238,7 +274,7 @@ func (a *API) registerFeedRoutes() {
 		Tags:        []string{"feeds"},
 	}, func(ctx context.Context, input *CreateFeedInput) (*FeedOutput, error) {
 		userID := auth.UserIDFromCtx(ctx)
-		feed, err := a.subscribeToFeed(ctx, userID, input.Body.FeedURL, input.Body.CategoryID)
+		feed, err := a.subscribeToFeed(ctx, userID, input.Body.FeedURL, input.Body.FolderID)
 		if err != nil {
 			return nil, huma.Error400BadRequest(err.Error())
 		}
@@ -297,6 +333,40 @@ func (a *API) registerFeedRoutes() {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
 		return nil, nil
+	})
+
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "update-feed",
+		Method:      http.MethodPatch,
+		Path:        "/api/v1/feeds/{feedId}",
+		Summary:     "Update a feed",
+		Description: "Update the folder assignment and/or title of a feed.",
+		Tags:        []string{"feeds"},
+	}, func(ctx context.Context, input *UpdateFeedInput) (*FeedOutput, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		feed, err := a.store.GetFeedByID(ctx, input.FeedID, userID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if feed == nil {
+			return nil, huma.Error404NotFound("feed not found")
+		}
+		folderID := input.Body.FolderID
+		if folderID == nil {
+			folderID = feed.FolderID
+		}
+		title := input.Body.Title
+		if title == "" {
+			title = feed.Title
+		}
+		updated, err := a.store.UpdateFeed(ctx, input.FeedID, userID, folderID, title, feed.ScraperRules, feed.RewriteRules, feed.Disabled, feed.Crawler)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if updated == nil {
+			return nil, huma.Error404NotFound("feed not found")
+		}
+		return &FeedOutput{Body: *updated}, nil
 	})
 
 	huma.Register(a.huma, huma.Operation{
@@ -440,13 +510,13 @@ func (a *API) registerEntryRoutes() {
 		Summary:     "List entries",
 		Tags:        []string{"entries"},
 	}, func(ctx context.Context, input *struct {
-		FeedID     int    `query:"feed_id" omitempty:""`
-		CategoryID int    `query:"category_id" omitempty:""`
-		Status     string `query:"status" enum:"unread,read,removed" omitempty:""`
-		Starred    bool   `query:"starred" omitempty:""`
-		Search     string `query:"search" omitempty:""`
-		Limit      int    `query:"limit" default:"50" maximum:"200"`
-		Offset     int    `query:"offset" default:"0"`
+		FeedID   int    `query:"feed_id" omitempty:""`
+		FolderID int    `query:"folder_id" omitempty:""`
+		Status   string `query:"status" enum:"unread,read,removed" omitempty:""`
+		Starred  bool   `query:"starred" omitempty:""`
+		Search   string `query:"search" omitempty:""`
+		Limit    int    `query:"limit" default:"50" maximum:"200"`
+		Offset   int    `query:"offset" default:"0"`
 	}) (*EntryListOutput, error) {
 		userID := auth.UserIDFromCtx(ctx)
 		if input.Limit == 0 {
@@ -456,15 +526,15 @@ func (a *API) registerEntryRoutes() {
 		if input.FeedID > 0 {
 			feedID = &input.FeedID
 		}
-		var categoryID *int
-		if input.CategoryID > 0 {
-			categoryID = &input.CategoryID
+		var folderID *int
+		if input.FolderID > 0 {
+			folderID = &input.FolderID
 		}
 		var starred *bool
 		if input.Starred {
 			starred = &input.Starred
 		}
-		entries, err := a.store.ListEntries(ctx, userID, feedID, categoryID, input.Status, starred, input.Search, input.Limit, input.Offset)
+		entries, err := a.store.ListEntries(ctx, userID, feedID, folderID, input.Status, starred, input.Search, input.Limit, input.Offset)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
@@ -650,7 +720,7 @@ func generateToken() string {
 // empty after subscription. If the user already subscribes to the feed URL,
 // the existing feed is returned (idempotent), making it safe for feed-list
 // import.
-func (a *API) subscribeToFeed(ctx context.Context, userID int, feedURL string, categoryID *int) (*store.Feed, error) {
+func (a *API) subscribeToFeed(ctx context.Context, userID int, feedURL string, folderID *int) (*store.Feed, error) {
 	if existing, err := a.store.GetFeedByURL(ctx, feedURL, userID); err != nil {
 		return nil, err
 	} else if existing != nil {
@@ -677,7 +747,7 @@ func (a *API) subscribeToFeed(ctx context.Context, userID int, feedURL string, c
 		}
 	}
 
-	feed, err := a.store.CreateFeed(ctx, userID, categoryID, feedURL, siteURL, title, description)
+	feed, err := a.store.CreateFeed(ctx, userID, folderID, feedURL, siteURL, title, description)
 	if err != nil {
 		return nil, err
 	}
@@ -1069,7 +1139,7 @@ func (a *API) registerOPMLRoutes() {
 		Method:      http.MethodGet,
 		Path:        "/api/v1/opml/export",
 		Summary:     "Export feeds as OPML",
-		Description: "Returns all feed subscriptions and categories as an OPML XML document.",
+		Description: "Returns all feed subscriptions and folders as an OPML XML document.",
 		Tags:        []string{"opml"},
 	}, func(ctx context.Context, _ *struct{}) (*OPMLExportOutput, error) {
 		userID := auth.UserIDFromCtx(ctx)
@@ -1078,36 +1148,36 @@ func (a *API) registerOPMLRoutes() {
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
-		cats, err := a.store.ListCategories(ctx, userID)
+		folders, err := a.store.ListFolders(ctx, userID)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
 
-		// Group feeds by category. Feeds without a category go into the root.
-		catMap := make(map[int][]store.Feed)
-		var uncategorized []store.Feed
+		// Group feeds by folder. Feeds without a folder go into the root.
+		folderMap := make(map[int][]store.Feed)
+		var unfiled []store.Feed
 		for _, f := range feeds {
-			if f.CategoryID != nil {
-				catMap[*f.CategoryID] = append(catMap[*f.CategoryID], f)
+			if f.FolderID != nil {
+				folderMap[*f.FolderID] = append(folderMap[*f.FolderID], f)
 			} else {
-				uncategorized = append(uncategorized, f)
+				unfiled = append(unfiled, f)
 			}
 		}
 
 		var outlines []opmlOutline
-		for _, c := range cats {
-			catFeeds := catMap[c.ID]
-			if len(catFeeds) == 0 {
+		for _, fo := range folders {
+			folderFeeds := folderMap[fo.ID]
+			if len(folderFeeds) == 0 {
 				continue
 			}
-			catOutline := opmlOutline{
-				Title:    c.Title,
-				Text:     c.Title,
-				Outlines: feedsToOutlines(catFeeds),
+			folderOutline := opmlOutline{
+				Title:    fo.Title,
+				Text:     fo.Title,
+				Outlines: feedsToOutlines(folderFeeds),
 			}
-			outlines = append(outlines, catOutline)
+			outlines = append(outlines, folderOutline)
 		}
-		outlines = append(outlines, feedsToOutlines(uncategorized)...)
+		outlines = append(outlines, feedsToOutlines(unfiled)...)
 
 		doc := opmlXML{
 			Version: "2.0",
@@ -1129,7 +1199,7 @@ func (a *API) registerOPMLRoutes() {
 		Method:      http.MethodPost,
 		Path:        "/api/v1/opml/import",
 		Summary:     "Import feeds from an OPML file",
-		Description: "Parses an OPML XML document and subscribes the user to all feeds found. Categories are created as needed. Existing subscriptions are skipped.",
+		Description: "Parses an OPML XML document and subscribes the user to all feeds found. Folders are created as needed. Existing subscriptions are skipped.",
 		Tags:        []string{"opml"},
 	}, func(ctx context.Context, input *OPMLImportInput) (*OPMLImportResult, error) {
 		userID := auth.UserIDFromCtx(ctx)
@@ -1141,51 +1211,51 @@ func (a *API) registerOPMLRoutes() {
 			return nil, huma.Error400BadRequest(fmt.Sprintf("invalid OPML: %s", err.Error()))
 		}
 
-		// Build category name → ID map from existing categories.
-		existingCats, err := a.store.ListCategories(ctx, userID)
+		// Build folder name → ID map from existing folders.
+		existingFolders, err := a.store.ListFolders(ctx, userID)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
-		catByName := make(map[string]int)
-		for _, c := range existingCats {
-			catByName[c.Title] = c.ID
+		folderByName := make(map[string]int)
+		for _, fo := range existingFolders {
+			folderByName[fo.Title] = fo.ID
 		}
 
 		result := OPMLImportResult{}
 		result.Body.FeedIDs = []int{}
 
-		getOrCreateCategory := func(name string) (*int, error) {
+		getOrCreateFolder := func(name string) (*int, error) {
 			if name == "" {
 				return nil, nil
 			}
-			if id, ok := catByName[name]; ok {
+			if id, ok := folderByName[name]; ok {
 				return &id, nil
 			}
-			cat, err := a.store.CreateCategory(ctx, userID, name)
+			folder, err := a.store.CreateFolder(ctx, userID, name, nil)
 			if err != nil {
 				return nil, err
 			}
-			catByName[name] = cat.ID
-			return &cat.ID, nil
+			folderByName[name] = folder.ID
+			return &folder.ID, nil
 		}
 
-		var processOutlines func(outlines []opmlOutline, categoryName string)
-		processOutlines = func(outlines []opmlOutline, categoryName string) {
+		var processOutlines func(outlines []opmlOutline, folderName string)
+		processOutlines = func(outlines []opmlOutline, folderName string) {
 			for _, o := range outlines {
 				if o.XMLURL != "" {
 					// Leaf node — a feed subscription.
-					var catID *int
-					if categoryName != "" {
-						c, err := getOrCreateCategory(categoryName)
+					var folderID *int
+					if folderName != "" {
+						f, err := getOrCreateFolder(folderName)
 						if err != nil {
 							result.Body.Failed++
 							result.Body.Errors = append(result.Body.Errors, o.XMLURL+": "+err.Error())
 							continue
 						}
-						catID = c
+						folderID = f
 					}
 
-					feed, fErr := a.subscribeToFeed(ctx, userID, o.XMLURL, catID)
+					feed, fErr := a.subscribeToFeed(ctx, userID, o.XMLURL, folderID)
 					if fErr != nil {
 						result.Body.Failed++
 						result.Body.Errors = append(result.Body.Errors, o.XMLURL+": "+fErr.Error())
@@ -1198,7 +1268,7 @@ func (a *API) registerOPMLRoutes() {
 						result.Body.Skipped++
 					}
 				} else {
-					// Container node — a category. Use its title, falling back to text.
+					// Container node — a folder. Use its title, falling back to text.
 					name := o.Title
 					if name == "" {
 						name = o.Text

@@ -50,12 +50,12 @@ func seedUser(t *testing.T, s *Store, email string) int {
 }
 
 // seedFeed creates a test feed and returns its ID. Cleans up via t.Cleanup.
-func seedFeed(t *testing.T, s *Store, userID int, categoryID *int, title string) int {
+func seedFeed(t *testing.T, s *Store, userID int, folderID *int, title string) int {
 	t.Helper()
 	var id int
 	err := s.DB.QueryRow(
-		`INSERT INTO feeds (user_id, category_id, feed_url, title) VALUES ($1, $2, $3, $4) RETURNING id`,
-		userID, categoryID, fmt.Sprintf("https://example.com/%s.xml", title), title,
+		`INSERT INTO feeds (user_id, folder_id, feed_url, title) VALUES ($1, $2, $3, $4) RETURNING id`,
+		userID, folderID, fmt.Sprintf("https://example.com/%s.xml", title), title,
 	).Scan(&id)
 	if err != nil {
 		t.Fatalf("seed feed: %v", err)
@@ -108,35 +108,35 @@ func TestListEntriesByFeedID(t *testing.T) {
 	}
 }
 
-// TestListEntriesByCategoryID verifies that filtering by category_id
+// TestListEntriesByFolderID verifies that filtering by folder_id
 // works without errors.
-func TestListEntriesByCategoryID(t *testing.T) {
+func TestListEntriesByFolderID(t *testing.T) {
 	s := testDB(t)
 	ctx := context.Background()
 
 	userID := seedUser(t, s, "test-cat-filter@example.com")
 
-	// Create category
-	var catID int
+	// Create folder
+	var folderID int
 	err := s.DB.QueryRow(
-		`INSERT INTO categories (user_id, title) VALUES ($1, 'Tech') RETURNING id`,
+		`INSERT INTO folders (user_id, title) VALUES ($1, 'Tech') RETURNING id`,
 		userID,
-	).Scan(&catID)
+	).Scan(&folderID)
 	if err != nil {
-		t.Fatalf("seed category: %v", err)
+		t.Fatalf("seed folder: %v", err)
 	}
-	t.Cleanup(func() { _, _ = s.DB.Exec(`DELETE FROM categories WHERE id = $1`, catID) })
+	t.Cleanup(func() { _, _ = s.DB.Exec(`DELETE FROM folders WHERE id = $1`, folderID) })
 
-	feedID := seedFeed(t, s, userID, &catID, "Cat Feed")
-	seedEntry(t, s, userID, feedID, "Cat Entry", "unread", false)
+	feedID := seedFeed(t, s, userID, &folderID, "Folder Feed")
+	seedEntry(t, s, userID, feedID, "Folder Entry", "unread", false)
 
-	cid := catID
-	entries, err := s.ListEntries(ctx, userID, nil, &cid, "", nil, "", 50, 0)
+	fid := folderID
+	entries, err := s.ListEntries(ctx, userID, nil, &fid, "", nil, "", 50, 0)
 	if err != nil {
-		t.Fatalf("ListEntries with category_id failed: %v", err)
+		t.Fatalf("ListEntries with folder_id failed: %v", err)
 	}
 	if len(entries) != 1 {
-		t.Errorf("expected 1 entry for category_id=%d, got %d", catID, len(entries))
+		t.Errorf("expected 1 entry for folder_id=%d, got %d", folderID, len(entries))
 	}
 }
 
