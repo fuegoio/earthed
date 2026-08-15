@@ -4,7 +4,6 @@ import { useState } from "react"
 import Link from "next/link"
 import { Menu as MenuIcon } from "lucide-react"
 import { AppSidebar } from "@/components/app-sidebar"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { Logo } from "@/components/logo"
 import { Button } from "@workspace/ui/components/button"
 
@@ -41,9 +40,6 @@ export function AppShell({
             <Logo className="size-5" />
             Planetary
           </Link>
-          <div className="ml-auto">
-            <ThemeToggle />
-          </div>
         </header>
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>

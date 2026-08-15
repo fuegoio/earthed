@@ -18,7 +18,10 @@ import {
   Key,
   FileDown,
   Upload,
+  Sun,
+  Moon,
 } from "lucide-react"
+import { useTheme } from "next-themes"
 import { Menu } from "@base-ui/react/menu"
 import { Avatar } from "@base-ui/react/avatar"
 import { Skeleton } from "@workspace/ui/components/skeleton"
@@ -34,7 +37,6 @@ import { signout } from "@/lib/auth"
 import { Logo } from "@/components/logo"
 import { FeedIcon } from "@/components/feed-icon"
 import { SearchBox } from "@/components/search-box"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { buttonVariants } from "@workspace/ui/components/button"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { CategoryCreateDialog } from "@/components/category-create-dialog"
@@ -220,12 +222,15 @@ function CategoryList({ categories }: { categories: Category[] }) {
 
 function AccountButton({ userEmail }: { userEmail: string }) {
   const router = useRouter()
+  const { resolvedTheme, setTheme } = useTheme()
 
   async function handleSignout() {
     await signout()
     router.push("/login")
     router.refresh()
   }
+
+  const isDark = resolvedTheme === "dark"
 
   const menuItemClass = cn(
     "flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm",
@@ -288,6 +293,23 @@ function AccountButton({ userEmail }: { userEmail: string }) {
             >
               <FileDown className="size-4" />
               Export OPML
+            </Menu.Item>
+            <div className="my-1 h-px bg-border" />
+            <Menu.Item
+              className={menuItemClass}
+              onClick={() => setTheme(isDark ? "light" : "dark")}
+            >
+              {isDark ? (
+                <>
+                  <Sun className="size-4" />
+                  Light mode
+                </>
+              ) : (
+                <>
+                  <Moon className="size-4" />
+                  Dark mode
+                </>
+              )}
             </Menu.Item>
             <div className="my-1 h-px bg-border" />
             <Menu.Item className={menuItemClass} onClick={handleSignout}>
@@ -388,11 +410,8 @@ function SidebarContent({ userEmail }: { userEmail: string }) {
         </div>
       </div>
 
-      <div className="flex shrink-0 items-center gap-1 border-t border-sidebar-border p-3">
+      <div className="shrink-0 border-t border-sidebar-border p-3">
         <AccountButton userEmail={userEmail} />
-        <ThemeToggle
-          className="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-        />
       </div>
     </div>
   )
