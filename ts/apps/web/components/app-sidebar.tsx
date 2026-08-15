@@ -13,7 +13,6 @@ import {
   Plus,
   Trash2,
   ListChecks,
-  MoreHorizontal,
   LogOut,
   Key,
   FileDown,
@@ -256,7 +255,6 @@ function AccountButton({ userEmail }: { userEmail: string }) {
         <span className="hidden truncate text-sm font-medium sm:inline">
           {userEmail}
         </span>
-        <MoreHorizontal className="ml-auto size-4 shrink-0 text-muted-foreground" />
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner
@@ -410,7 +408,7 @@ function SidebarContent({ userEmail }: { userEmail: string }) {
         </div>
       </div>
 
-      <div className="shrink-0 border-t border-sidebar-border p-3">
+      <div className="shrink-0 p-3">
         <AccountButton userEmail={userEmail} />
       </div>
     </div>
