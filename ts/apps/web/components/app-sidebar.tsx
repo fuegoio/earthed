@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import {
@@ -13,7 +13,14 @@ import {
   Plus,
   Trash2,
   ListChecks,
+  MoreHorizontal,
+  LogOut,
+  Key,
+  FileDown,
+  Upload,
 } from "lucide-react"
+import { Menu } from "@base-ui/react/menu"
+import { Avatar } from "@base-ui/react/avatar"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 import {
   getClient,
@@ -23,8 +30,11 @@ import {
   unwrap,
 } from "@/lib/planetary"
 import { getApiErrorMessage } from "@/lib/errors"
+import { signout } from "@/lib/auth"
 import { Logo } from "@/components/logo"
 import { FeedIcon } from "@/components/feed-icon"
+import { SearchBox } from "@/components/search-box"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { buttonVariants } from "@workspace/ui/components/button"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { CategoryCreateDialog } from "@/components/category-create-dialog"
@@ -208,7 +218,90 @@ function CategoryList({ categories }: { categories: Category[] }) {
   )
 }
 
-function SidebarContent() {
+function AccountButton({ userEmail }: { userEmail: string }) {
+  const router = useRouter()
+
+  async function handleSignout() {
+    await signout()
+    router.push("/login")
+    router.refresh()
+  }
+
+  const menuItemClass = cn(
+    "flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm",
+    "hover:bg-accent hover:text-accent-foreground transition-colors",
+    "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
+  )
+
+  return (
+    <Menu.Root>
+      <Menu.Trigger
+        className={cn(
+          "flex min-w-0 flex-1 items-center gap-2 rounded-md py-1.5 pl-1.5 pr-2",
+          "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors",
+          "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
+        )}
+        aria-label="Account menu"
+      >
+        <Avatar.Root className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
+          <Avatar.Fallback>
+            {userEmail.charAt(0).toUpperCase()}
+          </Avatar.Fallback>
+        </Avatar.Root>
+        <span className="hidden truncate text-sm font-medium sm:inline">
+          {userEmail}
+        </span>
+        <MoreHorizontal className="ml-auto size-4 shrink-0 text-muted-foreground" />
+      </Menu.Trigger>
+      <Menu.Portal>
+        <Menu.Positioner
+          className={cn(
+            "z-50 min-w-48 overflow-hidden rounded-md border border-border bg-popover p-1",
+            "shadow-md"
+          )}
+          align="start"
+          side="top"
+        >
+          <Menu.Popup>
+            <div className="px-2 py-1.5">
+              <p className="text-sm font-medium truncate">{userEmail}</p>
+            </div>
+            <div className="my-1 h-px bg-border" />
+            <Menu.Item
+              className={menuItemClass}
+              render={<Link href="/settings/tokens" />}
+            >
+              <Key className="size-4" />
+              API tokens
+            </Menu.Item>
+            <div className="my-1 h-px bg-border" />
+            <Menu.Item
+              className={menuItemClass}
+              render={<Link href="/settings/opml" />}
+            >
+              <Upload className="size-4" />
+              Import OPML
+            </Menu.Item>
+            <Menu.Item
+              className={menuItemClass}
+              render={<Link href="/settings/opml" />}
+            >
+              <FileDown className="size-4" />
+              Export OPML
+            </Menu.Item>
+            <div className="my-1 h-px bg-border" />
+            <Menu.Item className={menuItemClass} onClick={handleSignout}>
+              <LogOut className="size-4" />
+              Sign out
+            </Menu.Item>
+          </Menu.Popup>
+        </Menu.Positioner>
+      </Menu.Portal>
+    </Menu.Root>
+  )
+}
+
+function SidebarContent({ userEmail }: { userEmail: string }) {
   const { data: feeds, isLoading: feedsLoading } = useQuery<Feed[]>({
     queryKey: ["feeds"],
     queryFn: async () => unwrap(listFeeds({ client: await getClient() })),
@@ -224,7 +317,7 @@ function SidebarContent() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex h-14 shrink-0 items-center gap-2 border-b border-sidebar-border px-4">
+      <div className="flex h-14 shrink-0 items-center gap-2 px-4">
         <Link
           href="/"
           className="flex items-center gap-2 font-serif text-lg font-bold"
@@ -235,6 +328,8 @@ function SidebarContent() {
       </div>
 
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-3">
+        <SearchBox className="max-w-none" />
+
         <SidebarNav />
 
         <SidebarSeparator />
@@ -292,6 +387,13 @@ function SidebarContent() {
           )}
         </div>
       </div>
+
+      <div className="flex shrink-0 items-center gap-1 border-t border-sidebar-border p-3">
+        <AccountButton userEmail={userEmail} />
+        <ThemeToggle
+          className="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+        />
+      </div>
     </div>
   )
 }
@@ -299,15 +401,17 @@ function SidebarContent() {
 export function AppSidebar({
   open,
   onClose,
+  userEmail,
 }: {
   open: boolean
   onClose: () => void
+  userEmail: string
 }) {
   return (
     <>
       {/* Desktop sidebar */}
       <aside className="hidden w-64 shrink-0 border-r border-sidebar-border bg-sidebar lg:flex lg:flex-col">
-        <SidebarContent />
+        <SidebarContent userEmail={userEmail} />
       </aside>
 
       {/* Mobile sidebar drawer */}
@@ -319,7 +423,7 @@ export function AppSidebar({
             aria-hidden="true"
           />
           <aside className="absolute left-0 top-0 flex h-full w-64 flex-col border-r border-sidebar-border bg-sidebar animate-in slide-in-from-left duration-200">
-            <SidebarContent />
+            <SidebarContent userEmail={userEmail} />
           </aside>
         </div>
       )}
