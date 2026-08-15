@@ -33,7 +33,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/empty"
+} from "@workspace/ui/components/empty"
 import { FeedIcon } from "@/components/feed-icon"
 import {
   getClient,
@@ -364,9 +364,9 @@ export function FeedListDetail({
       <div className="p-4">
         {/* Feeds */}
         {feeds.length === 0 ? (
-          <Empty>
+          <Empty className="border">
             <EmptyHeader>
-              <EmptyMedia>
+              <EmptyMedia variant="icon">
                 <Rss className="size-6 text-primary" />
               </EmptyMedia>
               <EmptyTitle>No feeds yet</EmptyTitle>

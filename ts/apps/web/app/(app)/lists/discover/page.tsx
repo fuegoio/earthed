@@ -13,7 +13,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/empty"
+} from "@workspace/ui/components/empty"
 import {
   getClient,
   discoverFeedLists,
@@ -78,9 +78,9 @@ export default function DiscoverPage() {
             ))}
           </div>
         ) : (lists ?? []).length === 0 ? (
-          <Empty>
+          <Empty className="border">
             <EmptyHeader>
-              <EmptyMedia>
+              <EmptyMedia variant="icon">
                 <Globe className="size-6 text-primary" />
               </EmptyMedia>
               <EmptyTitle>No public lists yet</EmptyTitle>

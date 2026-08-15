@@ -9,7 +9,7 @@ export default function StarredPage() {
     <div className="mx-auto w-full max-w-3xl">
       <PageHeader
         title="Starred"
-        icon={<Star className="size-4 fill-amber-400 text-amber-400" />}
+        icon={<Star className="size-4 fill-primary text-primary" />}
       />
       <EntryTimeline
         filter={{ starred: true }}

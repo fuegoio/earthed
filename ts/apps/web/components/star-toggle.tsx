@@ -68,7 +68,7 @@ export function StarToggle({
         className={cn(
           "transition-colors",
           starred
-            ? "fill-amber-400 text-amber-400"
+            ? "fill-primary text-primary"
             : "text-muted-foreground hover:text-foreground"
         )}
       />

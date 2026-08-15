@@ -13,7 +13,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/empty"
+} from "@workspace/ui/components/empty"
 import {
   getClient,
   listMyFeedLists,
@@ -66,9 +66,9 @@ export default function FeedListsPage() {
         {mineLoading ? (
           <LoadingRow />
         ) : (mine ?? []).length === 0 ? (
-          <Empty className="py-10">
+          <Empty className="border py-10">
             <EmptyHeader>
-              <EmptyMedia>
+              <EmptyMedia variant="icon">
                 <ListChecks className="size-6 text-primary" />
               </EmptyMedia>
               <EmptyTitle>No lists yet</EmptyTitle>
@@ -105,9 +105,9 @@ export default function FeedListsPage() {
         {followedLoading ? (
           <LoadingRow />
         ) : (followed ?? []).length === 0 ? (
-          <Empty>
+          <Empty className="border">
             <EmptyHeader>
-              <EmptyMedia>
+              <EmptyMedia variant="icon">
                 <Users className="size-6 text-primary" />
               </EmptyMedia>
               <EmptyTitle>Not following any lists</EmptyTitle>

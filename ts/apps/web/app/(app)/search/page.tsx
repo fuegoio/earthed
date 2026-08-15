@@ -7,7 +7,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/empty"
+} from "@workspace/ui/components/empty"
 
 export const metadata = { title: "Search" }
 
@@ -33,9 +33,9 @@ export default async function SearchPage({
         />
       ) : (
         <div className="p-4">
-          <Empty>
+          <Empty className="border">
             <EmptyHeader>
-              <EmptyMedia>
+              <EmptyMedia variant="icon">
                 <Search className="size-6 text-primary" />
               </EmptyMedia>
               <EmptyTitle>Search your feeds</EmptyTitle>

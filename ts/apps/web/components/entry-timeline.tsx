@@ -17,7 +17,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/empty"
+} from "@workspace/ui/components/empty"
 import { getClient, listEntries, listFeeds, unwrap } from "@/lib/planetary"
 import type { Entry, Feed } from "@/lib/types"
 import { buttonVariants } from "@workspace/ui/components/button"
@@ -117,9 +117,9 @@ export function EntryTimeline({
   if (error) {
     return (
       <div className="p-4">
-        <Empty>
+        <Empty className="border">
           <EmptyHeader>
-            <EmptyMedia>
+            <EmptyMedia variant="icon">
               <Rss className="size-6 text-primary" />
             </EmptyMedia>
             <EmptyTitle>Couldn&apos;t load entries</EmptyTitle>
@@ -143,9 +143,9 @@ export function EntryTimeline({
   if (entries.length === 0) {
     return (
       <div className="p-4">
-        <Empty>
+        <Empty className="border">
           <EmptyHeader>
-            <EmptyMedia>
+            <EmptyMedia variant="icon">
               <Rss className="size-6 text-primary" />
             </EmptyMedia>
             <EmptyTitle>{emptyTitle}</EmptyTitle>
