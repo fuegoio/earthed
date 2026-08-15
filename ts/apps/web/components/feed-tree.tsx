@@ -191,38 +191,36 @@ function FolderNode({
           }
         }}
         className={cn(
-          "group flex items-center rounded-md text-sm transition-colors cursor-grab active:cursor-grabbing",
+          "group flex items-center gap-2.5 rounded-md px-3 py-2 text-sm",
+          "text-sidebar-foreground/70 transition-colors cursor-grab active:cursor-grabbing",
+          active
+            ? "bg-sidebar-accent text-sidebar-accent-foreground"
+            : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
           isDropTarget && "ring-1 ring-primary/50 ring-inset"
         )}
-        style={{ paddingLeft: `${depth * 16}px` }}
+        style={{ paddingLeft: `${depth * 16 + 12}px` }}
       >
+        {open ? (
+          <FolderOpen
+            className={cn(
+              "size-3.5 shrink-0",
+              active ? "text-primary" : "text-muted-foreground"
+            )}
+          />
+        ) : (
+          <FolderIcon
+            className={cn(
+              "size-3.5 shrink-0",
+              active ? "text-primary" : "text-muted-foreground"
+            )}
+          />
+        )}
         <Link
           href={href}
           aria-current={active ? "page" : undefined}
-          className={cn(
-            "flex min-w-0 flex-1 items-center gap-2.5 rounded-md py-2 pr-2",
-            "text-sidebar-foreground/70 transition-colors",
-            active
-              ? "bg-sidebar-accent text-sidebar-accent-foreground"
-              : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-          )}
+          className="min-w-0 flex-1 truncate"
         >
-          {open ? (
-            <FolderOpen
-              className={cn(
-                "size-3.5 shrink-0",
-                active ? "text-primary" : "text-muted-foreground"
-              )}
-            />
-          ) : (
-            <FolderIcon
-              className={cn(
-                "size-3.5 shrink-0",
-                active ? "text-primary" : "text-muted-foreground"
-              )}
-            />
-          )}
-          <span className="truncate">{folder.title}</span>
+          {folder.title}
         </Link>
         <button
           type="button"
