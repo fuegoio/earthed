@@ -116,10 +116,10 @@ func (a *API) registerDeviceRoutes() {
 		case "denied":
 			return nil, deviceError("access_denied")
 		case "authorized":
-			if dc.TokenPlaintext == "" {
+			if dc.TokenPlaintext == nil || *dc.TokenPlaintext == "" {
 				return nil, deviceError("expired_token")
 			}
-			token := dc.TokenPlaintext
+			token := *dc.TokenPlaintext
 			// Single-use: delete the grant so the code can't be replayed.
 			_ = a.store.ConsumeDeviceCode(ctx, dc.DeviceCode)
 			return &DeviceTokenOutput{Body: struct {
@@ -244,7 +244,7 @@ type DeviceTokenOutput struct {
 type DeviceConfirmInput struct {
 	Body struct {
 		UserCode string `json:"user_code" minLength:"1" maxLength:"32"`
-		Deny     bool   `json:"deny"`
+		Deny     bool   `json:"deny,omitempty"`
 	}
 }
 

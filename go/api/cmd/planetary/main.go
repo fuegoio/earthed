@@ -131,6 +131,8 @@ func run() (int, error) {
 	for _, p := range api.PublicDevicePaths {
 		mux.Handle(p, humaMux)
 	}
+	mux.Handle("/api/auth/device/confirm", authInst.Middleware(humaMux))
+	mux.Handle("/api/auth/device/status", authInst.Middleware(humaMux))
 	mux.Handle("/api/v1/health", humaMux)
 	mux.Handle("/api/", authInst.Middleware(humaMux))
 	mux.Handle("/docs", humaRouter.Adapter())

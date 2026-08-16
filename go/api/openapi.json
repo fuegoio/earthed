@@ -269,8 +269,7 @@
                     }
                 },
                 "required": [
-                    "user_code",
-                    "deny"
+                    "user_code"
                 ],
                 "type": "object"
             },

@@ -102,7 +102,7 @@ type DeviceCode struct {
 	Status         string     `json:"status"`    // pending|authorized|denied|expired
 	UserID         *int       `json:"-"`
 	TokenID        *int       `json:"-"`
-	TokenPlaintext string     `json:"-"` // populated on authorize, consumed once
+	TokenPlaintext *string    `json:"-"` // populated on authorize, consumed once
 	IntervalSecs   int        `json:"interval"`
 	CreatedAt      time.Time  `json:"created_at"`
 	ExpiresAt      time.Time  `json:"expires_at"`

@@ -156,8 +156,9 @@ func pollDeviceToken(ctx context.Context, baseURL, deviceCode string) (*deviceTo
 		}
 		return &t, nil, 0
 	}
-	var e deviceTokenErrorResponse
-	_ = json.Unmarshal(body, &e)
+	// huma wraps errors in an ErrorModel: {"detail":"{\"error\":\"...\"}"}.
+	// Try to extract the inner error code.
+	e := extractDeviceError(body)
 	if e.Error == "" {
 		e.Error = fmt.Sprintf("status %d: %s", resp.StatusCode, string(body))
 	}
@@ -168,7 +169,31 @@ func pollDeviceToken(ctx context.Context, baseURL, deviceCode string) (*deviceTo
 		_, _ = fmt.Sscanf(ra, "%d", &n)
 		wait = n
 	}
-	return nil, &e, wait
+	return nil, e, wait
+}
+
+// extractDeviceError parses a huma ErrorModel response body and extracts
+// the inner {"error":"<code>"} from the detail field. Returns an empty
+// error if parsing fails.
+func extractDeviceError(body []byte) *deviceTokenErrorResponse {
+	// First try: body is directly {"error":"..."} (non-huma).
+	var direct deviceTokenErrorResponse
+	if json.Unmarshal(body, &direct) == nil && direct.Error != "" {
+		return &direct
+	}
+	// Second try: huma wraps it as {"detail":"{\"error\":\"...\"}"}.
+	var wrapper struct {
+		Detail string `json:"detail"`
+	}
+	if json.Unmarshal(body, &wrapper) == nil && wrapper.Detail != "" {
+		var inner deviceTokenErrorResponse
+		if json.Unmarshal([]byte(wrapper.Detail), &inner) == nil && inner.Error != "" {
+			return &inner
+		}
+		// detail is a plain string, not JSON
+		return &deviceTokenErrorResponse{Error: wrapper.Detail}
+	}
+	return &deviceTokenErrorResponse{}
 }
 
 // openURL opens the given URL in the user's default browser. No-op on
