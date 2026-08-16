@@ -12,6 +12,7 @@ migrate: build
 gen-openapi: build
 	./planetary --openapi 2>/dev/null | python3 -m json.tool > openapi.json
 	cp openapi.json ../../ts/apps/docs/openapi/openapi.json
+	cd ../../ts/packages/api-client && pnpm gen
 
 test: build
 	go test ./... -count=1

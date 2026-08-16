@@ -41,8 +41,10 @@ there:
 
 - **OpenAPI spec** — the reference at `ts/apps/docs/openapi/*` is generated from
   `go/api/openapi.json`. After changing Go handlers or types, run
-  `make gen-openapi` from `go/api/` — it regenerates `openapi.json` and copies
-  it to `ts/apps/docs/openapi/openapi.json` automatically. Commit both files.
+  `make gen-openapi` from `go/api/` — it regenerates `go/api/openapi.json`,
+  copies it to `ts/apps/docs/openapi/openapi.json`, and regenerates the
+  TypeScript client at `ts/packages/api-client/src/generated/`. Commit all
+  changed files.
 - **Guides** (`ts/apps/docs/content/docs/*.mdx`) — if your change affects
   behaviour described in a guide (e.g. roles in `roles.mdx`, setup steps
   in `getting-started.mdx`), update the guide in the same PR.
