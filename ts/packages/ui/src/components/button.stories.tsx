@@ -3,7 +3,7 @@ import { Plus, ChevronRight } from "lucide-react";
 
 import { Button } from "@workspace/ui/components/button";
 
-const meta = {
+const meta: Meta<typeof Button> = {
   title: "UI/Button",
   component: Button,
   tags: ["autodocs"],
@@ -20,7 +20,7 @@ const meta = {
       options: ["default", "xs", "sm", "lg", "icon", "icon-xs", "icon-sm", "icon-lg"],
     },
   },
-} satisfies Meta<typeof Button>;
+};
 
 export default meta;
 type Story = StoryObj<typeof meta>;
