@@ -84,11 +84,24 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 // handleKey dispatches key events to the focused panel.
 func (m Model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	// Search mode intercepts everything except ctrl+c.
+	if m.searching {
+		if msg.String() == "ctrl+c" {
+			return m, tea.Quit
+		}
+		return m.handleSearchKey(msg)
+	}
+
 	switch msg.String() {
 	case "ctrl+c":
 		return m, tea.Quit
 	case "q":
 		return m, tea.Quit
+	case "/":
+		m.searching = true
+		m.searchQuery = ""
+		m.focus = focusEntries
+		return m, nil
 	case "r":
 		m.loading = true
 		return m, tea.Batch(loadFeeds(m.client), loadFolders(m.client))
@@ -98,6 +111,61 @@ func (m Model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return m.handleSidebarKey(msg)
 	}
 	return m.handleEntriesKey(msg)
+}
+
+func (m Model) handleSearchKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	switch msg.String() {
+	case "esc":
+		// Cancel: restore the previous sidebar selection.
+		m.searching = false
+		m.searchQuery = ""
+		if len(m.items) > 0 {
+			m.loading = true
+			m.entries = nil
+			return m, loadEntriesByParams(m.client, entriesParamsForItem(m.items[m.sidebarCursor]))
+		}
+		return m, nil
+	case "enter":
+		// Confirm: run the search.
+		m.loading = true
+		m.entries = nil
+		m.entriesCursor = 0
+		m.entriesOffset = 0
+		if m.searchQuery == "" {
+			// Empty query: exit search and reload current selection.
+			m.searching = false
+			if len(m.items) > 0 {
+				return m, loadEntriesByParams(m.client, entriesParamsForItem(m.items[m.sidebarCursor]))
+			}
+			return m, nil
+		}
+		return m, searchEntries(m.client, m.searchQuery)
+	case "backspace", "ctrl+h":
+		runes := []rune(m.searchQuery)
+		if len(runes) > 0 {
+			m.searchQuery = string(runes[:len(runes)-1])
+		}
+		// Live search on delete.
+		if m.searchQuery != "" {
+			m.loading = true
+			m.entries = nil
+			m.entriesCursor = 0
+			m.entriesOffset = 0
+			return m, searchEntries(m.client, m.searchQuery)
+		}
+		return m, nil
+	default:
+		// Append printable characters.
+		if msg.Type == tea.KeyRunes {
+			m.searchQuery += string(msg.Runes)
+			m.loading = true
+			m.entries = nil
+			m.entriesCursor = 0
+			m.entriesOffset = 0
+			return m, searchEntries(m.client, m.searchQuery)
+		}
+	}
+	return m, nil
 }
 
 func (m Model) handleSidebarKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
@@ -259,12 +327,25 @@ func (m Model) renderSidebarLines() []string {
 	addLine(headerStyle.Render(truncate("☀ Planetary", innerWidth-2)))
 	addLine(strings.Repeat("─", innerWidth))
 
-	if m.loading && len(m.items) == 0 {
+	// Search input box replaces the nav items when searching.
+	if m.searching {
+		prompt := searchInputStyle.Render("/") + " "
+		cursor := searchCursorStyle.Render("▌")
+		query := searchInputStyle.Render(m.searchQuery)
+		addLine(prompt + query + cursor)
+		addLine("")
+	}
+
+	if !m.searching && m.loading && len(m.items) == 0 {
 		addLine(dimStyle.Render("  Loading…"))
 	}
 
 	feedsLabelShown := false
 	for i, item := range m.items {
+		// When searching, skip the nav items (All/Unread/Starred) — only show feeds.
+		if m.searching && (item.kind == sidebarAll || item.kind == sidebarUnread || item.kind == sidebarStarred) {
+			continue
+		}
 		// Emit the "FEEDS" section label before the first feed or folder.
 		if !feedsLabelShown && (item.kind == sidebarFeed || item.kind == sidebarFolder) {
 			addLine("")
@@ -375,7 +456,9 @@ func (m Model) renderEntryList(width int) string {
 	var sb strings.Builder
 
 	title := "Entries"
-	if len(m.items) > 0 && m.sidebarCursor < len(m.items) {
+	if m.searching {
+		title = "Search"
+	} else if len(m.items) > 0 && m.sidebarCursor < len(m.items) {
 		item := m.items[m.sidebarCursor]
 		switch item.kind {
 		case sidebarAll:
@@ -474,10 +557,13 @@ func (m Model) renderEntryList(width int) string {
 	}
 
 	var helpText string
-	if m.focus == focusSidebar {
-		helpText = "j/k navigate · l open list · q quit"
-	} else {
-		helpText = "j/k · ^d/^u · g/G · enter/o open · u read/unread · s star · h sidebar · q quit"
+	switch {
+	case m.searching:
+		helpText = "type to search · esc cancel · enter confirm · / from anywhere"
+	case m.focus == focusSidebar:
+		helpText = "j/k navigate · l open · / search · q quit"
+	default:
+		helpText = "j/k · ^d/^u · g/G · enter/o open · u read/unread · s star · / search · h sidebar · q quit"
 	}
 	sb.WriteString("\n" + helpStyle.Render(helpText))
 

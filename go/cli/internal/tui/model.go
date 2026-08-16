@@ -31,6 +31,7 @@ const (
 	sidebarStarred
 	sidebarFeed
 	sidebarFolder
+	sidebarSearch
 )
 
 type sidebarItem struct {
@@ -56,6 +57,10 @@ type Model struct {
 	feedsByID     map[int64]planetary.Feed
 	items         []sidebarItem
 	sidebarCursor int
+
+	// search
+	searching   bool
+	searchQuery string
 
 	// entries panel
 	entries       []planetary.Entry
@@ -111,6 +116,13 @@ var (
 
 	sectionLabelStyle = lipgloss.NewStyle().
 				Foreground(lipgloss.Color("240")).
+				Bold(true)
+
+	searchInputStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("255"))
+
+	searchCursorStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color(sunColor)).
 				Bold(true)
 )
 
@@ -198,6 +210,12 @@ func loadEntriesByParams(client *planetary.ClientWithResponses, params *planetar
 		}
 		return loadEntriesMsg{entries: *resp.JSON200}
 	}
+}
+
+func searchEntries(client *planetary.ClientWithResponses, query string) tea.Cmd {
+	return loadEntriesByParams(client, &planetary.ListEntriesParams{
+		Search: ptr(query),
+	})
 }
 
 func setEntryStatus(client *planetary.ClientWithResponses, entryID int64, status planetary.UpdateEntriesRequestStatus) tea.Cmd {
