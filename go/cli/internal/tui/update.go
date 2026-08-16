@@ -126,20 +126,22 @@ func (m Model) handleSearchKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 		return m, nil
 	case "enter":
-		// Confirm: run the search.
-		m.loading = true
-		m.entries = nil
+		// Confirm: commit the search and focus the results list.
+		m.searching = false
+		m.focus = focusEntries
 		m.entriesCursor = 0
 		m.entriesOffset = 0
 		if m.searchQuery == "" {
-			// Empty query: exit search and reload current selection.
-			m.searching = false
+			// Empty query: restore current sidebar selection.
+			m.loading = true
+			m.entries = nil
 			if len(m.items) > 0 {
 				return m, loadEntriesByParams(m.client, entriesParamsForItem(m.items[m.sidebarCursor]))
 			}
 			return m, nil
 		}
-		return m, searchEntries(m.client, m.searchQuery)
+		// Results are already loaded live; nothing more to fetch.
+		return m, nil
 	case "backspace", "ctrl+h":
 		runes := []rune(m.searchQuery)
 		if len(runes) > 0 {
@@ -190,12 +192,14 @@ func (m Model) handleSidebarKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		m.focus = focusEntries
 		m.loading = true
 		m.entries = nil
+		m.searchQuery = ""
 		return m, loadEntriesByParams(m.client, entriesParamsForItem(m.items[m.sidebarCursor]))
 	}
 	// If the cursor moved, refresh the entry panel for the new selection.
 	if m.sidebarCursor != prev && len(m.items) > 0 {
 		m.loading = true
 		m.entries = nil
+		m.searchQuery = ""
 		return m, loadEntriesByParams(m.client, entriesParamsForItem(m.items[m.sidebarCursor]))
 	}
 	return m, nil
@@ -329,21 +333,27 @@ func (m Model) renderSidebarLines() []string {
 
 	// Search input box replaces the nav items when searching.
 	if m.searching {
+		// Active input: show cursor.
 		prompt := searchInputStyle.Render("/") + " "
 		cursor := searchCursorStyle.Render("▌")
 		query := searchInputStyle.Render(m.searchQuery)
 		addLine(prompt + query + cursor)
 		addLine("")
+	} else if m.searchQuery != "" {
+		// Committed search result: show as a static label.
+		label := dimStyle.Render("/ ") + searchInputStyle.Render(m.searchQuery)
+		addLine(label)
+		addLine("")
 	}
 
-	if !m.searching && m.loading && len(m.items) == 0 {
+	if !m.searching && m.searchQuery == "" && m.loading && len(m.items) == 0 {
 		addLine(dimStyle.Render("  Loading…"))
 	}
 
 	feedsLabelShown := false
 	for i, item := range m.items {
-		// When searching, skip the nav items (All/Unread/Starred) — only show feeds.
-		if m.searching && (item.kind == sidebarAll || item.kind == sidebarUnread || item.kind == sidebarStarred) {
+		// When in search mode (active or committed), skip nav items.
+		if (m.searching || m.searchQuery != "") && (item.kind == sidebarAll || item.kind == sidebarUnread || item.kind == sidebarStarred) {
 			continue
 		}
 		// Emit the "FEEDS" section label before the first feed or folder.
@@ -456,7 +466,7 @@ func (m Model) renderEntryList(width int) string {
 	var sb strings.Builder
 
 	title := "Entries"
-	if m.searching {
+	if m.searching || m.searchQuery != "" {
 		title = "Search"
 	} else if len(m.items) > 0 && m.sidebarCursor < len(m.items) {
 		item := m.items[m.sidebarCursor]
