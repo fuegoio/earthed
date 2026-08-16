@@ -15,7 +15,12 @@ export function proxy(request: NextRequest) {
 
   if (!isPublicRoute && !session) {
     const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
+    // Preserve the full path + query so the user returns to the exact page
+    // they requested (e.g. /device?user_code=PLN-XXXX-XXXX).
+    loginUrl.searchParams.set(
+      "redirect",
+      request.nextUrl.pathname + request.nextUrl.search,
+    );
     return NextResponse.redirect(loginUrl);
   }
 

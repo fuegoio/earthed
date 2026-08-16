@@ -454,14 +454,15 @@ func (s *Store) ListEnclosuresByEntry(ctx context.Context, entryIDs []int64) (ma
 
 // --- API Tokens ---
 
-// CreateAPIToken inserts an API token for the given user.
-func (s *Store) CreateAPIToken(ctx context.Context, userID int, label, tokenHash string) (*APIToken, error) {
+// CreateAPIToken inserts an API token for the given user. expiresAt may be
+// nil for a non-expiring token; origin is "manual" or "device_flow".
+func (s *Store) CreateAPIToken(ctx context.Context, userID int, label, tokenHash, origin string, expiresAt *time.Time) (*APIToken, error) {
 	var t APIToken
 	err := s.DB.QueryRowContext(ctx,
-		`INSERT INTO api_tokens (user_id, label, token_hash) VALUES ($1, $2, $3)
-		 RETURNING id, user_id, label, token_hash, created_at, last_used_at`,
-		userID, label, tokenHash,
-	).Scan(&t.ID, &t.UserID, &t.Label, &t.TokenHash, &t.CreatedAt, &t.LastUsedAt)
+		`INSERT INTO api_tokens (user_id, label, token_hash, origin, expires_at) VALUES ($1, $2, $3, $4, $5)
+		 RETURNING id, user_id, label, token_hash, origin, created_at, last_used_at, expires_at`,
+		userID, label, tokenHash, origin, expiresAt,
+	).Scan(&t.ID, &t.UserID, &t.Label, &t.TokenHash, &t.Origin, &t.CreatedAt, &t.LastUsedAt, &t.ExpiresAt)
 	if err != nil {
 		return nil, fmt.Errorf("create api token: %w", err)
 	}
@@ -471,7 +472,7 @@ func (s *Store) CreateAPIToken(ctx context.Context, userID int, label, tokenHash
 // ListAPITokens returns API tokens for the given user.
 func (s *Store) ListAPITokens(ctx context.Context, userID int) ([]APIToken, error) {
 	rows, err := s.DB.QueryContext(ctx,
-		`SELECT id, user_id, label, token_hash, created_at, last_used_at
+		`SELECT id, user_id, label, token_hash, origin, created_at, last_used_at, expires_at
 		 FROM api_tokens WHERE user_id = $1 ORDER BY created_at DESC`, userID)
 	if err != nil {
 		return nil, err
@@ -480,7 +481,7 @@ func (s *Store) ListAPITokens(ctx context.Context, userID int) ([]APIToken, erro
 	var tokens []APIToken
 	for rows.Next() {
 		var t APIToken
-		if err := rows.Scan(&t.ID, &t.UserID, &t.Label, &t.TokenHash, &t.CreatedAt, &t.LastUsedAt); err != nil {
+		if err := rows.Scan(&t.ID, &t.UserID, &t.Label, &t.TokenHash, &t.Origin, &t.CreatedAt, &t.LastUsedAt, &t.ExpiresAt); err != nil {
 			return nil, err
 		}
 		tokens = append(tokens, t)
@@ -489,13 +490,16 @@ func (s *Store) ListAPITokens(ctx context.Context, userID int) ([]APIToken, erro
 }
 
 // GetAPITokenByHash returns the API token matching the hash, or nil. It also
-// bumps last_used_at.
+// bumps last_used_at. Expired tokens (expires_at < now) are treated as
+// invalid and return nil.
 func (s *Store) GetAPITokenByHash(ctx context.Context, tokenHash string) (*APIToken, error) {
 	var t APIToken
 	err := s.DB.QueryRowContext(ctx,
-		`SELECT id, user_id, label, token_hash, created_at, last_used_at
-		 FROM api_tokens WHERE token_hash = $1`, tokenHash,
-	).Scan(&t.ID, &t.UserID, &t.Label, &t.TokenHash, &t.CreatedAt, &t.LastUsedAt)
+		`SELECT id, user_id, label, token_hash, origin, created_at, last_used_at, expires_at
+		 FROM api_tokens
+		 WHERE token_hash = $1
+		   AND (expires_at IS NULL OR expires_at > NOW())`, tokenHash,
+	).Scan(&t.ID, &t.UserID, &t.Label, &t.TokenHash, &t.Origin, &t.CreatedAt, &t.LastUsedAt, &t.ExpiresAt)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -510,6 +514,135 @@ func (s *Store) GetAPITokenByHash(ctx context.Context, tokenHash string) (*APITo
 func (s *Store) DeleteAPIToken(ctx context.Context, id, userID int) error {
 	_, err := s.DB.ExecContext(ctx, `DELETE FROM api_tokens WHERE id = $1 AND user_id = $2`, id, userID)
 	return err
+}
+
+// --- Device Codes (RFC 8628) ---
+
+// CreateDeviceCode inserts a new device authorization grant. deviceCodeHash
+// is the SHA-256 hash of the plaintext device code (which is only returned
+// to the caller, never stored).
+func (s *Store) CreateDeviceCode(ctx context.Context, deviceCodeHash, userCode string, intervalSecs int, expiresAt time.Time) (*DeviceCode, error) {
+	var dc DeviceCode
+	err := s.DB.QueryRowContext(ctx,
+		`INSERT INTO device_codes (device_code, user_code, interval_s, expires_at)
+		 VALUES ($1, $2, $3, $4)
+		 RETURNING id, device_code, user_code, status, user_id, token_id, token_plaintext, interval_s, created_at, expires_at, last_polled_at`,
+		deviceCodeHash, userCode, intervalSecs, expiresAt,
+	).Scan(&dc.ID, &dc.DeviceCode, &dc.UserCode, &dc.Status, &dc.UserID, &dc.TokenID, &dc.TokenPlaintext, &dc.IntervalSecs, &dc.CreatedAt, &dc.ExpiresAt, &dc.LastPolledAt)
+	if err != nil {
+		return nil, fmt.Errorf("create device code: %w", err)
+	}
+	return &dc, nil
+}
+
+// GetDeviceCodeByHash returns the device code grant matching the hash, or
+// nil. Expired grants are returned with Status set to "expired" so callers
+// can distinguish "expired" from "pending"/"authorized".
+func (s *Store) GetDeviceCodeByHash(ctx context.Context, deviceCodeHash string) (*DeviceCode, error) {
+	var dc DeviceCode
+	err := s.DB.QueryRowContext(ctx,
+		`SELECT id, device_code, user_code, status, user_id, token_id, token_plaintext, interval_s, created_at, expires_at, last_polled_at
+		 FROM device_codes WHERE device_code = $1`, deviceCodeHash,
+	).Scan(&dc.ID, &dc.DeviceCode, &dc.UserCode, &dc.Status, &dc.UserID, &dc.TokenID, &dc.TokenPlaintext, &dc.IntervalSecs, &dc.CreatedAt, &dc.ExpiresAt, &dc.LastPolledAt)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	if dc.Status == "pending" && time.Now().After(dc.ExpiresAt) {
+		dc.Status = "expired"
+	}
+	return &dc, nil
+}
+
+// GetDeviceCodeByUserCode returns the device code grant matching the
+// human-readable user code, or nil. Used by the confirm endpoint.
+func (s *Store) GetDeviceCodeByUserCode(ctx context.Context, userCode string) (*DeviceCode, error) {
+	var dc DeviceCode
+	err := s.DB.QueryRowContext(ctx,
+		`SELECT id, device_code, user_code, status, user_id, token_id, token_plaintext, interval_s, created_at, expires_at, last_polled_at
+		 FROM device_codes WHERE user_code = $1`, userCode,
+	).Scan(&dc.ID, &dc.DeviceCode, &dc.UserCode, &dc.Status, &dc.UserID, &dc.TokenID, &dc.TokenPlaintext, &dc.IntervalSecs, &dc.CreatedAt, &dc.ExpiresAt, &dc.LastPolledAt)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	if dc.Status == "pending" && time.Now().After(dc.ExpiresAt) {
+		dc.Status = "expired"
+	}
+	return &dc, nil
+}
+
+// AuthorizeDeviceCode marks a pending grant as authorized by userID and
+// attaches the freshly minted tokenID and the plaintext token (returned
+// once to the polling CLI, then the row is deleted). Returns the updated
+// grant, or nil if the grant was not pending (already confirmed/denied/
+// expired/missing).
+func (s *Store) AuthorizeDeviceCode(ctx context.Context, userCode string, userID, tokenID int, tokenPlaintext string) (*DeviceCode, error) {
+	var dc DeviceCode
+	err := s.DB.QueryRowContext(ctx,
+		`UPDATE device_codes
+		   SET status = 'authorized', user_id = $2, token_id = $3, token_plaintext = $4
+		 WHERE user_code = $1 AND status = 'pending' AND expires_at > NOW()
+		 RETURNING id, device_code, user_code, status, user_id, token_id, token_plaintext, interval_s, created_at, expires_at, last_polled_at`,
+		userCode, userID, tokenID, tokenPlaintext,
+	).Scan(&dc.ID, &dc.DeviceCode, &dc.UserCode, &dc.Status, &dc.UserID, &dc.TokenID, &dc.TokenPlaintext, &dc.IntervalSecs, &dc.CreatedAt, &dc.ExpiresAt, &dc.LastPolledAt)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("authorize device code: %w", err)
+	}
+	return &dc, nil
+}
+
+// DenyDeviceCode marks a pending grant as denied. Returns the updated grant,
+// or nil if the grant was not pending.
+func (s *Store) DenyDeviceCode(ctx context.Context, userCode string) (*DeviceCode, error) {
+	var dc DeviceCode
+	err := s.DB.QueryRowContext(ctx,
+		`UPDATE device_codes SET status = 'denied'
+		 WHERE user_code = $1 AND status = 'pending' AND expires_at > NOW()
+		 RETURNING id, device_code, user_code, status, user_id, token_id, token_plaintext, interval_s, created_at, expires_at, last_polled_at`,
+		userCode,
+	).Scan(&dc.ID, &dc.DeviceCode, &dc.UserCode, &dc.Status, &dc.UserID, &dc.TokenID, &dc.TokenPlaintext, &dc.IntervalSecs, &dc.CreatedAt, &dc.ExpiresAt, &dc.LastPolledAt)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("deny device code: %w", err)
+	}
+	return &dc, nil
+}
+
+// TouchDeviceCodePoll bumps last_polled_at on the grant row so the
+// slow_down check can detect too-frequent polling.
+func (s *Store) TouchDeviceCodePoll(ctx context.Context, deviceCodeHash string) error {
+	_, err := s.DB.ExecContext(ctx, `UPDATE device_codes SET last_polled_at = NOW() WHERE device_code = $1`, deviceCodeHash)
+	return err
+}
+
+// ConsumeDeviceCode deletes an authorized grant after its token has been
+// handed to the CLI, so the device code is single-use and cannot be replayed.
+func (s *Store) ConsumeDeviceCode(ctx context.Context, deviceCodeHash string) error {
+	_, err := s.DB.ExecContext(ctx, `DELETE FROM device_codes WHERE device_code = $1 AND status = 'authorized'`, deviceCodeHash)
+	return err
+}
+
+// PurgeExpiredDeviceCodes removes expired or consumed grants older than the
+// given retention window. Called lazily or by a background sweeper.
+func (s *Store) PurgeExpiredDeviceCodes(ctx context.Context, retention time.Duration) (int64, error) {
+	res, err := s.DB.ExecContext(ctx,
+		`DELETE FROM device_codes
+		 WHERE (status IN ('expired', 'denied') OR expires_at < NOW() - $1::interval)`,
+		retention.String())
+	if err != nil {
+		return 0, err
+	}
+	return res.RowsAffected()
 }
 
 // --- Users (Limen-managed table, read-only from here) ---

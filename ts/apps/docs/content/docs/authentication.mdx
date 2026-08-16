@@ -20,6 +20,25 @@ Planetary accepts two types of credentials:
 Bearer tokens take precedence. If a request includes both a bearer token
 and a session cookie, the token is used and the cookie is ignored.
 
+## Device flow (CLI login)
+
+The CLI logs in via [RFC 8628 device authorization grant](https://datatracker.ietf.org/doc/html/rfc8628).
+The CLI requests a device code from the API, opens a browser to a
+confirmation page on the web frontend, and polls the API until the user
+approves or denies the request.
+
+```
+POST /api/auth/device/code     → issue a device code (public)
+POST /api/auth/device/token    → poll for the result (public)
+POST /api/auth/device/confirm  → approve or deny (requires session)
+GET  /api/auth/device/status   → check status by user code (requires session)
+```
+
+Tokens issued via the device flow expire after 14 days and are labeled
+`CLI (device flow)` in the token list so they can be identified and
+revoked. The plaintext token is never exposed to the web UI — it is
+returned only to the CLI that initiated the flow.
+
 ## Session authentication
 
 Session auth is handled by Limen at `/api/auth/`. These endpoints are
@@ -129,6 +148,10 @@ error.
 
 Tokens follow the format `pla_` followed by 64 hex characters (32 random
 bytes). They are 69 characters long.
+
+Tokens created via the web UI or the `tokens create` command do not
+expire. Tokens issued via the device flow (`planetary login`) expire
+after 14 days.
 
 ## Authorization model
 

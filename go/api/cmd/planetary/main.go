@@ -63,7 +63,7 @@ func run() (int, error) {
 		humaConfig.Tags = api.OpenAPITags()
 		humaRouter := humago.New(humaMux, humaConfig)
 
-		apiHandler := api.New(humaRouter, nil, nil, nil)
+		apiHandler := api.New(humaRouter, nil, nil, nil, nil)
 		apiHandler.RegisterRoutes()
 
 		b, err := humaRouter.OpenAPI().MarshalJSON()
@@ -119,12 +119,20 @@ func run() (int, error) {
 	humaRouter := humago.New(humaMux, humaConfig)
 
 	f := fetcher.New(cfg.HTTPTimeout, cfg.HTTPMaxBody, "Planetary/1.0")
-	apiHandler := api.New(humaRouter, st, authInst, f)
+	apiHandler := api.New(humaRouter, st, authInst, cfg, f)
 	apiHandler.RegisterRoutes()
 
 	mux := http.NewServeMux()
 
 	mux.Handle("/api/auth/", authInst.Handler())
+	// Public device-flow endpoints (issue + poll) must be reachable without
+	// a session; the confirm + status endpoints sit behind the middleware
+	// because they require an authenticated user to approve the grant.
+	for _, p := range api.PublicDevicePaths {
+		mux.Handle(p, humaMux)
+	}
+	mux.Handle("/api/auth/device/confirm", authInst.Middleware(humaMux))
+	mux.Handle("/api/auth/device/status", authInst.Middleware(humaMux))
 	mux.Handle("/api/v1/health", humaMux)
 	mux.Handle("/api/", authInst.Middleware(humaMux))
 	mux.Handle("/docs", humaRouter.Adapter())
