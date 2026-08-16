@@ -1,32 +1,26 @@
-"use client"
+"use client";
 
-import { useState, useCallback, type DragEvent } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
-import { ChevronRight, FolderOpen, Folder as FolderIcon } from "lucide-react"
-import {
-  getClient,
-  updateFeed,
-  updateFolder,
-} from "@/lib/planetary"
-import { getApiErrorMessage } from "@/lib/errors"
-import { FeedIcon } from "@/components/feed-icon"
-import { cn } from "@workspace/ui/lib/utils"
-import type { Feed, Folder } from "@/lib/types"
+import { useState, useCallback, type DragEvent } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { ChevronRight, FolderOpen, Folder as FolderIcon } from "lucide-react";
+import { getClient, updateFeed, updateFolder } from "@/lib/planetary";
+import { getApiErrorMessage } from "@/lib/errors";
+import { FeedIcon } from "@/components/feed-icon";
+import { cn } from "@workspace/ui/lib/utils";
+import type { Feed, Folder } from "@/lib/types";
 
 type TreeNode =
   | { type: "folder"; folder: Folder; children: TreeNode[] }
-  | { type: "feed"; feed: Feed }
+  | { type: "feed"; feed: Feed };
 
-type DragData =
-  | { kind: "feed"; id: number }
-  | { kind: "folder"; id: number }
+type DragData = { kind: "feed"; id: number } | { kind: "folder"; id: number };
 
 function isActive(pathname: string, href: string): boolean {
-  if (href === "/") return pathname === "/"
-  return pathname === href || pathname.startsWith(href + "/")
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(href + "/");
 }
 
 /**
@@ -34,57 +28,50 @@ function isActive(pathname: string, href: string): boolean {
  * Feeds are placed inside their folder_id, or at the root if unassigned.
  */
 function buildTree(feeds: Feed[], folders: Folder[]): TreeNode[] {
-  const folderMap = new Map<number, Folder>()
-  for (const f of folders) folderMap.set(f.id, f)
+  const folderMap = new Map<number, Folder>();
+  for (const f of folders) folderMap.set(f.id, f);
 
-  const childrenMap = new Map<number | null, TreeNode[]>()
+  const childrenMap = new Map<number | null, TreeNode[]>();
   for (const f of folders) {
-    const parentKey = f.parent_id ?? null
-    if (!childrenMap.has(parentKey)) childrenMap.set(parentKey, [])
+    const parentKey = f.parent_id ?? null;
+    if (!childrenMap.has(parentKey)) childrenMap.set(parentKey, []);
     childrenMap.get(parentKey)!.push({
       type: "folder",
       folder: f,
       children: [],
-    })
+    });
   }
 
   // Recursively populate folder children
   function populate(nodes: TreeNode[]) {
     for (const node of nodes) {
       if (node.type === "folder") {
-        node.children = childrenMap.get(node.folder.id) ?? []
+        node.children = childrenMap.get(node.folder.id) ?? [];
         // Add feeds belonging to this folder
-        const folderFeeds = feeds.filter(
-          (feed) => feed.folder_id === node.folder.id
-        )
-        node.children.push(
-          ...folderFeeds.map((feed) => ({ type: "feed", feed }) as TreeNode)
-        )
-        populate(node.children)
+        const folderFeeds = feeds.filter((feed) => feed.folder_id === node.folder.id);
+        node.children.push(...folderFeeds.map((feed) => ({ type: "feed", feed }) as TreeNode));
+        populate(node.children);
       }
     }
   }
 
-  const rootNodes = childrenMap.get(null) ?? []
+  const rootNodes = childrenMap.get(null) ?? [];
   // Root-level feeds (no folder)
-  const rootFeeds = feeds.filter((feed) => !feed.folder_id)
-  const rootTree = [
-    ...rootNodes,
-    ...rootFeeds.map((feed) => ({ type: "feed", feed }) as TreeNode),
-  ]
-  populate(rootNodes)
-  return rootTree
+  const rootFeeds = feeds.filter((feed) => !feed.folder_id);
+  const rootTree = [...rootNodes, ...rootFeeds.map((feed) => ({ type: "feed", feed }) as TreeNode)];
+  populate(rootNodes);
+  return rootTree;
 }
 
 /** Check if a folder is a descendant of another folder (to prevent cycles). */
 function isDescendant(folders: Folder[], folderId: number, ancestorId: number): boolean {
-  const folderMap = new Map(folders.map((f) => [f.id, f]))
-  let current = folderMap.get(folderId)
+  const folderMap = new Map(folders.map((f) => [f.id, f]));
+  let current = folderMap.get(folderId);
   while (current?.parent_id) {
-    if (current.parent_id === ancestorId) return true
-    current = folderMap.get(current.parent_id)
+    if (current.parent_id === ancestorId) return true;
+    current = folderMap.get(current.parent_id);
   }
-  return false
+  return false;
 }
 
 function FeedNode({
@@ -94,15 +81,15 @@ function FeedNode({
   isDropTarget,
   onDrop,
 }: {
-  feed: Feed
-  onDragStart: (e: DragEvent, feedId: number) => void
-  onDragEnd: () => void
-  isDropTarget: boolean
-  onDrop: (e: DragEvent, targetFolderId: number | null) => void
+  feed: Feed;
+  onDragStart: (e: DragEvent, feedId: number) => void;
+  onDragEnd: () => void;
+  isDropTarget: boolean;
+  onDrop: (e: DragEvent, targetFolderId: number | null) => void;
 }) {
-  const pathname = usePathname()
-  const href = `/feeds/${feed.id}`
-  const active = isActive(pathname, href)
+  const pathname = usePathname();
+  const href = `/feeds/${feed.id}`;
+  const active = isActive(pathname, href);
 
   return (
     <Link
@@ -111,8 +98,8 @@ function FeedNode({
       onDragStart={(e) => onDragStart(e, feed.id)}
       onDragEnd={onDragEnd}
       onDragOver={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
+        e.preventDefault();
+        e.stopPropagation();
       }}
       onDrop={(e) => onDrop(e, null)}
       aria-current={active ? "page" : undefined}
@@ -122,16 +109,13 @@ function FeedNode({
         active
           ? "bg-sidebar-accent text-sidebar-accent-foreground"
           : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-        isDropTarget && "ring-1 ring-primary/50 ring-inset"
+        isDropTarget && "ring-1 ring-primary/50 ring-inset",
       )}
     >
-      <FeedIcon
-        siteUrl={feed.site_url}
-        className="size-3.5 shrink-0 rounded-sm"
-      />
+      <FeedIcon siteUrl={feed.site_url} className="size-3.5 shrink-0 rounded-sm" />
       <span className="truncate">{feed.title}</span>
     </Link>
-  )
+  );
 }
 
 function FolderNode({
@@ -148,31 +132,31 @@ function FolderNode({
   onDrop,
   depth,
 }: {
-  folder: Folder
-  childNodes: TreeNode[]
-  folders: Folder[]
-  feeds: Feed[]
-  onDragStart: (e: DragEvent, data: DragData) => void
-  onDragEnd: () => void
-  dragData: DragData | null
-  isDropTarget: boolean
-  dropTarget: number | null
-  setDropTarget: (id: number | null) => void
-  onDrop: (e: DragEvent, targetFolderId: number | null) => void
-  depth: number
+  folder: Folder;
+  childNodes: TreeNode[];
+  folders: Folder[];
+  feeds: Feed[];
+  onDragStart: (e: DragEvent, data: DragData) => void;
+  onDragEnd: () => void;
+  dragData: DragData | null;
+  isDropTarget: boolean;
+  dropTarget: number | null;
+  setDropTarget: (id: number | null) => void;
+  onDrop: (e: DragEvent, targetFolderId: number | null) => void;
+  depth: number;
 }) {
-  const pathname = usePathname()
-  const [open, setOpen] = useState(true)
+  const pathname = usePathname();
+  const [open, setOpen] = useState(true);
 
-  const href = `/folders/${folder.id}`
-  const active = isActive(pathname, href)
+  const href = `/folders/${folder.id}`;
+  const active = isActive(pathname, href);
 
   const canDropHere =
     dragData !== null &&
     !(
       dragData.kind === "folder" &&
       (dragData.id === folder.id || isDescendant(folders, folder.id, dragData.id))
-    )
+    );
 
   return (
     <div>
@@ -182,16 +166,16 @@ function FolderNode({
         onDragEnd={onDragEnd}
         onDragOver={(e) => {
           if (canDropHere) {
-            e.preventDefault()
-            e.stopPropagation()
-            setDropTarget(folder.id)
+            e.preventDefault();
+            e.stopPropagation();
+            setDropTarget(folder.id);
           }
         }}
         onDrop={(e) => {
           if (canDropHere) {
-            e.preventDefault()
-            e.stopPropagation()
-            onDrop(e, folder.id)
+            e.preventDefault();
+            e.stopPropagation();
+            onDrop(e, folder.id);
           }
         }}
         className={cn(
@@ -200,7 +184,7 @@ function FolderNode({
           active
             ? "bg-sidebar-accent text-sidebar-accent-foreground"
             : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-          isDropTarget && "ring-1 ring-primary/50 ring-inset"
+          isDropTarget && "ring-1 ring-primary/50 ring-inset",
         )}
         style={{ paddingLeft: `${depth * 16 + 12}px` }}
       >
@@ -211,17 +195,11 @@ function FolderNode({
         >
           {open ? (
             <FolderOpen
-              className={cn(
-                "size-3.5 shrink-0",
-                active ? "text-primary" : "text-muted-foreground"
-              )}
+              className={cn("size-3.5 shrink-0", active ? "text-primary" : "text-muted-foreground")}
             />
           ) : (
             <FolderIcon
-              className={cn(
-                "size-3.5 shrink-0",
-                active ? "text-primary" : "text-muted-foreground"
-              )}
+              className={cn("size-3.5 shrink-0", active ? "text-primary" : "text-muted-foreground")}
             />
           )}
           <span className="truncate">{folder.title}</span>
@@ -229,18 +207,15 @@ function FolderNode({
         <button
           type="button"
           onClick={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            setOpen((o) => !o)
+            e.preventDefault();
+            e.stopPropagation();
+            setOpen((o) => !o);
           }}
           className="flex size-5 shrink-0 items-center justify-center text-muted-foreground hover:text-foreground"
           aria-label={open ? "Collapse" : "Expand"}
         >
           <ChevronRight
-            className={cn(
-              "size-3.5 transition-transform duration-150",
-              open && "rotate-90"
-            )}
+            className={cn("size-3.5 transition-transform duration-150", open && "rotate-90")}
           />
         </button>
       </div>
@@ -267,20 +242,18 @@ function FolderNode({
               <div key={`feed-${child.feed.id}`} style={{ paddingLeft: `${(depth + 1) * 16}px` }}>
                 <FeedNode
                   feed={child.feed}
-                  onDragStart={(e, feedId) =>
-                    onDragStart(e, { kind: "feed", id: feedId })
-                  }
+                  onDragStart={(e, feedId) => onDragStart(e, { kind: "feed", id: feedId })}
                   onDragEnd={onDragEnd}
                   isDropTarget={false}
                   onDrop={onDrop}
                 />
               </div>
-            )
+            ),
           )}
         </div>
       )}
     </div>
-  )
+  );
 }
 
 /**
@@ -290,29 +263,29 @@ function FolderNode({
  * feed navigates to /feeds/[id].
  */
 export function FeedTree({ feeds, folders }: { feeds: Feed[]; folders: Folder[] }) {
-  const queryClient = useQueryClient()
-  const [dragData, setDragData] = useState<DragData | null>(null)
-  const [dropTarget, setDropTarget] = useState<number | null>(null)
+  const queryClient = useQueryClient();
+  const [dragData, setDragData] = useState<DragData | null>(null);
+  const [dropTarget, setDropTarget] = useState<number | null>(null);
 
-  const tree = buildTree(feeds, folders)
+  const tree = buildTree(feeds, folders);
 
   const handleDragStart = useCallback((e: DragEvent, data: DragData) => {
-    setDragData(data)
-    e.dataTransfer.effectAllowed = "move"
-    e.dataTransfer.setData("text/plain", JSON.stringify(data))
-  }, [])
+    setDragData(data);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", JSON.stringify(data));
+  }, []);
 
   const handleDragEnd = useCallback(() => {
-    setDragData(null)
-    setDropTarget(null)
-  }, [])
+    setDragData(null);
+    setDropTarget(null);
+  }, []);
 
   const handleDrop = useCallback(
     async (_e: DragEvent, targetFolderId: number | null) => {
-      if (!dragData) return
-      const data = dragData
-      setDragData(null)
-      setDropTarget(null)
+      if (!dragData) return;
+      const data = dragData;
+      setDragData(null);
+      setDropTarget(null);
 
       try {
         if (data.kind === "feed") {
@@ -320,15 +293,15 @@ export function FeedTree({ feeds, folders }: { feeds: Feed[]; folders: Folder[] 
             client: await getClient(),
             path: { feedId: data.id },
             body: { folder_id: targetFolderId ?? undefined },
-          })
-          if (error) throw error
-          await queryClient.invalidateQueries({ queryKey: ["feeds"] })
-          await queryClient.invalidateQueries({ queryKey: ["entries"] })
+          });
+          if (error) throw error;
+          await queryClient.invalidateQueries({ queryKey: ["feeds"] });
+          await queryClient.invalidateQueries({ queryKey: ["entries"] });
         } else {
           // Moving a folder — need to update both title and parent_id
-          const folder = folders.find((f) => f.id === data.id)
-          if (!folder) return
-          if (targetFolderId === folder.parent_id) return // no change
+          const folder = folders.find((f) => f.id === data.id);
+          if (!folder) return;
+          if (targetFolderId === folder.parent_id) return; // no change
           const { error } = await updateFolder({
             client: await getClient(),
             path: { folderId: data.id },
@@ -336,18 +309,18 @@ export function FeedTree({ feeds, folders }: { feeds: Feed[]; folders: Folder[] 
               title: folder.title,
               parent_id: targetFolderId ?? undefined,
             },
-          })
-          if (error) throw error
-          await queryClient.invalidateQueries({ queryKey: ["folders"] })
-          await queryClient.invalidateQueries({ queryKey: ["feeds"] })
-          await queryClient.invalidateQueries({ queryKey: ["entries"] })
+          });
+          if (error) throw error;
+          await queryClient.invalidateQueries({ queryKey: ["folders"] });
+          await queryClient.invalidateQueries({ queryKey: ["feeds"] });
+          await queryClient.invalidateQueries({ queryKey: ["entries"] });
         }
       } catch (err) {
-        toast.error(getApiErrorMessage(err, "Could not move item"))
+        toast.error(getApiErrorMessage(err, "Could not move item"));
       }
     },
-    [dragData, folders, queryClient]
-  )
+    [dragData, folders, queryClient],
+  );
 
   return (
     <div className="flex flex-col gap-0.5">
@@ -372,15 +345,13 @@ export function FeedTree({ feeds, folders }: { feeds: Feed[]; folders: Folder[] 
           <FeedNode
             key={`feed-${node.feed.id}`}
             feed={node.feed}
-            onDragStart={(e, feedId) =>
-              handleDragStart(e, { kind: "feed", id: feedId })
-            }
+            onDragStart={(e, feedId) => handleDragStart(e, { kind: "feed", id: feedId })}
             onDragEnd={handleDragEnd}
             isDropTarget={false}
             onDrop={handleDrop}
           />
-        )
+        ),
       )}
     </div>
-  )
+  );
 }

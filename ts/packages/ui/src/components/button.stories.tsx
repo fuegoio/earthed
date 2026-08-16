@@ -49,9 +49,15 @@ export const Sizes: Story = {
       <Button size="sm">Small</Button>
       <Button size="default">Default</Button>
       <Button size="lg">Large</Button>
-      <Button size="icon-sm" aria-label="Add"><Plus /></Button>
-      <Button size="icon" aria-label="Add"><Plus /></Button>
-      <Button size="icon-lg" aria-label="Add"><Plus /></Button>
+      <Button size="icon-sm" aria-label="Add">
+        <Plus />
+      </Button>
+      <Button size="icon" aria-label="Add">
+        <Plus />
+      </Button>
+      <Button size="icon-lg" aria-label="Add">
+        <Plus />
+      </Button>
     </div>
   ),
 };
@@ -65,7 +71,9 @@ export const WithIcon: Story = {
       <Button variant="default">
         Continue <ChevronRight data-icon="inline-end" />
       </Button>
-      <Button variant="outline" size="icon" aria-label="Add"><Plus /></Button>
+      <Button variant="outline" size="icon" aria-label="Add">
+        <Plus />
+      </Button>
     </div>
   ),
 };

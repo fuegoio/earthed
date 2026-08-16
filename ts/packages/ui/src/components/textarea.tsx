@@ -1,4 +1,4 @@
-import { cn } from "@workspace/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils";
 
 /** Shared textarea styled to match the Input component. */
 export function Textarea({
@@ -14,9 +14,9 @@ export function Textarea({
         "focus-visible:border-ring focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/30",
         "transition-[color,box-shadow]",
         "disabled:cursor-not-allowed disabled:opacity-50",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }

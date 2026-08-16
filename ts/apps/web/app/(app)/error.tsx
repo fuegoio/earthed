@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { AlertCircle } from "lucide-react"
-import { Button } from "@workspace/ui/components/button"
+import { useEffect } from "react";
+import { AlertCircle } from "lucide-react";
+import { Button } from "@workspace/ui/components/button";
 
 export default function Error({
   error,
   reset,
 }: {
-  error: Error & { digest?: string }
-  reset: () => void
+  error: Error & { digest?: string };
+  reset: () => void;
 }) {
   useEffect(() => {
-    console.error(error)
-  }, [error])
+    console.error(error);
+  }, [error]);
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 px-6 py-20 text-center">
@@ -21,9 +21,7 @@ export default function Error({
         <AlertCircle className="size-6 text-destructive" />
       </div>
       <div>
-        <h1 className="font-serif text-lg font-bold tracking-tight">
-          Something went wrong
-        </h1>
+        <h1 className="font-serif text-lg font-bold tracking-tight">Something went wrong</h1>
         <p className="mt-1 max-w-sm text-sm text-muted-foreground">
           An unexpected error occurred while loading this page.
         </p>
@@ -32,5 +30,5 @@ export default function Error({
         Try again
       </Button>
     </div>
-  )
+  );
 }

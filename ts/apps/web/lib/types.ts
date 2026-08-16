@@ -1,4 +1,4 @@
-import type { ApiToken, TokenOutputBody } from "@planetary/api-client"
+import type { ApiToken, TokenOutputBody } from "@planetary/api-client";
 
 export type {
   ApiToken,
@@ -17,9 +17,9 @@ export type {
   PreviewFeedBody,
   PreviewFeedItem,
   User,
-} from "@planetary/api-client"
+} from "@planetary/api-client";
 
 // Web-friendly aliases for generated types whose generated names are awkward
 // to use in components.
-export type APIToken = ApiToken
-export type CreatedToken = TokenOutputBody
+export type APIToken = ApiToken;
+export type CreatedToken = TokenOutputBody;

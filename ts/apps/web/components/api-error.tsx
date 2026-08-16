@@ -1,10 +1,10 @@
-import { cn } from "@workspace/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils";
 
 interface ApiErrorProps {
-  message: string
+  message: string;
   /** HTTP status from the failed response, if known. */
-  status?: number
-  className?: string
+  status?: number;
+  className?: string;
 }
 
 /**
@@ -18,7 +18,7 @@ export function ApiError({ message, status, className }: ApiErrorProps) {
       role="alert"
       className={cn(
         "rounded-md border border-destructive/50 bg-destructive/10 p-4 text-foreground",
-        className
+        className,
       )}
     >
       <div className="flex items-center gap-2 font-medium">
@@ -31,5 +31,5 @@ export function ApiError({ message, status, className }: ApiErrorProps) {
       </div>
       <p className="mt-1 text-sm text-muted-foreground">{message}</p>
     </div>
-  )
+  );
 }

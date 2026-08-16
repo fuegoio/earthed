@@ -1,9 +1,9 @@
 {
   "name": "@planetary/api-client",
   "version": "0.0.0",
+  "private": true,
   "description": "Typed TypeScript client for the Planetary API, generated from the OpenAPI spec using @hey-api/openapi-ts.",
   "license": "MIT",
-  "private": true,
   "type": "module",
   "exports": {
     ".": {
@@ -13,16 +13,13 @@
   },
   "scripts": {
     "gen": "openapi-ts && node scripts/strip-import-extensions.mjs",
-    "lint": "eslint",
-    "format": "prettier --write \"**/*.{ts,tsx}\"",
+    "lint": "oxlint .",
+    "format": "oxfmt --write .",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "^0.99.0",
-    "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
-    "eslint": "^9",
-    "prettier": "^3.8.3",
     "typescript": "^5"
   }
 }

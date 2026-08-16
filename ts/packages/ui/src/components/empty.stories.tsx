@@ -15,11 +15,13 @@ const meta: Meta<typeof Empty> = {
   title: "UI/Empty",
   component: Empty,
   tags: ["autodocs"],
-  decorators: [(Story) => (
-    <div className="flex min-h-[400px] max-w-2xl items-center justify-center">
-      <Story />
-    </div>
-  )],
+  decorators: [
+    (Story) => (
+      <div className="flex min-h-[400px] max-w-2xl items-center justify-center">
+        <Story />
+      </div>
+    ),
+  ],
 };
 
 export default meta;
@@ -45,11 +47,12 @@ export const WithIcon: Story = {
   render: () => (
     <Empty>
       <EmptyHeader>
-        <EmptyMedia variant="icon"><RssIcon /></EmptyMedia>
+        <EmptyMedia variant="icon">
+          <RssIcon />
+        </EmptyMedia>
         <EmptyTitle>No entries</EmptyTitle>
         <EmptyDescription>
-          This feed has no entries yet. Check back later or{" "}
-          <a href="#">add another feed</a>.
+          This feed has no entries yet. Check back later or <a href="#">add another feed</a>.
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
@@ -63,7 +66,9 @@ export const MediaDefault: Story = {
   render: () => (
     <Empty>
       <EmptyHeader>
-        <EmptyMedia variant="default"><RssIcon className="size-10" /></EmptyMedia>
+        <EmptyMedia variant="default">
+          <RssIcon className="size-10" />
+        </EmptyMedia>
         <EmptyTitle>Large icon</EmptyTitle>
         <EmptyDescription>The default media variant is transparent.</EmptyDescription>
       </EmptyHeader>

@@ -1,4 +1,4 @@
-import { cn } from "@workspace/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils";
 
 function Label({ className, ...props }: React.ComponentProps<"label">) {
   return (
@@ -7,11 +7,11 @@ function Label({ className, ...props }: React.ComponentProps<"label">) {
       className={cn(
         "flex items-center gap-2 text-sm font-medium leading-none select-none",
         "peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
-export { Label }
+export { Label };

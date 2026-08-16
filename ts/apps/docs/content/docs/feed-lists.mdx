@@ -121,26 +121,26 @@ follow status, and owner email) to any user who can see it.
 
 ### Feed List
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | int | List ID |
-| `user_id` | int | Owning user ID |
-| `title` | string | List title |
+| Field         | Type   | Description                         |
+| ------------- | ------ | ----------------------------------- |
+| `id`          | int    | List ID                             |
+| `user_id`     | int    | Owning user ID                      |
+| `title`       | string | List title                          |
 | `description` | string | List description (omitted if empty) |
-| `is_public` | bool | Whether the list is discoverable |
-| `created_at` | string | Creation timestamp |
-| `updated_at` | string | Last update timestamp |
+| `is_public`   | bool   | Whether the list is discoverable    |
+| `created_at`  | string | Creation timestamp                  |
+| `updated_at`  | string | Last update timestamp               |
 
 ### Feed List Item
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | int | Item ID |
-| `feed_list_id` | int | Parent list ID |
-| `feed_url` | string | Feed URL |
-| `title` | string | Feed title (metadata snapshot) |
-| `site_url` | string | Site URL (metadata snapshot, omitted if empty) |
-| `created_at` | string | Creation timestamp |
+| Field          | Type   | Description                                    |
+| -------------- | ------ | ---------------------------------------------- |
+| `id`           | int    | Item ID                                        |
+| `feed_list_id` | int    | Parent list ID                                 |
+| `feed_url`     | string | Feed URL                                       |
+| `title`        | string | Feed title (metadata snapshot)                 |
+| `site_url`     | string | Site URL (metadata snapshot, omitted if empty) |
+| `created_at`   | string | Creation timestamp                             |
 
 See [API Reference](/docs/api-reference#feed-lists) for the full endpoint
 list.

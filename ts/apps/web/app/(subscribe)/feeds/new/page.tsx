@@ -1,47 +1,37 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
-import {
-  ArrowLeft,
-  Loader2,
-  Rss,
-  ExternalLink,
-  Plus,
-} from "lucide-react"
-import { Button } from "@workspace/ui/components/button"
-import { Input } from "@workspace/ui/components/input"
-import { Label } from "@workspace/ui/components/label"
-import {
-  getClient,
-  previewFeed,
-  createFeed,
-} from "@/lib/planetary"
-import { getApiErrorMessage } from "@/lib/errors"
-import { subscribeFeedSchema, normalizeFeedURL } from "@/lib/schemas"
-import type { PreviewFeedBody } from "@/lib/types"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { ArrowLeft, Loader2, Rss, ExternalLink, Plus } from "lucide-react";
+import { Button } from "@workspace/ui/components/button";
+import { Input } from "@workspace/ui/components/input";
+import { Label } from "@workspace/ui/components/label";
+import { getClient, previewFeed, createFeed } from "@/lib/planetary";
+import { getApiErrorMessage } from "@/lib/errors";
+import { subscribeFeedSchema, normalizeFeedURL } from "@/lib/schemas";
+import type { PreviewFeedBody } from "@/lib/types";
 
 export default function SubscribeFeedPage() {
-  const router = useRouter()
-  const queryClient = useQueryClient()
-  const [url, setUrl] = useState("")
-  const [debouncedUrl, setDebouncedUrl] = useState("")
-  const [subscribing, setSubscribing] = useState(false)
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const [url, setUrl] = useState("");
+  const [debouncedUrl, setDebouncedUrl] = useState("");
+  const [subscribing, setSubscribing] = useState(false);
 
   // Debounce the URL so we only fetch after the user pauses typing.
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedUrl(url), 400)
-    return () => clearTimeout(t)
-  }, [url])
+    const t = setTimeout(() => setDebouncedUrl(url), 400);
+    return () => clearTimeout(t);
+  }, [url]);
 
   const urlValidation = subscribeFeedSchema.safeParse({
     feed_url: debouncedUrl,
-  })
-  const isUrlValid = urlValidation.success
-  const normalizedUrl = isUrlValid ? normalizeFeedURL(debouncedUrl) : ""
+  });
+  const isUrlValid = urlValidation.success;
+  const normalizedUrl = isUrlValid ? normalizeFeedURL(debouncedUrl) : "";
 
   const {
     data: preview,
@@ -53,39 +43,39 @@ export default function SubscribeFeedPage() {
       const result = await previewFeed({
         client: await getClient(),
         body: { feed_url: normalizedUrl },
-      })
-      if (result.error) throw result.error
-      return result.data as PreviewFeedBody
+      });
+      if (result.error) throw result.error;
+      return result.data as PreviewFeedBody;
     },
     enabled: isUrlValid,
     retry: false,
-  })
+  });
 
   async function handleSubscribe() {
-    if (!preview) return
-    setSubscribing(true)
+    if (!preview) return;
+    setSubscribing(true);
     try {
       const { error } = await createFeed({
         client: await getClient(),
         body: {
           feed_url: preview.feed_url,
         },
-      })
-      if (error) throw error
-      await queryClient.invalidateQueries({ queryKey: ["feeds"] })
-      await queryClient.invalidateQueries({ queryKey: ["entries"] })
-      toast.success(`Subscribed to "${preview.title}"`)
-      router.push("/")
-      router.refresh()
+      });
+      if (error) throw error;
+      await queryClient.invalidateQueries({ queryKey: ["feeds"] });
+      await queryClient.invalidateQueries({ queryKey: ["entries"] });
+      toast.success(`Subscribed to "${preview.title}"`);
+      router.push("/");
+      router.refresh();
     } catch (err) {
-      toast.error(getApiErrorMessage(err, "Could not subscribe to feed"))
-      setSubscribing(false)
+      toast.error(getApiErrorMessage(err, "Could not subscribe to feed"));
+      setSubscribing(false);
     }
   }
 
-  const showLoading = isUrlValid && isPreviewFetching && !preview
-  const showError = isUrlValid && !isPreviewFetching && previewError && !preview
-  const showPreview = !!preview
+  const showLoading = isUrlValid && isPreviewFetching && !preview;
+  const showError = isUrlValid && !isPreviewFetching && previewError && !preview;
+  const showPreview = !!preview;
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
@@ -103,13 +93,10 @@ export default function SubscribeFeedPage() {
           <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10">
             <Rss className="size-6 text-primary" />
           </div>
-          <h1 className="font-serif text-2xl font-bold tracking-tight">
-            Subscribe to a feed
-          </h1>
+          <h1 className="font-serif text-2xl font-bold tracking-tight">Subscribe to a feed</h1>
           <p className="max-w-md text-sm text-muted-foreground">
-            Paste any website URL or feed link. We&apos;ll discover the RSS
-            feed automatically and show you what you&apos;ll get before you
-            subscribe.
+            Paste any website URL or feed link. We&apos;ll discover the RSS feed automatically and
+            show you what you&apos;ll get before you subscribe.
           </p>
         </div>
 
@@ -126,9 +113,7 @@ export default function SubscribeFeedPage() {
             aria-invalid={!isUrlValid && debouncedUrl.length > 0}
           />
           {!isUrlValid && debouncedUrl.length > 0 && (
-            <p className="text-sm text-destructive">
-              Enter a valid URL
-            </p>
+            <p className="text-sm text-destructive">Enter a valid URL</p>
           )}
         </div>
 
@@ -136,9 +121,7 @@ export default function SubscribeFeedPage() {
         {showLoading && (
           <div className="flex flex-col items-center gap-4 py-8">
             <Loader2 className="size-6 animate-spin text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">
-              Fetching and parsing feed...
-            </p>
+            <p className="text-sm text-muted-foreground">Fetching and parsing feed...</p>
           </div>
         )}
 
@@ -157,10 +140,7 @@ export default function SubscribeFeedPage() {
         )}
 
         {showPreview && !subscribing && (
-          <PreviewContent
-            preview={preview}
-            onSubscribe={handleSubscribe}
-          />
+          <PreviewContent preview={preview} onSubscribe={handleSubscribe} />
         )}
 
         {showPreview && subscribing && (
@@ -173,17 +153,17 @@ export default function SubscribeFeedPage() {
         )}
       </div>
     </div>
-  )
+  );
 }
 
 function PreviewContent({
   preview,
   onSubscribe,
 }: {
-  preview: PreviewFeedBody
-  onSubscribe: () => void
+  preview: PreviewFeedBody;
+  onSubscribe: () => void;
 }) {
-  const items = preview.items ?? []
+  const items = preview.items ?? [];
 
   return (
     <div className="flex flex-col gap-6">
@@ -219,9 +199,7 @@ function PreviewContent({
             </a>
           )}
           {preview.description && (
-            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-              {preview.description}
-            </p>
+            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{preview.description}</p>
           )}
         </div>
       </div>
@@ -232,16 +210,12 @@ function PreviewContent({
           <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Recent articles
             {items.length > 0 && (
-              <span className="ml-1.5 text-muted-foreground/70">
-                ({items.length})
-              </span>
+              <span className="ml-1.5 text-muted-foreground/70">({items.length})</span>
             )}
           </h3>
         </div>
         {items.length === 0 ? (
-          <p className="px-4 py-6 text-sm text-muted-foreground">
-            No articles found in this feed.
-          </p>
+          <p className="px-4 py-6 text-sm text-muted-foreground">No articles found in this feed.</p>
         ) : (
           <ul className="divide-y divide-border">
             {items.map((item, idx) => (
@@ -260,15 +234,9 @@ function PreviewContent({
                       {formatDate(item.published_at)}
                     </time>
                   </div>
-                  {item.author && (
-                    <p className="text-xs text-muted-foreground">
-                      {item.author}
-                    </p>
-                  )}
+                  {item.author && <p className="text-xs text-muted-foreground">{item.author}</p>}
                   {item.description && (
-                    <p className="line-clamp-2 text-sm text-muted-foreground">
-                      {item.description}
-                    </p>
+                    <p className="line-clamp-2 text-sm text-muted-foreground">{item.description}</p>
                   )}
                 </div>
               </li>
@@ -285,17 +253,17 @@ function PreviewContent({
         </Button>
       </div>
     </div>
-  )
+  );
 }
 
 // --- Helpers ---
 
 function formatDate(dateStr: string): string {
-  const date = new Date(dateStr)
-  if (isNaN(date.getTime())) return ""
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return "";
   return date.toLocaleDateString(undefined, {
     month: "short",
     day: "numeric",
     year: "numeric",
-  })
+  });
 }

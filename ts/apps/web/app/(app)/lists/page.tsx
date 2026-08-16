@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useQuery } from "@tanstack/react-query"
-import { ListChecks, Plus, Globe, Users, Compass } from "lucide-react"
-import { Skeleton } from "@workspace/ui/components/skeleton"
-import { buttonVariants } from "@workspace/ui/components/button"
-import { PageHeader } from "@/components/page-header"
+import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import { ListChecks, Plus, Globe, Users, Compass } from "lucide-react";
+import { Skeleton } from "@workspace/ui/components/skeleton";
+import { buttonVariants } from "@workspace/ui/components/button";
+import { PageHeader } from "@/components/page-header";
 import {
   Empty,
   EmptyContent,
@@ -13,27 +13,20 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@workspace/ui/components/empty"
-import {
-  getClient,
-  listMyFeedLists,
-  listFollowedFeedLists,
-  unwrap,
-} from "@/lib/planetary"
-import { cn } from "@workspace/ui/lib/utils"
-import type { FeedList } from "@/lib/types"
+} from "@workspace/ui/components/empty";
+import { getClient, listMyFeedLists, listFollowedFeedLists, unwrap } from "@/lib/planetary";
+import { cn } from "@workspace/ui/lib/utils";
+import type { FeedList } from "@/lib/types";
 
 export default function FeedListsPage() {
   const { data: mine, isLoading: mineLoading } = useQuery<FeedList[]>({
     queryKey: ["feed-lists", "mine"],
-    queryFn: async () =>
-      unwrap(listMyFeedLists({ client: await getClient() })),
-  })
+    queryFn: async () => unwrap(listMyFeedLists({ client: await getClient() })),
+  });
   const { data: followed, isLoading: followedLoading } = useQuery<FeedList[]>({
     queryKey: ["feed-lists", "followed"],
-    queryFn: async () =>
-      unwrap(listFollowedFeedLists({ client: await getClient() })),
-  })
+    queryFn: async () => unwrap(listFollowedFeedLists({ client: await getClient() })),
+  });
 
   return (
     <div className="mx-auto w-full max-w-3xl">
@@ -73,15 +66,11 @@ export default function FeedListsPage() {
               </EmptyMedia>
               <EmptyTitle>No lists yet</EmptyTitle>
               <EmptyDescription>
-                Create a list, add feeds to it, and share it publicly so others
-                can follow.
+                Create a list, add feeds to it, and share it publicly so others can follow.
               </EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
-              <Link
-                href="/lists/new"
-                className={cn(buttonVariants({ size: "sm" }))}
-              >
+              <Link href="/lists/new" className={cn(buttonVariants({ size: "sm" }))}>
                 <Plus className="size-4" />
                 Create a list
               </Link>
@@ -112,8 +101,7 @@ export default function FeedListsPage() {
               </EmptyMedia>
               <EmptyTitle>Not following any lists</EmptyTitle>
               <EmptyDescription>
-                Discover public lists curated by others and follow them to keep
-                them bookmarked.
+                Discover public lists curated by others and follow them to keep them bookmarked.
               </EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
@@ -135,17 +123,14 @@ export default function FeedListsPage() {
         )}
       </section>
     </div>
-  )
+  );
 }
 
 function LoadingRow() {
   return (
     <div className="flex flex-col gap-2">
       {Array.from({ length: 2 }).map((_, i) => (
-        <div
-          key={i}
-          className="flex items-center gap-3 rounded-lg border border-border p-4"
-        >
+        <div key={i} className="flex items-center gap-3 rounded-lg border border-border p-4">
           <Skeleton className="size-10 shrink-0 rounded-lg" />
           <div className="min-w-0 flex-1 space-y-2">
             <Skeleton className="h-4 w-40" />
@@ -154,7 +139,7 @@ function LoadingRow() {
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 function FeedListRow({ list, mine = false }: { list: FeedList; mine?: boolean }) {
@@ -181,9 +166,7 @@ function FeedListRow({ list, mine = false }: { list: FeedList; mine?: boolean })
           )}
         </div>
         {list.description && (
-          <p className="line-clamp-1 text-sm text-muted-foreground">
-            {list.description}
-          </p>
+          <p className="line-clamp-1 text-sm text-muted-foreground">{list.description}</p>
         )}
         <p className="mt-0.5 text-xs text-muted-foreground">
           {list.feed_count} {list.feed_count === 1 ? "feed" : "feeds"}
@@ -191,5 +174,5 @@ function FeedListRow({ list, mine = false }: { list: FeedList; mine?: boolean })
         </p>
       </div>
     </Link>
-  )
+  );
 }

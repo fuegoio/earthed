@@ -1,15 +1,11 @@
-"use client"
+"use client";
 
-import { useEffect, useRef } from "react"
-import Link from "next/link"
-import {
-  useInfiniteQuery,
-  useQuery,
-  type InfiniteData,
-} from "@tanstack/react-query"
-import { Rss } from "lucide-react"
-import { EntryCard } from "@/components/entry-card"
-import { EntryCardSkeleton } from "@/components/entry-card-skeleton"
+import { useEffect, useRef } from "react";
+import Link from "next/link";
+import { useInfiniteQuery, useQuery, type InfiniteData } from "@tanstack/react-query";
+import { Rss } from "lucide-react";
+import { EntryCard } from "@/components/entry-card";
+import { EntryCardSkeleton } from "@/components/entry-card-skeleton";
 import {
   Empty,
   EmptyContent,
@@ -17,21 +13,21 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@workspace/ui/components/empty"
-import { getClient, listEntries, listFeeds, unwrap } from "@/lib/planetary"
-import type { Entry, Feed } from "@/lib/types"
-import { buttonVariants } from "@workspace/ui/components/button"
-import { cn } from "@workspace/ui/lib/utils"
+} from "@workspace/ui/components/empty";
+import { getClient, listEntries, listFeeds, unwrap } from "@/lib/planetary";
+import type { Entry, Feed } from "@/lib/types";
+import { buttonVariants } from "@workspace/ui/components/button";
+import { cn } from "@workspace/ui/lib/utils";
 
 export type EntryFilter = {
-  feed_id?: number
-  folder_id?: number
-  status?: "unread" | "read" | "removed"
-  starred?: boolean
-  search?: string
-}
+  feed_id?: number;
+  folder_id?: number;
+  status?: "unread" | "read" | "removed";
+  starred?: boolean;
+  search?: string;
+};
 
-const PAGE_SIZE = 50
+const PAGE_SIZE = 50;
 
 /**
  * Filtered, paginated entry list with infinite scroll. Fetches the user's feeds
@@ -42,61 +38,48 @@ export function EntryTimeline({
   emptyTitle = "Nothing here yet",
   emptyDescription = "Subscribe to feeds and your latest articles will appear here.",
 }: {
-  filter: EntryFilter
-  emptyTitle?: string
-  emptyDescription?: string
+  filter: EntryFilter;
+  emptyTitle?: string;
+  emptyDescription?: string;
 }) {
   const { data: feeds } = useQuery<Feed[]>({
     queryKey: ["feeds"],
     queryFn: async () => unwrap(listFeeds({ client: await getClient() })),
-  })
-  const feedMap = new Map<number, Feed>()
-  for (const f of feeds ?? []) feedMap.set(f.id, f)
+  });
+  const feedMap = new Map<number, Feed>();
+  for (const f of feeds ?? []) feedMap.set(f.id, f);
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-    error,
-    refetch,
-  } = useInfiniteQuery<
-    Entry[],
-    Error,
-    InfiniteData<Entry[]>,
-    ["entries", EntryFilter],
-    number
-  >({
-    queryKey: ["entries", filter],
-    queryFn: async ({ pageParam }) => {
-      const result = await listEntries({
-        client: await getClient(),
-        query: { ...filter, limit: PAGE_SIZE, offset: pageParam },
-      })
-      if (result.error) throw result.error
-      return (result.data ?? []) as Entry[]
-    },
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, _all, lastParam) =>
-      lastPage.length < PAGE_SIZE ? undefined : lastParam + PAGE_SIZE,
-  })
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, error, refetch } =
+    useInfiniteQuery<Entry[], Error, InfiniteData<Entry[]>, ["entries", EntryFilter], number>({
+      queryKey: ["entries", filter],
+      queryFn: async ({ pageParam }) => {
+        const result = await listEntries({
+          client: await getClient(),
+          query: { ...filter, limit: PAGE_SIZE, offset: pageParam },
+        });
+        if (result.error) throw result.error;
+        return (result.data ?? []) as Entry[];
+      },
+      initialPageParam: 0,
+      getNextPageParam: (lastPage, _all, lastParam) =>
+        lastPage.length < PAGE_SIZE ? undefined : lastParam + PAGE_SIZE,
+    });
 
-  const sentinelRef = useRef<HTMLDivElement>(null)
+  const sentinelRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const el = sentinelRef.current
-    if (!el || !hasNextPage || isFetchingNextPage) return
+    const el = sentinelRef.current;
+    if (!el || !hasNextPage || isFetchingNextPage) return;
     const obs = new IntersectionObserver(
       (entries) => {
-        if (entries[0]?.isIntersecting) fetchNextPage()
+        if (entries[0]?.isIntersecting) fetchNextPage();
       },
-      { rootMargin: "600px" }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+      { rootMargin: "600px" },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const entries = data?.pages.flat() ?? []
+  const entries = data?.pages.flat() ?? [];
 
   if (isLoading) {
     return (
@@ -105,7 +88,7 @@ export function EntryTimeline({
           <EntryCardSkeleton key={i} />
         ))}
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -122,16 +105,13 @@ export function EntryTimeline({
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
-            <button
-              onClick={() => refetch()}
-              className={cn(buttonVariants({ size: "sm" }))}
-            >
+            <button onClick={() => refetch()} className={cn(buttonVariants({ size: "sm" }))}>
               Retry
             </button>
           </EmptyContent>
         </Empty>
       </div>
-    )
+    );
   }
 
   if (entries.length === 0) {
@@ -146,26 +126,19 @@ export function EntryTimeline({
             <EmptyDescription>{emptyDescription}</EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
-            <Link
-              href="/feeds/new"
-              className={cn(buttonVariants({ size: "sm" }))}
-            >
+            <Link href="/feeds/new" className={cn(buttonVariants({ size: "sm" }))}>
               Subscribe to a feed
             </Link>
           </EmptyContent>
         </Empty>
       </div>
-    )
+    );
   }
 
   return (
     <div className="divide-y divide-border">
       {entries.map((entry) => (
-        <EntryCard
-          key={entry.id}
-          entry={entry}
-          feed={feedMap.get(entry.feed_id)}
-        />
+        <EntryCard key={entry.id} entry={entry} feed={feedMap.get(entry.feed_id)} />
       ))}
       <div ref={sentinelRef} className="h-px" />
       {isFetchingNextPage && (
@@ -176,5 +149,5 @@ export function EntryTimeline({
         </div>
       )}
     </div>
-  )
+  );
 }

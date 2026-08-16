@@ -1,4 +1,4 @@
-import { defineConfig } from "@hey-api/openapi-ts"
+import { defineConfig } from "@hey-api/openapi-ts";
 
 export default defineConfig({
   input: "../../../go/api/openapi.json",
@@ -6,10 +6,5 @@ export default defineConfig({
     path: "./src/generated",
     clean: true,
   },
-  plugins: [
-    "@hey-api/client-fetch",
-    "@hey-api/schemas",
-    "@hey-api/sdk",
-    "@hey-api/typescript",
-  ],
-})
+  plugins: ["@hey-api/client-fetch", "@hey-api/schemas", "@hey-api/sdk", "@hey-api/typescript"],
+});

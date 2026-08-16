@@ -11,10 +11,10 @@ A background scheduler keeps everything up to date.
 
 Planetary parses three feed formats:
 
-| Format | Detection |
-| ------ | --------- |
-| RSS 2.0 | XML root element `<rss>` |
-| Atom 1.0 | XML with `http://www.w3.org/2005/Atom` namespace |
+| Format    | Detection                                             |
+| --------- | ----------------------------------------------------- |
+| RSS 2.0   | XML root element `<rss>`                              |
+| Atom 1.0  | XML with `http://www.w3.org/2005/Atom` namespace      |
 | JSON Feed | Content-Type contains `json`, or body starts with `{` |
 
 Detection is automatic. The parser tries RSS 2.0 first (XML root
@@ -100,12 +100,12 @@ list are stripped from their parent tag.
 
 ### Allowed attributes
 
-| Tag | Attributes |
-| --- | ---------- |
-| `a` | `href`, `title`, `rel` |
-| `img` | `src`, `alt`, `title`, `width`, `height` |
-| `video` | `src`, `width`, `height`, `controls` |
-| `source` | `src`, `type` |
+| Tag      | Attributes                               |
+| -------- | ---------------------------------------- |
+| `a`      | `href`, `title`, `rel`                   |
+| `img`    | `src`, `alt`, `title`, `width`, `height` |
+| `video`  | `src`, `width`, `height`, `controls`     |
+| `source` | `src`, `type`                            |
 
 All other tags have their attributes stripped entirely.
 

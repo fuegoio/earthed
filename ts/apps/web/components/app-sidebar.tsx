@@ -32,15 +32,15 @@ import { cn } from "@workspace/ui/lib/utils";
 import { SidebarSeparator } from "@workspace/ui/components/separator";
 import type { Feed, Folder } from "@/lib/types";
 
-const navLinkClass = cn(
+export const navLinkClass = cn(
   "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium",
   "text-sidebar-foreground/70 transition-colors",
   "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
 );
 
-const navLinkActiveClass = cn("bg-sidebar-accent text-sidebar-accent-foreground");
+export const navLinkActiveClass = cn("bg-sidebar-accent text-sidebar-accent-foreground");
 
-function isActive(pathname: string, href: string): boolean {
+export function isActive(pathname: string, href: string): boolean {
   if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(href + "/");
 }
@@ -74,7 +74,7 @@ function SidebarNav() {
   );
 }
 
-function AccountButton({ userEmail }: { userEmail: string }) {
+export function AccountButton({ userEmail }: { userEmail: string }) {
   const router = useRouter();
   const { resolvedTheme, setTheme } = useTheme();
 

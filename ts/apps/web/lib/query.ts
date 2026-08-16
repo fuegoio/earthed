@@ -1,8 +1,4 @@
-import {
-  QueryClient,
-  dehydrate,
-  HydrationBoundary,
-} from "@tanstack/react-query"
+import { QueryClient, dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 /**
  * Shared `QueryClient` factory. Used both by the client-side `QueryProvider`
@@ -19,7 +15,7 @@ export function makeQueryClient(): QueryClient {
         retry: 1,
       },
     },
-  })
+  });
 }
 
-export { dehydrate, HydrationBoundary }
+export { dehydrate, HydrationBoundary };

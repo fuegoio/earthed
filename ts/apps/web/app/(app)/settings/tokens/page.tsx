@@ -1,7 +1,7 @@
-import { TokenManager } from "@/components/token-manager"
+import { TokenManager } from "@/components/token-manager";
 
-export const metadata = { title: "API Tokens" }
+export const metadata = { title: "API Tokens" };
 
 export default function TokensPage() {
-  return <TokenManager />
+  return <TokenManager />;
 }

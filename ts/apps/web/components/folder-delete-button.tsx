@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
-import { Trash2, Loader2 } from "lucide-react"
-import { Button } from "@workspace/ui/components/button"
-import { ConfirmDialog } from "@/components/confirm-dialog"
-import { getClient, deleteFolder } from "@/lib/planetary"
-import { getApiErrorMessage } from "@/lib/errors"
-import type { Folder } from "@/lib/types"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { Trash2, Loader2 } from "lucide-react";
+import { Button } from "@workspace/ui/components/button";
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { getClient, deleteFolder } from "@/lib/planetary";
+import { getApiErrorMessage } from "@/lib/errors";
+import type { Folder } from "@/lib/types";
 
 /**
  * Delete button for the folder page header. Renders a destructive button
@@ -17,28 +17,28 @@ import type { Folder } from "@/lib/types"
  * deletion it invalidates the feeds/folders queries and redirects home.
  */
 export function FolderDeleteButton({ folder }: { folder: Folder }) {
-  const router = useRouter()
-  const queryClient = useQueryClient()
-  const [pending, setPending] = useState(false)
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const [pending, setPending] = useState(false);
 
   async function handleDelete() {
-    setPending(true)
+    setPending(true);
     try {
       const { error } = await deleteFolder({
         client: await getClient(),
         path: { folderId: folder.id },
-      })
-      if (error) throw error
-      await queryClient.invalidateQueries({ queryKey: ["folders"] })
-      await queryClient.invalidateQueries({ queryKey: ["feeds"] })
-      await queryClient.invalidateQueries({ queryKey: ["entries"] })
-      toast.success(`Deleted folder "${folder.title}"`)
-      router.push("/")
-      router.refresh()
+      });
+      if (error) throw error;
+      await queryClient.invalidateQueries({ queryKey: ["folders"] });
+      await queryClient.invalidateQueries({ queryKey: ["feeds"] });
+      await queryClient.invalidateQueries({ queryKey: ["entries"] });
+      toast.success(`Deleted folder "${folder.title}"`);
+      router.push("/");
+      router.refresh();
     } catch (err) {
-      toast.error(getApiErrorMessage(err, "Could not delete folder"))
+      toast.error(getApiErrorMessage(err, "Could not delete folder"));
     } finally {
-      setPending(false)
+      setPending(false);
     }
   }
 
@@ -59,5 +59,5 @@ export function FolderDeleteButton({ folder }: { folder: Folder }) {
       confirmLabel="Delete"
       onConfirm={handleDelete}
     />
-  )
+  );
 }
