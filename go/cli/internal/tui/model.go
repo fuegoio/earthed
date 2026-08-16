@@ -68,10 +68,13 @@ type Model struct {
 
 const sidebarWidth = 28
 
+// sunColor is the brand primary: oklch(0.8 0.19 39) ≈ #ff8b59 (amber/orange).
+const sunColor = "#ff8b59"
+
 var (
 	headerStyle = lipgloss.NewStyle().
 			Bold(true).
-			Foreground(lipgloss.Color("99")).
+			Foreground(lipgloss.Color(sunColor)).
 			Padding(0, 1)
 
 	selectedStyle = lipgloss.NewStyle().
@@ -80,8 +83,8 @@ var (
 			Bold(true)
 
 	selectedFocusStyle = lipgloss.NewStyle().
-				Background(lipgloss.Color("57")).
-				Foreground(lipgloss.Color("255")).
+				Background(lipgloss.Color(sunColor)).
+				Foreground(lipgloss.Color("232")).
 				Bold(true)
 
 	normalStyle = lipgloss.NewStyle()

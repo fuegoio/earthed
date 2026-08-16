@@ -107,6 +107,7 @@ func (m Model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) handleSidebarKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	prev := m.sidebarCursor
 	switch msg.String() {
 	case "up", "k":
 		if m.sidebarCursor > 0 {
@@ -124,12 +125,18 @@ func (m Model) handleSidebarKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		if len(m.items) == 0 {
 			return m, nil
 		}
-		item := m.items[m.sidebarCursor]
 		m.focus = focusEntries
 		m.loading = true
 		m.entries = nil
 		m.showEntry = false
-		return m, loadEntriesByParams(m.client, entriesParamsForItem(item))
+		return m, loadEntriesByParams(m.client, entriesParamsForItem(m.items[m.sidebarCursor]))
+	}
+	// If the cursor moved, refresh the entry panel for the new selection.
+	if m.sidebarCursor != prev && len(m.items) > 0 {
+		m.loading = true
+		m.entries = nil
+		m.showEntry = false
+		return m, loadEntriesByParams(m.client, entriesParamsForItem(m.items[m.sidebarCursor]))
 	}
 	return m, nil
 }
