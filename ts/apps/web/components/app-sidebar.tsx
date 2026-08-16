@@ -3,7 +3,17 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { LayoutList, Circle, Star, Plus, ListChecks, Settings, LogOut, Sun, Moon } from "lucide-react";
+import {
+  LayoutList,
+  Circle,
+  Star,
+  Plus,
+  ListChecks,
+  Settings,
+  LogOut,
+  Sun,
+  Moon,
+} from "lucide-react";
 import { useTheme } from "next-themes";
 import { Menu } from "@base-ui/react/menu";
 import { Avatar } from "@base-ui/react/avatar";
@@ -107,17 +117,15 @@ export function AccountButton({ userEmail }: { userEmail: string }) {
               <Settings className="size-4" />
               Settings
             </Menu.Item>
+            <hr className="-mx-1 my-1 border-border" />
             <Menu.Item
               className={menuItemClass}
               onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
             >
-              {resolvedTheme === "dark" ? (
-                <Sun className="size-4" />
-              ) : (
-                <Moon className="size-4" />
-              )}
+              {resolvedTheme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
               {resolvedTheme === "dark" ? "Light mode" : "Dark mode"}
             </Menu.Item>
+            <hr className="-mx-1 my-1 border-border" />
             <Menu.Item className={menuItemClass} onClick={handleSignout}>
               <LogOut className="size-4" />
               Sign out
@@ -161,7 +169,7 @@ function SidebarContent({ userEmail }: { userEmail: string }) {
         <SidebarSeparator />
 
         <div className="flex flex-col gap-1">
-          <div className="flex items-center justify-between px-3 pb-1">
+          <div className="flex items-center justify-between pl-3 pr-2.5 pb-1">
             <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Feeds
             </h3>
