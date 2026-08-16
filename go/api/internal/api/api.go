@@ -15,6 +15,7 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 
 	"github.com/fuegoio/planetary/go/api/internal/auth"
+	"github.com/fuegoio/planetary/go/api/internal/config"
 	"github.com/fuegoio/planetary/go/api/internal/reader/discoverer"
 	"github.com/fuegoio/planetary/go/api/internal/reader/fetcher"
 	"github.com/fuegoio/planetary/go/api/internal/reader/parser"
@@ -28,18 +29,20 @@ type API struct {
 	huma      huma.API
 	store     *store.Store
 	auth      *auth.Auth
+	cfg       *config.Config
 	fetcher   *fetcher.Fetcher
 	processor *processor.Processor
 }
 
-// New returns an API bound to the given huma router, store, auth, and fetcher.
-// The fetcher may be nil when only generating the OpenAPI spec (--openapi flag).
-func New(humaAPI huma.API, st *store.Store, authInst *auth.Auth, f *fetcher.Fetcher) *API {
+// New returns an API bound to the given huma router, store, auth, config,
+// and fetcher. The fetcher may be nil when only generating the OpenAPI spec
+// (--openapi flag).
+func New(humaAPI huma.API, st *store.Store, authInst *auth.Auth, cfg *config.Config, f *fetcher.Fetcher) *API {
 	var proc *processor.Processor
 	if st != nil && f != nil {
 		proc = processor.New(st, f)
 	}
-	return &API{huma: humaAPI, store: st, auth: authInst, fetcher: f, processor: proc}
+	return &API{huma: humaAPI, store: st, auth: authInst, cfg: cfg, fetcher: f, processor: proc}
 }
 
 // OpenAPITags returns the ordered tag list for the OpenAPI spec.
@@ -52,6 +55,7 @@ func OpenAPITags() []*huma.Tag {
 		{Name: "tokens", Description: "API tokens"},
 		{Name: "opml", Description: "OPML import/export"},
 		{Name: "feed-lists", Description: "Shareable feed list collections"},
+		{Name: "device", Description: "Device-flow login (CLI/TUI)"},
 	}
 }
 
@@ -65,6 +69,7 @@ func (a *API) RegisterRoutes() {
 	a.registerTokenRoutes()
 	a.registerFeedListRoutes()
 	a.registerOPMLRoutes()
+	a.registerDeviceRoutes()
 }
 
 // --- Health ---
@@ -645,7 +650,7 @@ func (a *API) registerTokenRoutes() {
 		userID := auth.UserIDFromCtx(ctx)
 		rawToken := generateToken()
 		hash := auth.HashToken(rawToken)
-		t, err := a.store.CreateAPIToken(ctx, userID, input.Body.Label, hash)
+		t, err := a.store.CreateAPIToken(ctx, userID, input.Body.Label, hash, "manual", nil)
 		if err != nil {
 			return nil, huma.Error400BadRequest(err.Error())
 		}

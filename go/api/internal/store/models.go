@@ -76,13 +76,37 @@ type FeedIcon struct {
 }
 
 // APIToken is a hashed API token issued to a user for bearer auth.
+// ExpiresAt is nil for non-expiring tokens (e.g. created via the web UI);
+// device-flow tokens carry a 14-day expiry. Origin records how the token
+// was issued: "manual" or "device_flow".
 type APIToken struct {
 	ID         int        `json:"id"`
 	UserID     int        `json:"user_id"`
 	Label      string     `json:"label"`
 	TokenHash  string     `json:"-"`
+	Origin     string     `json:"origin"`
 	CreatedAt  time.Time  `json:"created_at"`
 	LastUsedAt *time.Time `json:"last_used_at"`
+	ExpiresAt  *time.Time `json:"expires_at,omitempty"`
+}
+
+// DeviceCode is an in-flight RFC 8628 device authorization grant.
+// DeviceCode is stored hashed (SHA-256), like APIToken.TokenHash; the
+// plaintext is only known to the CLI/TUI that initiated the flow.
+// TokenPlaintext is set on confirm and returned once to the polling CLI,
+// then the grant row is deleted (single-use).
+type DeviceCode struct {
+	ID             int64      `json:"-"`
+	DeviceCode     string     `json:"-"`           // hash
+	UserCode       string     `json:"user_code"`   // "PLN-XXXX-XXXX"
+	Status         string     `json:"status"`      // pending|authorized|denied|expired
+	UserID         *int       `json:"-"`
+	TokenID        *int       `json:"-"`
+	TokenPlaintext string     `json:"-"`           // populated on authorize, consumed once
+	IntervalSecs   int        `json:"interval"`
+	CreatedAt      time.Time  `json:"created_at"`
+	ExpiresAt      time.Time  `json:"expires_at"`
+	LastPolledAt   *time.Time `json:"-"`
 }
 
 // FeedList is a curated, shareable collection of feeds owned by a user.

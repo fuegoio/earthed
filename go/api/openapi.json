@@ -8,6 +8,10 @@
                         "format": "date-time",
                         "type": "string"
                     },
+                    "expires_at": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
                     "id": {
                         "format": "int64",
                         "type": "integer"
@@ -22,6 +26,9 @@
                             "null"
                         ]
                     },
+                    "origin": {
+                        "type": "string"
+                    },
                     "user_id": {
                         "format": "int64",
                         "type": "integer"
@@ -31,6 +38,7 @@
                     "id",
                     "user_id",
                     "label",
+                    "origin",
                     "created_at",
                     "last_used_at"
                 ],
@@ -172,6 +180,170 @@
                 },
                 "required": [
                     "label"
+                ],
+                "type": "object"
+            },
+            "DeviceCodeOutputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/DeviceCodeOutputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "device_code": {
+                        "type": "string"
+                    },
+                    "expires_in": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "interval": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "user_code": {
+                        "type": "string"
+                    },
+                    "verification_uri": {
+                        "type": "string"
+                    },
+                    "verification_uri_complete": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "device_code",
+                    "user_code",
+                    "verification_uri",
+                    "verification_uri_complete",
+                    "expires_in",
+                    "interval"
+                ],
+                "type": "object"
+            },
+            "DeviceConfirmBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/DeviceConfirmBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "authorized": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "authorized"
+                ],
+                "type": "object"
+            },
+            "DeviceConfirmInputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/DeviceConfirmInputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "deny": {
+                        "type": "boolean"
+                    },
+                    "user_code": {
+                        "maxLength": 32,
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "user_code",
+                    "deny"
+                ],
+                "type": "object"
+            },
+            "DeviceStatusBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/DeviceStatusBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "status"
+                ],
+                "type": "object"
+            },
+            "DeviceTokenInputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/DeviceTokenInputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "device_code": {
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "device_code"
+                ],
+                "type": "object"
+            },
+            "DeviceTokenOutputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/DeviceTokenOutputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "access_token": {
+                        "type": "string"
+                    },
+                    "expires_in": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "token_type": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "access_token",
+                    "token_type",
+                    "expires_in"
                 ],
                 "type": "object"
             },
@@ -1077,6 +1249,161 @@
     },
     "openapi": "3.1.0",
     "paths": {
+        "/api/auth/device/code": {
+            "post": {
+                "operationId": "device-code",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeviceCodeOutputBody"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Begin device-flow login (issue a device code)",
+                "tags": [
+                    "device"
+                ]
+            }
+        },
+        "/api/auth/device/confirm": {
+            "post": {
+                "operationId": "device-confirm",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeviceConfirmInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeviceConfirmBody"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Approve or deny a device-flow login (authenticated user)",
+                "tags": [
+                    "device"
+                ]
+            }
+        },
+        "/api/auth/device/status": {
+            "get": {
+                "operationId": "device-status",
+                "parameters": [
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "user_code",
+                        "schema": {
+                            "maxLength": 32,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeviceStatusBody"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Check device-flow status by user code (authenticated user)",
+                "tags": [
+                    "device"
+                ]
+            }
+        },
+        "/api/auth/device/token": {
+            "post": {
+                "operationId": "device-token",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeviceTokenInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeviceTokenOutputBody"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Poll for device-flow login result",
+                "tags": [
+                    "device"
+                ]
+            }
+        },
         "/api/v1/entries": {
             "get": {
                 "operationId": "list-entries",
@@ -2575,6 +2902,10 @@
         {
             "description": "Shareable feed list collections",
             "name": "feed-lists"
+        },
+        {
+            "description": "Device-flow login (CLI/TUI)",
+            "name": "device"
         }
     ]
 }
