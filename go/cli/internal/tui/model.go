@@ -68,11 +68,6 @@ type Model struct {
 const sidebarWidth = 28
 
 var (
-	sidebarBorderStyle = lipgloss.NewStyle().
-				BorderRight(true).
-				BorderStyle(lipgloss.NormalBorder()).
-				BorderForeground(lipgloss.Color("237"))
-
 	headerStyle = lipgloss.NewStyle().
 			Bold(true).
 			Foreground(lipgloss.Color("99")).

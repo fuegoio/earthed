@@ -1,7 +1,6 @@
 package tui
 
 import (
-	"fmt"
 	"strings"
 	"unicode/utf8"
 
@@ -56,7 +55,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case markReadMsg:
 		if msg.err == nil {
-			// update local state so the unread dot disappears immediately
 			for i, e := range m.entries {
 				if e.Id == msg.entryID {
 					m.entries[i].Status = "read"
@@ -90,7 +88,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 // handleKey dispatches key events to the focused panel.
 func (m Model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
-	// global keys
 	switch msg.String() {
 	case "ctrl+c":
 		return m, tea.Quit
@@ -161,7 +158,6 @@ func (m Model) handleEntriesKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 		entry := m.entries[m.entriesCursor]
 		m.current = entry
-		// mark as read and open in browser
 		var cmds []tea.Cmd
 		if entry.Status != "read" {
 			cmds = append(cmds, markRead(m.client, entry.Id))
@@ -174,8 +170,7 @@ func (m Model) handleEntriesKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 		entry := m.entries[m.entriesCursor]
-		newStarred := !entry.Starred
-		return m, toggleStar(m.client, entry.Id, newStarred)
+		return m, toggleStar(m.client, entry.Id, !entry.Starred)
 	case "esc", "h", "left":
 		m.focus = focusSidebar
 		m.showEntry = false
@@ -190,8 +185,7 @@ func (m Model) handleEntryDetailKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case "esc", "h", "left", "backspace", "q":
 		m.showEntry = false
 	case "s":
-		newStarred := !m.current.Starred
-		return m, toggleStar(m.client, m.current.Id, newStarred)
+		return m, toggleStar(m.client, m.current.Id, !m.current.Starred)
 	case "o":
 		return m, openURL(m.current.Url)
 	}
@@ -200,38 +194,72 @@ func (m Model) handleEntryDetailKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 
 // ---- View ------------------------------------------------------------------
 
-// View renders the full TUI layout.
 func (m Model) View() string {
 	if m.width == 0 {
 		return ""
 	}
-
 	if m.err != "" {
 		return errStyle.Render("error: " + m.err + "\n\nr refresh · q quit")
 	}
 
-	sidebar := m.renderSidebar()
-	main := m.renderMain()
+	sidebarLines := m.renderSidebarLines()
+	mainLines := m.renderMainLines()
 
-	layout := lipgloss.JoinHorizontal(lipgloss.Top, sidebar, main)
-	return layout
+	// Join sidebar and main manually: each sidebar line gets '│' appended,
+	// then the corresponding main line follows. This avoids all lipgloss
+	// Width/border interactions with ANSI-colored content.
+	// Cap at m.height to prevent output from scrolling past the visible area.
+	totalRows := max(len(sidebarLines), len(mainLines))
+	if m.height > 0 && totalRows > m.height {
+		totalRows = m.height
+	}
+	innerWidth := sidebarWidth - 1
+	borderColor := lipgloss.NewStyle().Foreground(lipgloss.Color("237"))
+
+
+
+	var out strings.Builder
+	for i := 0; i < totalRows; i++ {
+		// sidebar cell
+		sl := ""
+		if i < len(sidebarLines) {
+			sl = sidebarLines[i]
+		} else {
+			sl = strings.Repeat(" ", innerWidth)
+		}
+		out.WriteString(sl)
+		out.WriteString(borderColor.Render("│"))
+
+		// main cell
+		if i < len(mainLines) {
+			out.WriteString(mainLines[i])
+		}
+
+		if i < totalRows-1 {
+			out.WriteString("\n")
+		}
+	}
+	return out.String()
 }
 
-// renderSidebar renders the left navigation panel.
-func (m Model) renderSidebar() string {
-	innerWidth := sidebarWidth - 1 // subtract the right border
+// ---- Sidebar ---------------------------------------------------------------
 
-	var sb strings.Builder
+// renderSidebarLines returns one string per terminal row (no trailing newline),
+// each exactly innerWidth visible columns wide.
+func (m Model) renderSidebarLines() []string {
+	innerWidth := sidebarWidth - 1
+	var lines []string
 
-	// header
-	title := padRight(truncate("  Planetary", innerWidth), innerWidth)
-	sb.WriteString(headerStyle.Width(innerWidth).Render(title))
-	sb.WriteString("\n")
-	sb.WriteString(strings.Repeat("─", innerWidth) + "\n")
+	addLine := func(rendered string) {
+		lines = append(lines, sidebarLine(rendered, innerWidth))
+	}
+
+	// Header
+	addLine(headerStyle.Render(truncate("  Planetary", innerWidth-2)))
+	addLine(strings.Repeat("─", innerWidth))
 
 	if m.loading && len(m.items) == 0 {
-		sb.WriteString(dimStyle.Render("  Loading…"))
-		sb.WriteString("\n")
+		addLine(dimStyle.Render("  Loading…"))
 	}
 
 	for i, item := range m.items {
@@ -242,72 +270,106 @@ func (m Model) renderSidebar() string {
 		var icon string
 		switch item.kind {
 		case sidebarAll:
-			icon = " ≡ "
+			icon = "≡ "
 		case sidebarUnread:
-			icon = " ○ "
+			icon = "○ "
 		case sidebarStarred:
-			icon = " ★ "
+			icon = "★ "
 		case sidebarFolder:
-			icon = " ▸ "
-		case sidebarFeed:
-			icon = "   "
+			icon = "▸ "
+		default:
+			icon = "  "
 		}
 
-		label := truncate(item.label, innerWidth-len(indent)-len(icon))
-		line := padRight(indent+icon+label, innerWidth)
+		maxLabel := innerWidth - utf8.RuneCountInString(indent) - 1 - utf8.RuneCountInString(icon)
+		label := truncate(item.label, maxLabel)
+		plain := padRight(" "+indent+icon+label, innerWidth)
 
+		var rendered string
 		switch {
 		case isFocused:
-			sb.WriteString(selectedFocusStyle.Width(innerWidth).Render(line))
+			rendered = selectedFocusStyle.Render(plain)
 		case isActive:
-			sb.WriteString(selectedStyle.Width(innerWidth).Render(line))
+			rendered = selectedStyle.Render(plain)
 		case item.kind == sidebarFolder:
-			sb.WriteString(folderStyle.Width(innerWidth).Render(line))
+			rendered = folderStyle.Render(plain)
 		default:
-			sb.WriteString(normalStyle.Width(innerWidth).Render(line))
+			rendered = plain
 		}
-		sb.WriteString("\n")
+		addLine(rendered)
 	}
 
-	// fill remaining vertical space so the border reaches the bottom
-	usedLines := 2 + len(m.items) // header + sep + items
+	// blank rows to fill height
+	usedLines := 2 + len(m.items)
 	if m.loading && len(m.items) == 0 {
 		usedLines++
 	}
 	for i := usedLines; i < m.height-1; i++ {
-		sb.WriteString(strings.Repeat(" ", innerWidth) + "\n")
+		addLine("")
 	}
 
 	// help line at bottom
-	help := padRight("  r reload · q quit", innerWidth)
-	sb.WriteString(mutedStyle.Width(innerWidth).Render(help))
+	addLine(mutedStyle.Render(truncate("  r reload · q quit", innerWidth)))
 
-	content := sb.String()
-	return sidebarBorderStyle.Height(m.height).Render(content)
+	return lines
 }
 
-// renderMain renders the right content panel.
-func (m Model) renderMain() string {
-	mainWidth := m.width - sidebarWidth - 1 // -1 for the sidebar border
+// sidebarLine pads a pre-rendered (possibly ANSI-colored) string to innerWidth
+// visible columns by appending plain spaces. It does NOT pass the string
+// through any lipgloss Width() render, avoiding the wrapping bug.
+func sidebarLine(rendered string, innerWidth int) string {
+	visible := ansiStripWidth(rendered)
+	need := innerWidth - visible
+	if need <= 0 {
+		return rendered
+	}
+	return rendered + strings.Repeat(" ", need)
+}
+
+// ansiStripWidth returns the visible (column) width of s, ignoring ANSI escapes.
+func ansiStripWidth(s string) int {
+	w := 0
+	inEsc := false
+	for _, r := range s {
+		if r == '\x1b' {
+			inEsc = true
+			continue
+		}
+		if inEsc {
+			if r == 'm' {
+				inEsc = false
+			}
+			continue
+		}
+		w++
+	}
+	return w
+}
+
+// ---- Main panel ------------------------------------------------------------
+
+// renderMainLines returns the main panel content as a slice of lines.
+func (m Model) renderMainLines() []string {
+	mainWidth := m.width - sidebarWidth - 1
 	if mainWidth < 10 {
 		mainWidth = 10
 	}
 
+	var content string
 	if m.loading {
-		return lipgloss.NewStyle().Width(mainWidth).Padding(1, 2).Render(dimStyle.Render("Loading…"))
+		content = dimStyle.Render("  Loading…")
+	} else if m.showEntry {
+		content = m.renderEntryDetail(mainWidth)
+	} else {
+		content = m.renderEntryList(mainWidth)
 	}
 
-	if m.showEntry {
-		return m.renderEntryDetail(mainWidth)
-	}
-
-	return m.renderEntryList(mainWidth)
+	return strings.Split(content, "\n")
 }
 
 func (m Model) renderEntryList(width int) string {
 	var sb strings.Builder
 
-	// section title from current sidebar item
 	title := "Entries"
 	if len(m.items) > 0 && m.sidebarCursor < len(m.items) {
 		item := m.items[m.sidebarCursor]
@@ -327,80 +389,93 @@ func (m Model) renderEntryList(width int) string {
 	sb.WriteString(strings.Repeat("─", width) + "\n")
 
 	if len(m.entries) == 0 {
-		sb.WriteString("\n")
-		sb.WriteString(dimStyle.Padding(0, 2).Render("No entries here."))
-		sb.WriteString("\n")
+		sb.WriteString("\n" + dimStyle.Render("  No entries here.") + "\n")
 	} else {
 		isFocus := m.focus == focusEntries
+
+		// date column is always 5 chars "MM/DD"
+		const dateLen = 5
+		// prefix: " " (1) + dot (2) + star (2) = 5
+		const prefixLen = 5
+		titleWidth := width - prefixLen - dateLen - 2 // 2 = spaces around date
+		if titleWidth < 10 {
+			titleWidth = 10
+		}
+
 		for i, e := range m.entries {
 			isSelected := i == m.entriesCursor
 
-			// status dot: blue circle for unread
+			// Build each component as plain text for accurate width accounting.
 			dot := "  "
 			if e.Status != "read" {
-				dot = unreadDotStyle.Render("● ")
+				dot = unreadDotStyle.Render("● ") // 2 visible cols
 			}
-
-			// star indicator
 			star := "  "
 			if e.Starred {
-				star = starStyle.Render("★ ")
+				star = starStyle.Render("★ ") // 2 visible cols
 			}
 
-			dateStr := e.PublishedAt.Format("01/02")
-			dateCol := dimStyle.Render(dateStr) + " "
+			titleStr := padRight(truncate(e.Title, titleWidth), titleWidth)
+			dateStr := dimStyle.Render(e.PublishedAt.Format("01/02"))
 
-			// available width for title: width - dot(2) - star(2) - date(6) - padding(2)
-			titleWidth := width - 2 - 2 - 6 - 2
-			if titleWidth < 10 {
-				titleWidth = 10
-			}
-			titleStr := truncate(e.Title, titleWidth)
-			titleStr = padRight(titleStr, titleWidth)
+			// Assemble: 1 space + dot(2) + star(2) + title(titleWidth) + " " + date(5) + " "
+			line := " " + dot + star + titleStr + " " + dateStr + " "
 
-			line := fmt.Sprintf(" %s%s%s%s", dot, star, titleStr, dateCol)
-
-			if isSelected {
-				if isFocus {
-					sb.WriteString(selectedFocusStyle.Width(width).Render(line))
-				} else {
-					sb.WriteString(selectedStyle.Width(width).Render(line))
+			if isSelected && isFocus {
+				// For selection, rebuild the line as plain text so the background
+				// style fills the entire row without ANSI width confusion.
+				plainTitle := padRight(truncate(e.Title, titleWidth), titleWidth)
+				dotPlain := "● "
+				if e.Status == "read" {
+					dotPlain = "  "
 				}
-			} else {
-				if e.Status != "read" {
-					sb.WriteString(normalStyle.Width(width).Render(line))
-				} else {
-					sb.WriteString(dimStyle.Width(width).Render(line))
+				starPlain := "★ "
+				if !e.Starred {
+					starPlain = "  "
 				}
+				datePlain := e.PublishedAt.Format("01/02")
+				plainLine := padRight(" "+dotPlain+starPlain+plainTitle+" "+datePlain+" ", width)
+				line = selectedFocusStyle.Render(plainLine)
+			} else if isSelected {
+				plainTitle := padRight(truncate(e.Title, titleWidth), titleWidth)
+				dotPlain := "● "
+				if e.Status == "read" {
+					dotPlain = "  "
+				}
+				starPlain := "★ "
+				if !e.Starred {
+					starPlain = "  "
+				}
+				datePlain := e.PublishedAt.Format("01/02")
+				plainLine := padRight(" "+dotPlain+starPlain+plainTitle+" "+datePlain+" ", width)
+				line = selectedStyle.Render(plainLine)
+			} else if e.Status == "read" {
+				line = dimStyle.Render(" " + "  " + "  " + titleStr + " " + e.PublishedAt.Format("01/02") + " ")
 			}
-			sb.WriteString("\n")
+
+			sb.WriteString(line + "\n")
 		}
 	}
 
-	// help bar
 	var helpText string
 	if m.focus == focusSidebar {
-		helpText = "tab/l open · q quit"
+		helpText = "l/enter open list · q quit"
 	} else {
 		helpText = "j/k navigate · enter open in browser · s star · h sidebar · q quit"
 	}
-	sb.WriteString("\n")
-	sb.WriteString(helpStyle.Render(helpText))
+	sb.WriteString("\n" + helpStyle.Render(helpText))
 
 	return sb.String()
 }
 
 func (m Model) renderEntryDetail(width int) string {
 	e := m.current
-
 	var sb strings.Builder
 
-	// title
 	sb.WriteString("\n")
-	sb.WriteString(lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("255")).Width(width-4).Padding(0, 2).Render(e.Title))
+	sb.WriteString(headerStyle.Render(truncate(e.Title, width-4)))
 	sb.WriteString("\n\n")
 
-	// meta row
 	meta := ""
 	if e.Author != nil && *e.Author != "" {
 		meta += "by " + *e.Author + "  "
@@ -411,39 +486,30 @@ func (m Model) renderEntryDetail(width int) string {
 	} else {
 		meta += "  " + mutedStyle.Render("☆ not starred")
 	}
-	sb.WriteString(dimStyle.Padding(0, 2).Render(meta))
-	sb.WriteString("\n")
+	sb.WriteString(dimStyle.Render("  "+meta) + "\n")
+	sb.WriteString(dimStyle.Render("  "+truncate(e.Url, width-4)) + "\n\n")
+	sb.WriteString(strings.Repeat("─", width) + "\n\n")
 
-	// url
-	urlStr := truncate(e.Url, width-4)
-	sb.WriteString(dimStyle.Padding(0, 2).Render(urlStr))
-	sb.WriteString("\n\n")
-
-	sb.WriteString(strings.Repeat("─", width))
-	sb.WriteString("\n\n")
-
-	// body
 	content := ""
 	if e.Description != nil {
 		content = *e.Description
 	}
-	// strip HTML tags naively
 	content = stripTags(content)
-	// wrap to width
 	content = wordWrap(content, width-4)
-
 	if len(content) > 4000 {
 		content = content[:4000] + "\n\n[truncated]"
 	}
-	sb.WriteString(lipgloss.NewStyle().Padding(0, 2).Render(content))
-	sb.WriteString("\n\n")
 
-	sb.WriteString(helpStyle.Render("esc/h back · o open in browser · s toggle star"))
+	// indent body
+	for _, line := range strings.Split(content, "\n") {
+		sb.WriteString("  " + line + "\n")
+	}
 
+	sb.WriteString("\n" + helpStyle.Render("esc/h back · o open in browser · s toggle star"))
 	return sb.String()
 }
 
-// stripTags removes HTML tags from content for plain-text display.
+// stripTags removes HTML tags for plain-text display.
 func stripTags(s string) string {
 	var out strings.Builder
 	inTag := false
@@ -457,7 +523,6 @@ func stripTags(s string) string {
 			out.WriteRune(r)
 		}
 	}
-	// collapse multiple blank lines
 	result := out.String()
 	for strings.Contains(result, "\n\n\n") {
 		result = strings.ReplaceAll(result, "\n\n\n", "\n\n")
@@ -465,7 +530,7 @@ func stripTags(s string) string {
 	return strings.TrimSpace(result)
 }
 
-// wordWrap wraps long lines to width characters.
+// wordWrap wraps long lines to width columns.
 func wordWrap(s string, width int) string {
 	if width <= 0 {
 		return s
@@ -478,21 +543,18 @@ func wordWrap(s string, width int) string {
 		}
 		words := strings.Fields(para)
 		col := 0
-		for i, w := range words {
+		for _, w := range words {
 			wl := utf8.RuneCountInString(w)
 			if col == 0 {
 				out.WriteString(w)
 				col = wl
 			} else if col+1+wl > width {
-				out.WriteString("\n")
-				out.WriteString(w)
+				out.WriteString("\n" + w)
 				col = wl
 			} else {
-				out.WriteString(" ")
-				out.WriteString(w)
+				out.WriteString(" " + w)
 				col += 1 + wl
 			}
-			_ = i
 		}
 		out.WriteString("\n")
 	}
@@ -505,3 +567,5 @@ func max(a, b int) int {
 	}
 	return b
 }
+
+
