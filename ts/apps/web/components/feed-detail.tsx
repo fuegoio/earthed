@@ -13,6 +13,7 @@ import {
   Rss,
   FolderOpen,
 } from "lucide-react";
+import { FeedRenameDialog } from "@/components/feed-rename-dialog";
 import { Menu } from "@base-ui/react/menu";
 import { Button, buttonVariants } from "@workspace/ui/components/button";
 import { ConfirmDialog } from "@/components/confirm-dialog";
@@ -132,6 +133,7 @@ export function FeedDetail({ feed }: { feed: Feed }) {
           icon={<FeedIcon siteUrl={feed.site_url} className="size-5 shrink-0 rounded-md" />}
           actions={
             <div className="flex items-center gap-1">
+              <FeedRenameDialog feed={feed} />
               <Menu.Root>
                 <Menu.Trigger
                   disabled={movingFolder}
