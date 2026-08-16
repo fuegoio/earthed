@@ -4,12 +4,15 @@
   "pages": [
     "index",
     "getting-started",
+    "---Guides---",
     "web-ui",
     "feeds",
     "entries",
     "feed-lists",
-    "authentication",
+    "---Interfaces---",
     "cli",
+    "---Reference---",
+    "authentication",
     "architecture"
   ]
 }

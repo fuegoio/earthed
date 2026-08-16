@@ -1,5 +1,11 @@
 {
   "title": "Self-Hosting",
   "root": true,
-  "pages": ["index"]
+  "pages": [
+    "---Deployment---",
+    "index",
+    "configuration",
+    "---Operations---",
+    "production"
+  ]
 }
