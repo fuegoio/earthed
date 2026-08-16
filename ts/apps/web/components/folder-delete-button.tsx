@@ -45,7 +45,7 @@ export function FolderDeleteButton({ folder }: { folder: Folder }) {
   return (
     <ConfirmDialog
       trigger={
-        <Button variant="destructive" size="sm" disabled={pending}>
+        <Button variant="ghost" size="sm" disabled={pending} className="text-muted-foreground hover:text-destructive hover:bg-destructive/10">
           {pending ? (
             <Loader2 className="size-3.5 animate-spin" />
           ) : (

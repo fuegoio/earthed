@@ -216,7 +216,7 @@ export function FeedDetail({ feed }: { feed: Feed }) {
           </Button>
           <ConfirmDialog
             trigger={
-              <Button variant="destructive" size="xs" disabled={deleting} className="ml-auto">
+              <Button variant="ghost" size="xs" disabled={deleting} className="ml-auto text-muted-foreground hover:text-destructive hover:bg-destructive/10">
                 {deleting ? <Loader2 className="animate-spin" /> : <Trash2 />}
                 Unsubscribe
               </Button>

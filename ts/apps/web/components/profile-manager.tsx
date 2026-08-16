@@ -171,11 +171,11 @@ function DangerZone({ userEmail }: { userEmail: string }) {
   return (
     <section
       aria-labelledby="danger-zone-heading"
-      className="rounded-lg border border-destructive/40 p-4"
+      className="rounded-lg border border-border p-4"
     >
       <h2
         id="danger-zone-heading"
-        className="text-sm font-semibold text-destructive"
+        className="text-sm font-medium text-muted-foreground"
       >
         Danger zone
       </h2>
@@ -186,7 +186,7 @@ function DangerZone({ userEmail }: { userEmail: string }) {
       <div className="mt-4">
         <ConfirmDialog
           trigger={
-            <Button variant="destructive" size="sm">
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive hover:bg-destructive/10">
               Delete account
             </Button>
           }
