@@ -1,5 +1,11 @@
-import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
+import type { BaseLayoutProps, LayoutTab } from "fumadocs-ui/layouts/shared";
 import { Logo } from "@/components/logo";
+
+const tabs: LayoutTab[] = [
+  { title: "Docs", url: "/docs" },
+  { title: "Self-Hosting", url: "/self-hosting" },
+  { title: "API Reference", url: "/api-reference" },
+];
 
 export function baseOptions(props: BaseLayoutProps = {}): BaseLayoutProps {
   return {
@@ -14,3 +20,5 @@ export function baseOptions(props: BaseLayoutProps = {}): BaseLayoutProps {
     ...props,
   };
 }
+
+export { tabs };
