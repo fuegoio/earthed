@@ -156,11 +156,25 @@ type UserProfile struct {
 	Bio       string    `json:"bio,omitempty"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+	// AT Proto identity (set after connecting a DID).
+	DID    string `json:"did,omitempty"`
+	PDSUrl string `json:"pds_url,omitempty"`
 	// Denormalised fields set by query joins.
 	FirstName      string `json:"first_name,omitempty"`
 	FollowerCount  int    `json:"follower_count"`
 	FollowingCount int    `json:"following_count"`
 	IsFollowing    bool   `json:"is_following,omitempty"`
+}
+
+// ATProtoCredentials holds the PDS session tokens for a user. Never exposed
+// via the API — only read/written by internal AT Proto sync code.
+type ATProtoCredentials struct {
+	UserID       int
+	DID          string
+	PDSUrl       string
+	AccessToken  string
+	RefreshToken string
+	ExpiresAt    *time.Time
 }
 
 // SharedArticle is an article that a user shared on the social timeline.

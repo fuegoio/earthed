@@ -1,0 +1,50 @@
+{
+  "lexicon": 1,
+  "id": "io.planetary.relay.announceUser",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Called by a Planetary instance to register a new user DID with the relay. The relay will begin tracking the DID's PDS repo for aggregate counts.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["did", "pdsUrl", "instanceUrl"],
+          "properties": {
+            "did": {
+              "type": "string",
+              "description": "The user's DID (e.g. did:plc:xxx or did:web:handle.example.com)."
+            },
+            "pdsUrl": {
+              "type": "string",
+              "format": "uri",
+              "description": "Base URL of the PDS hosting this DID's repo."
+            },
+            "instanceUrl": {
+              "type": "string",
+              "format": "uri",
+              "description": "Base URL of the Planetary instance announcing this user."
+            },
+            "handle": {
+              "type": "string",
+              "description": "The user's Planetary handle at time of announcement."
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["tracked"],
+          "properties": {
+            "tracked": {
+              "type": "boolean",
+              "description": "Whether the relay is now tracking this DID."
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "io.planetary.feed.subscription",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A feed subscription. The repo owner subscribes to a feed URL.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["feedUrl", "createdAt"],
+        "properties": {
+          "feedUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL of the RSS/Atom/JSON Feed."
+          },
+          "siteUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Website URL associated with the feed."
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 512,
+            "description": "Feed title at time of subscription."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

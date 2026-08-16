@@ -1,0 +1,62 @@
+{
+  "lexicon": 1,
+  "id": "io.planetary.share.article",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A shared article. The repo owner is sharing an article URL with optional metadata.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["articleUrl", "sharedAt"],
+        "properties": {
+          "articleUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Canonical URL of the shared article."
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 1024,
+            "description": "Article title at time of sharing."
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "description": "Short excerpt or description."
+          },
+          "feedUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL of the RSS/Atom feed the article came from."
+          },
+          "feedTitle": {
+            "type": "string",
+            "maxLength": 512,
+            "description": "Title of the source feed."
+          },
+          "feedSiteUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Website URL of the source feed."
+          },
+          "author": {
+            "type": "string",
+            "maxLength": 255,
+            "description": "Article author."
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Original article publication time."
+          },
+          "sharedAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "When the user shared this article."
+          }
+        }
+      }
+    }
+  }
+}

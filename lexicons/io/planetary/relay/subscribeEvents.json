@@ -1,0 +1,108 @@
+{
+  "lexicon": 1,
+  "id": "io.planetary.relay.subscribeEvents",
+  "defs": {
+    "main": {
+      "type": "subscription",
+      "description": "WebSocket subscription for a Planetary instance to receive real-time events from the relay. The relay pushes events whenever a tracked DID emits a follow, share, or feed subscription record. Instances use this to keep their local counts and timelines up to date.",
+      "parameters": {
+        "type": "params",
+        "required": ["instanceUrl"],
+        "properties": {
+          "instanceUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "The subscribing instance's base URL. Used to route events to the right instance."
+          },
+          "cursor": {
+            "type": "integer",
+            "description": "Resume from a known sequence number. Omit for live tail."
+          }
+        }
+      },
+      "message": {
+        "schema": {
+          "type": "union",
+          "refs": [
+            "#follow",
+            "#unfollow",
+            "#share",
+            "#unshare",
+            "#feedSubscription",
+            "#feedUnsubscription"
+          ]
+        }
+      }
+    },
+    "follow": {
+      "type": "object",
+      "description": "A new follow record was committed to a tracked PDS repo.",
+      "required": ["seq", "did", "subjectDid", "rkey", "createdAt"],
+      "properties": {
+        "seq": { "type": "integer" },
+        "did": { "type": "string", "description": "DID of the follower." },
+        "subjectDid": { "type": "string", "description": "DID being followed." },
+        "rkey": { "type": "string", "description": "Record key in the follower's repo." },
+        "createdAt": { "type": "string", "format": "datetime" }
+      }
+    },
+    "unfollow": {
+      "type": "object",
+      "description": "A follow record was deleted from a tracked PDS repo.",
+      "required": ["seq", "did", "subjectDid", "rkey"],
+      "properties": {
+        "seq": { "type": "integer" },
+        "did": { "type": "string" },
+        "subjectDid": { "type": "string" },
+        "rkey": { "type": "string" }
+      }
+    },
+    "share": {
+      "type": "object",
+      "description": "A new article share record was committed.",
+      "required": ["seq", "did", "rkey", "articleUrl", "sharedAt"],
+      "properties": {
+        "seq": { "type": "integer" },
+        "did": { "type": "string" },
+        "rkey": { "type": "string" },
+        "articleUrl": { "type": "string", "format": "uri" },
+        "feedUrl": { "type": "string", "format": "uri" },
+        "title": { "type": "string" },
+        "sharedAt": { "type": "string", "format": "datetime" }
+      }
+    },
+    "unshare": {
+      "type": "object",
+      "description": "An article share record was deleted.",
+      "required": ["seq", "did", "rkey"],
+      "properties": {
+        "seq": { "type": "integer" },
+        "did": { "type": "string" },
+        "rkey": { "type": "string" }
+      }
+    },
+    "feedSubscription": {
+      "type": "object",
+      "description": "A new feed subscription record was committed.",
+      "required": ["seq", "did", "rkey", "feedUrl", "createdAt"],
+      "properties": {
+        "seq": { "type": "integer" },
+        "did": { "type": "string" },
+        "rkey": { "type": "string" },
+        "feedUrl": { "type": "string", "format": "uri" },
+        "title": { "type": "string" },
+        "createdAt": { "type": "string", "format": "datetime" }
+      }
+    },
+    "feedUnsubscription": {
+      "type": "object",
+      "description": "A feed subscription record was deleted.",
+      "required": ["seq", "did", "rkey"],
+      "properties": {
+        "seq": { "type": "integer" },
+        "did": { "type": "string" },
+        "rkey": { "type": "string" }
+      }
+    }
+  }
+}

@@ -29,6 +29,10 @@ type Config struct {
 	CookieSameSite string
 	CookieDomain   string
 	TrustedOrigins []string
+	// RelayURL is the base URL of the Earthed relay. When set, the API
+	// announces new AT Proto users to the relay and queries it for global counts.
+	// Leave empty to disable relay integration.
+	RelayURL string
 }
 
 // Load reads configuration from environment variables and validates it.
@@ -52,6 +56,7 @@ func Load() (*Config, error) {
 		CookieSameSite: env("EARTHED_COOKIE_SAMESITE", "lax"),
 		CookieDomain:   strings.TrimSpace(env("EARTHED_COOKIE_DOMAIN", "")),
 		TrustedOrigins: envList("EARTHED_TRUSTED_ORIGINS"),
+		RelayURL:       env("EARTHED_RELAY_URL", ""),
 	}
 
 	if cfg.LimenSecret == "" {

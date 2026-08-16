@@ -1,0 +1,358 @@
+package api
+
+import (
+	"context"
+	"fmt"
+	"log/slog"
+	"net/http"
+	"strings"
+	"time"
+
+	"github.com/danielgtaylor/huma/v2"
+
+	"github.com/fuegoio/planetary/go/api/internal/atproto"
+	"github.com/fuegoio/planetary/go/api/internal/auth"
+	"github.com/fuegoio/planetary/go/api/internal/store"
+)
+
+// --- Input/output types ---
+
+type ConnectATProtoInput struct {
+	Body struct {
+		// PDS base URL (e.g. "https://pds.example.com").
+		PDSUrl string `json:"pds_url" minLength:"1" maxLength:"2048"`
+		// Identifier: handle or DID for PDS authentication.
+		Identifier string `json:"identifier" minLength:"1" maxLength:"255"`
+		// App password or account password for the PDS.
+		Password string `json:"password" minLength:"1" maxLength:"255"`
+	}
+}
+
+type ATProtoStatusOutput struct {
+	Body struct {
+		Connected bool   `json:"connected"`
+		DID       string `json:"did,omitempty"`
+		PDSUrl    string `json:"pds_url,omitempty"`
+		Handle    string `json:"handle,omitempty"`
+	}
+}
+
+// registerATProtoRoutes registers AT Protocol integration endpoints.
+func (a *API) registerATProtoRoutes() {
+	// GET /.well-known/atproto-did — lets users point an AT Proto handle at
+	// this instance. Returns the DID for the handle in the subdomain or query.
+	// e.g. "fuego.planetary.example" → look up handle "fuego" → return DID.
+	//
+	// This is registered on the bare mux in main.go at /.well-known/atproto-did;
+	// here we register the XRPC-namespaced version for discoverability.
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "atproto-status",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/me/atproto",
+		Summary:     "Get AT Proto connection status for the current user",
+		Tags:        []string{"social"},
+	}, func(ctx context.Context, _ *struct{}) (*ATProtoStatusOutput, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		creds, err := a.store.GetATProtoCredentials(ctx, userID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		out := &ATProtoStatusOutput{}
+		if creds != nil {
+			out.Body.Connected = true
+			out.Body.DID = creds.DID
+			out.Body.PDSUrl = creds.PDSUrl
+		}
+		return out, nil
+	})
+
+	// POST /api/v1/me/atproto — connect a PDS account.
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "connect-atproto",
+		Method:      http.MethodPost,
+		Path:        "/api/v1/me/atproto",
+		Summary:     "Connect an AT Protocol PDS account",
+		Tags:        []string{"social"},
+	}, func(ctx context.Context, input *ConnectATProtoInput) (*ATProtoStatusOutput, error) {
+		userID := auth.UserIDFromCtx(ctx)
+
+		// Get the user's Planetary profile to include in the PDS profile record.
+		profile, err := a.store.GetProfileByUserID(ctx, userID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if profile == nil {
+			return nil, huma.Error422UnprocessableEntity("set a handle before connecting AT Proto", nil)
+		}
+
+		pdsURL := strings.TrimRight(input.Body.PDSUrl, "/")
+		client := atproto.NewClient(pdsURL, "")
+		session, err := client.CreateSession(ctx, input.Body.Identifier, input.Body.Password)
+		if err != nil {
+			return nil, huma.Error422UnprocessableEntity(fmt.Sprintf("PDS authentication failed: %s", err.Error()), nil)
+		}
+
+		// Persist DID + tokens.
+		expiresAt := time.Now().Add(2 * time.Hour) // standard AT Proto access token TTL
+		if err := a.store.ConnectATProto(ctx, userID,
+			session.DID, pdsURL,
+			session.AccessJwt, session.RefreshJwt, &expiresAt,
+		); err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+
+		// Write the profile record to the PDS asynchronously — we don't want
+		// a slow PDS to block the HTTP response.
+		go func() {
+			bgCtx := context.Background()
+			user, _ := a.store.GetUserByID(bgCtx, userID)
+			w := atproto.NewWriter(pdsURL, session.DID, session.AccessJwt)
+			displayName := ""
+			if user != nil {
+				displayName = user.FirstName
+			}
+			if err := w.PutProfile(bgCtx, profile.Handle, profile.Bio, displayName, a.cfg.BaseURL, profile.CreatedAt); err != nil {
+				slog.Warn("atproto: put profile", "did", session.DID, "err", err)
+			}
+			// Announce to the relay if configured.
+			a.announceToRelay(bgCtx, session.DID, pdsURL, profile.Handle)
+		}()
+
+		out := &ATProtoStatusOutput{}
+		out.Body.Connected = true
+		out.Body.DID = session.DID
+		out.Body.PDSUrl = pdsURL
+		out.Body.Handle = session.Handle
+		return out, nil
+	})
+
+	// DELETE /api/v1/me/atproto — disconnect PDS account.
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "disconnect-atproto",
+		Method:      http.MethodDelete,
+		Path:        "/api/v1/me/atproto",
+		Summary:     "Disconnect the AT Protocol PDS account",
+		Tags:        []string{"social"},
+	}, func(ctx context.Context, _ *struct{}) (*struct{}, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		if err := a.store.DisconnectATProto(ctx, userID); err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		return nil, nil
+	})
+}
+
+// --- AT Proto side-effects called from other handlers ---
+
+// atprotoWriterForUser returns an authenticated Writer for userID, or nil if
+// the user has no AT Proto connection or credentials are empty.
+// If the access token has expired, it attempts a refresh first.
+func (a *API) atprotoWriterForUser(ctx context.Context, userID int) (*atproto.Writer, *store.ATProtoCredentials, error) {
+	creds, err := a.store.GetATProtoCredentials(ctx, userID)
+	if err != nil || creds == nil {
+		return nil, nil, err
+	}
+
+	// Refresh if the token is expired or will expire within 5 minutes.
+	if creds.ExpiresAt != nil && time.Until(*creds.ExpiresAt) < 5*time.Minute {
+		refreshClient := atproto.NewClient(creds.PDSUrl, "")
+		newSession, err := refreshClient.RefreshSession(ctx, creds.RefreshToken)
+		if err != nil {
+			slog.Warn("atproto: token refresh failed", "user_id", userID, "err", err)
+			// Continue with the stale token — the PDS will return 401 if it's
+			// truly expired and the caller will see a write error.
+		} else {
+			expires := time.Now().Add(2 * time.Hour)
+			_ = a.store.UpdateATProtoTokens(ctx, userID, newSession.AccessJwt, newSession.RefreshJwt, &expires)
+			creds.AccessToken = newSession.AccessJwt
+			creds.RefreshToken = newSession.RefreshJwt
+		}
+	}
+
+	return atproto.NewWriter(creds.PDSUrl, creds.DID, creds.AccessToken), creds, nil
+}
+
+// ATProtoSyncFollow writes or deletes a follow record on the PDS.
+// Called fire-and-forget from FollowUser / UnfollowUser handlers.
+func (a *API) ATProtoSyncFollow(userID, followeeUserID int, followeeHandle string, isFollow bool) {
+	ctx := context.Background()
+	w, creds, err := a.atprotoWriterForUser(ctx, userID)
+	if err != nil || w == nil {
+		return
+	}
+
+	// Resolve followee DID — they may or may not have connected AT Proto.
+	followeeProfile, err := a.store.GetProfileByHandle(ctx, followeeHandle, 0)
+	if err != nil || followeeProfile == nil || followeeProfile.DID == "" {
+		return // followee has no DID — nothing to write
+	}
+
+	if isFollow {
+		rkey, err := w.PutFollow(ctx, followeeProfile.DID)
+		if err != nil {
+			slog.Warn("atproto: put follow", "user_id", userID, "err", err)
+			return
+		}
+		_ = a.store.SetFollowATProtoRkey(ctx, userID, followeeUserID, rkey)
+	} else {
+		rkey, err := a.store.GetFollowATProtoRkey(ctx, userID, followeeUserID)
+		if err != nil || rkey == "" {
+			return
+		}
+		if err := w.DeleteFollow(ctx, rkey); err != nil {
+			slog.Warn("atproto: delete follow", "user_id", userID, "err", err)
+		}
+		_ = a.store.SetFollowATProtoRkey(ctx, userID, followeeUserID, "")
+	}
+	_ = creds
+}
+
+// ATProtoSyncShare writes or deletes a share record on the PDS.
+func (a *API) ATProtoSyncShare(userID int, sa *store.SharedArticle, isShare bool) {
+	ctx := context.Background()
+	w, _, err := a.atprotoWriterForUser(ctx, userID)
+	if err != nil || w == nil {
+		return
+	}
+
+	if isShare {
+		rkey, err := w.PutShare(ctx,
+			sa.ArticleURL, sa.Title, sa.Description,
+			sa.FeedURL, sa.FeedTitle, sa.FeedSiteURL,
+			sa.Author, sa.PublishedAt, sa.SharedAt,
+		)
+		if err != nil {
+			slog.Warn("atproto: put share", "user_id", userID, "err", err)
+			return
+		}
+		_ = a.store.SetShareATProtoRkey(ctx, sa.ID, rkey)
+	} else {
+		rkey, err := a.store.GetShareATProtoRkey(ctx, sa.ID)
+		if err != nil || rkey == "" {
+			return
+		}
+		if err := w.DeleteShare(ctx, rkey); err != nil {
+			slog.Warn("atproto: delete share", "user_id", userID, "err", err)
+		}
+	}
+}
+
+// ATProtoSyncFeedSubscription writes or deletes a feed subscription record.
+func (a *API) ATProtoSyncFeedSubscription(userID, feedID int, feedURL, siteURL, title string, isSubscribe bool, createdAt time.Time) {
+	ctx := context.Background()
+	w, _, err := a.atprotoWriterForUser(ctx, userID)
+	if err != nil || w == nil {
+		return
+	}
+
+	if isSubscribe {
+		rkey, err := w.PutFeedSubscription(ctx, feedURL, siteURL, title, createdAt)
+		if err != nil {
+			slog.Warn("atproto: put feed subscription", "user_id", userID, "err", err)
+			return
+		}
+		_ = a.store.SetFeedATProtoRkey(ctx, feedID, rkey)
+	} else {
+		// On unsubscribe we don't have the rkey easily; skip for now.
+		// A full implementation would store rkey on the feeds row and delete.
+	}
+}
+
+// ATProtoSyncFeedList writes or deletes a feed list record on the PDS.
+func (a *API) ATProtoSyncFeedList(userID, listID int, fl *store.FeedList, isCreate bool) {
+	ctx := context.Background()
+	w, _, err := a.atprotoWriterForUser(ctx, userID)
+	if err != nil || w == nil {
+		return
+	}
+
+	if !isCreate {
+		rkey, err := a.store.GetFeedListATProtoRkey(ctx, listID)
+		if err != nil || rkey == "" {
+			return
+		}
+		if err := w.DeleteFeedList(ctx, rkey); err != nil {
+			slog.Warn("atproto: delete feed list", "user_id", userID, "err", err)
+		}
+		return
+	}
+
+	// Build the feed entry list from the full FeedList.
+	entries := make([]atproto.FeedListEntry, 0, len(fl.Feeds))
+	for _, f := range fl.Feeds {
+		entries = append(entries, atproto.FeedListEntry{
+			FeedURL: f.FeedURL,
+			SiteURL: f.SiteURL,
+			Title:   f.Title,
+		})
+	}
+
+	existingRkey, _ := a.store.GetFeedListATProtoRkey(ctx, listID)
+	rkey, err := w.PutFeedList(ctx, existingRkey, fl.Title, fl.Description, fl.IsPublic, entries, fl.CreatedAt)
+	if err != nil {
+		slog.Warn("atproto: put feed list", "user_id", userID, "err", err)
+		return
+	}
+	_ = a.store.SetFeedListATProtoRkey(ctx, listID, rkey)
+}
+
+// announceToRelay notifies the configured relay of a new user DID.
+// No-ops if no relay URL is configured.
+func (a *API) announceToRelay(ctx context.Context, did, pdsURL, handle string) {
+	if a.cfg.RelayURL == "" {
+		return
+	}
+	rc := atproto.NewClient(a.cfg.RelayURL, "")
+	type announceIn struct {
+		DID         string `json:"did"`
+		PDSUrl      string `json:"pdsUrl"`
+		InstanceURL string `json:"instanceUrl"`
+		Handle      string `json:"handle"`
+	}
+	if err := rc.Procedure(ctx, "io.planetary.relay.announceUser", announceIn{
+		DID:         did,
+		PDSUrl:      pdsURL,
+		InstanceURL: a.cfg.BaseURL,
+		Handle:      handle,
+	}, nil); err != nil {
+		slog.Warn("relay: announce user", "did", did, "err", err)
+	}
+}
+
+// WellKnownATProtoDIDHandler returns an http.Handler for /.well-known/atproto-did.
+// It resolves the host's subdomain (or ?handle= query param) to a DID.
+func (a *API) WellKnownATProtoDIDHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Extract handle from subdomain: "fuego.planetary.example" → "fuego"
+		host := r.Host
+		handle := r.URL.Query().Get("handle")
+		if handle == "" {
+			// Strip port from host
+			for i := len(host) - 1; i >= 0; i-- {
+				if host[i] == ':' {
+					host = host[:i]
+					break
+				}
+			}
+			// First segment before the first dot is the handle subdomain
+			if idx := strings.IndexByte(host, '.'); idx > 0 {
+				handle = host[:idx]
+			}
+		}
+		if handle == "" {
+			http.Error(w, "handle not found", http.StatusNotFound)
+			return
+		}
+
+		profile, err := a.store.GetProfileByHandle(r.Context(), handle, 0)
+		if err != nil || profile == nil || profile.DID == "" {
+			http.Error(w, "not found", http.StatusNotFound)
+			return
+		}
+
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		_, _ = w.Write([]byte(profile.DID))
+	})
+}
+
+

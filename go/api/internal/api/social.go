@@ -160,6 +160,13 @@ func (a *API) registerSocialRoutes() {
 			}
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
+		// Resolve followee user ID for rkey tracking.
+		followeeProfile, _ := a.store.GetProfileByHandle(ctx, input.Handle, 0)
+		followeeUserID := 0
+		if followeeProfile != nil {
+			followeeUserID = followeeProfile.UserID
+		}
+		go a.ATProtoSyncFollow(userID, followeeUserID, input.Handle, true)
 		return nil, nil
 	})
 
@@ -172,12 +179,19 @@ func (a *API) registerSocialRoutes() {
 		Tags:        []string{"social"},
 	}, func(ctx context.Context, input *FollowInput) (*struct{}, error) {
 		userID := auth.UserIDFromCtx(ctx)
+		// Resolve before deleting so we still have the followee profile.
+		followeeProfile, _ := a.store.GetProfileByHandle(ctx, input.Handle, 0)
 		if err := a.store.UnfollowUser(ctx, userID, input.Handle); err != nil {
 			if errors.Is(err, store.ErrProfileNotFound) {
 				return nil, huma.Error404NotFound("user not found")
 			}
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
+		followeeUserID := 0
+		if followeeProfile != nil {
+			followeeUserID = followeeProfile.UserID
+		}
+		go a.ATProtoSyncFollow(userID, followeeUserID, input.Handle, false)
 		return nil, nil
 	})
 
@@ -273,6 +287,8 @@ func (a *API) registerSocialRoutes() {
 		if err != nil {
 			return nil, huma.Error500InternalServerError(fmt.Errorf("share article: %w", err).Error())
 		}
+		saSnap := *sa
+		go a.ATProtoSyncShare(userID, &saSnap, true)
 		return &SharedArticleOutput{Body: *sa}, nil
 	})
 
@@ -287,12 +303,15 @@ func (a *API) registerSocialRoutes() {
 		ShareID int64 `path:"shareId"`
 	}) (*struct{}, error) {
 		userID := auth.UserIDFromCtx(ctx)
+		// Grab the rkey before deleting.
+		shareSnap := &store.SharedArticle{ID: input.ShareID}
 		if err := a.store.UnshareArticle(ctx, input.ShareID, userID); err != nil {
 			if errors.Is(err, store.ErrShareNotFound) {
 				return nil, huma.Error404NotFound("shared article not found")
 			}
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
+		go a.ATProtoSyncShare(userID, shareSnap, false)
 		return nil, nil
 	})
 

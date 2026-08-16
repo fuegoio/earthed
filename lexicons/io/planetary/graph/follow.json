@@ -1,0 +1,25 @@
+{
+  "lexicon": 1,
+  "id": "io.planetary.graph.follow",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A follow relationship. The repo owner follows the subject DID.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["subject", "createdAt"],
+        "properties": {
+          "subject": {
+            "type": "string",
+            "description": "DID of the user being followed."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}
