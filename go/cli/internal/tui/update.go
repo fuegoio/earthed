@@ -492,7 +492,7 @@ func (m Model) renderEntryList(width int) string {
 	if len(m.entries) == 0 {
 		sb.WriteString("\n" + dimStyle.Render("  No entries here.") + "\n")
 	} else {
-		isFocus := m.focus == focusEntries
+		isFocus := m.focus == focusEntries && !m.searching
 
 		// Fixed column widths (all in visible chars):
 		//   prefix: " "(1) + dot(2) + star(2) = 5
