@@ -104,7 +104,7 @@ var (
 			Foreground(lipgloss.Color("220"))
 
 	unreadDotStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("39"))
+			Foreground(lipgloss.Color(sunColor))
 
 	helpStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("240")).
