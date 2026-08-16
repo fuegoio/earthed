@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { LayoutList, Circle, Star, Plus, ListChecks, Settings, LogOut } from "lucide-react";
+import { LayoutList, Circle, Star, Plus, ListChecks, Settings, LogOut, Users } from "lucide-react";
 import { Menu } from "@base-ui/react/menu";
 import { Avatar } from "@base-ui/react/avatar";
 import { Skeleton } from "@workspace/ui/components/skeleton";
@@ -38,6 +38,7 @@ function SidebarNav() {
     { href: "/", label: "All", icon: LayoutList },
     { href: "/unread", label: "Unread", icon: Circle },
     { href: "/starred", label: "Starred", icon: Star },
+    { href: "/social", label: "Social", icon: Users },
     { href: "/lists", label: "Feed lists", icon: ListChecks },
   ];
 

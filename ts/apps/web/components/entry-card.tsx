@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { motion } from "motion/react";
 import { StarToggle } from "@/components/star-toggle";
+import { ShareToggle } from "@/components/share-toggle";
 import { FeedIcon } from "@/components/feed-icon";
 import { getClient, updateEntries } from "@/lib/planetary";
 import { getApiErrorMessage } from "@/lib/errors";
@@ -27,10 +28,13 @@ export function EntryCard({
   entry,
   feed,
   staggerIndex,
+  shareId = null,
 }: {
   entry: Entry;
   feed?: Feed;
   staggerIndex?: number;
+  /** ID of the SharedArticle row if this entry is already shared; null otherwise. */
+  shareId?: number | null;
 }) {
   const queryClient = useQueryClient();
   const [readOptimistic, setReadOptimistic] = useOptimistic(entry.status === "read");
@@ -138,6 +142,7 @@ export function EntryCard({
         </p>
       </div>
       <div className="flex shrink-0 items-start gap-0.5" onClick={(e) => e.stopPropagation()}>
+        <ShareToggle entry={entry} feed={feed} shareId={shareId} size="icon-sm" />
         <StarToggle entryId={entry.id} starred={entry.starred} size="icon-sm" />
       </div>
     </motion.a>

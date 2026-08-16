@@ -671,11 +671,16 @@ func (s *Store) DeleteUser(ctx context.Context, id int) error {
 }
 
 // GetUserByID returns the user with the given id, or nil.
+// The Handle field is populated when the user has a social profile.
 func (s *Store) GetUserByID(ctx context.Context, id int) (*User, error) {
 	var u User
 	err := s.DB.QueryRowContext(ctx,
-		`SELECT id, email, COALESCE(first_name, ''), false, created_at FROM users WHERE id = $1`, id,
-	).Scan(&u.ID, &u.Email, &u.FirstName, &u.IsAdmin, &u.CreatedAt)
+		`SELECT u.id, u.email, COALESCE(u.first_name, ''), false, u.created_at,
+		        COALESCE(p.handle, '')
+		 FROM users u
+		 LEFT JOIN user_profiles p ON p.user_id = u.id
+		 WHERE u.id = $1`, id,
+	).Scan(&u.ID, &u.Email, &u.FirstName, &u.IsAdmin, &u.CreatedAt, &u.Handle)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}

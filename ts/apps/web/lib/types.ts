@@ -11,12 +11,16 @@ export type {
   FeedList,
   FeedListFeed,
   FeedListWritable,
+  FeedSubscribersResponse,
   FeedWritable,
   Folder,
   ImportFeedListResponse,
   PreviewFeedBody,
   PreviewFeedItem,
+  PublicProfileResponse,
+  SharedArticle,
   User,
+  UserProfile,
 } from "@planetary/api-client";
 
 // Web-friendly aliases for generated types whose generated names are awkward

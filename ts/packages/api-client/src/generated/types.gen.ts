@@ -247,6 +247,15 @@ export type FeedListFeed = {
     title: string;
 };
 
+export type FeedSubscribersResponse = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    count: number;
+    subscribers: Array<UserProfile> | null;
+};
+
 export type Folder = {
     /**
      * A URL to the JSON Schema for this object.
@@ -324,6 +333,51 @@ export type PreviewFeedItem = {
     url: string;
 };
 
+export type PublicProfileResponse = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    feeds: Array<Feed> | null;
+    profile: UserProfile;
+    shared_articles: Array<SharedArticle> | null;
+};
+
+export type ShareArticleInputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    article_url: string;
+    author?: string;
+    description?: string;
+    feed_site_url?: string;
+    feed_title?: string;
+    feed_url?: string;
+    published_at?: string;
+    title: string;
+};
+
+export type SharedArticle = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    article_url: string;
+    author?: string;
+    description?: string;
+    feed_site_url?: string;
+    feed_title?: string;
+    feed_url?: string;
+    id: number;
+    published_at?: string;
+    shared_at: string;
+    sharer_first_name?: string;
+    sharer_handle?: string;
+    title: string;
+    user_id: number;
+};
+
 export type ToggleEntryStarredRequest = {
     /**
      * A URL to the JSON Schema for this object.
@@ -380,6 +434,15 @@ export type UpdateFolderInputBody = {
     title: string;
 };
 
+export type UpdateHandleInputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    bio?: string;
+    handle: string;
+};
+
 export type UpdateMeInputBody = {
     /**
      * A URL to the JSON Schema for this object.
@@ -397,8 +460,25 @@ export type User = {
     created_at: string;
     email: string;
     first_name?: string;
+    handle?: string;
     id: number;
     is_admin: boolean;
+};
+
+export type UserProfile = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    bio?: string;
+    created_at: string;
+    first_name?: string;
+    follower_count: number;
+    following_count: number;
+    handle: string;
+    is_following?: boolean;
+    updated_at: string;
+    user_id: number;
 };
 
 export type AddFeedListFeedInputBodyWritable = {
@@ -547,6 +627,11 @@ export type FeedListFeedWritable = {
     title: string;
 };
 
+export type FeedSubscribersResponseWritable = {
+    count: number;
+    subscribers: Array<UserProfileWritable> | null;
+};
+
 export type FolderWritable = {
     created_at: string;
     id: number;
@@ -590,6 +675,39 @@ export type PreviewFeedInputBodyWritable = {
     feed_url: string;
 };
 
+export type PublicProfileResponseWritable = {
+    feeds: Array<FeedWritable> | null;
+    profile: UserProfileWritable;
+    shared_articles: Array<SharedArticleWritable> | null;
+};
+
+export type ShareArticleInputBodyWritable = {
+    article_url: string;
+    author?: string;
+    description?: string;
+    feed_site_url?: string;
+    feed_title?: string;
+    feed_url?: string;
+    published_at?: string;
+    title: string;
+};
+
+export type SharedArticleWritable = {
+    article_url: string;
+    author?: string;
+    description?: string;
+    feed_site_url?: string;
+    feed_title?: string;
+    feed_url?: string;
+    id: number;
+    published_at?: string;
+    shared_at: string;
+    sharer_first_name?: string;
+    sharer_handle?: string;
+    title: string;
+    user_id: number;
+};
+
 export type ToggleEntryStarredRequestWritable = {
     starred: boolean;
 };
@@ -622,6 +740,11 @@ export type UpdateFolderInputBodyWritable = {
     title: string;
 };
 
+export type UpdateHandleInputBodyWritable = {
+    bio?: string;
+    handle: string;
+};
+
 export type UpdateMeInputBodyWritable = {
     email: string;
     first_name: string;
@@ -631,8 +754,21 @@ export type UserWritable = {
     created_at: string;
     email: string;
     first_name?: string;
+    handle?: string;
     id: number;
     is_admin: boolean;
+};
+
+export type UserProfileWritable = {
+    bio?: string;
+    created_at: string;
+    first_name?: string;
+    follower_count: number;
+    following_count: number;
+    handle: string;
+    is_following?: boolean;
+    updated_at: string;
+    user_id: number;
 };
 
 export type DeviceCodeData = {
@@ -1379,6 +1515,33 @@ export type RefreshFeedResponses = {
 
 export type RefreshFeedResponse = RefreshFeedResponses[keyof RefreshFeedResponses];
 
+export type FeedSubscribersData = {
+    body?: never;
+    path: {
+        feedId: number;
+    };
+    query?: never;
+    url: '/api/v1/feeds/{feedId}/subscribers';
+};
+
+export type FeedSubscribersErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type FeedSubscribersError = FeedSubscribersErrors[keyof FeedSubscribersErrors];
+
+export type FeedSubscribersResponses = {
+    /**
+     * OK
+     */
+    200: FeedSubscribersResponse;
+};
+
+export type FeedSubscribersResponse2 = FeedSubscribersResponses[keyof FeedSubscribersResponses];
+
 export type ListFoldersData = {
     body?: never;
     path?: never;
@@ -1583,6 +1746,31 @@ export type UpdateMeResponses = {
 
 export type UpdateMeResponse = UpdateMeResponses[keyof UpdateMeResponses];
 
+export type UpdateHandleData = {
+    body: UpdateHandleInputBodyWritable;
+    path?: never;
+    query?: never;
+    url: '/api/v1/me/handle';
+};
+
+export type UpdateHandleErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type UpdateHandleError = UpdateHandleErrors[keyof UpdateHandleErrors];
+
+export type UpdateHandleResponses = {
+    /**
+     * OK
+     */
+    200: UserProfile;
+};
+
+export type UpdateHandleResponse = UpdateHandleResponses[keyof UpdateHandleResponses];
+
 export type ExportOpmlData = {
     body?: never;
     path?: never;
@@ -1632,6 +1820,136 @@ export type ImportOpmlResponses = {
 };
 
 export type ImportOpmlResponse = ImportOpmlResponses[keyof ImportOpmlResponses];
+
+export type ListFollowingData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/social/following';
+};
+
+export type ListFollowingErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type ListFollowingError = ListFollowingErrors[keyof ListFollowingErrors];
+
+export type ListFollowingResponses = {
+    /**
+     * OK
+     */
+    200: Array<UserProfile> | null;
+};
+
+export type ListFollowingResponse = ListFollowingResponses[keyof ListFollowingResponses];
+
+export type MySharedArticlesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/social/shares';
+};
+
+export type MySharedArticlesErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type MySharedArticlesError = MySharedArticlesErrors[keyof MySharedArticlesErrors];
+
+export type MySharedArticlesResponses = {
+    /**
+     * OK
+     */
+    200: Array<SharedArticle> | null;
+};
+
+export type MySharedArticlesResponse = MySharedArticlesResponses[keyof MySharedArticlesResponses];
+
+export type ShareArticleData = {
+    body: ShareArticleInputBodyWritable;
+    path?: never;
+    query?: never;
+    url: '/api/v1/social/shares';
+};
+
+export type ShareArticleErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type ShareArticleError = ShareArticleErrors[keyof ShareArticleErrors];
+
+export type ShareArticleResponses = {
+    /**
+     * OK
+     */
+    200: SharedArticle;
+};
+
+export type ShareArticleResponse = ShareArticleResponses[keyof ShareArticleResponses];
+
+export type UnshareArticleData = {
+    body?: never;
+    path: {
+        shareId: number;
+    };
+    query?: never;
+    url: '/api/v1/social/shares/{shareId}';
+};
+
+export type UnshareArticleErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type UnshareArticleError = UnshareArticleErrors[keyof UnshareArticleErrors];
+
+export type UnshareArticleResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type UnshareArticleResponse = UnshareArticleResponses[keyof UnshareArticleResponses];
+
+export type SocialTimelineData = {
+    body?: never;
+    path?: never;
+    query?: {
+        limit?: number;
+        offset?: number;
+    };
+    url: '/api/v1/social/timeline';
+};
+
+export type SocialTimelineErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type SocialTimelineError = SocialTimelineErrors[keyof SocialTimelineErrors];
+
+export type SocialTimelineResponses = {
+    /**
+     * OK
+     */
+    200: Array<SharedArticle> | null;
+};
+
+export type SocialTimelineResponse = SocialTimelineResponses[keyof SocialTimelineResponses];
 
 export type ListTokensData = {
     body?: never;
@@ -1709,3 +2027,138 @@ export type DeleteTokenResponses = {
 };
 
 export type DeleteTokenResponse = DeleteTokenResponses[keyof DeleteTokenResponses];
+
+export type GetUserProfileData = {
+    body?: never;
+    path: {
+        handle: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{handle}';
+};
+
+export type GetUserProfileErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type GetUserProfileError = GetUserProfileErrors[keyof GetUserProfileErrors];
+
+export type GetUserProfileResponses = {
+    /**
+     * OK
+     */
+    200: PublicProfileResponse;
+};
+
+export type GetUserProfileResponse = GetUserProfileResponses[keyof GetUserProfileResponses];
+
+export type UnfollowUserData = {
+    body?: never;
+    path: {
+        handle: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{handle}/follow';
+};
+
+export type UnfollowUserErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type UnfollowUserError = UnfollowUserErrors[keyof UnfollowUserErrors];
+
+export type UnfollowUserResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type UnfollowUserResponse = UnfollowUserResponses[keyof UnfollowUserResponses];
+
+export type FollowUserData = {
+    body?: never;
+    path: {
+        handle: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{handle}/follow';
+};
+
+export type FollowUserErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type FollowUserError = FollowUserErrors[keyof FollowUserErrors];
+
+export type FollowUserResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type FollowUserResponse = FollowUserResponses[keyof FollowUserResponses];
+
+export type ListFollowersData = {
+    body?: never;
+    path: {
+        handle: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{handle}/followers';
+};
+
+export type ListFollowersErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type ListFollowersError = ListFollowersErrors[keyof ListFollowersErrors];
+
+export type ListFollowersResponses = {
+    /**
+     * OK
+     */
+    200: Array<UserProfile> | null;
+};
+
+export type ListFollowersResponse = ListFollowersResponses[keyof ListFollowersResponses];
+
+export type ListUserFollowingData = {
+    body?: never;
+    path: {
+        handle: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{handle}/following';
+};
+
+export type ListUserFollowingErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type ListUserFollowingError = ListUserFollowingErrors[keyof ListUserFollowingErrors];
+
+export type ListUserFollowingResponses = {
+    /**
+     * OK
+     */
+    200: Array<UserProfile> | null;
+};
+
+export type ListUserFollowingResponse = ListUserFollowingResponses[keyof ListUserFollowingResponses];
