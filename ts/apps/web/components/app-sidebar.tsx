@@ -179,7 +179,7 @@ function SidebarContent({ userEmail }: { userEmail: string }) {
   return (
     <div className="flex h-full flex-col">
       <div className="flex h-14 shrink-0 items-center gap-2 px-4 w-full">
-        <Link href="/" className="flex items-center gap-2 font-serif text-lg font-bold">
+        <Link href="/" className="flex items-center gap-2 font-serif text-lg font-bold px-1">
           <Logo className="size-5" />
           Planetary
         </Link>
@@ -264,7 +264,7 @@ export function AppSidebar({
           <aside
             className="absolute left-0 top-0 flex h-full w-64 flex-col border-r border-sidebar-border bg-sidebar animate-in slide-in-from-left duration-200"
             onClick={(e) => {
-              if ((e.target as HTMLElement).closest("a")) onClose()
+              if ((e.target as HTMLElement).closest("a")) onClose();
             }}
           >
             <SidebarContent userEmail={userEmail} />
