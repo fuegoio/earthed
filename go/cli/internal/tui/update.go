@@ -256,7 +256,7 @@ func (m Model) renderSidebarLines() []string {
 	}
 
 	// Header
-	addLine(headerStyle.Render(truncate("  Planetary", innerWidth-2)))
+	addLine(headerStyle.Render(truncate(" ☀ Planetary", innerWidth-2)))
 	addLine(strings.Repeat("─", innerWidth))
 
 	if m.loading && len(m.items) == 0 {
