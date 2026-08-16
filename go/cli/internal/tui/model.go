@@ -108,6 +108,10 @@ var (
 	folderStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("245")).
 			Bold(true)
+
+	sectionLabelStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("240")).
+				Bold(true)
 )
 
 // NewModel creates a new TUI model with the given client.

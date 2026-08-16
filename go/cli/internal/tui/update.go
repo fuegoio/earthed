@@ -263,7 +263,15 @@ func (m Model) renderSidebarLines() []string {
 		addLine(dimStyle.Render("  Loading…"))
 	}
 
+	feedsLabelShown := false
 	for i, item := range m.items {
+		// Emit the "FEEDS" section label before the first feed or folder.
+		if !feedsLabelShown && (item.kind == sidebarFeed || item.kind == sidebarFolder) {
+			label := padRight(" FEEDS", innerWidth)
+			addLine(sectionLabelStyle.Render(label))
+			feedsLabelShown = true
+		}
+
 		isFocused := m.focus == focusSidebar && i == m.sidebarCursor
 		isActive := m.focus == focusEntries && i == m.sidebarCursor
 
@@ -300,12 +308,8 @@ func (m Model) renderSidebarLines() []string {
 		addLine(rendered)
 	}
 
-	// blank rows to fill height
-	usedLines := 2 + len(m.items)
-	if m.loading && len(m.items) == 0 {
-		usedLines++
-	}
-	for i := usedLines; i < m.height-1; i++ {
+	// blank rows to fill height (use actual line count as ground truth)
+	for len(lines) < m.height-1 {
 		addLine("")
 	}
 
