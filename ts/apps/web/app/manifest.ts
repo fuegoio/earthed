@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "A modern, self-hostable RSS reader with a clean REST API.",
     start_url: "/",
     display: "standalone",
-    background_color: "#ffffff",
-    theme_color: "#ff6923",
+    background_color: "#fff7ee",
+    theme_color: "#fff7ee",
     icons: [
       {
         src: "/icons/icon-192x192.png",
