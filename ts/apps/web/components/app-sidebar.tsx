@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { LayoutList, Circle, Star, Plus, ListChecks, Settings, LogOut } from "lucide-react";
+import { LayoutList, Circle, Star, Plus, ListChecks, Settings, LogOut, Sun, Moon } from "lucide-react";
+import { useTheme } from "next-themes";
 import { Menu } from "@base-ui/react/menu";
 import { Avatar } from "@base-ui/react/avatar";
 import { Skeleton } from "@workspace/ui/components/skeleton";
@@ -63,6 +64,7 @@ function SidebarNav() {
 
 export function AccountButton({ userEmail }: { userEmail: string }) {
   const router = useRouter();
+  const { resolvedTheme, setTheme } = useTheme();
 
   async function handleSignout() {
     await signout();
@@ -104,6 +106,17 @@ export function AccountButton({ userEmail }: { userEmail: string }) {
             <Menu.Item className={menuItemClass} render={<Link href="/settings" />}>
               <Settings className="size-4" />
               Settings
+            </Menu.Item>
+            <Menu.Item
+              className={menuItemClass}
+              onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+            >
+              {resolvedTheme === "dark" ? (
+                <Sun className="size-4" />
+              ) : (
+                <Moon className="size-4" />
+              )}
+              {resolvedTheme === "dark" ? "Light mode" : "Dark mode"}
             </Menu.Item>
             <Menu.Item className={menuItemClass} onClick={handleSignout}>
               <LogOut className="size-4" />
