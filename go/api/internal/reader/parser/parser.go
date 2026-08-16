@@ -23,6 +23,7 @@ type Feed struct {
 type Item struct {
 	Title       string
 	Link        string
+	CommentsURL string
 	Description string
 	Content     string
 	Author      string
@@ -61,15 +62,16 @@ func parseXMLFeed(body []byte) (*Feed, error) {
 			Items       []struct {
 				Title       string   `xml:"title"`
 				Links       []string `xml:"link"`
+				Comments    string   `xml:"comments"`
 				Description string   `xml:"description"`
 				Content     string   `xml:"encoded"`
 				PubDate     string   `xml:"pubDate"`
 				Author      string   `xml:"author"`
 				Categories  []string `xml:"category"`
 				Enclosures  []struct {
-					URL  string `xml:"url,attr"`
-					Type string `xml:"type,attr"`
-					Length int64 `xml:"length,attr"`
+					URL    string `xml:"url,attr"`
+					Type   string `xml:"type,attr"`
+					Length int64  `xml:"length,attr"`
 				} `xml:"enclosure"`
 			} `xml:"item"`
 		} `xml:"channel"`
@@ -86,6 +88,7 @@ func parseXMLFeed(body []byte) (*Feed, error) {
 			feed.Items = append(feed.Items, Item{
 				Title:       item.Title,
 				Link:        firstNonEmpty(item.Links),
+				CommentsURL: item.Comments,
 				Description: item.Description,
 				Content:     item.Content,
 				Author:      item.Author,

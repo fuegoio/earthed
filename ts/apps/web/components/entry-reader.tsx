@@ -3,7 +3,7 @@
 import { useState, useOptimistic, startTransition } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ExternalLink, Circle, CheckCircle } from "lucide-react";
+import { ExternalLink, MessageSquare, Circle, CheckCircle } from "lucide-react";
 import { Button, buttonVariants } from "@workspace/ui/components/button";
 import { StarToggle } from "@/components/star-toggle";
 import { FeedIcon } from "@/components/feed-icon";
@@ -63,6 +63,17 @@ export function EntryReader({ entry: initialEntry, feed }: { entry: Entry; feed?
               >
                 <ExternalLink className="size-3.5" />
                 Open
+              </a>
+            )}
+            {initialEntry.comments_url && (
+              <a
+                href={initialEntry.comments_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+              >
+                <MessageSquare className="size-3.5" />
+                Comments
               </a>
             )}
             <Button variant="ghost" size="sm" onClick={handleToggleRead} disabled={pending}>
