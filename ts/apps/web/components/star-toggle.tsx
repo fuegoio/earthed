@@ -4,6 +4,7 @@ import { useState, useOptimistic, startTransition } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Star } from "lucide-react";
+import { motion, useAnimationControls } from "motion/react";
 import { Button } from "@workspace/ui/components/button";
 import { getClient, toggleEntryStarred } from "@/lib/planetary";
 import { getApiErrorMessage } from "@/lib/errors";
@@ -13,6 +14,8 @@ import { cn } from "@workspace/ui/lib/utils";
  * Toggles the starred flag on an entry. Optimistically flips the star
  * immediately and rolls back on error. Invalidates entry queries so
  * starred/unread counts stay fresh after the mutation settles.
+ *
+ * Plays a scale-pop via framer-motion on every toggle for tactile feedback.
  */
 export function StarToggle({
   entryId,
@@ -28,9 +31,12 @@ export function StarToggle({
   const queryClient = useQueryClient();
   const [starred, setOptimistic] = useOptimistic(starredProp);
   const [pending, setPending] = useState(false);
+  const controls = useAnimationControls();
 
   async function handleToggle() {
     const next = !starred;
+    // Fire the pop sequence immediately — no state needed
+    void controls.start({ scale: [1, 0.72, 1.22, 1], transition: { duration: 0.2, ease: "easeOut" } });
     startTransition(() => {
       setOptimistic(next);
       setPending(true);
@@ -64,12 +70,14 @@ export function StarToggle({
       }}
       className={cn(className)}
     >
-      <Star
-        className={cn(
-          "transition-colors",
-          starred ? "fill-primary text-primary" : "text-muted-foreground hover:text-foreground",
-        )}
-      />
+      <motion.span animate={controls} className="flex">
+        <Star
+          className={cn(
+            "transition-[color,fill] duration-200",
+            starred ? "fill-primary text-primary" : "text-muted-foreground",
+          )}
+        />
+      </motion.span>
     </Button>
   );
 }

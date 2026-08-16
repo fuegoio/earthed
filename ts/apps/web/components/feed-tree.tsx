@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ChevronRight, FolderOpen, Folder as FolderIcon } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { getClient, updateFeed, updateFolder } from "@/lib/planetary";
 import { getApiErrorMessage } from "@/lib/errors";
 import { FeedIcon } from "@/components/feed-icon";
@@ -193,15 +194,23 @@ function FolderNode({
           aria-current={active ? "page" : undefined}
           className="flex min-w-0 flex-1 items-center gap-2.5"
         >
-          {open ? (
-            <FolderOpen
-              className={cn("size-3.5 shrink-0", active ? "text-primary" : "text-muted-foreground")}
-            />
-          ) : (
-            <FolderIcon
-              className={cn("size-3.5 shrink-0", active ? "text-primary" : "text-muted-foreground")}
-            />
-          )}
+          {/* Crossfade open/closed folder icons */}
+          <span className="relative size-3.5 shrink-0">
+            <motion.span
+              animate={{ opacity: open ? 1 : 0 }}
+              transition={{ duration: 0.15 }}
+              className="absolute inset-0"
+            >
+              <FolderOpen className={cn("size-3.5", active ? "text-primary" : "text-muted-foreground")} />
+            </motion.span>
+            <motion.span
+              animate={{ opacity: open ? 0 : 1 }}
+              transition={{ duration: 0.15 }}
+              className="absolute inset-0"
+            >
+              <FolderIcon className={cn("size-3.5", active ? "text-primary" : "text-muted-foreground")} />
+            </motion.span>
+          </span>
           <span className="truncate">{folder.title}</span>
         </Link>
         <button
@@ -214,44 +223,58 @@ function FolderNode({
           className="flex size-5 shrink-0 items-center justify-center text-muted-foreground hover:text-foreground"
           aria-label={open ? "Collapse" : "Expand"}
         >
-          <ChevronRight
-            className={cn("size-3.5 transition-transform duration-150", open && "rotate-90")}
-          />
+          <motion.span
+            animate={{ rotate: open ? 90 : 0 }}
+            transition={{ duration: 0.2, ease: [0.25, 1, 0.5, 1] }}
+            className="flex"
+          >
+            <ChevronRight className="size-3.5" />
+          </motion.span>
         </button>
       </div>
-      {open && (
-        <div className="flex flex-col gap-0.5">
-          {childNodes.map((child) =>
-            child.type === "folder" ? (
-              <FolderNode
-                key={`folder-${child.folder.id}`}
-                folder={child.folder}
-                childNodes={child.children}
-                folders={folders}
-                feeds={feeds}
-                onDragStart={onDragStart}
-                onDragEnd={onDragEnd}
-                dragData={dragData}
-                isDropTarget={dropTarget === child.folder.id}
-                dropTarget={dropTarget}
-                setDropTarget={setDropTarget}
-                onDrop={onDrop}
-                depth={depth + 1}
-              />
-            ) : (
-              <div key={`feed-${child.feed.id}`} style={{ paddingLeft: `${(depth + 1) * 16}px` }}>
-                <FeedNode
-                  feed={child.feed}
-                  onDragStart={(e, feedId) => onDragStart(e, { kind: "feed", id: feedId })}
-                  onDragEnd={onDragEnd}
-                  isDropTarget={false}
-                  onDrop={onDrop}
-                />
-              </div>
-            ),
-          )}
-        </div>
-      )}
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: [0.25, 1, 0.5, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="flex flex-col gap-0.5 pt-0.5">
+              {childNodes.map((child) =>
+                child.type === "folder" ? (
+                  <FolderNode
+                    key={`folder-${child.folder.id}`}
+                    folder={child.folder}
+                    childNodes={child.children}
+                    folders={folders}
+                    feeds={feeds}
+                    onDragStart={onDragStart}
+                    onDragEnd={onDragEnd}
+                    dragData={dragData}
+                    isDropTarget={dropTarget === child.folder.id}
+                    dropTarget={dropTarget}
+                    setDropTarget={setDropTarget}
+                    onDrop={onDrop}
+                    depth={depth + 1}
+                  />
+                ) : (
+                  <div key={`feed-${child.feed.id}`} style={{ paddingLeft: `${(depth + 1) * 16}px` }}>
+                    <FeedNode
+                      feed={child.feed}
+                      onDragStart={(e, feedId) => onDragStart(e, { kind: "feed", id: feedId })}
+                      onDragEnd={onDragEnd}
+                      isDropTarget={false}
+                      onDrop={onDrop}
+                    />
+                  </div>
+                ),
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

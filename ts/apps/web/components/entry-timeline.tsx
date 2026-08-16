@@ -137,8 +137,16 @@ export function EntryTimeline({
 
   return (
     <div className="divide-y divide-border">
-      {entries.map((entry) => (
-        <EntryCard key={entry.id} entry={entry} feed={feedMap.get(entry.feed_id)} />
+      {entries.map((entry, i) => (
+        <EntryCard
+          key={entry.id}
+          entry={entry}
+          feed={feedMap.get(entry.feed_id)}
+          // Stagger only the first page (first 8 entries). Cap at 8 so the
+          // total stagger window stays under 250ms. Subsequent pages animate
+          // in flat with no delay.
+          staggerIndex={i < 8 ? i : undefined}
+        />
       ))}
       <div ref={sentinelRef} className="h-px" />
       {isFetchingNextPage && (
