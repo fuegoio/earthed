@@ -393,11 +393,16 @@ func (m Model) renderEntryList(width int) string {
 	} else {
 		isFocus := m.focus == focusEntries
 
-		// date column is always 5 chars "MM/DD"
-		const dateLen = 5
-		// prefix: " " (1) + dot (2) + star (2) = 5
+		// Fixed column widths (all in visible chars):
+		//   prefix: " "(1) + dot(2) + star(2) = 5
+		//   date:   "2006-01-02"(10) + " "(1) = 11
+		//   feed:   up to 20 chars + " "(1) = 21
+		//   title:  remainder
 		const prefixLen = 5
-		titleWidth := width - prefixLen - dateLen - 2 // 2 = spaces around date
+		const dateLen = 10
+		const feedLen = 20
+		const gaps = 3 // spaces: after title, after feed, trailing
+		titleWidth := width - prefixLen - dateLen - feedLen - gaps
 		if titleWidth < 10 {
 			titleWidth = 10
 		}
@@ -405,52 +410,47 @@ func (m Model) renderEntryList(width int) string {
 		for i, e := range m.entries {
 			isSelected := i == m.entriesCursor
 
-			// Build each component as plain text for accurate width accounting.
-			dot := "  "
-			if e.Status != "read" {
-				dot = unreadDotStyle.Render("● ") // 2 visible cols
-			}
-			star := "  "
-			if e.Starred {
-				star = starStyle.Render("★ ") // 2 visible cols
+			feedName := ""
+			if f, ok := m.feedsByID[e.FeedId]; ok {
+				feedName = f.Title
 			}
 
-			titleStr := padRight(truncate(e.Title, titleWidth), titleWidth)
-			dateStr := dimStyle.Render(e.PublishedAt.Format("01/02"))
+			// buildPlain assembles a raw (no-ANSI) row of exact width.
+			buildPlain := func(dotCh, starCh string) string {
+				t := padRight(truncate(e.Title, titleWidth), titleWidth)
+				f := padRight(truncate(feedName, feedLen), feedLen)
+				d := e.PublishedAt.Format("2006-01-02")
+				return padRight(" "+dotCh+starCh+t+" "+f+" "+d+" ", width)
+			}
 
-			// Assemble: 1 space + dot(2) + star(2) + title(titleWidth) + " " + date(5) + " "
-			line := " " + dot + star + titleStr + " " + dateStr + " "
+			dotPlain := "● "
+			if e.Status == "read" {
+				dotPlain = "· "
+			}
+			starPlain := "★ "
+			if !e.Starred {
+				starPlain = "  "
+			}
 
-			if isSelected && isFocus {
-				// For selection, rebuild the line as plain text so the background
-				// style fills the entire row without ANSI width confusion.
-				plainTitle := padRight(truncate(e.Title, titleWidth), titleWidth)
-				dotPlain := "● "
-				if e.Status == "read" {
-					dotPlain = "  "
+			var line string
+			switch {
+			case isSelected && isFocus:
+				line = selectedFocusStyle.Render(buildPlain(dotPlain, starPlain))
+			case isSelected:
+				line = selectedStyle.Render(buildPlain(dotPlain, starPlain))
+			case e.Status == "read":
+				line = dimStyle.Render(buildPlain(dotPlain, starPlain))
+			default:
+				// unread: colorize dot and star inline, plain text otherwise
+				dot := unreadDotStyle.Render("● ") // 2 visible cols
+				star := "  "
+				if e.Starred {
+					star = starStyle.Render("★ ")
 				}
-				starPlain := "★ "
-				if !e.Starred {
-					starPlain = "  "
-				}
-				datePlain := e.PublishedAt.Format("01/02")
-				plainLine := padRight(" "+dotPlain+starPlain+plainTitle+" "+datePlain+" ", width)
-				line = selectedFocusStyle.Render(plainLine)
-			} else if isSelected {
-				plainTitle := padRight(truncate(e.Title, titleWidth), titleWidth)
-				dotPlain := "● "
-				if e.Status == "read" {
-					dotPlain = "  "
-				}
-				starPlain := "★ "
-				if !e.Starred {
-					starPlain = "  "
-				}
-				datePlain := e.PublishedAt.Format("01/02")
-				plainLine := padRight(" "+dotPlain+starPlain+plainTitle+" "+datePlain+" ", width)
-				line = selectedStyle.Render(plainLine)
-			} else if e.Status == "read" {
-				line = dimStyle.Render(" " + "  " + "  " + titleStr + " " + e.PublishedAt.Format("01/02") + " ")
+				t := padRight(truncate(e.Title, titleWidth), titleWidth)
+				f := padRight(truncate(feedName, feedLen), feedLen)
+				d := dimStyle.Render(e.PublishedAt.Format("2006-01-02"))
+				line = " " + dot + star + t + " " + dimStyle.Render(f) + " " + d + " "
 			}
 
 			sb.WriteString(line + "\n")

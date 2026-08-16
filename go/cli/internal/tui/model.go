@@ -53,6 +53,7 @@ type Model struct {
 	// sidebar data
 	feeds         []planetary.Feed
 	folders       []planetary.Folder
+	feedsByID     map[int64]planetary.Feed
 	items         []sidebarItem
 	sidebarCursor int
 
@@ -258,6 +259,12 @@ func (m *Model) rebuildSidebar() {
 	}
 
 	m.items = items
+
+	// rebuild lookup map
+	m.feedsByID = make(map[int64]planetary.Feed, len(m.feeds))
+	for _, f := range m.feeds {
+		m.feedsByID[f.Id] = f
+	}
 }
 
 // entriesParamsForItem returns API params matching the selected sidebar item.

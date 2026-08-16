@@ -33,14 +33,25 @@ var entriesListCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-		fmt.Fprintln(w, "ID\tSTARRED\tSTATUS\tTITLE")
-		for _, e := range *resp.JSON200 {
-			star := ""
-			if e.Starred {
-				star = "*"
+		// Build a feed-name lookup from the feeds endpoint.
+		feedNames := map[int64]string{}
+		if fr, ferr := c.ListFeedsWithResponse(context.Background()); ferr == nil && fr.JSON200 != nil {
+			for _, f := range *fr.JSON200 {
+				feedNames[f.Id] = f.Title
 			}
-			fmt.Fprintf(w, "%d\t%s\t%s\t%s\n", e.Id, star, e.Status, e.Title)
+		}
+
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+		fmt.Fprintln(w, "ID\tSTARRED\tSTATUS\tDATE\tFEED\tTITLE")
+		for _, e := range *resp.JSON200 {
+			star := " "
+			if e.Starred {
+				star = "★"
+			}
+			status := e.Status
+			date := e.PublishedAt.Format("2006-01-02")
+			feed := feedNames[e.FeedId]
+			fmt.Fprintf(w, "%d\t%s\t%s\t%s\t%s\t%s\n", e.Id, star, status, date, feed, e.Title)
 		}
 		w.Flush()
 	},
