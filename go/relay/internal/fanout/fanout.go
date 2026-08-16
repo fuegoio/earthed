@@ -18,15 +18,33 @@ import (
 	"github.com/fuegoio/planetary/go/relay/internal/store"
 )
 
+// fanoutStore is the subset of store.Store that the Fanout uses.
+// It is an interface so tests can inject a stub implementation.
+type fanoutStore interface {
+	ListActiveTrackedDIDs(ctx context.Context) ([]store.TrackedDID, error)
+	UpdateTrackedDIDCursor(ctx context.Context, did string, seq int64) error
+	SetTrackedDIDError(ctx context.Context, did, msg string) error
+	RecordFollow(ctx context.Context, followerDID, followeeDID, rkey, pdsURL string, createdAt time.Time) (bool, error)
+	DeleteFollow(ctx context.Context, followerDID, rkey string) (string, bool, error)
+	RecordShare(ctx context.Context, did, rkey, articleURL, feedURL, title, pdsURL string, sharedAt *time.Time) (bool, error)
+	DeleteShare(ctx context.Context, did, rkey string) (bool, error)
+	RecordFeedSubscription(ctx context.Context, did, rkey, feedURL, pdsURL string, createdAt *time.Time) (bool, error)
+	DeleteFeedSubscription(ctx context.Context, did, rkey string) (bool, error)
+	AppendEvent(ctx context.Context, eventType, did string, payload any) (int64, error)
+}
+
 // Fanout manages one goroutine per tracked DID that subscribes to its PDS repo stream.
 type Fanout struct {
-	store          *store.Store
+	store          fanoutStore
 	reconnectDelay time.Duration
 	httpClient     *http.Client
 	subscribers    map[string]chan *store.RelayEvent
 	subsMu         sync.RWMutex
 	workers        map[string]context.CancelFunc
 	wmu            sync.Mutex
+	// testPDSURL overrides the PDS URL used for fetchRecord calls in unit tests.
+	// In production this is always empty and the DID's real pdsURL is used.
+	testPDSURL string
 }
 
 // New returns a Fanout.
@@ -169,13 +187,18 @@ func (f *Fanout) processOp(ctx context.Context, did, pdsURL string, op repoOp) {
 		return
 	}
 	col, rkey := parts[0], parts[1]
+	// Allow test hook to override the PDS URL for fetchRecord calls.
+	effectivePDS := pdsURL
+	if f.testPDSURL != "" {
+		effectivePDS = f.testPDSURL
+	}
 	switch col {
 	case "io.planetary.graph.follow":
-		f.handleFollow(ctx, did, pdsURL, rkey, op.Action)
+		f.handleFollow(ctx, did, effectivePDS, rkey, op.Action)
 	case "io.planetary.share.article":
-		f.handleShare(ctx, did, pdsURL, rkey, op.Action)
+		f.handleShare(ctx, did, effectivePDS, rkey, op.Action)
 	case "io.planetary.feed.subscription":
-		f.handleFeedSub(ctx, did, pdsURL, rkey, op.Action)
+		f.handleFeedSub(ctx, did, effectivePDS, rkey, op.Action)
 	}
 }
 

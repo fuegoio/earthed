@@ -218,7 +218,7 @@ func (s *Store) GetRelayCursor(ctx context.Context) (string, int64, error) {
 func (s *Store) UpdateRelayCursor(ctx context.Context, relayURL string, seq int64) error {
 	_, err := s.DB.ExecContext(ctx, `
 		UPDATE atproto_relay_cursor
-		SET relay_url = $2, cursor_seq = $3, updated_at = NOW()
+		SET relay_url = $1, cursor_seq = $2, updated_at = NOW()
 		WHERE id = 1`,
 		relayURL, seq,
 	)
