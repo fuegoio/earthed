@@ -60,6 +60,7 @@ type Model struct {
 	// entries panel
 	entries       []planetary.Entry
 	entriesCursor int
+	entriesOffset int // index of first visible entry (scroll offset)
 	showEntry     bool
 	current       planetary.Entry
 }

@@ -79,12 +79,7 @@ func TestAnsiStripWidth(t *testing.T) {
 	}
 }
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
+
 
 // stripAnsiChars returns the plain text of s with ANSI escape sequences removed.
 func stripAnsiChars(s string) string {

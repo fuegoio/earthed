@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"fmt"
 	"strings"
 	"unicode/utf8"
 
@@ -49,6 +50,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		m.entries = msg.entries
 		m.entriesCursor = 0
+		m.entriesOffset = 0
 		m.showEntry = false
 		m.err = ""
 		return m, nil
@@ -159,6 +161,12 @@ func (m Model) handleEntriesKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		m.entriesCursor = 0
 	case "G":
 		m.entriesCursor = max(0, len(m.entries)-1)
+	case "ctrl+d":
+		pageSize := m.entriesPageSize()
+		m.entriesCursor = min(m.entriesCursor+pageSize/2, len(m.entries)-1)
+	case "ctrl+u":
+		pageSize := m.entriesPageSize()
+		m.entriesCursor = max(m.entriesCursor-pageSize/2, 0)
 	case "enter", "l", "right":
 		if len(m.entries) == 0 {
 			return m, nil
@@ -184,6 +192,7 @@ func (m Model) handleEntriesKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case "q":
 		return m, tea.Quit
 	}
+	m.clampEntriesOffset()
 	return m, nil
 }
 
@@ -392,7 +401,11 @@ func (m Model) renderEntryList(width int) string {
 		}
 	}
 
-	sb.WriteString(headerStyle.Render(title) + "\n")
+	headerLine := headerStyle.Render(title)
+	if len(m.entries) > 0 {
+		headerLine += " " + dimStyle.Render(formatPos(m.entriesCursor+1, len(m.entries)))
+	}
+	sb.WriteString(headerLine + "\n")
 	sb.WriteString(strings.Repeat("─", width) + "\n")
 
 	if len(m.entries) == 0 {
@@ -414,8 +427,16 @@ func (m Model) renderEntryList(width int) string {
 			titleWidth = 10
 		}
 
-		for i, e := range m.entries {
-			isSelected := i == m.entriesCursor
+		pageSize := m.entriesPageSize()
+		start := m.entriesOffset
+		end := start + pageSize
+		if end > len(m.entries) {
+			end = len(m.entries)
+		}
+
+		for idx := start; idx < end; idx++ {
+			e := m.entries[idx]
+			isSelected := idx == m.entriesCursor
 
 			feedName := ""
 			if f, ok := m.feedsByID[e.FeedId]; ok {
@@ -466,9 +487,9 @@ func (m Model) renderEntryList(width int) string {
 
 	var helpText string
 	if m.focus == focusSidebar {
-		helpText = "l/enter open list · q quit"
+		helpText = "j/k navigate · l open list · q quit"
 	} else {
-		helpText = "j/k navigate · enter open in browser · s star · h sidebar · q quit"
+		helpText = "j/k navigate · ^d/^u half-page · g/G top/bottom · enter open · s star · h sidebar · q quit"
 	}
 	sb.WriteString("\n" + helpStyle.Render(helpText))
 
@@ -573,6 +594,41 @@ func max(a, b int) int {
 		return a
 	}
 	return b
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func formatPos(cur, total int) string {
+	return fmt.Sprintf("%d/%d", cur, total)
+}
+
+// entriesPageSize returns how many entry rows fit in the main panel.
+// Layout: 1 header + 1 separator + N entries + 1 blank + 1 help = height rows.
+func (m Model) entriesPageSize() int {
+	n := m.height - 4 // header, sep, blank, help
+	if n < 1 {
+		n = 1
+	}
+	return n
+}
+
+// clampEntriesOffset adjusts entriesOffset so that entriesCursor stays visible.
+func (m *Model) clampEntriesOffset() {
+	pageSize := m.entriesPageSize()
+	if m.entriesCursor < m.entriesOffset {
+		m.entriesOffset = m.entriesCursor
+	}
+	if m.entriesCursor >= m.entriesOffset+pageSize {
+		m.entriesOffset = m.entriesCursor - pageSize + 1
+	}
+	if m.entriesOffset < 0 {
+		m.entriesOffset = 0
+	}
 }
 
 
