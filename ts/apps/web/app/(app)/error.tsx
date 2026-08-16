@@ -21,7 +21,7 @@ export default function Error({
         <AlertCircle className="size-6 text-destructive" />
       </div>
       <div>
-        <h1 className="font-serif text-lg font-bold tracking-tight">Something went wrong</h1>
+        <h1 className="font-serif text-lg font-bold tracking-normal">Something went wrong</h1>
         <p className="mt-1 max-w-sm text-sm text-muted-foreground">
           An unexpected error occurred while loading this page.
         </p>

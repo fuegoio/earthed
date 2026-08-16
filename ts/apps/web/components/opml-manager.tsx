@@ -80,7 +80,7 @@ export function OpmlManager() {
     <div className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-6">
       <header className="flex items-center gap-2">
         <FileText className="size-5 text-muted-foreground" />
-        <h1 className="font-serif text-2xl font-bold tracking-tight">OPML</h1>
+        <h1 className="font-serif text-2xl font-bold tracking-normal">OPML</h1>
       </header>
       <p className="mt-2 text-sm text-muted-foreground">
         Import or export your feed subscriptions as an OPML file. OPML is the standard format for

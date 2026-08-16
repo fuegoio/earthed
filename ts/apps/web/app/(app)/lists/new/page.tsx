@@ -56,7 +56,7 @@ export default function NewFeedListPage() {
         <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10">
           <ListChecks className="size-6 text-primary" />
         </div>
-        <h1 className="font-serif text-2xl font-bold tracking-tight">New feed list</h1>
+        <h1 className="font-serif text-2xl font-bold tracking-normal">New feed list</h1>
         <p className="max-w-md text-sm text-muted-foreground">
           A feed list is a curated collection of RSS feeds. Add feeds, then share it publicly so
           others can follow and import them in one click.

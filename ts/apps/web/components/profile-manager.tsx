@@ -245,7 +245,7 @@ export function ProfileManager() {
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-6">
       <header>
-        <h1 className="flex items-center gap-2 font-serif text-2xl font-bold tracking-tight">
+        <h1 className="flex items-center gap-2 font-serif text-2xl font-bold tracking-normal">
           <User className="size-5" />
           Profile
         </h1>

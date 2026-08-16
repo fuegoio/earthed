@@ -55,7 +55,7 @@ export function ConfirmDialog({
             "rounded-lg border border-border bg-popover p-6 shadow-lg",
           )}
         >
-          <AlertDialog.Title className="font-serif text-lg font-bold tracking-tight">
+          <AlertDialog.Title className="font-serif text-lg font-bold tracking-normal">
             {title}
           </AlertDialog.Title>
           {description && (

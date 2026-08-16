@@ -93,7 +93,7 @@ export default function SubscribeFeedPage() {
           <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10">
             <Rss className="size-6 text-primary" />
           </div>
-          <h1 className="font-serif text-2xl font-bold tracking-tight">Subscribe to a feed</h1>
+          <h1 className="font-serif text-2xl font-bold tracking-normal">Subscribe to a feed</h1>
           <p className="max-w-md text-sm text-muted-foreground">
             Paste any website URL or feed link. We&apos;ll discover the RSS feed automatically and
             show you what you&apos;ll get before you subscribe.
@@ -184,7 +184,7 @@ function PreviewContent({
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <h2 className="truncate font-serif text-xl font-bold tracking-tight">
+          <h2 className="truncate font-serif text-xl font-bold tracking-normal">
             {preview.title || "Untitled feed"}
           </h2>
           {preview.site_url && (

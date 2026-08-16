@@ -61,7 +61,7 @@ export function FolderCreateDialog() {
             "rounded-lg border border-border bg-popover p-6 shadow-lg",
           )}
         >
-          <Dialog.Title className="font-serif text-lg font-bold tracking-tight">
+          <Dialog.Title className="font-serif text-lg font-bold tracking-normal">
             New folder
           </Dialog.Title>
           <Dialog.Description className="mt-1 text-sm text-muted-foreground">

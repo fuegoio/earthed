@@ -87,7 +87,7 @@ export function TokenManager() {
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-6">
       <div className="flex items-center justify-between">
-        <h1 className="flex items-center gap-2 font-serif text-2xl font-bold tracking-tight">
+        <h1 className="flex items-center gap-2 font-serif text-2xl font-bold tracking-normal">
           <Key className="size-5" />
           API tokens
         </h1>
@@ -175,7 +175,7 @@ export function TokenManager() {
           >
             {!created ? (
               <>
-                <Dialog.Title className="font-serif text-lg font-bold tracking-tight">
+                <Dialog.Title className="font-serif text-lg font-bold tracking-normal">
                   New API token
                 </Dialog.Title>
                 <Dialog.Description className="mt-1 text-sm text-muted-foreground">
@@ -205,7 +205,7 @@ export function TokenManager() {
               </>
             ) : (
               <>
-                <Dialog.Title className="font-serif text-lg font-bold tracking-tight">
+                <Dialog.Title className="font-serif text-lg font-bold tracking-normal">
                   Token created
                 </Dialog.Title>
                 <Dialog.Description className="mt-1 text-sm text-muted-foreground">

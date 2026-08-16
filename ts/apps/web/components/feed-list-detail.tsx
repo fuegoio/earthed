@@ -521,7 +521,7 @@ function EditListDialog({
             "rounded-lg border border-border bg-popover p-6 shadow-lg",
           )}
         >
-          <Dialog.Title className="font-serif text-lg font-bold tracking-tight">
+          <Dialog.Title className="font-serif text-lg font-bold tracking-normal">
             Edit list
           </Dialog.Title>
           <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-4">

@@ -42,7 +42,7 @@ export default function DiscoverPage() {
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-6">
       <div className="flex items-center justify-between">
-        <h1 className="flex items-center gap-2 font-serif text-2xl font-bold tracking-tight">
+        <h1 className="flex items-center gap-2 font-serif text-2xl font-bold tracking-normal">
           <Compass className="size-5" />
           Discover
         </h1>

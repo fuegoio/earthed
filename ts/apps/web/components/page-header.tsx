@@ -30,7 +30,7 @@ export function PageHeader({
       <div className="flex items-center justify-between gap-3">
         <h1
           className={cn(
-            "flex min-w-0 items-center gap-2 font-serif text-lg font-bold tracking-tight",
+            "flex min-w-0 items-center gap-2 font-serif text-lg font-bold tracking-normal",
             !icon && "pl-8",
           )}
         >
