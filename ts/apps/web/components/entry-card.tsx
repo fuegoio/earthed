@@ -87,13 +87,13 @@ export function EntryCard({
       target={entry.url ? "_blank" : undefined}
       rel={entry.url ? "noopener noreferrer" : undefined}
       onClick={handleClick}
-      initial={staggerIndex !== undefined ? { opacity: 0, y: 5 } : false}
+      initial={{ opacity: 0, y: 5 }}
       animate={{ opacity: unread ? 1 : 0.6, y: 0 }}
       // "row-hover" variant propagates to child motion elements that declare it.
       whileHover="row-hover"
       transition={{
         opacity: { duration: 0.3, ease: EASE },
-        y: { duration: 0.22, ease: EASE, delay: staggerIndex !== undefined ? staggerIndex * 0.03 : 0 },
+        y: { duration: 0.22, ease: EASE, delay: (staggerIndex ?? 0) * 0.03 },
       }}
       className="group flex gap-3 px-4 py-3 hover:bg-muted/50"
     >
