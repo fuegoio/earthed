@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
@@ -27,11 +28,56 @@ import {
   refreshFeed,
   updateFeed,
   listFolders,
+  feedSubscribers,
   unwrap,
 } from "@/lib/earthed";
 import { getApiErrorMessage } from "@/lib/errors";
 import { cn } from "@workspace/ui/lib/utils";
-import type { Feed, Folder } from "@/lib/types";
+import type { Feed, Folder, FeedSubscribersResponse, UserProfile } from "@/lib/types";
+
+/**
+ * Small badge that shows subscriber count and, on click, expands a list of
+ * public subscriber profiles.
+ */
+function SubscriberBadge({
+  count,
+  subscribers,
+}: {
+  count: number;
+  subscribers: UserProfile[];
+}) {
+  const [open, setOpen] = useState(false);
+
+  if (count === 0) return null;
+
+  return (
+    <div className="mt-1">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+      >
+        {count} {count === 1 ? "subscriber" : "subscribers"}
+      </button>
+      {open && subscribers.length > 0 && (
+        <div className="mt-1 flex flex-wrap gap-1">
+          {subscribers.map((s) => (
+            <Link
+              key={s.user_id}
+              href={`/users/${s.handle}`}
+              className={cn(
+                "rounded-full bg-muted px-2 py-0.5 text-xs font-medium",
+                "hover:bg-muted/80 transition-colors",
+              )}
+            >
+              @{s.handle}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 /**
  * Feed detail view: header with site link, refresh, mark-all-read, and delete
@@ -50,6 +96,12 @@ export function FeedDetail({ feed, initialFolders }: { feed: Feed; initialFolder
     queryKey: ["folders"],
     queryFn: async () => unwrap(listFolders({ client: await getClient() })),
     initialData: initialFolders,
+  });
+
+  const { data: subscribers } = useQuery<FeedSubscribersResponse>({
+    queryKey: ["feed-subscribers", feed.id],
+    queryFn: async () =>
+      unwrap(feedSubscribers({ client: await getClient(), path: { feedId: feed.id } })),
   });
 
   async function handleRefresh() {
@@ -175,10 +227,17 @@ export function FeedDetail({ feed, initialFolders }: { feed: Feed; initialFolder
             metadata={
               <>
                 {feed.description && <p>{feed.description}</p>}
+                {subscribers !== undefined && (
+                  <SubscriberBadge
+                    count={subscribers.count}
+                    subscribers={subscribers.subscribers ?? []}
+                  />
+                )}
                 {feed.parsing_error && (
                   <p className="mt-1 text-destructive">Last parse error: {feed.parsing_error}</p>
                 )}
               </>
+
             }
           />
           <div className="flex items-center gap-2 border-b border-border px-4 py-2 pl-[52px] lg:pl-[48px]">

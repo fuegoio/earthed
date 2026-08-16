@@ -763,6 +763,39 @@ export const FeedListFeedSchema = {
     type: 'object'
 } as const;
 
+export const FeedSubscribersResponseSchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/FeedSubscribersResponse.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        count: {
+            format: 'int64',
+            type: 'integer'
+        },
+        subscribers: {
+            items: {
+                $ref: '#/components/schemas/UserProfile'
+            },
+            type: [
+                'array',
+                'null'
+            ]
+        }
+    },
+    required: [
+        'count',
+        'subscribers'
+    ],
+    type: 'object'
+} as const;
+
 export const FolderSchema = {
     additionalProperties: false,
     properties: {
@@ -1053,6 +1086,167 @@ export const PreviewFeedItemSchema = {
     type: 'object'
 } as const;
 
+export const PublicProfileResponseSchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/PublicProfileResponse.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        feeds: {
+            items: {
+                $ref: '#/components/schemas/Feed'
+            },
+            type: [
+                'array',
+                'null'
+            ]
+        },
+        profile: {
+            $ref: '#/components/schemas/UserProfile'
+        },
+        shared_articles: {
+            items: {
+                $ref: '#/components/schemas/SharedArticle'
+            },
+            type: [
+                'array',
+                'null'
+            ]
+        }
+    },
+    required: [
+        'profile',
+        'shared_articles',
+        'feeds'
+    ],
+    type: 'object'
+} as const;
+
+export const ShareArticleInputBodySchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/ShareArticleInputBody.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        article_url: {
+            maxLength: 2048,
+            minLength: 1,
+            type: 'string'
+        },
+        author: {
+            maxLength: 255,
+            type: 'string'
+        },
+        description: {
+            maxLength: 1000,
+            type: 'string'
+        },
+        feed_site_url: {
+            maxLength: 2048,
+            type: 'string'
+        },
+        feed_title: {
+            maxLength: 512,
+            type: 'string'
+        },
+        feed_url: {
+            maxLength: 2048,
+            type: 'string'
+        },
+        published_at: {
+            format: 'date-time',
+            type: 'string'
+        },
+        title: {
+            maxLength: 1024,
+            type: 'string'
+        }
+    },
+    required: [
+        'article_url',
+        'title'
+    ],
+    type: 'object'
+} as const;
+
+export const SharedArticleSchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/SharedArticle.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        article_url: {
+            type: 'string'
+        },
+        author: {
+            type: 'string'
+        },
+        description: {
+            type: 'string'
+        },
+        feed_site_url: {
+            type: 'string'
+        },
+        feed_title: {
+            type: 'string'
+        },
+        feed_url: {
+            type: 'string'
+        },
+        id: {
+            format: 'int64',
+            type: 'integer'
+        },
+        published_at: {
+            format: 'date-time',
+            type: 'string'
+        },
+        shared_at: {
+            format: 'date-time',
+            type: 'string'
+        },
+        sharer_first_name: {
+            type: 'string'
+        },
+        sharer_handle: {
+            type: 'string'
+        },
+        title: {
+            type: 'string'
+        },
+        user_id: {
+            format: 'int64',
+            type: 'integer'
+        }
+    },
+    required: [
+        'id',
+        'user_id',
+        'article_url',
+        'title',
+        'shared_at'
+    ],
+    type: 'object'
+} as const;
+
 export const Toggle_entry_starredRequestSchema = {
     additionalProperties: false,
     properties: {
@@ -1233,6 +1427,34 @@ export const UpdateFolderInputBodySchema = {
     type: 'object'
 } as const;
 
+export const UpdateHandleInputBodySchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/UpdateHandleInputBody.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        bio: {
+            maxLength: 500,
+            type: 'string'
+        },
+        handle: {
+            maxLength: 64,
+            minLength: 3,
+            type: 'string'
+        }
+    },
+    required: [
+        'handle'
+    ],
+    type: 'object'
+} as const;
+
 export const UpdateMeInputBodySchema = {
     additionalProperties: false,
     properties: {
@@ -1285,6 +1507,9 @@ export const UserSchema = {
         first_name: {
             type: 'string'
         },
+        handle: {
+            type: 'string'
+        },
         id: {
             format: 'int64',
             type: 'integer'
@@ -1298,6 +1523,62 @@ export const UserSchema = {
         'email',
         'is_admin',
         'created_at'
+    ],
+    type: 'object'
+} as const;
+
+export const UserProfileSchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                '/api/schemas/UserProfile.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        bio: {
+            type: 'string'
+        },
+        created_at: {
+            format: 'date-time',
+            type: 'string'
+        },
+        first_name: {
+            type: 'string'
+        },
+        follower_count: {
+            format: 'int64',
+            type: 'integer'
+        },
+        following_count: {
+            format: 'int64',
+            type: 'integer'
+        },
+        handle: {
+            type: 'string'
+        },
+        is_following: {
+            type: 'boolean'
+        },
+        updated_at: {
+            format: 'date-time',
+            type: 'string'
+        },
+        user_id: {
+            format: 'int64',
+            type: 'integer'
+        }
+    },
+    required: [
+        'user_id',
+        'handle',
+        'created_at',
+        'updated_at',
+        'follower_count',
+        'following_count'
     ],
     type: 'object'
 } as const;
@@ -1827,6 +2108,30 @@ export const FeedListFeedWritableSchema = {
     type: 'object'
 } as const;
 
+export const FeedSubscribersResponseWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        count: {
+            format: 'int64',
+            type: 'integer'
+        },
+        subscribers: {
+            items: {
+                $ref: '#/components/schemas/UserProfileWritable'
+            },
+            type: [
+                'array',
+                'null'
+            ]
+        }
+    },
+    required: [
+        'count',
+        'subscribers'
+    ],
+    type: 'object'
+} as const;
+
 export const FolderWritableSchema = {
     additionalProperties: false,
     properties: {
@@ -2022,6 +2327,140 @@ export const PreviewFeedInputBodyWritableSchema = {
     type: 'object'
 } as const;
 
+export const PublicProfileResponseWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        feeds: {
+            items: {
+                $ref: '#/components/schemas/FeedWritable'
+            },
+            type: [
+                'array',
+                'null'
+            ]
+        },
+        profile: {
+            $ref: '#/components/schemas/UserProfileWritable'
+        },
+        shared_articles: {
+            items: {
+                $ref: '#/components/schemas/SharedArticleWritable'
+            },
+            type: [
+                'array',
+                'null'
+            ]
+        }
+    },
+    required: [
+        'profile',
+        'shared_articles',
+        'feeds'
+    ],
+    type: 'object'
+} as const;
+
+export const ShareArticleInputBodyWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        article_url: {
+            maxLength: 2048,
+            minLength: 1,
+            type: 'string'
+        },
+        author: {
+            maxLength: 255,
+            type: 'string'
+        },
+        description: {
+            maxLength: 1000,
+            type: 'string'
+        },
+        feed_site_url: {
+            maxLength: 2048,
+            type: 'string'
+        },
+        feed_title: {
+            maxLength: 512,
+            type: 'string'
+        },
+        feed_url: {
+            maxLength: 2048,
+            type: 'string'
+        },
+        published_at: {
+            format: 'date-time',
+            type: 'string'
+        },
+        title: {
+            maxLength: 1024,
+            type: 'string'
+        }
+    },
+    required: [
+        'article_url',
+        'title'
+    ],
+    type: 'object'
+} as const;
+
+export const SharedArticleWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        article_url: {
+            type: 'string'
+        },
+        author: {
+            type: 'string'
+        },
+        description: {
+            type: 'string'
+        },
+        feed_site_url: {
+            type: 'string'
+        },
+        feed_title: {
+            type: 'string'
+        },
+        feed_url: {
+            type: 'string'
+        },
+        id: {
+            format: 'int64',
+            type: 'integer'
+        },
+        published_at: {
+            format: 'date-time',
+            type: 'string'
+        },
+        shared_at: {
+            format: 'date-time',
+            type: 'string'
+        },
+        sharer_first_name: {
+            type: 'string'
+        },
+        sharer_handle: {
+            type: 'string'
+        },
+        title: {
+            type: 'string'
+        },
+        user_id: {
+            format: 'int64',
+            type: 'integer'
+        }
+    },
+    required: [
+        'id',
+        'user_id',
+        'article_url',
+        'title',
+        'shared_at'
+    ],
+    type: 'object'
+} as const;
+
 export const Toggle_entry_starredRequestWritableSchema = {
     additionalProperties: false,
     properties: {
@@ -2148,6 +2587,25 @@ export const UpdateFolderInputBodyWritableSchema = {
     type: 'object'
 } as const;
 
+export const UpdateHandleInputBodyWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        bio: {
+            maxLength: 500,
+            type: 'string'
+        },
+        handle: {
+            maxLength: 64,
+            minLength: 3,
+            type: 'string'
+        }
+    },
+    required: [
+        'handle'
+    ],
+    type: 'object'
+} as const;
+
 export const UpdateMeInputBodyWritableSchema = {
     additionalProperties: false,
     properties: {
@@ -2182,6 +2640,9 @@ export const UserWritableSchema = {
         first_name: {
             type: 'string'
         },
+        handle: {
+            type: 'string'
+        },
         id: {
             format: 'int64',
             type: 'integer'
@@ -2195,6 +2656,53 @@ export const UserWritableSchema = {
         'email',
         'is_admin',
         'created_at'
+    ],
+    type: 'object'
+} as const;
+
+export const UserProfileWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        bio: {
+            type: 'string'
+        },
+        created_at: {
+            format: 'date-time',
+            type: 'string'
+        },
+        first_name: {
+            type: 'string'
+        },
+        follower_count: {
+            format: 'int64',
+            type: 'integer'
+        },
+        following_count: {
+            format: 'int64',
+            type: 'integer'
+        },
+        handle: {
+            type: 'string'
+        },
+        is_following: {
+            type: 'boolean'
+        },
+        updated_at: {
+            format: 'date-time',
+            type: 'string'
+        },
+        user_id: {
+            format: 'int64',
+            type: 'integer'
+        }
+    },
+    required: [
+        'user_id',
+        'handle',
+        'created_at',
+        'updated_at',
+        'follower_count',
+        'following_count'
     ],
     type: 'object'
 } as const;
