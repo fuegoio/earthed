@@ -6,6 +6,7 @@ import { SerwistProvider } from "@serwist/turbopack/react";
 import "@workspace/ui/globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { QueryProvider } from "@/components/query-provider";
+import { PublicEnv } from "@/lib/public-env";
 import { cn } from "@workspace/ui/lib/utils";
 
 export const metadata: Metadata = {
@@ -56,6 +57,7 @@ export default function RootLayout({
       className={cn("antialiased", ibmPlexSans.variable, geistMono.variable, merriweather.variable)}
     >
       <body>
+        <PublicEnv />
         <SerwistProvider swUrl="/serwist/sw.js">
           <ThemeProvider>
             <QueryProvider>

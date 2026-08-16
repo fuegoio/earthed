@@ -114,6 +114,9 @@ importers:
       next:
         specifier: 16.2.6
         version: 16.2.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      next-public-env:
+        specifier: ^1.1.0
+        version: 1.1.0(next@16.2.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)(zod@4.4.3)
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -4750,6 +4753,14 @@ packages:
   neotraverse@1.0.1:
     resolution: {integrity: sha512-WmmLty1YWwJl9yZi77v2dVIV6X2kuYV8YYBI/G3LWGKdGHmHUvL1z7FW0iDvEvGAwNEoc5x1tOOOyDnf5jJw/w==}
     engines: {node: '>= 10'}
+
+  next-public-env@1.1.0:
+    resolution: {integrity: sha512-LNgnYoPLuJtCO8nXVGq8TXZ6A3Ndb1s7sQQTtaF+PnYXw+qoN02BTqxSjmK+Bm9AW2xpqxkbBF0UNT6is+ps6g==}
+    engines: {node: '>=20.0.0'}
+    peerDependencies:
+      next: ^14.0.0 || ^15.0.0 || ^16.0.0
+      react: ^17.0.0 || ^18.0.0 || ^19.0.0
+      zod: ^3.25.0 || ^4.0.0
 
   next-themes@0.4.6:
     resolution: {integrity: sha512-pZvgD5L0IEvX5/9GWyHMf3m8BKiVQwsCMHfoFosXtXBMnaS0ZnIJ9ST4b4NqLVKDEm8QBxoNNGNaBv2JNF6XNA==}
@@ -10834,6 +10845,12 @@ snapshots:
   negotiator@1.0.0: {}
 
   neotraverse@1.0.1: {}
+
+  next-public-env@1.1.0(next@16.2.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)(zod@4.4.3):
+    dependencies:
+      next: 16.2.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react: 19.2.4
+      zod: 4.4.3
 
   next-themes@0.4.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
