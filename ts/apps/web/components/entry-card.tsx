@@ -93,7 +93,7 @@ export function EntryCard({
       whileHover="row-hover"
       transition={{
         opacity: { duration: 0.3, ease: EASE },
-        y: { duration: 0.22, ease: EASE, delay: (staggerIndex ?? 0) * 0.03 },
+        y: { duration: 0.22, ease: EASE, delay: Math.min(staggerIndex ?? 0, 8) * 0.03 },
       }}
       className="group flex gap-3 px-4 py-3 hover:bg-muted/50"
     >
