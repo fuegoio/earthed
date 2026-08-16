@@ -40,10 +40,9 @@ When you change the API, keep the docs in sync if the change is covered
 there:
 
 - **OpenAPI spec** — the reference at `ts/apps/docs/openapi/*` is generated from
-  `go/api/openapi.json`. After changing Go handlers or types, regenerate the
-  spec with `make gen-openapi` (from `go/api/`) and copy the result into the
-  docs app: `cp go/api/openapi.json ts/apps/docs/openapi/openapi.json`. Commit
-  both files. The copy inside `ts/` is what the Docker build uses.
+  `go/api/openapi.json`. After changing Go handlers or types, run
+  `make gen-openapi` from `go/api/` — it regenerates `openapi.json` and copies
+  it to `ts/apps/docs/openapi/openapi.json` automatically. Commit both files.
 - **Guides** (`ts/apps/docs/content/docs/*.mdx`) — if your change affects
   behaviour described in a guide (e.g. roles in `roles.mdx`, setup steps
   in `getting-started.mdx`), update the guide in the same PR.
