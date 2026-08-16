@@ -245,17 +245,17 @@ func (a *API) ATProtoSyncFeedSubscription(userID, feedID int, feedURL, siteURL, 
 		return
 	}
 
-	if isSubscribe {
-		rkey, err := w.PutFeedSubscription(ctx, feedURL, siteURL, title, createdAt)
-		if err != nil {
-			slog.Warn("atproto: put feed subscription", "user_id", userID, "err", err)
-			return
-		}
-		_ = a.store.SetFeedATProtoRkey(ctx, feedID, rkey)
-	} else {
+	if !isSubscribe {
 		// On unsubscribe we don't have the rkey easily; skip for now.
 		// A full implementation would store rkey on the feeds row and delete.
+		return
 	}
+	rkey, err := w.PutFeedSubscription(ctx, feedURL, siteURL, title, createdAt)
+	if err != nil {
+		slog.Warn("atproto: put feed subscription", "user_id", userID, "err", err)
+		return
+	}
+	_ = a.store.SetFeedATProtoRkey(ctx, feedID, rkey)
 }
 
 // ATProtoSyncFeedList writes or deletes a feed list record on the PDS.
