@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { motion } from "motion/react";
 import { MessageSquare } from "lucide-react";
 import { StarToggle } from "@/components/star-toggle";
+import { ShareToggle } from "@/components/share-toggle";
 import { FeedIcon } from "@/components/feed-icon";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getClient, updateEntries } from "@/lib/earthed";
@@ -55,11 +56,14 @@ export function EntryCard({
   feed,
   staggerIndex,
   animateExit = false,
+  shareId = null,
 }: {
   entry: Entry;
   feed?: Feed;
   staggerIndex?: number;
   animateExit?: boolean;
+  /** ID of the SharedArticle row if this entry is already shared; null otherwise. */
+  shareId?: number | null;
 }) {
   const queryClient = useQueryClient();
   const isMobile = useIsMobile();
@@ -185,6 +189,7 @@ export function EntryCard({
             <MessageSquare className="size-3.5" />
           </button>
         )}
+        <ShareToggle entry={entry} feed={feed} shareId={shareId} size="icon-sm" />
         <StarToggle entryId={entry.id} starred={entry.starred} size="icon-sm" />
       </div>
     </motion.a>

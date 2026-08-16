@@ -13,7 +13,7 @@ import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { ConfirmDialog } from "@/components/confirm-dialog";
-import { getClient, getMe, updateMe, deleteMe, unwrap } from "@/lib/earthed";
+import { getClient, getMe, updateMe, deleteMe, updateHandle, unwrap } from "@/lib/earthed";
 import { signout } from "@/lib/auth";
 import { getApiErrorMessage } from "@/lib/errors";
 import { cn } from "@workspace/ui/lib/utils";
@@ -201,6 +201,105 @@ function DangerZone({ userEmail }: { userEmail: string }) {
 }
 
 // ---------------------------------------------------------------------------
+// Handle form
+// ---------------------------------------------------------------------------
+
+const handleSchema = z.object({
+  handle: z
+    .string()
+    .min(3, "Handle must be at least 3 characters")
+    .max(64, "Handle must be 64 characters or fewer")
+    .regex(/^[a-zA-Z0-9_-]+$/, "Only letters, digits, hyphens, and underscores"),
+  bio: z.string().max(500, "Bio must be 500 characters or fewer").optional(),
+});
+
+type HandleValues = z.infer<typeof handleSchema>;
+
+function HandleForm({ currentHandle, currentBio }: { currentHandle?: string; currentBio?: string }) {
+  const queryClient = useQueryClient();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isDirty, isSubmitting },
+  } = useForm<HandleValues>({
+    resolver: zodResolver(handleSchema),
+    defaultValues: {
+      handle: currentHandle ?? "",
+      bio: currentBio ?? "",
+    },
+  });
+
+  async function onSubmit(values: HandleValues) {
+    const { error } = await updateHandle({
+      client: await getClient(),
+      body: { handle: values.handle, bio: values.bio ?? "" },
+    });
+    if (error) {
+      toast.error(getApiErrorMessage(error, "Could not update handle"));
+      return;
+    }
+    await queryClient.invalidateQueries({ queryKey: ["me"] });
+    toast.success("Handle updated");
+  }
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="profile-handle">Handle</Label>
+        <div className="relative">
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+            @
+          </span>
+          <Input
+            id="profile-handle"
+            placeholder="yourhandle"
+            autoComplete="off"
+            className="pl-7"
+            aria-invalid={!!errors.handle}
+            {...register("handle")}
+          />
+        </div>
+        {errors.handle ? (
+          <p className="text-xs text-destructive">{errors.handle.message}</p>
+        ) : (
+          <p className="text-xs text-muted-foreground">
+            Your public handle. Will correspond to your AT Protocol handle in the future.
+          </p>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="profile-bio">Bio</Label>
+        <textarea
+          id="profile-bio"
+          placeholder="Tell people about yourself…"
+          rows={3}
+          className={cn(
+            "flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm",
+            "placeholder:text-muted-foreground focus-visible:outline-none",
+            "focus-visible:ring-3 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50",
+            "resize-none",
+          )}
+          aria-invalid={!!errors.bio}
+          {...register("bio")}
+        />
+        {errors.bio && (
+          <p className="text-xs text-destructive">{errors.bio.message}</p>
+        )}
+      </div>
+
+      <div className="flex justify-end">
+        <Button type="submit" disabled={isSubmitting || !isDirty}>
+          {isSubmitting && <Loader2 className="size-4 animate-spin" />}
+          Save handle
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Skeleton
 // ---------------------------------------------------------------------------
 
@@ -260,6 +359,22 @@ export function ProfileManager() {
             <ProfileSkeleton />
           ) : (
             <ProfileForm user={user} />
+          )}
+        </section>
+
+        <div className="h-px bg-border" />
+
+        <section aria-labelledby="handle-section-heading">
+          <h2 id="handle-section-heading" className="mb-4 text-base font-semibold">
+            Social handle
+          </h2>
+          {isLoading || !user ? (
+            <div className="flex flex-col gap-4">
+              <Skeleton className="h-9 w-full" />
+              <Skeleton className="h-20 w-full" />
+            </div>
+          ) : (
+            <HandleForm currentHandle={user.handle ?? ""} />
           )}
         </section>
 

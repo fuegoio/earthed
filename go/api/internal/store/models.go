@@ -144,6 +144,41 @@ type User struct {
 	FirstName string    `json:"first_name,omitempty"`
 	IsAdmin   bool      `json:"is_admin"`
 	CreatedAt time.Time `json:"created_at"`
+	// Handle is the user's social handle (e.g. "fuego"). Populated when a
+	// profile row exists; empty string otherwise.
+	Handle string `json:"handle,omitempty"`
+}
+
+// UserProfile holds the social profile data for a user.
+type UserProfile struct {
+	UserID    int       `json:"user_id"`
+	Handle    string    `json:"handle"`
+	Bio       string    `json:"bio,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	// Denormalised fields set by query joins.
+	FirstName      string `json:"first_name,omitempty"`
+	FollowerCount  int    `json:"follower_count"`
+	FollowingCount int    `json:"following_count"`
+	IsFollowing    bool   `json:"is_following,omitempty"`
+}
+
+// SharedArticle is an article that a user shared on the social timeline.
+type SharedArticle struct {
+	ID           int64      `json:"id"`
+	UserID       int        `json:"user_id"`
+	ArticleURL   string     `json:"article_url"`
+	Title        string     `json:"title"`
+	Description  string     `json:"description,omitempty"`
+	FeedURL      string     `json:"feed_url,omitempty"`
+	FeedTitle    string     `json:"feed_title,omitempty"`
+	FeedSiteURL  string     `json:"feed_site_url,omitempty"`
+	Author       string     `json:"author,omitempty"`
+	PublishedAt  *time.Time `json:"published_at,omitempty"`
+	SharedAt     time.Time  `json:"shared_at"`
+	// Sharer info, populated on social timeline queries.
+	SharerHandle    string `json:"sharer_handle,omitempty"`
+	SharerFirstName string `json:"sharer_first_name,omitempty"`
 }
 
 // Store wraps a *sql.DB with query helpers for the Earthed schema.

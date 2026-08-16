@@ -1,0 +1,372 @@
+package api
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"net/http"
+	"time"
+
+	"github.com/danielgtaylor/huma/v2"
+
+	"github.com/fuegoio/planetary/go/api/internal/auth"
+	"github.com/fuegoio/planetary/go/api/internal/store"
+)
+
+// --- Input / output types ---
+
+type UpdateHandleInput struct {
+	Body struct {
+		Handle string `json:"handle" minLength:"3" maxLength:"64"`
+		Bio    string `json:"bio,omitempty" maxLength:"500"`
+	}
+}
+
+type UserProfileOutput struct {
+	Body store.UserProfile
+}
+
+type UserProfileListOutput struct {
+	Body []store.UserProfile
+}
+
+type FollowInput struct {
+	Handle string `path:"handle"`
+}
+
+type ShareArticleInput struct {
+	Body struct {
+		ArticleURL  string     `json:"article_url" minLength:"1" maxLength:"2048"`
+		Title       string     `json:"title" maxLength:"1024"`
+		Description string     `json:"description,omitempty" maxLength:"1000"`
+		FeedURL     string     `json:"feed_url,omitempty" maxLength:"2048"`
+		FeedTitle   string     `json:"feed_title,omitempty" maxLength:"512"`
+		FeedSiteURL string     `json:"feed_site_url,omitempty" maxLength:"2048"`
+		Author      string     `json:"author,omitempty" maxLength:"255"`
+		PublishedAt *time.Time `json:"published_at,omitempty"`
+	}
+}
+
+type SharedArticleOutput struct {
+	Body store.SharedArticle
+}
+
+type SharedArticleListOutput struct {
+	Body []store.SharedArticle
+}
+
+type PublicProfileResponse struct {
+	Profile        store.UserProfile    `json:"profile"`
+	SharedArticles []store.SharedArticle `json:"shared_articles"`
+	Feeds          []store.Feed          `json:"feeds"`
+}
+
+type PublicProfileOutput struct {
+	Body PublicProfileResponse
+}
+
+type FeedSubscribersResponse struct {
+	Count       int                `json:"count"`
+	Subscribers []store.UserProfile `json:"subscribers"`
+}
+
+type FeedSubscribersOutput struct {
+	Body FeedSubscribersResponse
+}
+
+// registerSocialRoutes wires all social-feature endpoints.
+func (a *API) registerSocialRoutes() {
+	// PATCH /api/v1/me/handle — set or update the caller's handle + bio
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "update-handle",
+		Method:      http.MethodPatch,
+		Path:        "/api/v1/me/handle",
+		Summary:     "Set or update your social handle",
+		Tags:        []string{"social"},
+	}, func(ctx context.Context, input *UpdateHandleInput) (*UserProfileOutput, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		p, err := a.store.UpsertHandle(ctx, userID, input.Body.Handle, input.Body.Bio)
+		if err != nil {
+			if errors.Is(err, store.ErrHandleInvalid) {
+				return nil, huma.Error422UnprocessableEntity(err.Error(), nil)
+			}
+			if errors.Is(err, store.ErrHandleTaken) {
+				return nil, huma.Error409Conflict(err.Error())
+			}
+			return nil, huma.Error500InternalServerError(fmt.Errorf("upsert handle: %w", err).Error())
+		}
+		return &UserProfileOutput{Body: *p}, nil
+	})
+
+	// GET /api/v1/users/{handle} — public profile (articles + feeds)
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "get-user-profile",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/users/{handle}",
+		Summary:     "Get a public user profile",
+		Tags:        []string{"social"},
+	}, func(ctx context.Context, input *struct {
+		Handle string `path:"handle"`
+	}) (*PublicProfileOutput, error) {
+		viewerID := auth.UserIDFromCtx(ctx)
+		profile, err := a.store.GetProfileByHandle(ctx, input.Handle, viewerID)
+		if err != nil {
+			if errors.Is(err, store.ErrProfileNotFound) {
+				return nil, huma.Error404NotFound("user not found")
+			}
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+
+		shared, err := a.store.ListSharedArticlesByUser(ctx, profile.UserID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if shared == nil {
+			shared = []store.SharedArticle{}
+		}
+
+		feeds, err := a.store.ListPublicFeedsByUser(ctx, profile.UserID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if feeds == nil {
+			feeds = []store.Feed{}
+		}
+
+		return &PublicProfileOutput{Body: PublicProfileResponse{
+			Profile:        *profile,
+			SharedArticles: shared,
+			Feeds:          feeds,
+		}}, nil
+	})
+
+	// POST /api/v1/users/{handle}/follow — follow a user
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "follow-user",
+		Method:      http.MethodPost,
+		Path:        "/api/v1/users/{handle}/follow",
+		Summary:     "Follow a user",
+		Tags:        []string{"social"},
+	}, func(ctx context.Context, input *FollowInput) (*struct{}, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		if err := a.store.FollowUser(ctx, userID, input.Handle); err != nil {
+			switch {
+			case errors.Is(err, store.ErrProfileNotFound):
+				return nil, huma.Error404NotFound("user not found")
+			case errors.Is(err, store.ErrCannotFollowSelf):
+				return nil, huma.Error422UnprocessableEntity(err.Error(), nil)
+			case errors.Is(err, store.ErrAlreadyFollowing):
+				return nil, huma.Error409Conflict(err.Error())
+			}
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		return nil, nil
+	})
+
+	// DELETE /api/v1/users/{handle}/follow — unfollow a user
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "unfollow-user",
+		Method:      http.MethodDelete,
+		Path:        "/api/v1/users/{handle}/follow",
+		Summary:     "Unfollow a user",
+		Tags:        []string{"social"},
+	}, func(ctx context.Context, input *FollowInput) (*struct{}, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		if err := a.store.UnfollowUser(ctx, userID, input.Handle); err != nil {
+			if errors.Is(err, store.ErrProfileNotFound) {
+				return nil, huma.Error404NotFound("user not found")
+			}
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		return nil, nil
+	})
+
+	// GET /api/v1/social/following — list users I follow
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "list-following",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/social/following",
+		Summary:     "List users you are following",
+		Tags:        []string{"social"},
+	}, func(ctx context.Context, _ *struct{}) (*UserProfileListOutput, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		profiles, err := a.store.ListFollowing(ctx, userID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if profiles == nil {
+			profiles = []store.UserProfile{}
+		}
+		return &UserProfileListOutput{Body: profiles}, nil
+	})
+
+	// GET /api/v1/users/{handle}/followers — list followers of a user
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "list-followers",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/users/{handle}/followers",
+		Summary:     "List followers of a user",
+		Tags:        []string{"social"},
+	}, func(ctx context.Context, input *struct {
+		Handle string `path:"handle"`
+	}) (*UserProfileListOutput, error) {
+		viewerID := auth.UserIDFromCtx(ctx)
+		profile, err := a.store.GetProfileByHandle(ctx, input.Handle, viewerID)
+		if err != nil {
+			if errors.Is(err, store.ErrProfileNotFound) {
+				return nil, huma.Error404NotFound("user not found")
+			}
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		followers, err := a.store.ListFollowers(ctx, profile.UserID, viewerID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if followers == nil {
+			followers = []store.UserProfile{}
+		}
+		return &UserProfileListOutput{Body: followers}, nil
+	})
+
+	// GET /api/v1/users/{handle}/following — list users a user follows
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "list-user-following",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/users/{handle}/following",
+		Summary:     "List users a user is following",
+		Tags:        []string{"social"},
+	}, func(ctx context.Context, input *struct {
+		Handle string `path:"handle"`
+	}) (*UserProfileListOutput, error) {
+		viewerID := auth.UserIDFromCtx(ctx)
+		profile, err := a.store.GetProfileByHandle(ctx, input.Handle, viewerID)
+		if err != nil {
+			if errors.Is(err, store.ErrProfileNotFound) {
+				return nil, huma.Error404NotFound("user not found")
+			}
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		following, err := a.store.ListFollowing(ctx, profile.UserID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if following == nil {
+			following = []store.UserProfile{}
+		}
+		return &UserProfileListOutput{Body: following}, nil
+	})
+
+	// POST /api/v1/social/shares — share an article
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "share-article",
+		Method:      http.MethodPost,
+		Path:        "/api/v1/social/shares",
+		Summary:     "Share an article to your social timeline",
+		Tags:        []string{"social"},
+	}, func(ctx context.Context, input *ShareArticleInput) (*SharedArticleOutput, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		sa, err := a.store.ShareArticle(ctx, userID,
+			input.Body.ArticleURL, input.Body.Title, input.Body.Description,
+			input.Body.FeedURL, input.Body.FeedTitle, input.Body.FeedSiteURL,
+			input.Body.Author, input.Body.PublishedAt,
+		)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(fmt.Errorf("share article: %w", err).Error())
+		}
+		return &SharedArticleOutput{Body: *sa}, nil
+	})
+
+	// DELETE /api/v1/social/shares/{shareId} — unshare
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "unshare-article",
+		Method:      http.MethodDelete,
+		Path:        "/api/v1/social/shares/{shareId}",
+		Summary:     "Remove a shared article",
+		Tags:        []string{"social"},
+	}, func(ctx context.Context, input *struct {
+		ShareID int64 `path:"shareId"`
+	}) (*struct{}, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		if err := a.store.UnshareArticle(ctx, input.ShareID, userID); err != nil {
+			if errors.Is(err, store.ErrShareNotFound) {
+				return nil, huma.Error404NotFound("shared article not found")
+			}
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		return nil, nil
+	})
+
+	// GET /api/v1/social/timeline — social timeline (shares from followed users)
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "social-timeline",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/social/timeline",
+		Summary:     "Social timeline: shared articles from followed users",
+		Tags:        []string{"social"},
+	}, func(ctx context.Context, input *struct {
+		Limit  int `query:"limit" default:"50" minimum:"1" maximum:"100"`
+		Offset int `query:"offset" default:"0" minimum:"0"`
+	}) (*SharedArticleListOutput, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		articles, err := a.store.ListSocialTimeline(ctx, userID, input.Limit, input.Offset)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if articles == nil {
+			articles = []store.SharedArticle{}
+		}
+		return &SharedArticleListOutput{Body: articles}, nil
+	})
+
+	// GET /api/v1/social/shares — my own shared articles
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "my-shared-articles",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/social/shares",
+		Summary:     "List your shared articles",
+		Tags:        []string{"social"},
+	}, func(ctx context.Context, _ *struct{}) (*SharedArticleListOutput, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		articles, err := a.store.ListSharedArticlesByUser(ctx, userID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if articles == nil {
+			articles = []store.SharedArticle{}
+		}
+		return &SharedArticleListOutput{Body: articles}, nil
+	})
+
+	// GET /api/v1/feeds/{feedId}/subscribers — subscriber count + public profiles
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "feed-subscribers",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/feeds/{feedId}/subscribers",
+		Summary:     "Get subscriber count and public profiles for a feed",
+		Tags:        []string{"feeds"},
+	}, func(ctx context.Context, input *struct {
+		FeedID int `path:"feedId"`
+	}) (*FeedSubscribersOutput, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		feed, err := a.store.GetFeedByID(ctx, input.FeedID, userID)
+		if err != nil || feed == nil {
+			return nil, huma.Error404NotFound("feed not found")
+		}
+
+		count, err := a.store.CountFeedSubscribers(ctx, feed.FeedURL)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		subs, err := a.store.ListFeedSubscribers(ctx, feed.FeedURL)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if subs == nil {
+			subs = []store.UserProfile{}
+		}
+		return &FeedSubscribersOutput{Body: FeedSubscribersResponse{
+			Count:       count,
+			Subscribers: subs,
+		}}, nil
+	})
+}
