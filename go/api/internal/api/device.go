@@ -15,9 +15,9 @@ import (
 
 // Device-flow tuning constants.
 const (
-	deviceCodeTTL      = 5 * time.Minute     // grant lifetime
-	devicePollInterval = 5                   // seconds, returned to the CLI
-	deviceTokenTTL     = 14 * 24 * time.Hour // 14 days, stored on the issued api token
+	deviceCodeTTL      = 5 * time.Minute                   // grant lifetime
+	devicePollInterval = 5                                 // seconds, returned to the CLI
+	deviceTokenTTL     = 14 * 24 * time.Hour               // 14 days, stored on the issued api token
 	userCodeAlphabet   = "ABCDEFGHJKMNPQRSTUVWXYZ23456789" // no ambiguous chars (0/O, 1/I/L)
 	userCodeLen        = 8
 )

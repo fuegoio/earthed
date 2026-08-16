@@ -97,12 +97,12 @@ type APIToken struct {
 // then the grant row is deleted (single-use).
 type DeviceCode struct {
 	ID             int64      `json:"-"`
-	DeviceCode     string     `json:"-"`           // hash
-	UserCode       string     `json:"user_code"`   // "PLN-XXXX-XXXX"
-	Status         string     `json:"status"`      // pending|authorized|denied|expired
+	DeviceCode     string     `json:"-"`         // hash
+	UserCode       string     `json:"user_code"` // "PLN-XXXX-XXXX"
+	Status         string     `json:"status"`    // pending|authorized|denied|expired
 	UserID         *int       `json:"-"`
 	TokenID        *int       `json:"-"`
-	TokenPlaintext string     `json:"-"`           // populated on authorize, consumed once
+	TokenPlaintext string     `json:"-"` // populated on authorize, consumed once
 	IntervalSecs   int        `json:"interval"`
 	CreatedAt      time.Time  `json:"created_at"`
 	ExpiresAt      time.Time  `json:"expires_at"`

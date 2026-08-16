@@ -1104,10 +1104,10 @@ func (a *API) registerFeedListRoutes() {
 
 // opmlXML is the XML representation of an OPML document.
 type opmlXML struct {
-	XMLName xml.Name      `xml:"opml"`
-	Version string        `xml:"version,attr"`
-	Head    opmlHead      `xml:"head"`
-	Body    opmlBody      `xml:"body"`
+	XMLName xml.Name `xml:"opml"`
+	Version string   `xml:"version,attr"`
+	Head    opmlHead `xml:"head"`
+	Body    opmlBody `xml:"body"`
 }
 
 type opmlHead struct {
@@ -1119,11 +1119,11 @@ type opmlBody struct {
 }
 
 type opmlOutline struct {
-	XMLURL  string        `xml:"xmlUrl,attr,omitempty"`
-	HTMLURL string        `xml:"htmlUrl,attr,omitempty"`
-	Title   string        `xml:"title,attr,omitempty"`
-	Text    string        `xml:"text,attr,omitempty"`
-	Type    string        `xml:"type,attr,omitempty"`
+	XMLURL   string        `xml:"xmlUrl,attr,omitempty"`
+	HTMLURL  string        `xml:"htmlUrl,attr,omitempty"`
+	Title    string        `xml:"title,attr,omitempty"`
+	Text     string        `xml:"text,attr,omitempty"`
+	Type     string        `xml:"type,attr,omitempty"`
 	Outlines []opmlOutline `xml:"outline,omitempty"`
 }
 

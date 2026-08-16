@@ -26,23 +26,59 @@ binary to your `PATH`.
 
 ## Configuration
 
-Before first use, point the CLI at your API server and set an API token:
+Point the CLI at your API server (defaults to `http://localhost:8080`):
 
 ```bash
 ./planetary config set base_url http://localhost:8080
-./planetary config set token pla_your-token-here
-```
-
-View the current configuration:
-
-```bash
-./planetary config show
 ```
 
 Configuration is stored at `~/.config/planetary/config.json` (or the
 equivalent on your OS).
 
+## Login
+
+Log in with the device flow — it opens a browser to a confirmation page
+where you approve the CLI's access:
+
+```bash
+./planetary login
+```
+
+The CLI displays a confirmation code and a URL. If a browser can't be
+opened automatically, copy the URL into a browser on any device where
+you're signed in. Once you approve, the CLI stores the token and you're
+ready to go.
+
+Use `--no-browser` to skip auto-opening a browser, or `--url` to
+override the API base URL for this login only:
+
+```bash
+./planetary login --no-browser --url https://api.example.com
+```
+
+Tokens issued via the device flow expire after 14 days. Run `planetary
+login` again to refresh.
+
+<details>
+<summary>Manual token setup (alternative)</summary>
+
+If you can't use the device flow, create a token via the web UI or the
+API and set it manually:
+
+```bash
+./planetary config set token pla_your-token-here
+```
+
+</details>
+
 ## Commands
+
+### login
+
+```bash
+planetary login                # log in via the browser (device flow)
+planetary login --no-browser    # print the URL instead of opening a browser
+```
 
 ### feeds
 
@@ -94,10 +130,17 @@ planetary health                   # check API health
 
 ## TUI
 
-The TUI is an interactive feed browser:
+The TUI is an interactive feed browser. If you're not logged in, it
+runs the device-flow login automatically before starting:
 
 ```bash
 ./planetary-tui
+```
+
+Pass `--login` to force a re-login even if a token is already saved:
+
+```bash
+./planetary-tui --login
 ```
 
 ### Navigation

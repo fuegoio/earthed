@@ -15,8 +15,8 @@ import (
 
 // bucket is a token bucket: tokens refill at a fixed rate up to burst.
 type bucket struct {
-	tokens   float64
-	last     time.Time
+	tokens float64
+	last   time.Time
 }
 
 // Limiter is a concurrency-safe, in-memory collection of token buckets
