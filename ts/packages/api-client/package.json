@@ -13,15 +13,13 @@
   },
   "scripts": {
     "gen": "openapi-ts && node scripts/strip-import-extensions.mjs",
-    "lint": "eslint",
+    "lint": "oxlint .",
     "format": "oxfmt --write .",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "^0.99.0",
-    "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
-    "eslint": "^9",
     "typescript": "^5"
   }
 }

@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "oxlint .",
     "format": "oxfmt --write .",
     "typecheck": "tsc --noEmit"
   },
@@ -35,10 +35,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@workspace/eslint-config": "workspace:^",
     "@workspace/typescript-config": "workspace:*",
     "esbuild": "^0.28.2",
-    "eslint": "^9",
     "serwist": "^9.5.12",
     "typescript": "^5"
   }

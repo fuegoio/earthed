@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "oxlint .",
     "format": "oxfmt --write .",
     "typecheck": "fumadocs-mdx && tsc --noEmit"
   },
@@ -28,9 +28,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@workspace/eslint-config": "workspace:^",
     "@workspace/typescript-config": "workspace:*",
-    "eslint": "^9",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
