@@ -113,7 +113,7 @@ function FeedNode({
         isDropTarget && "ring-1 ring-primary/50 ring-inset",
       )}
     >
-      <FeedIcon siteUrl={feed.site_url} className="size-3.5 shrink-0 rounded-sm" />
+      <FeedIcon siteUrl={feed.site_url} className="size-3.5 shrink-0 rounded-sm ml-0.5" />
       <span className="truncate">{feed.title}</span>
     </Link>
   );
