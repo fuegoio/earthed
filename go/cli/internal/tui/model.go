@@ -82,8 +82,7 @@ var (
 			Bold(true)
 
 	selectedFocusStyle = lipgloss.NewStyle().
-				Background(lipgloss.Color(sunColor)).
-				Foreground(lipgloss.Color("232")).
+				Foreground(lipgloss.Color(sunColor)).
 				Bold(true)
 
 	normalStyle = lipgloss.NewStyle()
