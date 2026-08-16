@@ -1,17 +1,13 @@
 ---
 title: Managing Feeds
-description: Subscribe to feeds, organize them with folders, and understand how the refresh pipeline works.
+description: Subscribe to feeds, organize them with folders, and trigger manual refreshes.
 ---
 
-Feeds are RSS, Atom, or JSON Feed subscriptions. Planetary fetches and
-parses them in the background, stores entries, and keeps them up to date
-with adaptive polling.
+Feeds are RSS 2.0, Atom 1.0, or JSON Feed subscriptions. Planetary fetches and parses them in the background and stores new entries automatically. See [Architecture](/docs/architecture) for how the refresh pipeline and adaptive polling work.
 
 ## Subscribe to a feed
 
-Create a feed subscription by providing a URL. If the URL is already a
-feed, it is used directly. If the URL is a website, Planetary discovers
-the feed by parsing `<link rel="alternate">` tags in the HTML head:
+Pass a feed URL or a website URL. When given a website, Planetary discovers the feed from `<link rel="alternate">` tags in the page's `<head>`:
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/feeds \
@@ -20,12 +16,20 @@ curl -X POST http://localhost:8080/api/v1/feeds \
   -d '{"feed_url":"https://blog.golang.org"}'
 ```
 
-Planetary will fetch the page, find the RSS or Atom feed link, and
-subscribe to it. You can also pass a direct feed URL.
+Assign to a folder at creation time with `folder_id`:
+
+```bash
+curl -X POST http://localhost:8080/api/v1/feeds \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer pla_your-token" \
+  -d '{"feed_url":"https://blog.golang.org","folder_id":2}'
+```
+
+The `site_url` and `title` fields are temporarily set to the feed URL and updated to real values after the first refresh. Duplicate subscriptions (same URL per user) return a 400 error.
 
 ## Preview a feed
 
-Preview a feed without subscribing. This also supports auto-discovery:
+Check what a feed contains before subscribing:
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/feeds/preview \
@@ -34,36 +38,16 @@ curl -X POST http://localhost:8080/api/v1/feeds/preview \
   -d '{"feed_url":"https://blog.golang.org"}'
 ```
 
-The response includes the discovered `feed_url`, feed metadata, and the
-20 most recent entries.
-
-When you subscribe, the `site_url` and `title` are temporarily set to
-the feed URL. After the first refresh, they are updated to the real
-values from the feed content.
-
-You can assign a feed to a folder at creation time:
-
-```bash
-curl -X POST http://localhost:8080/api/v1/feeds \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer pla_your-token" \
-  -d '{"feed_url":"https://blog.golang.org/feeds/posts/default","folder_id":2}'
-```
-
-Duplicate subscriptions (same URL for the same user) return a 400 error.
+Returns the discovered feed URL, metadata, and the 20 most recent entries. Auto-discovery works here too.
 
 ## List feeds
-
-List all subscriptions:
 
 ```bash
 curl http://localhost:8080/api/v1/feeds \
   -H "Authorization: Bearer pla_your-token"
 ```
 
-Feeds are ordered by title. The response includes scheduling metadata:
-`next_check_at` (when the scheduler will next try to refresh the feed)
-and `last_fetch_at` (when the feed was last successfully fetched).
+Feeds are ordered by title. Each feed includes `next_check_at` and `last_fetch_at` so you can see when it was last refreshed and when the next refresh is due.
 
 ## Get a single feed
 
@@ -72,28 +56,38 @@ curl http://localhost:8080/api/v1/feeds/1 \
   -H "Authorization: Bearer pla_your-token"
 ```
 
-## Delete a feed
+## Manually refresh a feed
 
-Unsubscribe from a feed. All entries belonging to the feed are deleted
-permanently.
+Fetch new entries immediately without waiting for the scheduler:
 
 ```bash
-curl -X DELETE http://localhost:8080/api/v1/feeds/1 \
+curl -X POST http://localhost:8080/api/v1/feeds/1/refresh \
   -H "Authorization: Bearer pla_your-token"
 ```
 
-## Mark all entries as read
+Returns the updated feed object.
 
-Mark every unread entry in a feed as read in one operation:
+## Mark all entries as read
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/feeds/1/mark-all-read \
   -H "Authorization: Bearer pla_your-token"
 ```
 
+## Delete a feed
+
+Unsubscribes and permanently deletes all entries belonging to the feed.
+
+```bash
+curl -X DELETE http://localhost:8080/api/v1/feeds/1 \
+  -H "Authorization: Bearer pla_your-token"
+```
+
 ## Folders
 
-Folders organize feeds into groups. Create a folder:
+Folders group feeds in the sidebar. They have no effect on entries themselves.
+
+Create a folder:
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/folders \
@@ -109,74 +103,9 @@ curl http://localhost:8080/api/v1/folders \
   -H "Authorization: Bearer pla_your-token"
 ```
 
-Delete a folder. Feeds in the deleted folder are not deleted — they
-become ungrouped:
+Delete a folder — feeds inside it become ungrouped, not deleted:
 
 ```bash
 curl -X DELETE http://localhost:8080/api/v1/folders/2 \
   -H "Authorization: Bearer pla_your-token"
 ```
-
-## How feed refreshing works
-
-Planetary runs a background scheduler that periodically checks for feeds
-due for refresh. The pipeline has four stages:
-
-1. **Fetch** — the feed URL is fetched with conditional headers
-   (`If-None-Match` / `If-Modified-Since`). If the server returns 304 Not
-   Modified, the feed is skipped and the next check is scheduled in 60
-   minutes.
-
-2. **Parse** — the response body is parsed based on content type and
-   format. Planetary supports RSS 2.0, Atom 1.0, and JSON Feed.
-
-3. **Sanitize** — entry HTML content is sanitized through an allowlist.
-   Unsafe tags and attributes are stripped. Links get
-   `rel="noopener noreferrer"`. `javascript:` and `data:` URLs are
-   blocked. See [Architecture](/docs/architecture) for the full list of
-   allowed HTML.
-
-4. **Store** — entries are deduplicated by a SHA-256 hash of the link,
-   title, and publication date. New entries are inserted; existing ones
-   are skipped. Media attachments (enclosures) are stored separately.
-
-### Adaptive polling
-
-The scheduler does not poll every feed at a fixed interval. Instead, it
-estimates the ideal refresh frequency based on the feed's average
-publication cadence:
-
-- The average interval between the most recent items is calculated.
-- The interval is clamped to a minimum of 10 minutes and a maximum of 24
-  hours.
-- If there are fewer than two items with parseable dates, the default
-  interval is 60 minutes.
-
-This means frequently-updated feeds are checked more often, while
-infrequent feeds save resources.
-
-### Error handling
-
-When a fetch or parse error occurs:
-
-- The `parsing_error` field is set to the error message.
-- The `parsing_error_count` is incremented.
-- The next check is scheduled in 15 minutes.
-
-When the feed is successfully fetched and parsed again, the error
-fields are cleared and the count resets to 0.
-
-### Scheduler configuration
-
-The scheduler runs by default. Configure it with environment variables:
-
-| Variable                         | Default    | Description                                  |
-| -------------------------------- | ---------- | -------------------------------------------- |
-| `PLANETARY_POLLING_FREQUENCY`    | `60s`      | How often the scheduler checks for due feeds |
-| `PLANETARY_BATCH_SIZE`           | `100`      | Max feeds processed per scheduler tick       |
-| `PLANETARY_WORKER_POOL_SIZE`     | `5`        | Concurrent feed-processing workers           |
-| `PLANETARY_HTTP_CLIENT_TIMEOUT`  | `20s`      | Timeout for fetching a single feed           |
-| `PLANETARY_HTTP_CLIENT_MAX_BODY` | `15728640` | Max feed body size in bytes (15 MB)          |
-| `PLANETARY_DISABLE_SCHEDULER`    | (unset)    | Set to any non-empty value to disable        |
-
-See [Self-Hosting](/docs/self-hosting) for all environment variables.

@@ -3,22 +3,16 @@ title: Authentication
 description: Authenticate with the Planetary API using session cookies or bearer tokens.
 ---
 
-Planetary uses [Limen](https://github.com/thecodearcher/limen) for
-authentication. All API endpoints under `/api/v1/` require authentication.
-The only exception is `GET /api/v1/health`.
+All endpoints under `/api/v1/` require authentication. The only exception is `GET /api/v1/health`.
 
-## Two authentication methods
+Planetary supports two credential types:
 
-Planetary accepts two types of credentials:
+- **Session cookie** — used by the web frontend. The browser sends it automatically after sign-in.
+- **Bearer token** — used by the CLI, scripts, and custom integrations. Send it in the `Authorization` header.
 
-1. **Session cookie** — for browser-based clients (the web frontend).
-   The browser sends the cookie automatically after sign-in.
+When both are present, the bearer token takes precedence.
 
-2. **Bearer token** — for programmatic clients (CLI, scripts, custom
-   integrations). Send the token in the `Authorization` header.
-
-Bearer tokens take precedence. If a request includes both a bearer token
-and a session cookie, the token is used and the cookie is ignored.
+All data is scoped per user — you can only read and write your own feeds, entries, folders, and tokens.
 
 ## Device flow (CLI login)
 
@@ -41,20 +35,15 @@ returned only to the CLI that initiated the flow.
 
 ## Session authentication
 
-Session auth is handled by Limen at `/api/auth/`. These endpoints are
-not under the `/api/v1/` prefix and do not require authentication.
+Session endpoints live at `/api/auth/` and do not require authentication.
 
-### Sign up
-
-Create a new account:
+Sign up:
 
 ```bash
 curl -X POST http://localhost:8080/api/auth/signup \
   -H "Content-Type: application/json" \
   -d '{"email":"user@example.com","password":"your-password"}'
 ```
-
-### Sign in
 
 Sign in to get a session cookie:
 
@@ -65,35 +54,20 @@ curl -X POST http://localhost:8080/api/auth/signin \
   -c cookies.txt
 ```
 
-The session cookie is stored in `cookies.txt`. Pass it with subsequent
-requests:
+Pass the cookie in subsequent requests:
 
 ```bash
 curl http://localhost:8080/api/v1/me \
   -b cookies.txt
 ```
 
-### Email verification
-
-> **Important:** Email verification tokens are logged to the server
-> output instead of being emailed. Check the server logs for the
-> verification token and URL. Wire a real mailer before deploying to
-> production.
-
-### Password reset
-
-Password reset tokens are also logged to the server output. Wire a real
-mailer when deploying to production.
+> **Email and password reset:** Verification and reset tokens are printed to the server's terminal output instead of being emailed. Check your terminal and open the URL from the logs. Wire a real mailer before deploying to production.
 
 ## API tokens
 
-API tokens are bearer tokens prefixed with `pla_`. They are stored as
-SHA-256 hashes — the raw token is shown only once at creation.
+API tokens are prefixed with `pla_` and stored as SHA-256 hashes. The raw token value is shown only once at creation — save it immediately.
 
-### Create a token
-
-Create a token via the API. You need to be authenticated first (via
-session cookie or an existing token):
+Create a token (requires an active session or an existing token):
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/tokens \
@@ -111,28 +85,19 @@ curl -X POST http://localhost:8080/api/v1/tokens \
 }
 ```
 
-Save the `token` value immediately. It cannot be retrieved later.
-
-### Use a token
-
-Send the token in the `Authorization` header:
+Use the token:
 
 ```bash
 curl http://localhost:8080/api/v1/feeds \
   -H "Authorization: Bearer pla_a1b2c3d4e5f6..."
 ```
 
-### List tokens
-
-List all tokens. The raw token values are never returned — only labels
-and metadata:
+List tokens (raw values are never returned, only labels and metadata):
 
 ```bash
 curl http://localhost:8080/api/v1/tokens \
   -H "Authorization: Bearer pla_your-token"
 ```
-
-### Delete a token
 
 Revoke a token by ID:
 
@@ -141,8 +106,7 @@ curl -X DELETE http://localhost:8080/api/v1/tokens/1 \
   -H "Authorization: Bearer pla_your-token"
 ```
 
-Any requests using the deleted token will fail immediately with a 401
-error.
+Requests using a deleted token fail immediately with 401.
 
 ## Token format
 
@@ -152,14 +116,6 @@ bytes). They are 69 characters long.
 Tokens created via the web UI or the `tokens create` command do not
 expire. Tokens issued via the device flow (`planetary login`) expire
 after 14 days.
-
-## Authorization model
-
-All data is scoped per user. Every API request that reads or writes
-data is filtered by the authenticated user's ID. A user can only see
-and modify their own feeds, entries, folders, and tokens.
-
-There are no roles or admin permissions in the current version.
 
 ## CORS
 

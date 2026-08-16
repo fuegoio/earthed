@@ -1,37 +1,22 @@
 ---
 title: Self-Hosting
-description: Deploy Planetary with official Docker images, configure environment variables, and run in production.
+description: Deploy Planetary with Docker Compose, configure environment variables, and run in production.
 ---
 
-## Official container images
+## Container images
 
-Planetary publishes container images to GitHub Container Registry on
-every push to `main` and every tagged release:
+Planetary publishes images to GitHub Container Registry on every push to `main` and every release:
 
 | Image | Registry                        |
 | ----- | ------------------------------- |
 | API   | `ghcr.io/fuegoio/planetary-api` |
 | Web   | `ghcr.io/fuegoio/planetary-web` |
 
-Images are tagged as follows:
+Tags: `latest` (main branch), `1.2.3` / `v1.2.3` (release), `1.2` (minor), `1` (major), `sha-<short>` (commit).
 
-- `latest` — tracks the `main` branch
-- `1.2.3` / `v1.2.3` — semantic version tags
-- `1.2` — minor version tag
-- `1` — major version tag
-- `sha-<short>` — commit SHA tag
-
-Pull an image:
-
-```bash
-docker pull ghcr.io/fuegoio/planetary-api:latest
-docker pull ghcr.io/fuegoio/planetary-web:latest
-```
+Both containers run as a non-root user (`uid 10001`). The API listens on port 8080, the web app on port 3000.
 
 ## Quick start with Docker Compose
-
-The fastest way to self-host Planetary is a single `docker-compose.yml`
-with PostgreSQL, the API, and the web frontend:
 
 ```yaml
 services:
@@ -82,97 +67,51 @@ volumes:
   pgdata:
 ```
 
-Start everything:
+Start:
 
 ```bash
 docker compose up -d
 ```
 
-Run migrations (first time only):
+Run database migrations on first start:
 
 ```bash
 docker compose exec api /app/planetary --migrate
 ```
 
-The web frontend is reachable at `http://localhost:3000` and the API at
-`http://localhost:8080`.
-
-`PLANETARY_API_URL` is used server-side (the web container reaching the
-API container over the Docker network). `NEXT_PUBLIC_PLANETARY_API_URL`
-is baked into the client bundle and must be reachable from the browser.
-
-## Running containers manually
-
-If you prefer not to use Compose, run each container individually.
-
-API:
-
-```bash
-docker run -p 8080:8080 \
-  -e LIMEN_SECRET=<32-byte-secret> \
-  -e PLANETARY_DATABASE_URL=postgres://user:pass@db-host:5432/planetary?sslmode=require \
-  ghcr.io/fuegoio/planetary-api:latest
-```
-
-Web:
-
-```bash
-docker run -p 3000:3000 \
-  -e PLANETARY_API_URL=http://api-host:8080 \
-  -e NEXT_PUBLIC_PLANETARY_API_URL=https://api.your-domain.com \
-  ghcr.io/fuegoio/planetary-web:latest
-```
-
-Both containers run as a non-root user (`uid 10001`). The API listens on
-port 8080, the web app on port 3000.
-
-## Building from source
-
-If you prefer to build the images yourself instead of using the
-pre-built ones, both Dockerfiles are multi-stage and produce minimal
-runtime images:
-
-```bash
-# API (from repo root)
-docker build -f go/api/Dockerfile -t planetary-api .
-
-# Web (from ts/ directory)
-docker build -f ts/apps/web/Dockerfile -t planetary-web ts/
-```
+`PLANETARY_API_URL` is the server-side URL the web container uses to reach the API over the Docker network. `NEXT_PUBLIC_PLANETARY_API_URL` is baked into the browser bundle and must be publicly reachable.
 
 ## Environment variables
 
 ### API
 
-| Variable                         | Default                                                                   | Description                                                               |
-| -------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `LIMEN_SECRET`                   | **required**                                                              | 32-byte secret for session signing. Generate with `openssl rand -hex 16`. |
-| `PLANETARY_DATABASE_URL`         | `postgres://planetary:planetary@localhost:5432/planetary?sslmode=disable` | PostgreSQL connection string.                                             |
-| `PLANETARY_HTTP_ADDR`            | `:8080`                                                                   | HTTP listen address.                                                      |
-| `PLANETARY_BASE_URL`             | `http://localhost:8080`                                                   | Public URL of the API (used by Limen for auth redirects).                 |
-| `PLANETARY_WEB_URL`              | `http://localhost:3000`                                                   | Public URL of the web frontend.                                           |
-| `PLANETARY_LOG_FORMAT`           | `pretty`                                                                  | Log format: `pretty` or `json`.                                           |
-| `PLANETARY_POLLING_FREQUENCY`    | `60s`                                                                     | How often the scheduler checks for feed updates.                          |
-| `PLANETARY_BATCH_SIZE`           | `100`                                                                     | Number of feeds to process per scheduling cycle.                          |
-| `PLANETARY_WORKER_POOL_SIZE`     | `5`                                                                       | Number of concurrent feed-processing workers.                             |
-| `PLANETARY_HTTP_CLIENT_TIMEOUT`  | `20s`                                                                     | Timeout for fetching remote feeds.                                        |
-| `PLANETARY_HTTP_CLIENT_MAX_BODY` | `15728640`                                                                | Max feed body size in bytes (15 MB).                                      |
-| `PLANETARY_CLEANUP_FREQUENCY`    | `24h`                                                                     | How often to run entry cleanup.                                           |
-| `PLANETARY_ENTRY_MAX_AGE_DAYS`   | `60`                                                                      | Entries older than this are eligible for cleanup.                         |
-| `PLANETARY_DISABLE_SCHEDULER`    | (unset)                                                                   | Set to any non-empty value to disable the feed scheduler.                 |
+| Variable                         | Default                                                                   | Description                                               |
+| -------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `LIMEN_SECRET`                   | **required**                                                              | 32-byte secret for session signing. `openssl rand -hex 16` |
+| `PLANETARY_DATABASE_URL`         | `postgres://planetary:planetary@localhost:5432/planetary?sslmode=disable` | PostgreSQL connection string                              |
+| `PLANETARY_HTTP_ADDR`            | `:8080`                                                                   | HTTP listen address                                       |
+| `PLANETARY_BASE_URL`             | `http://localhost:8080`                                                   | Public URL of the API (used for auth redirects)           |
+| `PLANETARY_WEB_URL`              | `http://localhost:3000`                                                   | Public URL of the web frontend                            |
+| `PLANETARY_LOG_FORMAT`           | `pretty`                                                                  | Log format: `pretty` or `json`                            |
+| `PLANETARY_POLLING_FREQUENCY`    | `60s`                                                                     | How often the scheduler checks for due feeds              |
+| `PLANETARY_BATCH_SIZE`           | `100`                                                                     | Feeds processed per scheduler tick                        |
+| `PLANETARY_WORKER_POOL_SIZE`     | `5`                                                                       | Concurrent feed-processing workers                        |
+| `PLANETARY_HTTP_CLIENT_TIMEOUT`  | `20s`                                                                     | Timeout for fetching a single feed                        |
+| `PLANETARY_HTTP_CLIENT_MAX_BODY` | `15728640`                                                                | Max feed body size in bytes (15 MB)                       |
+| `PLANETARY_CLEANUP_FREQUENCY`    | `24h`                                                                     | How often to run entry cleanup                            |
+| `PLANETARY_ENTRY_MAX_AGE_DAYS`   | `60`                                                                      | Entries older than this are eligible for cleanup          |
+| `PLANETARY_DISABLE_SCHEDULER`    | (unset)                                                                   | Set to any non-empty value to disable the scheduler       |
 
 ### Web
 
-| Variable                        | Default                 | Description                                                 |
-| ------------------------------- | ----------------------- | ----------------------------------------------------------- |
-| `PLANETARY_API_URL`             | `http://localhost:8080` | Server-side API URL (must be reachable from the container). |
-| `NEXT_PUBLIC_PLANETARY_API_URL` | `http://localhost:8080` | Client-side API URL (must be reachable from the browser).   |
+| Variable                        | Default                 | Description                                                  |
+| ------------------------------- | ----------------------- | ------------------------------------------------------------ |
+| `PLANETARY_API_URL`             | `http://localhost:8080` | Server-side API URL (reachable from the container)           |
+| `NEXT_PUBLIC_PLANETARY_API_URL` | `http://localhost:8080` | Client-side API URL (reachable from the browser)             |
 
 ## Reverse proxy
 
-In production, put both services behind a reverse proxy (nginx, Caddy,
-Traefik) that handles TLS termination. Neither the API nor the web app
-serve HTTPS directly.
+Neither service terminates TLS directly. Put both behind a reverse proxy (nginx, Caddy, Traefik).
 
 Example nginx configuration:
 
@@ -204,20 +143,14 @@ server {
 
 ## Database backup
 
-Your PostgreSQL database holds all feeds, entries, folders, and feed
-lists. Back it up regularly.
-
-Create a backup:
+All feeds, entries, folders, and feed lists are in PostgreSQL. Back it up regularly.
 
 ```bash
+# Create a backup
 docker compose exec postgres pg_dump -U planetary planetary > backup.sql
-```
 
-Restore from a backup:
-
-```bash
+# Restore from a backup
 cat backup.sql | docker compose exec -T postgres psql -U planetary planetary
 ```
 
-For automated backups, schedule `pg_dump` with a cron job and store
-backups off-site (e.g., an S3 bucket or other object storage).
+Schedule `pg_dump` with a cron job and store backups off-site for automated backups.

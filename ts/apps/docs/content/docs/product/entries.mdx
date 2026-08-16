@@ -3,14 +3,11 @@ title: Reading Entries
 description: Browse, filter, search, and manage entry status with the Planetary API.
 ---
 
-Entries are individual articles fetched from your feed subscriptions.
-Each entry has a status (`unread`, `read`, or `removed`), a starred flag,
-and sanitized HTML content.
+Entries are individual articles fetched from your feed subscriptions. Each entry has a status (`unread`, `read`, or `removed`), a starred flag, and sanitized HTML content.
 
 ## List entries
 
-List entries with optional filters. Results are ordered by
-`published_at` descending (newest first).
+Results are ordered by `published_at` descending (newest first).
 
 ```bash
 curl "http://localhost:8080/api/v1/entries?limit=10" \
@@ -25,49 +22,27 @@ curl "http://localhost:8080/api/v1/entries?limit=10" \
 | `folder_id` | int    | —       | Filter by folder (joins through feed) |
 | `status`    | string | —       | `unread`, `read`, or `removed`        |
 | `starred`   | bool   | —       | Filter starred entries                |
-| `search`    | string | —       | Full-text search                      |
+| `search`    | string | —       | Full-text search (English dictionary) |
 | `limit`     | int    | 50      | Max 200                               |
 | `offset`    | int    | 0       | Pagination offset                     |
 
-Combine filters to narrow results. For example, list unread entries in
-a specific feed:
+Filters can be combined freely. When both `feed_id` and `folder_id` are provided, `folder_id` takes precedence.
 
 ```bash
+# Unread entries in a specific feed
 curl "http://localhost:8080/api/v1/entries?feed_id=1&status=unread" \
   -H "Authorization: Bearer pla_your-token"
-```
 
-Or list starred entries across all feeds:
-
-```bash
+# Starred entries across all feeds
 curl "http://localhost:8080/api/v1/entries?starred=true" \
   -H "Authorization: Bearer pla_your-token"
-```
 
-Paginate with `limit` and `offset`:
+# Full-text search combined with a status filter
+curl "http://localhost:8080/api/v1/entries?search=docker&status=unread" \
+  -H "Authorization: Bearer pla_your-token"
 
-```bash
+# Second page of results
 curl "http://localhost:8080/api/v1/entries?limit=50&offset=50" \
-  -H "Authorization: Bearer pla_your-token"
-```
-
-When both `feed_id` and `folder_id` are provided, `folder_id` takes
-precedence.
-
-## Full-text search
-
-Search entry titles and content using the `search` parameter. The
-search uses PostgreSQL full-text search with the English dictionary:
-
-```bash
-curl "http://localhost:8080/api/v1/entries?search=go+release+notes" \
-  -H "Authorization: Bearer pla_your-token"
-```
-
-Search can be combined with other filters:
-
-```bash
-curl "http://localhost:8080/api/v1/entries?search=docker&status=unread&feed_id=1" \
   -H "Authorization: Bearer pla_your-token"
 ```
 
@@ -78,25 +53,21 @@ curl http://localhost:8080/api/v1/entries/42 \
   -H "Authorization: Bearer pla_your-token"
 ```
 
-The response includes the full sanitized HTML content in the `content`
-field.
+The `content` field contains the full sanitized HTML. The `description` field is a short summary, when available from the feed. Entries may also include `tags` (feed category tags) and `enclosures` (podcast audio, images, and other media attachments).
 
 ## Entry statuses
 
-Every entry has one of three statuses:
-
-| Status    | Description                          |
+| Status    | Meaning                              |
 | --------- | ------------------------------------ |
 | `unread`  | New entry, not yet read              |
-| `read`    | Entry has been read                  |
-| `removed` | Entry is hidden from the normal view |
+| `read`    | Entry has been opened                |
+| `removed` | Hidden from the normal view          |
 
-New entries start as `unread`. The `changed_at` field tracks when the
-status was last modified.
+New entries start as `unread`. `changed_at` tracks when the status last changed.
 
 ## Bulk update status
 
-Update the status of multiple entries at once:
+Update the status of multiple entries in one request. Any valid status works: `read`, `unread`, or `removed`.
 
 ```bash
 curl -X PUT http://localhost:8080/api/v1/entries \
@@ -105,36 +76,16 @@ curl -X PUT http://localhost:8080/api/v1/entries \
   -d '{"entry_ids":[42,43,44],"status":"read"}'
 ```
 
-Mark entries as `unread` to return them to the unread list:
-
-```bash
-curl -X PUT http://localhost:8080/api/v1/entries \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer pla_your-token" \
-  -d '{"entry_ids":[42],"status":"unread"}'
-```
-
-Mark entries as `removed` to hide them:
-
-```bash
-curl -X PUT http://localhost:8080/api/v1/entries \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer pla_your-token" \
-  -d '{"entry_ids":[43,44],"status":"removed"}'
-```
-
-## Mark all entries in a feed as read
-
-Mark every unread entry in a feed as read in a single request:
+To mark all entries in a feed as read at once:
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/feeds/1/mark-all-read \
   -H "Authorization: Bearer pla_your-token"
 ```
 
-## Star and unstar entries
+## Star entries
 
-Star an entry to bookmark it:
+Star an entry to bookmark it. The `starred` flag is independent of status — a `removed` entry that is starred still appears when filtering with `starred=true`.
 
 ```bash
 curl -X PUT http://localhost:8080/api/v1/entries/42/starred \
@@ -143,26 +94,4 @@ curl -X PUT http://localhost:8080/api/v1/entries/42/starred \
   -d '{"starred":true}'
 ```
 
-Unstar an entry:
-
-```bash
-curl -X PUT http://localhost:8080/api/v1/entries/42/starred \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer pla_your-token" \
-  -d '{"starred":false}'
-```
-
-Starred entries persist their starred flag regardless of status. A
-`removed` entry that is starred will still appear when filtering with
-`starred=true`.
-
-## Entry content
-
-Entry content is sanitized HTML. Planetary strips unsafe tags and
-attributes using an allowlist before storing entries. The `description`
-field contains a short summary when available from the feed.
-
-Entries may include `tags` (from the feed's category tags) and
-`enclosures` (media attachments like podcast audio or images). See
-[API Reference](/docs/api-reference#data-models) for the full data
-model.
+Pass `false` to unstar.
