@@ -4,7 +4,14 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Dialog } from "@base-ui/react/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@workspace/ui/components/dialog";
 import {
   Globe,
   Lock,
@@ -49,7 +56,6 @@ import {
   unwrap,
 } from "@/lib/planetary";
 import { getApiErrorMessage } from "@/lib/errors";
-import { cn } from "@workspace/ui/lib/utils";
 import type { Feed, FeedList, FeedListFeed } from "@/lib/types";
 
 /**
@@ -511,68 +517,60 @@ function EditListDialog({
   }
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/50" />
-        <Dialog.Popup
-          className={cn(
-            "fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2",
-            "rounded-lg border border-border bg-popover p-6 shadow-lg",
-          )}
-        >
-          <Dialog.Title className="font-serif text-lg font-bold tracking-normal">
-            Edit list
-          </Dialog.Title>
-          <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="edit-title">Title</Label>
-              <Input
-                id="edit-title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                maxLength={255}
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="edit-desc">Description</Label>
-              <Textarea
-                id="edit-desc"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                maxLength={2000}
-                rows={3}
-              />
-            </div>
-            <label className="flex cursor-pointer items-start gap-3 rounded-md border border-border p-3">
-              <input
-                type="checkbox"
-                checked={isPublic}
-                onChange={(e) => setIsPublic(e.target.checked)}
-                className="mt-0.5 size-4 accent-primary"
-              />
-              <span className="flex flex-col">
-                <span className="text-sm font-medium">Public</span>
-                <span className="text-sm text-muted-foreground">
-                  Public lists can be discovered and followed by others.
-                </span>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Edit list</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="edit-title">Title</Label>
+            <Input
+              id="edit-title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              maxLength={255}
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="edit-desc">Description</Label>
+            <Textarea
+              id="edit-desc"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              maxLength={2000}
+              rows={3}
+            />
+          </div>
+          <label className="flex cursor-pointer items-start gap-3 rounded-md border border-border p-3">
+            <input
+              type="checkbox"
+              checked={isPublic}
+              onChange={(e) => setIsPublic(e.target.checked)}
+              className="mt-0.5 size-4 accent-primary"
+            />
+            <span className="flex flex-col">
+              <span className="text-sm font-medium">Public</span>
+              <span className="text-sm text-muted-foreground">
+                Public lists can be discovered and followed by others.
               </span>
-            </label>
-            <div className="flex justify-end gap-2 pt-2">
-              <Dialog.Close
-                render={
-                  <Button variant="ghost" type="button">
-                    Cancel
-                  </Button>
-                }
-              />
-              <Button type="submit" disabled={pending || !title.trim()}>
-                {pending && <Loader2 className="size-4 animate-spin" />}
-                Save
-              </Button>
-            </div>
-          </form>
-        </Dialog.Popup>
-      </Dialog.Portal>
-    </Dialog.Root>
+            </span>
+          </label>
+          <DialogFooter>
+            <DialogClose
+              render={
+                <Button variant="ghost" type="button">
+                  Cancel
+                </Button>
+              }
+            />
+            <Button type="submit" disabled={pending || !title.trim()}>
+              {pending && <Loader2 className="size-4 animate-spin" />}
+              Save
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -3,7 +3,14 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Dialog } from "@base-ui/react/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@workspace/ui/components/dialog";
 import { Key, Plus, Trash2, Loader2, Copy, Check } from "lucide-react";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Button } from "@workspace/ui/components/button";
@@ -20,7 +27,6 @@ import {
 import { getClient, listTokens, createToken, deleteToken, unwrap } from "@/lib/planetary";
 import { getApiErrorMessage } from "@/lib/errors";
 import { formatDateTime } from "@/lib/format";
-import { cn } from "@workspace/ui/lib/utils";
 import type { APIToken, CreatedToken } from "@/lib/types";
 
 /** API token management: list, create (revealing the secret once), delete. */
@@ -158,84 +164,76 @@ export function TokenManager() {
       </div>
 
       {/* Create / reveal dialog */}
-      <Dialog.Root
+      <Dialog
         open={createOpen}
         onOpenChange={(o) => {
           if (!o) closeCreate();
           setCreateOpen(o);
         }}
       >
-        <Dialog.Portal>
-          <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/50" />
-          <Dialog.Popup
-            className={cn(
-              "fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2",
-              "rounded-lg border border-border bg-popover p-6 shadow-lg",
-            )}
-          >
-            {!created ? (
-              <>
-                <Dialog.Title className="font-serif text-lg font-bold tracking-normal">
-                  New API token
-                </Dialog.Title>
-                <Dialog.Description className="mt-1 text-sm text-muted-foreground">
+        <DialogContent className="max-w-md">
+          {!created ? (
+            <>
+              <DialogHeader>
+                <DialogTitle>New API token</DialogTitle>
+                <DialogDescription>
                   Give it a label so you remember where it&apos;s used.
-                </Dialog.Description>
-                <form onSubmit={handleCreate} className="mt-4 flex flex-col gap-3">
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="token-label">Label</Label>
-                    <Input
-                      id="token-label"
-                      value={label}
-                      onChange={(e) => setLabel(e.target.value)}
-                      placeholder="e.g. planetary-cli"
-                      autoFocus
-                    />
-                  </div>
-                  <div className="flex justify-end gap-2 pt-2">
-                    <Button variant="ghost" type="button" onClick={closeCreate}>
-                      Cancel
-                    </Button>
-                    <Button type="submit" disabled={pending || !label.trim()}>
-                      {pending && <Loader2 className="size-4 animate-spin" />}
-                      Create token
-                    </Button>
-                  </div>
-                </form>
-              </>
-            ) : (
-              <>
-                <Dialog.Title className="font-serif text-lg font-bold tracking-normal">
-                  Token created
-                </Dialog.Title>
-                <Dialog.Description className="mt-1 text-sm text-muted-foreground">
-                  Copy this token now — you won&apos;t be able to see it again.
-                </Dialog.Description>
-                <div className="mt-4 flex items-center gap-2">
-                  <code className="min-w-0 flex-1 truncate rounded-md border border-border bg-muted px-3 py-2 text-sm">
-                    {created.token}
-                  </code>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => copyToken(created.token)}
-                    aria-label="Copy token"
-                  >
-                    {copied ? (
-                      <Check className="size-4 text-green-600" />
-                    ) : (
-                      <Copy className="size-4" />
-                    )}
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleCreate} className="mt-4 flex flex-col gap-3">
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="token-label">Label</Label>
+                  <Input
+                    id="token-label"
+                    value={label}
+                    onChange={(e) => setLabel(e.target.value)}
+                    placeholder="e.g. planetary-cli"
+                    autoFocus
+                  />
+                </div>
+                <DialogFooter>
+                  <Button variant="ghost" type="button" onClick={closeCreate}>
+                    Cancel
                   </Button>
-                </div>
-                <div className="mt-5 flex justify-end">
-                  <Button onClick={closeCreate}>Done</Button>
-                </div>
-              </>
-            )}
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
+                  <Button type="submit" disabled={pending || !label.trim()}>
+                    {pending && <Loader2 className="size-4 animate-spin" />}
+                    Create token
+                  </Button>
+                </DialogFooter>
+              </form>
+            </>
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle>Token created</DialogTitle>
+                <DialogDescription>
+                  Copy this token now — you won&apos;t be able to see it again.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="mt-4 flex items-center gap-2">
+                <code className="min-w-0 flex-1 truncate rounded-md border border-border bg-muted px-3 py-2 text-sm">
+                  {created.token}
+                </code>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => copyToken(created.token)}
+                  aria-label="Copy token"
+                >
+                  {copied ? (
+                    <Check className="size-4 text-green-600" />
+                  ) : (
+                    <Copy className="size-4" />
+                  )}
+                </Button>
+              </div>
+              <DialogFooter className="mt-5">
+                <Button onClick={closeCreate}>Done</Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
