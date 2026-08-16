@@ -1,0 +1,2910 @@
+{
+    "components": {
+        "schemas": {
+            "APIToken": {
+                "additionalProperties": false,
+                "properties": {
+                    "created_at": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "expires_at": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "label": {
+                        "type": "string"
+                    },
+                    "last_used_at": {
+                        "format": "date-time",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "origin": {
+                        "type": "string"
+                    },
+                    "user_id": {
+                        "format": "int64",
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "id",
+                    "user_id",
+                    "label",
+                    "origin",
+                    "created_at",
+                    "last_used_at"
+                ],
+                "type": "object"
+            },
+            "AddFeedListFeedInputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/AddFeedListFeedInputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "feed_url": {
+                        "maxLength": 2048,
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "site_url": {
+                        "maxLength": 2048,
+                        "type": "string"
+                    },
+                    "title": {
+                        "maxLength": 512,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "feed_url"
+                ],
+                "type": "object"
+            },
+            "CreateFeedInputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/CreateFeedInputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "feed_url": {
+                        "maxLength": 2048,
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "folder_id": {
+                        "format": "int64",
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "feed_url"
+                ],
+                "type": "object"
+            },
+            "CreateFeedListInputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/CreateFeedListInputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "description": {
+                        "maxLength": 2000,
+                        "type": "string"
+                    },
+                    "is_public": {
+                        "type": "boolean"
+                    },
+                    "title": {
+                        "maxLength": 255,
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "title",
+                    "is_public"
+                ],
+                "type": "object"
+            },
+            "CreateFolderInputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/CreateFolderInputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "parent_id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "maxLength": 255,
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "title"
+                ],
+                "type": "object"
+            },
+            "CreateTokenInputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/CreateTokenInputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "label": {
+                        "maxLength": 255,
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "label"
+                ],
+                "type": "object"
+            },
+            "DeviceCodeOutputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/DeviceCodeOutputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "device_code": {
+                        "type": "string"
+                    },
+                    "expires_in": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "interval": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "user_code": {
+                        "type": "string"
+                    },
+                    "verification_uri": {
+                        "type": "string"
+                    },
+                    "verification_uri_complete": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "device_code",
+                    "user_code",
+                    "verification_uri",
+                    "verification_uri_complete",
+                    "expires_in",
+                    "interval"
+                ],
+                "type": "object"
+            },
+            "DeviceConfirmBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/DeviceConfirmBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "authorized": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "authorized"
+                ],
+                "type": "object"
+            },
+            "DeviceConfirmInputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/DeviceConfirmInputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "deny": {
+                        "type": "boolean"
+                    },
+                    "user_code": {
+                        "maxLength": 32,
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "user_code"
+                ],
+                "type": "object"
+            },
+            "DeviceStatusBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/DeviceStatusBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "status"
+                ],
+                "type": "object"
+            },
+            "DeviceTokenInputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/DeviceTokenInputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "device_code": {
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "device_code"
+                ],
+                "type": "object"
+            },
+            "DeviceTokenOutputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/DeviceTokenOutputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "access_token": {
+                        "type": "string"
+                    },
+                    "expires_in": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "token_type": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "access_token",
+                    "token_type",
+                    "expires_in"
+                ],
+                "type": "object"
+            },
+            "Enclosure": {
+                "additionalProperties": false,
+                "properties": {
+                    "entry_id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "mime_type": {
+                        "type": "string"
+                    },
+                    "size": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "url": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "entry_id",
+                    "url",
+                    "mime_type",
+                    "size"
+                ],
+                "type": "object"
+            },
+            "Entry": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/Entry.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "author": {
+                        "type": "string"
+                    },
+                    "changed_at": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "comments_url": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "enclosures": {
+                        "items": {
+                            "$ref": "#/components/schemas/Enclosure"
+                        },
+                        "type": [
+                            "array",
+                            "null"
+                        ]
+                    },
+                    "feed_id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "hash": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "published_at": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "starred": {
+                        "type": "boolean"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "tags": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": [
+                            "array",
+                            "null"
+                        ]
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string"
+                    },
+                    "user_id": {
+                        "format": "int64",
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "id",
+                    "user_id",
+                    "feed_id",
+                    "hash",
+                    "title",
+                    "url",
+                    "status",
+                    "starred",
+                    "published_at",
+                    "changed_at"
+                ],
+                "type": "object"
+            },
+            "ErrorDetail": {
+                "additionalProperties": false,
+                "properties": {
+                    "location": {
+                        "description": "Where the error occurred, e.g. 'body.items[3].tags' or 'path.thing-id'",
+                        "type": "string"
+                    },
+                    "message": {
+                        "description": "Error message text",
+                        "type": "string"
+                    },
+                    "value": {
+                        "description": "The value at the given location"
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorModel": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/ErrorModel.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "detail": {
+                        "description": "A human-readable explanation specific to this occurrence of the problem.",
+                        "examples": [
+                            "Property foo is required but is missing."
+                        ],
+                        "type": "string"
+                    },
+                    "errors": {
+                        "description": "Optional list of individual error details",
+                        "items": {
+                            "$ref": "#/components/schemas/ErrorDetail"
+                        },
+                        "type": [
+                            "array",
+                            "null"
+                        ]
+                    },
+                    "instance": {
+                        "description": "A URI reference that identifies the specific occurrence of the problem.",
+                        "examples": [
+                            "https://example.com/error-log/abc123"
+                        ],
+                        "format": "uri",
+                        "type": "string"
+                    },
+                    "status": {
+                        "description": "HTTP status code",
+                        "examples": [
+                            400
+                        ],
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "description": "A short, human-readable summary of the problem type. This value should not change between occurrences of the error.",
+                        "examples": [
+                            "Bad Request"
+                        ],
+                        "type": "string"
+                    },
+                    "type": {
+                        "default": "about:blank",
+                        "description": "A URI reference to human-readable documentation for the error.",
+                        "examples": [
+                            "https://example.com/errors/example"
+                        ],
+                        "format": "uri",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "Feed": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/Feed.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "crawler": {
+                        "type": "boolean"
+                    },
+                    "created_at": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "disabled": {
+                        "type": "boolean"
+                    },
+                    "feed_url": {
+                        "type": "string"
+                    },
+                    "folder_id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "last_fetch_at": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "next_check_at": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "parsing_error": {
+                        "type": "string"
+                    },
+                    "parsing_error_count": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "rewrite_rules": {
+                        "type": "string"
+                    },
+                    "scraper_rules": {
+                        "type": "string"
+                    },
+                    "site_url": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "updated_at": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "user_id": {
+                        "format": "int64",
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "id",
+                    "user_id",
+                    "feed_url",
+                    "site_url",
+                    "title",
+                    "parsing_error_count",
+                    "disabled",
+                    "crawler",
+                    "created_at",
+                    "updated_at"
+                ],
+                "type": "object"
+            },
+            "FeedList": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/FeedList.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "feed_count": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "feeds": {
+                        "items": {
+                            "$ref": "#/components/schemas/FeedListFeed"
+                        },
+                        "type": [
+                            "array",
+                            "null"
+                        ]
+                    },
+                    "id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "is_following": {
+                        "type": "boolean"
+                    },
+                    "is_public": {
+                        "type": "boolean"
+                    },
+                    "owner_email": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "updated_at": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "user_id": {
+                        "format": "int64",
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "id",
+                    "user_id",
+                    "title",
+                    "is_public",
+                    "feed_count",
+                    "created_at",
+                    "updated_at"
+                ],
+                "type": "object"
+            },
+            "FeedListFeed": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/FeedListFeed.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "feed_list_id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "feed_url": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "position": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "site_url": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "feed_list_id",
+                    "feed_url",
+                    "site_url",
+                    "title",
+                    "position"
+                ],
+                "type": "object"
+            },
+            "Folder": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/Folder.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "parent_id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "sort_order": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "updated_at": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "user_id": {
+                        "format": "int64",
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "id",
+                    "user_id",
+                    "title",
+                    "sort_order",
+                    "created_at",
+                    "updated_at"
+                ],
+                "type": "object"
+            },
+            "HealthResponse": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/HealthResponse.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "status"
+                ],
+                "type": "object"
+            },
+            "Import-feed-listResponse": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/Import-feed-listResponse.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "errors": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": [
+                            "array",
+                            "null"
+                        ]
+                    },
+                    "failed": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "feed_ids": {
+                        "items": {
+                            "format": "int64",
+                            "type": "integer"
+                        },
+                        "type": [
+                            "array",
+                            "null"
+                        ]
+                    },
+                    "imported": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "skipped": {
+                        "format": "int64",
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "imported",
+                    "skipped",
+                    "failed",
+                    "feed_ids"
+                ],
+                "type": "object"
+            },
+            "OPMLImportResultBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/OPMLImportResultBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "errors": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": [
+                            "array",
+                            "null"
+                        ]
+                    },
+                    "failed": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "feed_ids": {
+                        "items": {
+                            "format": "int64",
+                            "type": "integer"
+                        },
+                        "type": [
+                            "array",
+                            "null"
+                        ]
+                    },
+                    "imported": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "skipped": {
+                        "format": "int64",
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "imported",
+                    "skipped",
+                    "failed",
+                    "feed_ids"
+                ],
+                "type": "object"
+            },
+            "PreviewFeedBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/PreviewFeedBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "favicon_url": {
+                        "type": "string"
+                    },
+                    "feed_url": {
+                        "type": "string"
+                    },
+                    "items": {
+                        "items": {
+                            "$ref": "#/components/schemas/PreviewFeedItem"
+                        },
+                        "type": [
+                            "array",
+                            "null"
+                        ]
+                    },
+                    "site_url": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "title",
+                    "site_url",
+                    "feed_url",
+                    "items"
+                ],
+                "type": "object"
+            },
+            "PreviewFeedInputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/PreviewFeedInputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "feed_url": {
+                        "maxLength": 2048,
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "feed_url"
+                ],
+                "type": "object"
+            },
+            "PreviewFeedItem": {
+                "additionalProperties": false,
+                "properties": {
+                    "author": {
+                        "type": "string"
+                    },
+                    "content": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "published_at": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "tags": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": [
+                            "array",
+                            "null"
+                        ]
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "title",
+                    "url",
+                    "content",
+                    "published_at"
+                ],
+                "type": "object"
+            },
+            "Toggle-entry-starredRequest": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/Toggle-entry-starredRequest.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "starred": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "starred"
+                ],
+                "type": "object"
+            },
+            "TokenOutputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/TokenOutputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "label": {
+                        "type": "string"
+                    },
+                    "token": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "label",
+                    "token",
+                    "created_at"
+                ],
+                "type": "object"
+            },
+            "Update-entriesRequest": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/Update-entriesRequest.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "entry_ids": {
+                        "items": {
+                            "format": "int64",
+                            "type": "integer"
+                        },
+                        "type": [
+                            "array",
+                            "null"
+                        ]
+                    },
+                    "status": {
+                        "enum": [
+                            "unread",
+                            "read",
+                            "removed"
+                        ],
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "entry_ids",
+                    "status"
+                ],
+                "type": "object"
+            },
+            "UpdateFeedInputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/UpdateFeedInputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "folder_id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "maxLength": 512,
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateFeedListInputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/UpdateFeedListInputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "description": {
+                        "maxLength": 2000,
+                        "type": "string"
+                    },
+                    "is_public": {
+                        "type": "boolean"
+                    },
+                    "title": {
+                        "maxLength": 255,
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "title",
+                    "is_public"
+                ],
+                "type": "object"
+            },
+            "UpdateFolderInputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/UpdateFolderInputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "parent_id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "maxLength": 255,
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "title"
+                ],
+                "type": "object"
+            },
+            "User": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/User.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "first_name": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "is_admin": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "email",
+                    "is_admin",
+                    "created_at"
+                ],
+                "type": "object"
+            }
+        }
+    },
+    "info": {
+        "title": "Planetary API",
+        "version": "1.0.0"
+    },
+    "openapi": "3.1.0",
+    "paths": {
+        "/api/auth/device/code": {
+            "post": {
+                "operationId": "device-code",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeviceCodeOutputBody"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Begin device-flow login (issue a device code)",
+                "tags": [
+                    "device"
+                ]
+            }
+        },
+        "/api/auth/device/confirm": {
+            "post": {
+                "operationId": "device-confirm",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeviceConfirmInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeviceConfirmBody"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Approve or deny a device-flow login (authenticated user)",
+                "tags": [
+                    "device"
+                ]
+            }
+        },
+        "/api/auth/device/status": {
+            "get": {
+                "operationId": "device-status",
+                "parameters": [
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "user_code",
+                        "schema": {
+                            "maxLength": 32,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeviceStatusBody"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Check device-flow status by user code (authenticated user)",
+                "tags": [
+                    "device"
+                ]
+            }
+        },
+        "/api/auth/device/token": {
+            "post": {
+                "operationId": "device-token",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeviceTokenInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeviceTokenOutputBody"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Poll for device-flow login result",
+                "tags": [
+                    "device"
+                ]
+            }
+        },
+        "/api/v1/entries": {
+            "get": {
+                "operationId": "list-entries",
+                "parameters": [
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "feed_id",
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "folder_id",
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "enum": [
+                                "unread",
+                                "read",
+                                "removed"
+                            ],
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "starred",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "search",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "limit",
+                        "schema": {
+                            "default": 50,
+                            "format": "int64",
+                            "maximum": 200,
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "offset",
+                        "schema": {
+                            "default": 0,
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/Entry"
+                                    },
+                                    "type": [
+                                        "array",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "List entries",
+                "tags": [
+                    "entries"
+                ]
+            },
+            "put": {
+                "operationId": "update-entries",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Update-entriesRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Bulk update entry status",
+                "tags": [
+                    "entries"
+                ]
+            }
+        },
+        "/api/v1/entries/{entryId}": {
+            "get": {
+                "operationId": "get-entry",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entryId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Entry"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Get an entry",
+                "tags": [
+                    "entries"
+                ]
+            }
+        },
+        "/api/v1/entries/{entryId}/starred": {
+            "put": {
+                "operationId": "toggle-entry-starred",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entryId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Toggle-entry-starredRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Toggle starred on an entry",
+                "tags": [
+                    "entries"
+                ]
+            }
+        },
+        "/api/v1/feed-lists": {
+            "get": {
+                "operationId": "list-my-feed-lists",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/FeedList"
+                                    },
+                                    "type": [
+                                        "array",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "List my feed lists",
+                "tags": [
+                    "feed-lists"
+                ]
+            },
+            "post": {
+                "operationId": "create-feed-list",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateFeedListInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FeedList"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Create a feed list",
+                "tags": [
+                    "feed-lists"
+                ]
+            }
+        },
+        "/api/v1/feed-lists/discover": {
+            "get": {
+                "operationId": "discover-feed-lists",
+                "parameters": [
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "limit",
+                        "schema": {
+                            "default": 24,
+                            "format": "int64",
+                            "maximum": 100,
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "offset",
+                        "schema": {
+                            "default": 0,
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/FeedList"
+                                    },
+                                    "type": [
+                                        "array",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Discover public feed lists",
+                "tags": [
+                    "feed-lists"
+                ]
+            }
+        },
+        "/api/v1/feed-lists/followed": {
+            "get": {
+                "operationId": "list-followed-feed-lists",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/FeedList"
+                                    },
+                                    "type": [
+                                        "array",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "List feed lists I follow",
+                "tags": [
+                    "feed-lists"
+                ]
+            }
+        },
+        "/api/v1/feed-lists/{listId}": {
+            "delete": {
+                "operationId": "delete-feed-list",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "listId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Delete a feed list",
+                "tags": [
+                    "feed-lists"
+                ]
+            },
+            "get": {
+                "operationId": "get-feed-list",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "listId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FeedList"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Get a feed list",
+                "tags": [
+                    "feed-lists"
+                ]
+            },
+            "patch": {
+                "operationId": "update-feed-list",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "listId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateFeedListInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FeedList"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Update a feed list",
+                "tags": [
+                    "feed-lists"
+                ]
+            }
+        },
+        "/api/v1/feed-lists/{listId}/feeds": {
+            "post": {
+                "operationId": "add-feed-list-feed",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "listId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AddFeedListFeedInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FeedListFeed"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Add a feed to a feed list",
+                "tags": [
+                    "feed-lists"
+                ]
+            }
+        },
+        "/api/v1/feed-lists/{listId}/feeds/{itemId}": {
+            "delete": {
+                "operationId": "remove-feed-list-feed",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "listId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "name": "itemId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Remove a feed from a feed list",
+                "tags": [
+                    "feed-lists"
+                ]
+            }
+        },
+        "/api/v1/feed-lists/{listId}/follow": {
+            "delete": {
+                "operationId": "unfollow-feed-list",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "listId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Unfollow a feed list",
+                "tags": [
+                    "feed-lists"
+                ]
+            },
+            "post": {
+                "operationId": "follow-feed-list",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "listId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Follow a feed list",
+                "tags": [
+                    "feed-lists"
+                ]
+            }
+        },
+        "/api/v1/feed-lists/{listId}/import": {
+            "post": {
+                "operationId": "import-feed-list",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "listId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Import-feed-listResponse"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Subscribe to all feeds in a feed list",
+                "tags": [
+                    "feed-lists"
+                ]
+            }
+        },
+        "/api/v1/feeds": {
+            "get": {
+                "operationId": "list-feeds",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/Feed"
+                                    },
+                                    "type": [
+                                        "array",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "List feeds",
+                "tags": [
+                    "feeds"
+                ]
+            },
+            "post": {
+                "operationId": "create-feed",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateFeedInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Feed"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Subscribe to a feed",
+                "tags": [
+                    "feeds"
+                ]
+            }
+        },
+        "/api/v1/feeds/preview": {
+            "post": {
+                "description": "Fetches and parses a feed URL, returning feed metadata and recent entries without persisting anything.",
+                "operationId": "preview-feed",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PreviewFeedInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PreviewFeedBody"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Preview a feed without subscribing",
+                "tags": [
+                    "feeds"
+                ]
+            }
+        },
+        "/api/v1/feeds/{feedId}": {
+            "delete": {
+                "operationId": "delete-feed",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "feedId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Delete a feed",
+                "tags": [
+                    "feeds"
+                ]
+            },
+            "get": {
+                "operationId": "get-feed",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "feedId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Feed"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Get a feed",
+                "tags": [
+                    "feeds"
+                ]
+            },
+            "patch": {
+                "description": "Update the folder assignment and/or title of a feed.",
+                "operationId": "update-feed",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "feedId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateFeedInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Feed"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Update a feed",
+                "tags": [
+                    "feeds"
+                ]
+            }
+        },
+        "/api/v1/feeds/{feedId}/mark-all-read": {
+            "post": {
+                "operationId": "mark-feed-read",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "feedId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Mark all entries in a feed as read",
+                "tags": [
+                    "feeds"
+                ]
+            }
+        },
+        "/api/v1/feeds/{feedId}/refresh": {
+            "post": {
+                "description": "Manually fetch and parse the feed, inserting any new entries. Use this to get the latest articles without waiting for the scheduler.",
+                "operationId": "refresh-feed",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "feedId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Feed"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Refresh a feed",
+                "tags": [
+                    "feeds"
+                ]
+            }
+        },
+        "/api/v1/folders": {
+            "get": {
+                "operationId": "list-folders",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/Folder"
+                                    },
+                                    "type": [
+                                        "array",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "List folders",
+                "tags": [
+                    "folders"
+                ]
+            },
+            "post": {
+                "operationId": "create-folder",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateFolderInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Folder"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Create a folder",
+                "tags": [
+                    "folders"
+                ]
+            }
+        },
+        "/api/v1/folders/{folderId}": {
+            "delete": {
+                "operationId": "delete-folder",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "folderId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Delete a folder",
+                "tags": [
+                    "folders"
+                ]
+            },
+            "patch": {
+                "description": "Update the title and/or parent folder of a folder. Set parent_id to move or nest the folder.",
+                "operationId": "update-folder",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "folderId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateFolderInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Folder"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Update a folder",
+                "tags": [
+                    "folders"
+                ]
+            }
+        },
+        "/api/v1/health": {
+            "get": {
+                "operationId": "health",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HealthResponse"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Health check",
+                "tags": [
+                    "health"
+                ]
+            }
+        },
+        "/api/v1/me": {
+            "get": {
+                "operationId": "get-me",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Get current user",
+                "tags": [
+                    "users"
+                ]
+            }
+        },
+        "/api/v1/opml/export": {
+            "get": {
+                "description": "Returns all feed subscriptions and folders as an OPML XML document.",
+                "operationId": "export-opml",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "contentEncoding": "base64",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Export feeds as OPML",
+                "tags": [
+                    "opml"
+                ]
+            }
+        },
+        "/api/v1/opml/import": {
+            "post": {
+                "description": "Parses an OPML XML document and subscribes the user to all feeds found. Folders are created as needed. Existing subscriptions are skipped.",
+                "operationId": "import-opml",
+                "requestBody": {
+                    "content": {
+                        "application/octet-stream": {
+                            "schema": {
+                                "contentMediaType": "application/octet-stream",
+                                "format": "binary",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OPMLImportResultBody"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Import feeds from an OPML file",
+                "tags": [
+                    "opml"
+                ]
+            }
+        },
+        "/api/v1/tokens": {
+            "get": {
+                "operationId": "list-tokens",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/APIToken"
+                                    },
+                                    "type": [
+                                        "array",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "List API tokens",
+                "tags": [
+                    "tokens"
+                ]
+            },
+            "post": {
+                "operationId": "create-token",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateTokenInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenOutputBody"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Create an API token",
+                "tags": [
+                    "tokens"
+                ]
+            }
+        },
+        "/api/v1/tokens/{tokenId}": {
+            "delete": {
+                "operationId": "delete-token",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "tokenId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Delete an API token",
+                "tags": [
+                    "tokens"
+                ]
+            }
+        }
+    },
+    "servers": [
+        {
+            "url": "/api"
+        }
+    ],
+    "tags": [
+        {
+            "description": "Feed subscriptions",
+            "name": "feeds"
+        },
+        {
+            "description": "Feed entries/articles",
+            "name": "entries"
+        },
+        {
+            "description": "Feed folders",
+            "name": "folders"
+        },
+        {
+            "description": "User accounts",
+            "name": "users"
+        },
+        {
+            "description": "API tokens",
+            "name": "tokens"
+        },
+        {
+            "description": "OPML import/export",
+            "name": "opml"
+        },
+        {
+            "description": "Shareable feed list collections",
+            "name": "feed-lists"
+        },
+        {
+            "description": "Device-flow login (CLI/TUI)",
+            "name": "device"
+        }
+    ]
+}
