@@ -201,14 +201,18 @@ function FolderNode({
               transition={{ duration: 0.15 }}
               className="absolute inset-0"
             >
-              <FolderOpen className={cn("size-3.5", active ? "text-primary" : "text-muted-foreground")} />
+              <FolderOpen
+                className={cn("size-3.5 ml-0.5", active ? "text-primary" : "text-muted-foreground")}
+              />
             </motion.span>
             <motion.span
               animate={{ opacity: open ? 0 : 1 }}
               transition={{ duration: 0.15 }}
               className="absolute inset-0"
             >
-              <FolderIcon className={cn("size-3.5", active ? "text-primary" : "text-muted-foreground")} />
+              <FolderIcon
+                className={cn("size-3.5 ml-0.5", active ? "text-primary" : "text-muted-foreground")}
+              />
             </motion.span>
           </span>
           <span className="truncate">{folder.title}</span>
@@ -260,7 +264,10 @@ function FolderNode({
                     depth={depth + 1}
                   />
                 ) : (
-                  <div key={`feed-${child.feed.id}`} style={{ paddingLeft: `${(depth + 1) * 16}px` }}>
+                  <div
+                    key={`feed-${child.feed.id}`}
+                    style={{ paddingLeft: `${(depth + 1) * 16}px` }}
+                  >
                     <FeedNode
                       feed={child.feed}
                       onDragStart={(e, feedId) => onDragStart(e, { kind: "feed", id: feedId })}
