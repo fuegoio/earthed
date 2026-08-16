@@ -7,6 +7,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/fuegoio/planetary/go/sdk/planetary"
 )
 
 // Update handles messages and keyboard input.
@@ -51,7 +52,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.entries = msg.entries
 		m.entriesCursor = 0
 		m.entriesOffset = 0
-		m.showEntry = false
 		m.err = ""
 		return m, nil
 
@@ -59,11 +59,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if msg.err == nil {
 			for i, e := range m.entries {
 				if e.Id == msg.entryID {
-					m.entries[i].Status = "read"
+					m.entries[i].Status = string(msg.status)
 				}
-			}
-			if m.current.Id == msg.entryID {
-				m.current.Status = "read"
 			}
 		}
 		return m, nil
@@ -74,9 +71,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if e.Id == msg.entryID {
 					m.entries[i].Starred = msg.starred
 				}
-			}
-			if m.current.Id == msg.entryID {
-				m.current.Starred = msg.starred
 			}
 		}
 		return m, nil
@@ -94,9 +88,7 @@ func (m Model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case "ctrl+c":
 		return m, tea.Quit
 	case "q":
-		if !m.showEntry {
-			return m, tea.Quit
-		}
+		return m, tea.Quit
 	case "r":
 		m.loading = true
 		return m, tea.Batch(loadFeeds(m.client), loadFolders(m.client))
@@ -130,24 +122,18 @@ func (m Model) handleSidebarKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		m.focus = focusEntries
 		m.loading = true
 		m.entries = nil
-		m.showEntry = false
 		return m, loadEntriesByParams(m.client, entriesParamsForItem(m.items[m.sidebarCursor]))
 	}
 	// If the cursor moved, refresh the entry panel for the new selection.
 	if m.sidebarCursor != prev && len(m.items) > 0 {
 		m.loading = true
 		m.entries = nil
-		m.showEntry = false
 		return m, loadEntriesByParams(m.client, entriesParamsForItem(m.items[m.sidebarCursor]))
 	}
 	return m, nil
 }
 
 func (m Model) handleEntriesKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
-	if m.showEntry {
-		return m.handleEntryDetailKey(msg)
-	}
-
 	switch msg.String() {
 	case "up", "k":
 		if m.entriesCursor > 0 {
@@ -167,20 +153,32 @@ func (m Model) handleEntriesKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case "ctrl+u":
 		pageSize := m.entriesPageSize()
 		m.entriesCursor = max(m.entriesCursor-pageSize/2, 0)
-	case "enter", "l", "right":
+	case "enter", "o":
+		// Open in browser and mark as read.
 		if len(m.entries) == 0 {
 			return m, nil
 		}
 		entry := m.entries[m.entriesCursor]
-		m.current = entry
 		var cmds []tea.Cmd
 		if entry.Status != "read" {
-			cmds = append(cmds, markRead(m.client, entry.Id))
+			cmds = append(cmds, setEntryStatus(m.client, entry.Id, planetary.UpdateEntriesRequestStatusRead))
 		}
 		cmds = append(cmds, openURL(entry.Url))
-		m.showEntry = true
+		m.clampEntriesOffset()
 		return m, tea.Batch(cmds...)
+	case "u":
+		// Toggle read / unread.
+		if len(m.entries) == 0 {
+			return m, nil
+		}
+		entry := m.entries[m.entriesCursor]
+		newStatus := planetary.UpdateEntriesRequestStatusRead
+		if entry.Status == "read" {
+			newStatus = planetary.UpdateEntriesRequestStatusUnread
+		}
+		return m, setEntryStatus(m.client, entry.Id, newStatus)
 	case "s":
+		// Toggle star.
 		if len(m.entries) == 0 {
 			return m, nil
 		}
@@ -188,23 +186,10 @@ func (m Model) handleEntriesKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return m, toggleStar(m.client, entry.Id, !entry.Starred)
 	case "esc", "h", "left":
 		m.focus = focusSidebar
-		m.showEntry = false
 	case "q":
 		return m, tea.Quit
 	}
 	m.clampEntriesOffset()
-	return m, nil
-}
-
-func (m Model) handleEntryDetailKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
-	switch msg.String() {
-	case "esc", "h", "left", "backspace", "q":
-		m.showEntry = false
-	case "s":
-		return m, toggleStar(m.client, m.current.Id, !m.current.Starred)
-	case "o":
-		return m, openURL(m.current.Url)
-	}
 	return m, nil
 }
 
@@ -374,8 +359,6 @@ func (m Model) renderMainLines() []string {
 	var content string
 	if m.loading {
 		content = dimStyle.Render("  Loading…")
-	} else if m.showEntry {
-		content = m.renderEntryDetail(mainWidth)
 	} else {
 		content = m.renderEntryList(mainWidth)
 	}
@@ -489,104 +472,11 @@ func (m Model) renderEntryList(width int) string {
 	if m.focus == focusSidebar {
 		helpText = "j/k navigate · l open list · q quit"
 	} else {
-		helpText = "j/k navigate · ^d/^u half-page · g/G top/bottom · enter open · s star · h sidebar · q quit"
+		helpText = "j/k · ^d/^u · g/G · enter/o open · u read/unread · s star · h sidebar · q quit"
 	}
 	sb.WriteString("\n" + helpStyle.Render(helpText))
 
 	return sb.String()
-}
-
-func (m Model) renderEntryDetail(width int) string {
-	e := m.current
-	var sb strings.Builder
-
-	sb.WriteString("\n")
-	sb.WriteString(headerStyle.Render(truncate(e.Title, width-4)))
-	sb.WriteString("\n\n")
-
-	meta := ""
-	if e.Author != nil && *e.Author != "" {
-		meta += "by " + *e.Author + "  "
-	}
-	meta += e.PublishedAt.Format("2006-01-02 15:04")
-	if e.Starred {
-		meta += "  " + starStyle.Render("★ starred")
-	} else {
-		meta += "  " + mutedStyle.Render("☆ not starred")
-	}
-	sb.WriteString(dimStyle.Render("  "+meta) + "\n")
-	sb.WriteString(dimStyle.Render("  "+truncate(e.Url, width-4)) + "\n\n")
-	sb.WriteString(strings.Repeat("─", width) + "\n\n")
-
-	content := ""
-	if e.Description != nil {
-		content = *e.Description
-	}
-	content = stripTags(content)
-	content = wordWrap(content, width-4)
-	if len(content) > 4000 {
-		content = content[:4000] + "\n\n[truncated]"
-	}
-
-	// indent body
-	for _, line := range strings.Split(content, "\n") {
-		sb.WriteString("  " + line + "\n")
-	}
-
-	sb.WriteString("\n" + helpStyle.Render("esc/h back · o open in browser · s toggle star"))
-	return sb.String()
-}
-
-// stripTags removes HTML tags for plain-text display.
-func stripTags(s string) string {
-	var out strings.Builder
-	inTag := false
-	for _, r := range s {
-		switch {
-		case r == '<':
-			inTag = true
-		case r == '>':
-			inTag = false
-		case !inTag:
-			out.WriteRune(r)
-		}
-	}
-	result := out.String()
-	for strings.Contains(result, "\n\n\n") {
-		result = strings.ReplaceAll(result, "\n\n\n", "\n\n")
-	}
-	return strings.TrimSpace(result)
-}
-
-// wordWrap wraps long lines to width columns.
-func wordWrap(s string, width int) string {
-	if width <= 0 {
-		return s
-	}
-	var out strings.Builder
-	for _, para := range strings.Split(s, "\n") {
-		if para == "" {
-			out.WriteString("\n")
-			continue
-		}
-		words := strings.Fields(para)
-		col := 0
-		for _, w := range words {
-			wl := utf8.RuneCountInString(w)
-			if col == 0 {
-				out.WriteString(w)
-				col = wl
-			} else if col+1+wl > width {
-				out.WriteString("\n" + w)
-				col = wl
-			} else {
-				out.WriteString(" " + w)
-				col += 1 + wl
-			}
-		}
-		out.WriteString("\n")
-	}
-	return strings.TrimRight(out.String(), "\n")
 }
 
 func max(a, b int) int {

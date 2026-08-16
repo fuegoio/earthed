@@ -61,8 +61,6 @@ type Model struct {
 	entries       []planetary.Entry
 	entriesCursor int
 	entriesOffset int // index of first visible entry (scroll offset)
-	showEntry     bool
-	current       planetary.Entry
 }
 
 // ---- styles ----------------------------------------------------------------
@@ -146,6 +144,7 @@ type loadEntriesMsg struct {
 
 type markReadMsg struct {
 	entryID int64
+	status  planetary.UpdateEntriesRequestStatus
 	err     error
 }
 
@@ -199,14 +198,14 @@ func loadEntriesByParams(client *planetary.ClientWithResponses, params *planetar
 	}
 }
 
-func markRead(client *planetary.ClientWithResponses, entryID int64) tea.Cmd {
+func setEntryStatus(client *planetary.ClientWithResponses, entryID int64, status planetary.UpdateEntriesRequestStatus) tea.Cmd {
 	return func() tea.Msg {
 		ids := []int64{entryID}
 		_, err := client.UpdateEntriesWithResponse(context.Background(), planetary.UpdateEntriesRequest{
 			EntryIds: &ids,
-			Status:   planetary.UpdateEntriesRequestStatusRead,
+			Status:   status,
 		})
-		return markReadMsg{entryID: entryID, err: err}
+		return markReadMsg{entryID: entryID, status: status, err: err}
 	}
 }
 
