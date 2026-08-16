@@ -3,14 +3,22 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Dialog } from "@base-ui/react/dialog";
 import { Loader2, Pencil } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@workspace/ui/components/dialog";
 import { getClient, updateFeed } from "@/lib/planetary";
 import { getApiErrorMessage } from "@/lib/errors";
-import { cn } from "@workspace/ui/lib/utils";
 import type { Feed } from "@/lib/types";
 
 /**
@@ -55,8 +63,8 @@ export function FeedRenameDialog({ feed }: { feed: Feed }) {
   }
 
   return (
-    <Dialog.Root open={open} onOpenChange={handleOpenChange}>
-      <Dialog.Trigger
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogTrigger
         render={
           <Button
             variant="ghost"
@@ -68,48 +76,38 @@ export function FeedRenameDialog({ feed }: { feed: Feed }) {
           </Button>
         }
       />
-      <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/50" />
-        <Dialog.Popup
-          className={cn(
-            "fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2",
-            "rounded-lg border border-border bg-popover p-6 shadow-lg",
-          )}
-        >
-          <Dialog.Title className="font-serif text-lg font-bold tracking-normal">
-            Rename feed
-          </Dialog.Title>
-          <Dialog.Description className="mt-1 text-sm text-muted-foreground">
-            Give this feed a custom display name.
-          </Dialog.Description>
-          <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="feed-title">Name</Label>
-              <Input
-                id="feed-title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Feed name"
-                autoFocus
-                autoComplete="off"
-              />
-            </div>
-            <div className="flex justify-end gap-2 pt-2">
-              <Dialog.Close
-                render={
-                  <Button variant="ghost" type="button" disabled={pending}>
-                    Cancel
-                  </Button>
-                }
-              />
-              <Button type="submit" disabled={pending || !title.trim()}>
-                {pending && <Loader2 className="size-4 animate-spin" />}
-                Save
-              </Button>
-            </div>
-          </form>
-        </Dialog.Popup>
-      </Dialog.Portal>
-    </Dialog.Root>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Rename feed</DialogTitle>
+          <DialogDescription>Give this feed a custom display name.</DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="feed-title">Name</Label>
+            <Input
+              id="feed-title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Feed name"
+              autoFocus
+              autoComplete="off"
+            />
+          </div>
+          <DialogFooter>
+            <DialogClose
+              render={
+                <Button variant="ghost" type="button" disabled={pending}>
+                  Cancel
+                </Button>
+              }
+            />
+            <Button type="submit" disabled={pending || !title.trim()}>
+              {pending && <Loader2 className="size-4 animate-spin" />}
+              Save
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
