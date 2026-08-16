@@ -1,27 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import {
-  LayoutList,
-  Circle,
-  Star,
-  Plus,
-  ListChecks,
-  LogOut,
-  Key,
-  FileDown,
-  Upload,
-  Sun,
-  Moon,
-} from "lucide-react";
-import { useTheme } from "next-themes";
+import { LayoutList, Circle, Star, Plus, ListChecks, Settings } from "lucide-react";
 import { Menu } from "@base-ui/react/menu";
 import { Avatar } from "@base-ui/react/avatar";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { getClient, listFeeds, listFolders, unwrap } from "@/lib/planetary";
-import { signout } from "@/lib/auth";
 import { Logo } from "@/components/logo";
 import { OfflineBadge } from "@/components/offline-badge";
 import { FeedTree } from "@/components/feed-tree";
@@ -75,17 +61,6 @@ function SidebarNav() {
 }
 
 export function AccountButton({ userEmail }: { userEmail: string }) {
-  const router = useRouter();
-  const { resolvedTheme, setTheme } = useTheme();
-
-  async function handleSignout() {
-    await signout();
-    router.push("/login");
-    router.refresh();
-  }
-
-  const isDark = resolvedTheme === "dark";
-
   const menuItemClass = cn(
     "flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm",
     "hover:bg-accent hover:text-accent-foreground transition-colors",
@@ -117,44 +92,9 @@ export function AccountButton({ userEmail }: { userEmail: string }) {
           side="top"
         >
           <Menu.Popup>
-            <div className="px-2 py-1.5">
-              <p className="text-sm font-medium truncate">{userEmail}</p>
-            </div>
-            <div className="my-1 h-px bg-border" />
-            <Menu.Item className={menuItemClass} render={<Link href="/settings/tokens" />}>
-              <Key className="size-4" />
-              API tokens
-            </Menu.Item>
-            <div className="my-1 h-px bg-border" />
-            <Menu.Item className={menuItemClass} render={<Link href="/settings/opml" />}>
-              <Upload className="size-4" />
-              Import OPML
-            </Menu.Item>
-            <Menu.Item className={menuItemClass} render={<Link href="/settings/opml" />}>
-              <FileDown className="size-4" />
-              Export OPML
-            </Menu.Item>
-            <div className="my-1 h-px bg-border" />
-            <Menu.Item
-              className={menuItemClass}
-              onClick={() => setTheme(isDark ? "light" : "dark")}
-            >
-              {isDark ? (
-                <>
-                  <Sun className="size-4" />
-                  Light mode
-                </>
-              ) : (
-                <>
-                  <Moon className="size-4" />
-                  Dark mode
-                </>
-              )}
-            </Menu.Item>
-            <div className="my-1 h-px bg-border" />
-            <Menu.Item className={menuItemClass} onClick={handleSignout}>
-              <LogOut className="size-4" />
-              Sign out
+            <Menu.Item className={menuItemClass} render={<Link href="/settings" />}>
+              <Settings className="size-4" />
+              Settings
             </Menu.Item>
           </Menu.Popup>
         </Menu.Positioner>
