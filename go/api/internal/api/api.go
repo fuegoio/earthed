@@ -102,6 +102,13 @@ type MeOutput struct {
 	Body store.User
 }
 
+type UpdateMeInput struct {
+	Body struct {
+		FirstName string `json:"first_name" maxLength:"255"`
+		Email     string `json:"email" format:"email" minLength:"1" maxLength:"255"`
+	}
+}
+
 func (a *API) registerMeRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "get-me",
@@ -119,6 +126,38 @@ func (a *API) registerMeRoutes() {
 			return nil, huma.Error404NotFound("user not found")
 		}
 		return &MeOutput{Body: *user}, nil
+	})
+
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "update-me",
+		Method:      http.MethodPatch,
+		Path:        "/api/v1/me",
+		Summary:     "Update current user profile",
+		Tags:        []string{"users"},
+	}, func(ctx context.Context, input *UpdateMeInput) (*MeOutput, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		user, err := a.store.UpdateUser(ctx, userID, input.Body.FirstName, input.Body.Email)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(fmt.Errorf("update user: %w", err).Error())
+		}
+		if user == nil {
+			return nil, huma.Error404NotFound("user not found")
+		}
+		return &MeOutput{Body: *user}, nil
+	})
+
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "delete-me",
+		Method:      http.MethodDelete,
+		Path:        "/api/v1/me",
+		Summary:     "Delete current user account",
+		Tags:        []string{"users"},
+	}, func(ctx context.Context, _ *struct{}) (*struct{}, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		if err := a.store.DeleteUser(ctx, userID); err != nil {
+			return nil, huma.Error500InternalServerError(fmt.Errorf("delete user: %w", err).Error())
+		}
+		return nil, nil
 	})
 }
 

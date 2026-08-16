@@ -647,6 +647,29 @@ func (s *Store) PurgeExpiredDeviceCodes(ctx context.Context, retention time.Dura
 
 // --- Users (Limen-managed table, read-only from here) ---
 
+// UpdateUser updates the first_name and email of the user with the given id.
+func (s *Store) UpdateUser(ctx context.Context, id int, firstName, email string) (*User, error) {
+	var u User
+	err := s.DB.QueryRowContext(ctx,
+		`UPDATE users SET first_name = $2, email = $3 WHERE id = $1
+		 RETURNING id, email, COALESCE(first_name, ''), false, created_at`,
+		id, firstName, email,
+	).Scan(&u.ID, &u.Email, &u.FirstName, &u.IsAdmin, &u.CreatedAt)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &u, nil
+}
+
+// DeleteUser deletes the user with the given id and all their associated data.
+func (s *Store) DeleteUser(ctx context.Context, id int) error {
+	_, err := s.DB.ExecContext(ctx, `DELETE FROM users WHERE id = $1`, id)
+	return err
+}
+
 // GetUserByID returns the user with the given id, or nil.
 func (s *Store) GetUserByID(ctx context.Context, id int) (*User, error) {
 	var u User

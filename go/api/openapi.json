@@ -1202,6 +1202,35 @@
                 ],
                 "type": "object"
             },
+            "UpdateMeInputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "/api/schemas/UpdateMeInputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "email": {
+                        "format": "email",
+                        "maxLength": 255,
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "first_name": {
+                        "maxLength": 255,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "first_name",
+                    "email"
+                ],
+                "type": "object"
+            },
             "User": {
                 "additionalProperties": false,
                 "properties": {
@@ -2649,6 +2678,28 @@
             }
         },
         "/api/v1/me": {
+            "delete": {
+                "operationId": "delete-me",
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Delete current user account",
+                "tags": [
+                    "users"
+                ]
+            },
             "get": {
                 "operationId": "get-me",
                 "responses": {
@@ -2674,6 +2725,45 @@
                     }
                 },
                 "summary": "Get current user",
+                "tags": [
+                    "users"
+                ]
+            },
+            "patch": {
+                "operationId": "update-me",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateMeInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Update current user profile",
                 "tags": [
                     "users"
                 ]
