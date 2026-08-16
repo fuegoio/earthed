@@ -71,28 +71,31 @@ export const WithIcon: Story = {
 };
 
 /**
- * Primary-button contrast explorations. The "current" token pairing is
- * `--primary: oklch(0.80 0.19 39)` (bright "sun" orange) with a near-black
- * `--primary-foreground: oklch(0.15 0.01 79)`. It passes WCAG AAA on luminance
- * (~8.5:1) but reads as a construction-sign pairing — heavy and industrial.
- *
- * Each option below is the real Button with its colors overridden via
- * arbitrary-value classes (twMerge lets later bg/text utilities win).
- * Ratios are measured against the light theme; switch the Theme toolbar to
- * see how each option carries into dark mode (most of these are light-only
- * explorations — a dark-mode pass would derive a paired value per option).
+ * Primary-button contrast explorations. The default button now uses
+ * `--foreground` on `--background` (black on white in light, inverse in dark),
+ * which clears AAA in both directions. The alternatives below explore using
+ * the brand sun color as the primary button fill instead — each is the real
+ * Button with its colors overridden via arbitrary-value classes (twMerge lets
+ * later bg/text utilities win). Ratios are measured against the light theme;
+ * switch the Theme toolbar to see how each carries into dark mode.
  */
 export const ContrastProposals: Story = {
   render: () => (
     <div className="flex flex-col gap-8">
       <Proposal
-        label="Current"
+        label="Default (foreground/background)"
+        description="Black bg + white text in light, inverse in dark. Neutral, high-contrast, no brand color."
+        ratio="19.68:1 (AAA)"
+        className="bg-foreground text-background hover:bg-foreground/90"
+      />
+      <Proposal
+        label="Original primary"
         description="Bright sun + near-black. ~8.5:1 (AAA), but reads heavy/industrial."
         ratio="8.54:1"
         className="bg-primary text-primary-foreground hover:bg-primary/80"
       />
       <Proposal
-        label="A · Solid sun + white (recommended)"
+        label="A · Solid sun + white"
         description="Same sun, one stop darker, white type. Clean confident CTA, preserves brand hue."
         ratio="4.66:1 (AA)"
         className="bg-[oklch(0.58_0.19_39)] text-[oklch(0.99_0.005_79)] hover:bg-[oklch(0.52_0.19_39)]"
