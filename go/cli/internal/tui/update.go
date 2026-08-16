@@ -267,6 +267,7 @@ func (m Model) renderSidebarLines() []string {
 	for i, item := range m.items {
 		// Emit the "FEEDS" section label before the first feed or folder.
 		if !feedsLabelShown && (item.kind == sidebarFeed || item.kind == sidebarFolder) {
+			addLine("")
 			label := padRight(" FEEDS", innerWidth)
 			addLine(sectionLabelStyle.Render(label))
 			feedsLabelShown = true
