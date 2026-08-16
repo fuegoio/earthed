@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Link from "next/link";
 import { useInfiniteQuery, useQuery, type InfiniteData } from "@tanstack/react-query";
 import { Users } from "lucide-react";
 import { SharedArticleCard } from "@/components/shared-article-card";
@@ -25,7 +24,7 @@ export default function SocialPage() {
     queryFn: async () => unwrap(listFollowing({ client: await getClient() })),
   });
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, error } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery<
       SharedArticle[],
       Error,
