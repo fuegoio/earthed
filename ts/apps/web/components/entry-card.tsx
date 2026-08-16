@@ -4,6 +4,7 @@ import { useState, useOptimistic, startTransition } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { motion } from "motion/react";
+import { MessageSquare } from "lucide-react";
 import { StarToggle } from "@/components/star-toggle";
 import { FeedIcon } from "@/components/feed-icon";
 import { getClient, updateEntries } from "@/lib/planetary";
@@ -138,6 +139,17 @@ export function EntryCard({
         </p>
       </div>
       <div className="flex shrink-0 items-start gap-0.5" onClick={(e) => e.stopPropagation()}>
+        {entry.comments_url && (
+          <a
+            href={entry.comments_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="View comments"
+            className="flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+          >
+            <MessageSquare className="size-3.5" />
+          </a>
+        )}
         <StarToggle entryId={entry.id} starred={entry.starred} size="icon-sm" />
       </div>
     </motion.a>
