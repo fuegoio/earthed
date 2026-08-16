@@ -1,7 +1,6 @@
 "use client";
 
 import { use } from "react";
-import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Users, ExternalLink, UserCheck, UserPlus } from "lucide-react";
 import { Avatar } from "@base-ui/react/avatar";
