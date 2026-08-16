@@ -77,8 +77,7 @@ var (
 			Padding(0, 1)
 
 	selectedStyle = lipgloss.NewStyle().
-			Background(lipgloss.Color("237")).
-			Foreground(lipgloss.Color("255")).
+			Foreground(lipgloss.Color("245")).
 			Bold(true)
 
 	selectedFocusStyle = lipgloss.NewStyle().
@@ -115,7 +114,7 @@ var (
 func NewModel(client *planetary.ClientWithResponses) Model {
 	return Model{
 		client: client,
-		focus:  focusSidebar,
+		focus:  focusEntries,
 	}
 }
 
