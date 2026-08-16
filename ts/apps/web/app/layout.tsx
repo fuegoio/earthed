@@ -27,7 +27,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#fff7ee",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fffffd" },
+    { media: "(prefers-color-scheme: dark)", color: "#1a1815" },
+  ],
 };
 
 const ibmPlexSans = IBM_Plex_Sans({
