@@ -128,11 +128,9 @@ export function EntryCard({
         >
           {entry.title || "Untitled"}
         </h3>
-        {snippet ? (
-          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{snippet}</p>
-        ) : (
-          <div className="mt-1 h-10" aria-hidden />
-        )}
+        <p className="mt-1 line-clamp-2 min-h-[2.5rem] text-sm text-muted-foreground">
+          {snippet}
+        </p>
       </div>
       <div className="flex shrink-0 items-start gap-0.5" onClick={(e) => e.stopPropagation()}>
         <StarToggle entryId={entry.id} starred={entry.starred} size="icon-sm" />
