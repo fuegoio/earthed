@@ -265,9 +265,8 @@ export function FeedListDetail({
               </Button>
               <ConfirmDialog
                 trigger={
-                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive hover:bg-destructive/10">
+                  <Button variant="ghost" size="icon-sm" className="text-muted-foreground" aria-label="Delete feed list">
                     <Trash2 className="size-3.5" />
-                    Delete
                   </Button>
                 }
                 title="Delete feed list?"

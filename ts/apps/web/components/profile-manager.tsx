@@ -186,7 +186,7 @@ function DangerZone({ userEmail }: { userEmail: string }) {
       <div className="mt-4">
         <ConfirmDialog
           trigger={
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive hover:bg-destructive/10">
+            <Button variant="ghost" size="sm" className="text-muted-foreground">
               Delete account
             </Button>
           }

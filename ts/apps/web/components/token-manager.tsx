@@ -143,7 +143,7 @@ export function TokenManager() {
               </div>
               <ConfirmDialog
                 trigger={
-                  <Button variant="ghost" size="icon-sm" className="text-muted-foreground hover:text-destructive hover:bg-destructive/10">
+                  <Button variant="ghost" size="icon-sm" className="text-muted-foreground" aria-label="Delete token">
                     <Trash2 className="size-3.5" />
                   </Button>
                 }
