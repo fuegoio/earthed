@@ -89,6 +89,8 @@ export function EntryCard({
       onClick={handleClick}
       initial={staggerIndex !== undefined ? { opacity: 0, y: 5 } : false}
       animate={{ opacity: unread ? 1 : 0.6, y: 0 }}
+      // "row-hover" variant propagates to child motion elements that declare it.
+      whileHover="row-hover"
       transition={{
         opacity: { duration: 0.3, ease: EASE },
         y: { duration: 0.22, ease: EASE, delay: staggerIndex !== undefined ? staggerIndex * 0.03 : 0 },
@@ -109,7 +111,10 @@ export function EntryCard({
             opacity: unread ? 1 : 0,
             backgroundColor: unread ? "var(--color-primary)" : "var(--color-muted-foreground)",
           }}
-          transition={{ duration: 0.2, ease: EASE }}
+          // When the row is hovered and the entry is read, show a ghost dot
+          // so users know they can click to mark it unread again.
+          variants={unread ? undefined : { "row-hover": { scale: 1, opacity: 0.4 } }}
+          transition={{ duration: 0.15, ease: EASE }}
           className="size-2 rounded-full"
         />
       </button>
