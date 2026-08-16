@@ -1,14 +1,30 @@
 import { source } from "@/lib/source";
+import { openapi } from "@/lib/openapi";
+import { OpenAPIPage } from "@/components/api-page";
 import { getMDXComponents } from "@/components/mdx";
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from "fumadocs-ui/page";
 import { notFound } from "next/navigation";
 
-const ROOT = "product";
+const ROOT = "openapi";
 
 export default async function Page({ params }: { params: Promise<{ slug?: string[] }> }) {
   const { slug } = await params;
   const page = source.getPage(slug ? [ROOT, ...slug] : [ROOT]);
-  if (!page || page.type === "openapi") notFound();
+  if (!page) notFound();
+
+  if (page.type === "openapi") {
+    return (
+      <DocsPage full>
+        <DocsTitle>{page.data.title}</DocsTitle>
+        {page.data.description ? (
+          <DocsDescription>{page.data.description}</DocsDescription>
+        ) : null}
+        <DocsBody>
+          <OpenAPIPage {...page.data.getOpenAPIPageProps()} />
+        </DocsBody>
+      </DocsPage>
+    );
+  }
 
   const MDXContent = page.data.body;
 
@@ -17,7 +33,13 @@ export default async function Page({ params }: { params: Promise<{ slug?: string
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
-        <MDXContent components={getMDXComponents()} />
+        <MDXContent
+          components={getMDXComponents({
+            OpenAPIPage: async (props) => (
+              <OpenAPIPage {...(await openapi.preloadOpenAPIPage(page))} {...props} />
+            ),
+          })}
+        />
       </DocsBody>
     </DocsPage>
   );

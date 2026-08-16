@@ -1,5 +1,5 @@
 {
-  "title": "Documentation",
+  "title": "Planetary",
   "root": true,
   "pages": [
     "index",
@@ -10,8 +10,6 @@
     "feed-lists",
     "authentication",
     "cli",
-    "api-reference",
-    "self-hosting",
     "architecture"
   ]
 }
