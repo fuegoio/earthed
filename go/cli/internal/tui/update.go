@@ -256,7 +256,7 @@ func (m Model) renderSidebarLines() []string {
 	}
 
 	// Header
-	addLine(headerStyle.Render(truncate(" ☀ Planetary", innerWidth-2)))
+	addLine(headerStyle.Render(truncate("☀ Planetary", innerWidth-2)))
 	addLine(strings.Repeat("─", innerWidth))
 
 	if m.loading && len(m.items) == 0 {
@@ -275,7 +275,7 @@ func (m Model) renderSidebarLines() []string {
 		case sidebarUnread:
 			icon = "○ "
 		case sidebarStarred:
-			icon = "★ "
+			icon = "✦ "
 		case sidebarFolder:
 			icon = "▸ "
 		default:
@@ -438,7 +438,7 @@ func (m Model) renderEntryList(width int) string {
 			if e.Status == "read" {
 				dotPlain = "· "
 			}
-			starPlain := "★ "
+			starPlain := "✦ "
 			if !e.Starred {
 				starPlain = "  "
 			}
@@ -456,7 +456,7 @@ func (m Model) renderEntryList(width int) string {
 				dot := unreadDotStyle.Render("● ") // 2 visible cols
 				star := "  "
 				if e.Starred {
-					star = starStyle.Render("★ ")
+					star = starStyle.Render("✦ ")
 				}
 				t := padRight(truncate(e.Title, titleWidth), titleWidth)
 				f := padRight(truncate(feedName, feedLen), feedLen)
