@@ -118,7 +118,7 @@ func run() (int, error) {
 	humaConfig.Tags = api.OpenAPITags()
 	humaRouter := humago.New(humaMux, humaConfig)
 
-	f := fetcher.New(cfg.HTTPTimeout, cfg.HTTPMaxBody, "Planetary/1.0")
+	f := fetcher.New(cfg.HTTPTimeout, cfg.HTTPMaxBody, "Planetary")
 	apiHandler := api.New(humaRouter, st, authInst, cfg, f)
 	apiHandler.RegisterRoutes()
 
