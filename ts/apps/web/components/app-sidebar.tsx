@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { LayoutList, Circle, Star, Plus, ListChecks, Settings } from "lucide-react";
+import { LayoutList, Circle, Star, Plus, ListChecks, Settings, LogOut } from "lucide-react";
 import { Menu } from "@base-ui/react/menu";
 import { Avatar } from "@base-ui/react/avatar";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { getClient, listFeeds, listFolders, unwrap } from "@/lib/planetary";
+import { signout } from "@/lib/auth";
 import { Logo } from "@/components/logo";
 import { OfflineBadge } from "@/components/offline-badge";
 import { FeedTree } from "@/components/feed-tree";
@@ -61,6 +62,14 @@ function SidebarNav() {
 }
 
 export function AccountButton({ userEmail }: { userEmail: string }) {
+  const router = useRouter();
+
+  async function handleSignout() {
+    await signout();
+    router.push("/login");
+    router.refresh();
+  }
+
   const menuItemClass = cn(
     "flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm",
     "hover:bg-accent hover:text-accent-foreground transition-colors",
@@ -95,6 +104,10 @@ export function AccountButton({ userEmail }: { userEmail: string }) {
             <Menu.Item className={menuItemClass} render={<Link href="/settings" />}>
               <Settings className="size-4" />
               Settings
+            </Menu.Item>
+            <Menu.Item className={menuItemClass} onClick={handleSignout}>
+              <LogOut className="size-4" />
+              Sign out
             </Menu.Item>
           </Menu.Popup>
         </Menu.Positioner>
