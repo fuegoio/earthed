@@ -1,0 +1,111 @@
+---
+title: Managing Feeds
+description: Subscribe to feeds, organize them with folders, and trigger manual refreshes.
+---
+
+Feeds are RSS 2.0, Atom 1.0, or JSON Feed subscriptions. Planetary fetches and parses them in the background and stores new entries automatically. See [Architecture](/docs/architecture) for how the refresh pipeline and adaptive polling work.
+
+## Subscribe to a feed
+
+Pass a feed URL or a website URL. When given a website, Planetary discovers the feed from `<link rel="alternate">` tags in the page's `<head>`:
+
+```bash
+curl -X POST http://localhost:8080/api/v1/feeds \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer pla_your-token" \
+  -d '{"feed_url":"https://blog.golang.org"}'
+```
+
+Assign to a folder at creation time with `folder_id`:
+
+```bash
+curl -X POST http://localhost:8080/api/v1/feeds \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer pla_your-token" \
+  -d '{"feed_url":"https://blog.golang.org","folder_id":2}'
+```
+
+The `site_url` and `title` fields are temporarily set to the feed URL and updated to real values after the first refresh. Duplicate subscriptions (same URL per user) return a 400 error.
+
+## Preview a feed
+
+Check what a feed contains before subscribing:
+
+```bash
+curl -X POST http://localhost:8080/api/v1/feeds/preview \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer pla_your-token" \
+  -d '{"feed_url":"https://blog.golang.org"}'
+```
+
+Returns the discovered feed URL, metadata, and the 20 most recent entries. Auto-discovery works here too.
+
+## List feeds
+
+```bash
+curl http://localhost:8080/api/v1/feeds \
+  -H "Authorization: Bearer pla_your-token"
+```
+
+Feeds are ordered by title. Each feed includes `next_check_at` and `last_fetch_at` so you can see when it was last refreshed and when the next refresh is due.
+
+## Get a single feed
+
+```bash
+curl http://localhost:8080/api/v1/feeds/1 \
+  -H "Authorization: Bearer pla_your-token"
+```
+
+## Manually refresh a feed
+
+Fetch new entries immediately without waiting for the scheduler:
+
+```bash
+curl -X POST http://localhost:8080/api/v1/feeds/1/refresh \
+  -H "Authorization: Bearer pla_your-token"
+```
+
+Returns the updated feed object.
+
+## Mark all entries as read
+
+```bash
+curl -X POST http://localhost:8080/api/v1/feeds/1/mark-all-read \
+  -H "Authorization: Bearer pla_your-token"
+```
+
+## Delete a feed
+
+Unsubscribes and permanently deletes all entries belonging to the feed.
+
+```bash
+curl -X DELETE http://localhost:8080/api/v1/feeds/1 \
+  -H "Authorization: Bearer pla_your-token"
+```
+
+## Folders
+
+Folders group feeds in the sidebar. They have no effect on entries themselves.
+
+Create a folder:
+
+```bash
+curl -X POST http://localhost:8080/api/v1/folders \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer pla_your-token" \
+  -d '{"title":"Technology"}'
+```
+
+List folders:
+
+```bash
+curl http://localhost:8080/api/v1/folders \
+  -H "Authorization: Bearer pla_your-token"
+```
+
+Delete a folder — feeds inside it become ungrouped, not deleted:
+
+```bash
+curl -X DELETE http://localhost:8080/api/v1/folders/2 \
+  -H "Authorization: Bearer pla_your-token"
+```

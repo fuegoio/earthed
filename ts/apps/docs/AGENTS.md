@@ -8,17 +8,36 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ## Documentation conventions
 
 This directory is the docs site for Planetary. Content lives in
-`content/docs/` as MDX files.
+`content/docs/` as MDX files, split into three sections.
 
-### What belongs here
+### Sections
 
-- User-facing guides: getting started, managing feeds, reading entries.
-- API documentation and usage examples.
-- Deployment and self-hosting instructions.
+**`content/docs/product/`** — usage documentation for end users of Planetary.
+Covers what things are and how to use them: subscribing to feeds, reading
+entries, using the web UI, the CLI, feed lists, authentication. Audience: anyone
+using a running Planetary instance.
 
-### What does not belong here
+- No environment variables, no Docker, no server config.
+- No internal pipeline details (adaptive polling algorithm, sanitization
+  allowlists, request logging). Those belong in `architecture.mdx` only if they
+  directly affect user-visible behavior, but even then keep it brief.
+- If a section is about running or configuring the server, it does not belong here.
 
-- Internal implementation details, database schema, Go package layout.
+**`content/docs/self-hosting/`** — everything needed to deploy and operate
+Planetary: Docker Compose setup, all environment variables, reverse proxy config,
+database backups, log format, scheduler tuning. Audience: people running their
+own instance.
+
+- This is the only place environment variables should appear.
+- Operational details (log format, cleanup frequency, worker pool size) live here,
+  not in the product docs.
+
+**`content/docs/openapi/`** — generated API reference from `go/api/openapi.json`.
+Do not write prose here; the content is rendered from the OpenAPI spec.
+
+### What does not belong anywhere in the docs site
+
+- Internal implementation details: Go package layout, database schema, SQL queries.
 - Test instructions or internal tooling.
 
 ### Tone

@@ -1,0 +1,50 @@
+---
+title: Production
+description: Reverse proxy setup and database backups for a production Planetary deployment.
+---
+
+## Reverse proxy
+
+Neither service terminates TLS directly. Put both behind a reverse proxy (nginx, Caddy, Traefik).
+
+Example nginx configuration:
+
+```nginx
+server {
+    listen 443 ssl;
+    server_name your-domain.com;
+
+    ssl_certificate /path/to/cert.pem;
+    ssl_certificate_key /path/to/key.pem;
+
+    location /api/ {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+## Database backup
+
+All feeds, entries, folders, and feed lists are in PostgreSQL. Back it up regularly.
+
+```bash
+# Create a backup
+docker compose exec postgres pg_dump -U planetary planetary > backup.sql
+
+# Restore from a backup
+cat backup.sql | docker compose exec -T postgres psql -U planetary planetary
+```
+
+Schedule `pg_dump` with a cron job and store backups off-site for automated backups.

@@ -1,17 +1,18 @@
 {
-  "title": "Documentation",
+  "title": "Planetary",
   "root": true,
   "pages": [
     "index",
     "getting-started",
+    "---Guides---",
     "web-ui",
     "feeds",
     "entries",
     "feed-lists",
-    "authentication",
+    "---Interfaces---",
     "cli",
-    "api-reference",
-    "self-hosting",
+    "---Reference---",
+    "authentication",
     "architecture"
   ]
 }

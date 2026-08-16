@@ -1,0 +1,11 @@
+{
+  "title": "Self-Hosting",
+  "root": true,
+  "pages": [
+    "---Deployment---",
+    "index",
+    "configuration",
+    "---Operations---",
+    "production"
+  ]
+}

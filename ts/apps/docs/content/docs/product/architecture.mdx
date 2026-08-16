@@ -3,13 +3,9 @@ title: Architecture
 description: How Planetary works — feed formats, the refresh pipeline, adaptive polling, and HTML sanitization.
 ---
 
-Planetary is a self-hosted RSS reader. The API server fetches feeds,
-parses them, sanitizes the content, and stores entries in PostgreSQL.
-A background scheduler keeps everything up to date.
+The API server fetches feeds, parses them, sanitizes content, and stores entries in PostgreSQL. A background scheduler keeps everything up to date.
 
 ## Supported feed formats
-
-Planetary parses three feed formats:
 
 | Format    | Detection                                             |
 | --------- | ----------------------------------------------------- |
@@ -17,12 +13,7 @@ Planetary parses three feed formats:
 | Atom 1.0  | XML with `http://www.w3.org/2005/Atom` namespace      |
 | JSON Feed | Content-Type contains `json`, or body starts with `{` |
 
-Detection is automatic. The parser tries RSS 2.0 first (XML root
-`<rss>`), falls back to Atom 1.0, or switches to JSON Feed based on
-content type or body content.
-
-Each format is normalized into a common structure with title, link,
-content, description, author, publication date, tags, and enclosures.
+Detection is automatic — the parser tries RSS 2.0 first, falls back to Atom 1.0, or switches to JSON Feed based on the content type or body. All three formats normalize into the same structure: title, link, content, description, author, publication date, tags, and enclosures.
 
 ## The refresh pipeline
 
@@ -111,18 +102,8 @@ All other tags have their attributes stripped entirely.
 
 ### Link safety
 
-All `<a>` tags get `rel="noopener noreferrer"` enforced. URLs starting
-with `javascript:` or `data:` are blanked out.
+All `<a>` tags get `rel="noopener noreferrer"` enforced. URLs starting with `javascript:` or `data:` are blanked out.
 
 ## Full-text search
 
-Entry titles and content are indexed in PostgreSQL using a full-text
-search index. The `search` query parameter on `GET /api/v1/entries`
-runs a natural-language search against this index, allowing you to find
-entries across all your feeds.
-
-## Request logging
-
-Every HTTP request is logged with method, path, remote address, status
-code, duration, and query string. Configure the log format with
-`PLANETARY_LOG_FORMAT` (`pretty` for development, `json` for production).
+Entry titles and content are indexed in PostgreSQL. The `search` query parameter on `GET /api/v1/entries` runs an English-language full-text search against this index. See [Reading Entries](/docs/entries) for usage.

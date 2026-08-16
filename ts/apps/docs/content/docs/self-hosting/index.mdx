@@ -1,0 +1,80 @@
+---
+title: Docker Compose
+description: Deploy Planetary with Docker Compose.
+---
+
+Planetary publishes images to GitHub Container Registry on every push to `main` and every release:
+
+| Image | Registry                        |
+| ----- | ------------------------------- |
+| API   | `ghcr.io/fuegoio/planetary-api` |
+| Web   | `ghcr.io/fuegoio/planetary-web` |
+
+Tags: `latest` (main branch), `1.2.3` / `v1.2.3` (release), `1.2` (minor), `1` (major), `sha-<short>` (commit).
+
+Both containers run as a non-root user (`uid 10001`). The API listens on port 8080, the web app on port 3000.
+
+## Docker Compose
+
+```yaml
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: planetary
+      POSTGRES_PASSWORD: <db-password>
+      POSTGRES_DB: planetary
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U planetary"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    image: ghcr.io/fuegoio/planetary-api:latest
+    ports:
+      - "8080:8080"
+    environment:
+      LIMEN_SECRET: <32-byte-secret>
+      PLANETARY_DATABASE_URL: postgres://planetary:<db-password>@postgres:5432/planetary?sslmode=disable
+      PLANETARY_BASE_URL: https://api.your-domain.com
+      PLANETARY_WEB_URL: https://your-domain.com
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/api/v1/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  web:
+    image: ghcr.io/fuegoio/planetary-web:latest
+    ports:
+      - "3000:3000"
+    environment:
+      PLANETARY_API_URL: http://api:8080
+      NEXT_PUBLIC_PLANETARY_API_URL: https://api.your-domain.com
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+```
+
+Start:
+
+```bash
+docker compose up -d
+```
+
+Run database migrations on first start:
+
+```bash
+docker compose exec api /app/planetary --migrate
+```
+
+`PLANETARY_API_URL` is the server-side URL the web container uses to reach the API over the Docker network. `NEXT_PUBLIC_PLANETARY_API_URL` is baked into the browser bundle and must be publicly reachable.

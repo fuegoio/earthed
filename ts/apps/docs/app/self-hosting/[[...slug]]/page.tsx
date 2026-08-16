@@ -3,7 +3,7 @@ import { getMDXComponents } from "@/components/mdx";
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from "fumadocs-ui/page";
 import { notFound } from "next/navigation";
 
-const ROOT = "product";
+const ROOT = "self-hosting";
 
 export default async function Page({ params }: { params: Promise<{ slug?: string[] }> }) {
   const { slug } = await params;

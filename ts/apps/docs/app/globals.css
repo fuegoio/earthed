@@ -2,3 +2,4 @@
 @import "fumadocs-ui/css/shadcn.css";
 @import "@workspace/ui/tokens.css";
 @import "fumadocs-ui/css/preset.css";
+@import "fumadocs-openapi/css/preset.css";
