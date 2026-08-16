@@ -7,7 +7,13 @@ const meta: Meta<typeof Textarea> = {
   component: Textarea,
   tags: ["autodocs"],
   args: { placeholder: "Write something…" },
-  decorators: [(Story) => <div className="max-w-sm"><Story /></div>],
+  decorators: [
+    (Story) => (
+      <div className="max-w-sm">
+        <Story />
+      </div>
+    ),
+  ],
 };
 
 export default meta;
@@ -18,7 +24,9 @@ export const Default: Story = {};
 export const WithLabel: Story = {
   render: () => (
     <div className="flex flex-col gap-2">
-      <label htmlFor="bio" className="text-sm font-medium">Bio</label>
+      <label htmlFor="bio" className="text-sm font-medium">
+        Bio
+      </label>
       <Textarea id="bio" placeholder="Tell us about yourself" rows={4} />
     </div>
   ),

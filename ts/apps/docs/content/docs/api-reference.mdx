@@ -42,7 +42,7 @@ curl http://localhost:8080/api/v1/health
 ```
 
 ```json
-{"status":"ok"}
+{ "status": "ok" }
 ```
 
 ## User
@@ -65,13 +65,13 @@ curl http://localhost:8080/api/v1/me \
 }
 ```
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | int | User ID |
-| `email` | string | Email address |
-| `first_name` | string | First name (omitted if empty) |
-| `is_admin` | bool | Admin flag (always false in current version) |
-| `created_at` | string | Account creation timestamp (RFC 3339) |
+| Field        | Type   | Description                                  |
+| ------------ | ------ | -------------------------------------------- |
+| `id`         | int    | User ID                                      |
+| `email`      | string | Email address                                |
+| `first_name` | string | First name (omitted if empty)                |
+| `is_admin`   | bool   | Admin flag (always false in current version) |
+| `created_at` | string | Account creation timestamp (RFC 3339)        |
 
 ## Feeds
 
@@ -112,10 +112,10 @@ Subscribe to a feed. If the URL is a website (not a direct feed URL),
 Planetary discovers the feed by parsing `<link rel="alternate">` tags
 in the HTML head.
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `feed_url` | string | Yes | URL of a website or RSS/Atom/JSON feed (1-2048 chars) |
-| `folder_id` | int | No | Folder to assign the feed to |
+| Field       | Type   | Required | Description                                           |
+| ----------- | ------ | -------- | ----------------------------------------------------- |
+| `feed_url`  | string | Yes      | URL of a website or RSS/Atom/JSON feed (1-2048 chars) |
+| `folder_id` | int    | No       | Folder to assign the feed to                          |
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/feeds \
@@ -152,9 +152,9 @@ error.
 Preview a feed without subscribing. Supports auto-discovery — pass a
 website URL and Planetary will find the feed.
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `feed_url` | string | Yes | URL of a website or RSS/Atom/JSON feed (1-2048 chars) |
+| Field      | Type   | Required | Description                                           |
+| ---------- | ------ | -------- | ----------------------------------------------------- |
+| `feed_url` | string | Yes      | URL of a website or RSS/Atom/JSON feed (1-2048 chars) |
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/feeds/preview \
@@ -218,15 +218,15 @@ Returns the updated feed object on success.
 List entries with optional filters. Results are ordered by
 `published_at` descending (newest first).
 
-| Parameter | Type | Default | Description |
-| --------- | ---- | ------- | ----------- |
-| `feed_id` | int | — | Filter by feed |
-| `folder_id` | int | — | Filter by folder (joins through feed) |
-| `status` | string | — | `unread`, `read`, or `removed` |
-| `starred` | bool | — | Filter starred entries |
-| `search` | string | — | Full-text search (English dictionary) |
-| `limit` | int | 50 | Max 200 |
-| `offset` | int | 0 | Pagination offset |
+| Parameter   | Type   | Default | Description                           |
+| ----------- | ------ | ------- | ------------------------------------- |
+| `feed_id`   | int    | —       | Filter by feed                        |
+| `folder_id` | int    | —       | Filter by folder (joins through feed) |
+| `status`    | string | —       | `unread`, `read`, or `removed`        |
+| `starred`   | bool   | —       | Filter starred entries                |
+| `search`    | string | —       | Full-text search (English dictionary) |
+| `limit`     | int    | 50      | Max 200                               |
+| `offset`    | int    | 0       | Pagination offset                     |
 
 ```bash
 curl "http://localhost:8080/api/v1/entries?status=unread&limit=10" \
@@ -274,10 +274,10 @@ Returns 404 if the entry does not exist or belongs to another user.
 
 Bulk update entry status.
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `entry_ids` | int[] | Yes | Entry IDs to update |
-| `status` | string | Yes | `unread`, `read`, or `removed` |
+| Field       | Type   | Required | Description                    |
+| ----------- | ------ | -------- | ------------------------------ |
+| `entry_ids` | int[]  | Yes      | Entry IDs to update            |
+| `status`    | string | Yes      | `unread`, `read`, or `removed` |
 
 ```bash
 curl -X PUT http://localhost:8080/api/v1/entries \
@@ -293,9 +293,9 @@ the current time for all affected entries.
 
 Set the starred flag on an entry.
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `starred` | bool | Yes | `true` to star, `false` to unstar |
+| Field     | Type | Required | Description                       |
+| --------- | ---- | -------- | --------------------------------- |
+| `starred` | bool | Yes      | `true` to star, `false` to unstar |
 
 ```bash
 curl -X PUT http://localhost:8080/api/v1/entries/42/starred \
@@ -340,9 +340,9 @@ Returns an empty array `[]` when no folders exist.
 
 Create a folder.
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `title` | string | Yes | Folder name (1-255 chars) |
+| Field   | Type   | Required | Description               |
+| ------- | ------ | -------- | ------------------------- |
+| `title` | string | Yes      | Folder name (1-255 chars) |
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/folders \
@@ -404,11 +404,11 @@ curl http://localhost:8080/api/v1/feed-lists \
 
 Create a feed list.
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `title` | string | Yes | List title (1-255 chars) |
-| `description` | string | No | List description |
-| `is_public` | bool | No | Whether the list is discoverable (default: false) |
+| Field         | Type   | Required | Description                                       |
+| ------------- | ------ | -------- | ------------------------------------------------- |
+| `title`       | string | Yes      | List title (1-255 chars)                          |
+| `description` | string | No       | List description                                  |
+| `is_public`   | bool   | No       | Whether the list is discoverable (default: false) |
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/feed-lists \
@@ -432,11 +432,11 @@ curl http://localhost:8080/api/v1/feed-lists/1 \
 Update a feed list's title, description, or visibility. Only the owner
 can update.
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `title` | string | No | New title |
-| `description` | string | No | New description |
-| `is_public` | bool | No | New visibility |
+| Field         | Type   | Required | Description     |
+| ------------- | ------ | -------- | --------------- |
+| `title`       | string | No       | New title       |
+| `description` | string | No       | New description |
+| `is_public`   | bool   | No       | New visibility  |
 
 ```bash
 curl -X PATCH http://localhost:8080/api/v1/feed-lists/1 \
@@ -460,10 +460,10 @@ Returns 204 No Content on success.
 
 Add a feed to a list. Only the list owner can add feeds.
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `feed_url` | string | Yes | Feed URL (1-2048 chars) |
-| `title` | string | No | Optional title override |
+| Field      | Type   | Required | Description             |
+| ---------- | ------ | -------- | ----------------------- |
+| `feed_url` | string | Yes      | Feed URL (1-2048 chars) |
+| `title`    | string | No       | Optional title override |
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/feed-lists/1/feeds \
@@ -576,9 +576,9 @@ Create a new API token. The response includes the full token string
 (prefixed with `pla_`). Save it immediately; it cannot be retrieved
 later.
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
-| `label` | string | Yes | Label for the token (1-255 chars) |
+| Field   | Type   | Required | Description                       |
+| ------- | ------ | -------- | --------------------------------- |
+| `label` | string | Yes      | Label for the token (1-255 chars) |
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/tokens \
@@ -612,107 +612,107 @@ Returns 204 No Content on success.
 
 ### Feed
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | int | Feed ID |
-| `user_id` | int | Owning user ID |
-| `folder_id` | int (nullable) | Folder ID, or null if ungrouped |
-| `feed_url` | string | Feed URL |
-| `site_url` | string | Website URL |
-| `title` | string | Feed title |
-| `parsing_error` | string | Last parsing error message (omitted if empty) |
-| `parsing_error_count` | int | Number of consecutive fetch/parse errors |
-| `disabled` | bool | Whether the feed is excluded from refresh |
-| `scraper_rules` | string | Scraper rules (omitted if empty) |
-| `rewrite_rules` | string | Rewrite rules (omitted if empty) |
-| `crawler` | bool | Whether crawler mode is enabled |
-| `next_check_at` | string (nullable) | Next scheduled refresh time (omitted if unset) |
-| `last_fetch_at` | string (nullable) | Last successful fetch time (omitted if never fetched) |
-| `created_at` | string | Subscription timestamp |
-| `updated_at` | string | Last update timestamp |
+| Field                 | Type              | Description                                           |
+| --------------------- | ----------------- | ----------------------------------------------------- |
+| `id`                  | int               | Feed ID                                               |
+| `user_id`             | int               | Owning user ID                                        |
+| `folder_id`           | int (nullable)    | Folder ID, or null if ungrouped                       |
+| `feed_url`            | string            | Feed URL                                              |
+| `site_url`            | string            | Website URL                                           |
+| `title`               | string            | Feed title                                            |
+| `parsing_error`       | string            | Last parsing error message (omitted if empty)         |
+| `parsing_error_count` | int               | Number of consecutive fetch/parse errors              |
+| `disabled`            | bool              | Whether the feed is excluded from refresh             |
+| `scraper_rules`       | string            | Scraper rules (omitted if empty)                      |
+| `rewrite_rules`       | string            | Rewrite rules (omitted if empty)                      |
+| `crawler`             | bool              | Whether crawler mode is enabled                       |
+| `next_check_at`       | string (nullable) | Next scheduled refresh time (omitted if unset)        |
+| `last_fetch_at`       | string (nullable) | Last successful fetch time (omitted if never fetched) |
+| `created_at`          | string            | Subscription timestamp                                |
+| `updated_at`          | string            | Last update timestamp                                 |
 
 ### Entry
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | int | Entry ID |
-| `user_id` | int | Owning user ID |
-| `feed_id` | int | Parent feed ID |
-| `hash` | string | SHA-256 deduplication hash |
-| `title` | string | Entry title |
-| `url` | string | Entry URL |
-| `comments_url` | string | Comments URL (omitted if empty) |
-| `author` | string | Author name (omitted if empty) |
-| `content` | string | Sanitized HTML content |
-| `description` | string | Short description / summary (omitted if empty) |
-| `status` | string | `unread`, `read`, or `removed` |
-| `starred` | bool | Whether the entry is starred |
-| `published_at` | string | Publication timestamp |
-| `changed_at` | string | Last status change timestamp |
-| `tags` | string[] | Feed-assigned tags (omitted if empty) |
-| `enclosures` | Enclosure[] | Media attachments (omitted if empty) |
+| Field          | Type        | Description                                    |
+| -------------- | ----------- | ---------------------------------------------- |
+| `id`           | int         | Entry ID                                       |
+| `user_id`      | int         | Owning user ID                                 |
+| `feed_id`      | int         | Parent feed ID                                 |
+| `hash`         | string      | SHA-256 deduplication hash                     |
+| `title`        | string      | Entry title                                    |
+| `url`          | string      | Entry URL                                      |
+| `comments_url` | string      | Comments URL (omitted if empty)                |
+| `author`       | string      | Author name (omitted if empty)                 |
+| `content`      | string      | Sanitized HTML content                         |
+| `description`  | string      | Short description / summary (omitted if empty) |
+| `status`       | string      | `unread`, `read`, or `removed`                 |
+| `starred`      | bool        | Whether the entry is starred                   |
+| `published_at` | string      | Publication timestamp                          |
+| `changed_at`   | string      | Last status change timestamp                   |
+| `tags`         | string[]    | Feed-assigned tags (omitted if empty)          |
+| `enclosures`   | Enclosure[] | Media attachments (omitted if empty)           |
 
 ### Enclosure
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | int | Enclosure ID |
-| `entry_id` | int | Parent entry ID |
-| `url` | string | Media URL |
-| `mime_type` | string | MIME type |
-| `size` | int | File size in bytes |
+| Field       | Type   | Description        |
+| ----------- | ------ | ------------------ |
+| `id`        | int    | Enclosure ID       |
+| `entry_id`  | int    | Parent entry ID    |
+| `url`       | string | Media URL          |
+| `mime_type` | string | MIME type          |
+| `size`      | int    | File size in bytes |
 
 ### Folder
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | int | Folder ID |
-| `user_id` | int | Owning user ID |
-| `title` | string | Folder name |
+| Field        | Type   | Description        |
+| ------------ | ------ | ------------------ |
+| `id`         | int    | Folder ID          |
+| `user_id`    | int    | Owning user ID     |
+| `title`      | string | Folder name        |
 | `created_at` | string | Creation timestamp |
 
 ### Feed List
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | int | List ID |
-| `user_id` | int | Owning user ID |
-| `title` | string | List title |
+| Field         | Type   | Description                         |
+| ------------- | ------ | ----------------------------------- |
+| `id`          | int    | List ID                             |
+| `user_id`     | int    | Owning user ID                      |
+| `title`       | string | List title                          |
 | `description` | string | List description (omitted if empty) |
-| `is_public` | bool | Whether the list is discoverable |
-| `created_at` | string | Creation timestamp |
-| `updated_at` | string | Last update timestamp |
+| `is_public`   | bool   | Whether the list is discoverable    |
+| `created_at`  | string | Creation timestamp                  |
+| `updated_at`  | string | Last update timestamp               |
 
 ### Feed List Item
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | int | Item ID |
-| `feed_list_id` | int | Parent list ID |
-| `feed_url` | string | Feed URL |
-| `title` | string | Feed title (metadata snapshot) |
-| `site_url` | string | Site URL (metadata snapshot, omitted if empty) |
-| `created_at` | string | Creation timestamp |
+| Field          | Type   | Description                                    |
+| -------------- | ------ | ---------------------------------------------- |
+| `id`           | int    | Item ID                                        |
+| `feed_list_id` | int    | Parent list ID                                 |
+| `feed_url`     | string | Feed URL                                       |
+| `title`        | string | Feed title (metadata snapshot)                 |
+| `site_url`     | string | Site URL (metadata snapshot, omitted if empty) |
+| `created_at`   | string | Creation timestamp                             |
 
 ### API Token
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | int | Token ID |
-| `user_id` | int | Owning user ID |
-| `label` | string | Human-readable label |
-| `created_at` | string | Creation timestamp |
+| Field          | Type              | Description                           |
+| -------------- | ----------------- | ------------------------------------- |
+| `id`           | int               | Token ID                              |
+| `user_id`      | int               | Owning user ID                        |
+| `label`        | string            | Human-readable label                  |
+| `created_at`   | string            | Creation timestamp                    |
 | `last_used_at` | string (nullable) | Last time the token was used for auth |
 
 ### User
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| `id` | int | User ID |
-| `email` | string | Email address |
-| `first_name` | string | First name (omitted if empty) |
-| `is_admin` | bool | Admin flag (always false in current version) |
-| `created_at` | string | Account creation timestamp |
+| Field        | Type   | Description                                  |
+| ------------ | ------ | -------------------------------------------- |
+| `id`         | int    | User ID                                      |
+| `email`      | string | Email address                                |
+| `first_name` | string | First name (omitted if empty)                |
+| `is_admin`   | bool   | Admin flag (always false in current version) |
+| `created_at` | string | Account creation timestamp                   |
 
 ## Errors
 
@@ -733,9 +733,9 @@ All errors follow [RFC 9457](https://datatracker.ietf.org/doc/html/rfc9457)
 }
 ```
 
-| Status | Meaning |
-| ------ | ------- |
-| 400 | Bad request (validation) |
-| 401 | Unauthorized (no or invalid token) |
-| 404 | Resource not found |
-| 500 | Internal server error |
+| Status | Meaning                            |
+| ------ | ---------------------------------- |
+| 400    | Bad request (validation)           |
+| 401    | Unauthorized (no or invalid token) |
+| 404    | Resource not found                 |
+| 500    | Internal server error              |

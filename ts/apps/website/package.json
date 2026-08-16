@@ -1,14 +1,14 @@
 {
   "name": "website",
   "version": "0.0.1",
-  "type": "module",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "lint": "eslint",
-    "format": "prettier --write \"**/*.{ts,tsx,astro,css}\"",
+    "format": "oxfmt --write .",
     "typecheck": "astro check"
   },
   "dependencies": {
@@ -21,9 +21,6 @@
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "^9",
-    "prettier": "^3.8.3",
-    "prettier-plugin-astro": "^0.14.1",
-    "prettier-plugin-tailwindcss": "^0.8.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

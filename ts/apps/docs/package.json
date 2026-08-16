@@ -1,17 +1,18 @@
 {
   "name": "docs",
   "version": "0.0.1",
-  "type": "module",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "format": "prettier --write \"**/*.{ts,tsx,mdx}\"",
+    "format": "oxfmt --write .",
     "typecheck": "fumadocs-mdx && tsc --noEmit"
   },
   "dependencies": {
+    "@workspace/ui": "workspace:*",
     "fumadocs-core": "^16.11.5",
     "fumadocs-mdx": "15.1.1",
     "fumadocs-ui": "^16.11.5",
@@ -19,8 +20,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "shiki": "^3.0.0",
-    "zod": "^4.4.3",
-    "@workspace/ui": "workspace:*"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

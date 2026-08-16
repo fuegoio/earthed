@@ -6,13 +6,15 @@ const meta: Meta<typeof SidebarSeparator> = {
   title: "UI/Separator",
   component: SidebarSeparator,
   tags: ["autodocs"],
-  decorators: [(Story) => (
-    <div className="flex w-full max-w-sm flex-col gap-4 rounded-lg bg-sidebar p-4">
-      <span className="text-sm text-sidebar-foreground">Section above</span>
-      <Story />
-      <span className="text-sm text-sidebar-foreground">Section below</span>
-    </div>
-  )],
+  decorators: [
+    (Story) => (
+      <div className="flex w-full max-w-sm flex-col gap-4 rounded-lg bg-sidebar p-4">
+        <span className="text-sm text-sidebar-foreground">Section above</span>
+        <Story />
+        <span className="text-sm text-sidebar-foreground">Section below</span>
+      </div>
+    ),
+  ],
 };
 
 export default meta;

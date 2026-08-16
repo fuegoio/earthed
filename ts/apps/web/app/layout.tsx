@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next"
+import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Merriweather, IBM_Plex_Sans } from "next/font/google";
 import { Toaster } from "@workspace/ui/components/sonner";
 import { SerwistProvider } from "@serwist/turbopack/react";

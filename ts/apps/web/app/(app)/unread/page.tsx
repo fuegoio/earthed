@@ -1,7 +1,7 @@
-import { PageHeader } from "@/components/page-header"
-import { EntryTimeline } from "@/components/entry-timeline"
+import { PageHeader } from "@/components/page-header";
+import { EntryTimeline } from "@/components/entry-timeline";
 
-export const metadata = { title: "Unread" }
+export const metadata = { title: "Unread" };
 
 export default function UnreadPage() {
   return (
@@ -13,5 +13,5 @@ export default function UnreadPage() {
         emptyDescription="You're all caught up. New articles will show up here as your feeds update."
       />
     </div>
-  )
+  );
 }

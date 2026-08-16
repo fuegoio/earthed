@@ -1,9 +1,9 @@
-import { z } from "zod"
+import { z } from "zod";
 
 export const signinSchema = z.object({
   email: z.string().email("Enter a valid email address"),
   password: z.string().min(1, "Password is required"),
-})
+});
 
 export const signupSchema = z
   .object({
@@ -19,10 +19,10 @@ export const signupSchema = z
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
-  })
+  });
 
-export type SigninValues = z.infer<typeof signinSchema>
-export type SignupValues = z.infer<typeof signupSchema>
+export type SigninValues = z.infer<typeof signinSchema>;
+export type SignupValues = z.infer<typeof signupSchema>;
 
 export const subscribeFeedSchema = z.object({
   feed_url: z
@@ -32,19 +32,19 @@ export const subscribeFeedSchema = z.object({
     .refine((val) => {
       try {
         // Accept URLs with or without a scheme.
-        const withScheme = /^https?:\/\//i.test(val) ? val : `https://${val}`
-        new URL(withScheme)
-        return true
+        const withScheme = /^https?:\/\//i.test(val) ? val : `https://${val}`;
+        new URL(withScheme);
+        return true;
       } catch {
-        return false
+        return false;
       }
     }, "Enter a valid URL"),
-})
+});
 
 export function normalizeFeedURL(input: string): string {
-  const trimmed = input.trim()
-  if (/^https?:\/\//i.test(trimmed)) return trimmed
-  return `https://${trimmed}`
+  const trimmed = input.trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
 }
 
-export type SubscribeFeedValues = z.infer<typeof subscribeFeedSchema>
+export type SubscribeFeedValues = z.infer<typeof subscribeFeedSchema>;

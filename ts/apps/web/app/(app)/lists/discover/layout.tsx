@@ -1,9 +1,5 @@
-export const metadata = { title: "Discover" }
+export const metadata = { title: "Discover" };
 
-export default function DiscoverLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return children
+export default function DiscoverLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

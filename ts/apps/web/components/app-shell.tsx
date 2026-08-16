@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Menu as MenuIcon } from "lucide-react"
-import { AppSidebar } from "@/components/app-sidebar"
-import { Logo } from "@/components/logo"
-import { Button } from "@workspace/ui/components/button"
+import { useState } from "react";
+import Link from "next/link";
+import { Menu as MenuIcon } from "lucide-react";
+import { AppSidebar } from "@/components/app-sidebar";
+import { Logo } from "@/components/logo";
+import { Button } from "@workspace/ui/components/button";
 
 export function AppShell({
   children,
   userEmail,
 }: {
-  children: React.ReactNode
-  userEmail: string
+  children: React.ReactNode;
+  userEmail: string;
 }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="flex h-svh overflow-hidden">
@@ -37,10 +37,7 @@ export function AppShell({
             >
               <MenuIcon className="size-4" />
             </Button>
-            <Link
-              href="/"
-              className="flex items-center gap-2 font-serif text-lg font-bold"
-            >
+            <Link href="/" className="flex items-center gap-2 font-serif text-lg font-bold">
               <Logo className="size-5" />
               Planetary
             </Link>
@@ -52,5 +49,5 @@ export function AppShell({
       {/* Right filler — matches main content bg on wide screens */}
       <div className="hidden flex-1 bg-background lg:block" />
     </div>
-  )
+  );
 }

@@ -1,23 +1,23 @@
-import { Search } from "lucide-react"
-import { EntryTimeline } from "@/components/entry-timeline"
-import { PageHeader } from "@/components/page-header"
+import { Search } from "lucide-react";
+import { EntryTimeline } from "@/components/entry-timeline";
+import { PageHeader } from "@/components/page-header";
 import {
   Empty,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@workspace/ui/components/empty"
+} from "@workspace/ui/components/empty";
 
-export const metadata = { title: "Search" }
+export const metadata = { title: "Search" };
 
 export default async function SearchPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>
+  searchParams: Promise<{ q?: string }>;
 }) {
-  const { q } = await searchParams
-  const query = (q ?? "").trim()
+  const { q } = await searchParams;
+  const query = (q ?? "").trim();
 
   return (
     <div className="mx-auto w-full max-w-3xl">
@@ -40,13 +40,13 @@ export default async function SearchPage({
               </EmptyMedia>
               <EmptyTitle>Search your feeds</EmptyTitle>
               <EmptyDescription>
-                Type in the search box above to find articles across all your
-                subscriptions. Search matches titles and article content.
+                Type in the search box above to find articles across all your subscriptions. Search
+                matches titles and article content.
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
         </div>
       )}
     </div>
-  )
+  );
 }

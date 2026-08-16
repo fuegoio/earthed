@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { useState, useOptimistic, startTransition } from "react"
-import { useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
-import { StarToggle } from "@/components/star-toggle"
-import { FeedIcon } from "@/components/feed-icon"
-import { getClient, updateEntries } from "@/lib/planetary"
-import { getApiErrorMessage } from "@/lib/errors"
-import { formatRelative, htmlSnippet } from "@/lib/format"
-import { cn } from "@workspace/ui/lib/utils"
-import type { Entry, Feed } from "@/lib/types"
+import { useState, useOptimistic, startTransition } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { StarToggle } from "@/components/star-toggle";
+import { FeedIcon } from "@/components/feed-icon";
+import { getClient, updateEntries } from "@/lib/planetary";
+import { getApiErrorMessage } from "@/lib/errors";
+import { formatRelative, htmlSnippet } from "@/lib/format";
+import { cn } from "@workspace/ui/lib/utils";
+import type { Entry, Feed } from "@/lib/types";
 
 /**
  * A single entry row in a timeline. The entire row is a link that opens
@@ -19,53 +19,53 @@ import type { Entry, Feed } from "@/lib/types"
  * marked unread again.
  */
 export function EntryCard({ entry, feed }: { entry: Entry; feed?: Feed }) {
-  const queryClient = useQueryClient()
-  const [readOptimistic, setReadOptimistic] = useOptimistic(entry.status === "read")
-  const [pending, setPending] = useState(false)
+  const queryClient = useQueryClient();
+  const [readOptimistic, setReadOptimistic] = useOptimistic(entry.status === "read");
+  const [pending, setPending] = useState(false);
 
-  const unread = !readOptimistic
-  const snippet = htmlSnippet(entry.description, 200)
+  const unread = !readOptimistic;
+  const snippet = htmlSnippet(entry.description, 200);
 
   function toggleRead(e: React.MouseEvent) {
-    e.preventDefault()
-    e.stopPropagation()
-    const next = readOptimistic ? "unread" : "read"
+    e.preventDefault();
+    e.stopPropagation();
+    const next = readOptimistic ? "unread" : "read";
     startTransition(() => {
-      setReadOptimistic(next === "read")
-      setPending(true)
-    })
+      setReadOptimistic(next === "read");
+      setPending(true);
+    });
     void (async () => {
       const { error } = await updateEntries({
         client: await getClient(),
         body: { entry_ids: [entry.id], status: next },
-      })
+      });
       if (error) {
-        toast.error(getApiErrorMessage(error, "Could not update entry"))
-        return
+        toast.error(getApiErrorMessage(error, "Could not update entry"));
+        return;
       }
-      await queryClient.invalidateQueries({ queryKey: ["entries"] })
-    })().finally(() => setPending(false))
+      await queryClient.invalidateQueries({ queryKey: ["entries"] });
+    })().finally(() => setPending(false));
   }
 
   function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
     if (!entry.url) {
-      e.preventDefault()
-      return
+      e.preventDefault();
+      return;
     }
     // Mark as read when opening the article.
     if (unread) {
-      startTransition(() => setReadOptimistic(true))
+      startTransition(() => setReadOptimistic(true));
       void (async () => {
         const { error } = await updateEntries({
           client: await getClient(),
           body: { entry_ids: [entry.id], status: "read" },
-        })
+        });
         if (error) {
-          toast.error(getApiErrorMessage(error, "Could not mark as read"))
-          return
+          toast.error(getApiErrorMessage(error, "Could not mark as read"));
+          return;
         }
-        await queryClient.invalidateQueries({ queryKey: ["entries"] })
-      })()
+        await queryClient.invalidateQueries({ queryKey: ["entries"] });
+      })();
     }
   }
 
@@ -77,7 +77,7 @@ export function EntryCard({ entry, feed }: { entry: Entry; feed?: Feed }) {
       onClick={handleClick}
       className={cn(
         "group flex gap-3 px-4 py-3 transition-colors hover:bg-muted/50",
-        unread ? "" : "opacity-60"
+        unread ? "" : "opacity-60",
       )}
     >
       <button
@@ -104,25 +104,20 @@ export function EntryCard({ entry, feed }: { entry: Entry; feed?: Feed }) {
         <h3
           className={cn(
             "mt-1 line-clamp-2 text-sm",
-            unread ? "font-semibold text-foreground" : "font-medium"
+            unread ? "font-semibold text-foreground" : "font-medium",
           )}
         >
           {entry.title || "Untitled"}
         </h3>
         {snippet ? (
-          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-            {snippet}
-          </p>
+          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{snippet}</p>
         ) : (
           <div className="mt-1 h-10" aria-hidden />
         )}
       </div>
-      <div
-        className="flex shrink-0 items-start gap-0.5"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="flex shrink-0 items-start gap-0.5" onClick={(e) => e.stopPropagation()}>
         <StarToggle entryId={entry.id} starred={entry.starred} size="icon-sm" />
       </div>
     </a>
-  )
+  );
 }

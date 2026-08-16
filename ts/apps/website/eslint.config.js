@@ -1,4 +1,4 @@
-import { config } from "@workspace/eslint-config/base"
+import { config } from "@workspace/eslint-config/base";
 
 /** @type {import("eslint").Linter.Config} */
 export default [
@@ -6,4 +6,4 @@ export default [
   {
     ignores: ["dist/**", ".astro/**"],
   },
-]
+];

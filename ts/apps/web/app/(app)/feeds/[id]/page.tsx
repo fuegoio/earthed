@@ -1,70 +1,66 @@
-import { notFound } from "next/navigation"
-import { getClient, getFeed, refreshFeed } from "@/lib/planetary"
-import { getApiErrorMessage, apiErrorStatus } from "@/lib/errors"
-import { ApiError } from "@/components/api-error"
-import { FeedDetail } from "@/components/feed-detail"
-import type { Metadata } from "next"
-import type { Feed } from "@/lib/types"
+import { notFound } from "next/navigation";
+import { getClient, getFeed, refreshFeed } from "@/lib/planetary";
+import { getApiErrorMessage, apiErrorStatus } from "@/lib/errors";
+import { ApiError } from "@/components/api-error";
+import { FeedDetail } from "@/components/feed-detail";
+import type { Metadata } from "next";
+import type { Feed } from "@/lib/types";
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }): Promise<Metadata> {
-  const { id } = await params
-  const feedId = Number(id)
-  if (!Number.isFinite(feedId)) return { title: "Feed" }
+  const { id } = await params;
+  const feedId = Number(id);
+  if (!Number.isFinite(feedId)) return { title: "Feed" };
   try {
-    const { data } = await getFeed({ client: await getClient(), path: { feedId } })
+    const { data } = await getFeed({ client: await getClient(), path: { feedId } });
     if (data) {
-      const feed = data as Feed
-      return { title: feed.title || "Feed" }
+      const feed = data as Feed;
+      return { title: feed.title || "Feed" };
     }
   } catch {
     // metadata is best-effort; fall through to default
   }
-  return { title: "Feed" }
+  return { title: "Feed" };
 }
 
-export default async function FeedPage({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
-  const { id } = await params
-  const feedId = Number(id)
-  if (!Number.isFinite(feedId)) notFound()
+export default async function FeedPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const feedId = Number(id);
+  if (!Number.isFinite(feedId)) notFound();
 
-  const client = await getClient()
+  const client = await getClient();
   const { data: feed, error } = await getFeed({
     client,
     path: { feedId },
-  })
+  });
   if (error) {
-    if (apiErrorStatus(error) === 404) notFound()
+    if (apiErrorStatus(error) === 404) notFound();
     return (
       <div className="p-4">
         <ApiError message={getApiErrorMessage(error)} status={apiErrorStatus(error)} />
       </div>
-    )
+    );
   }
-  if (!feed) notFound()
+  if (!feed) notFound();
 
   // Refresh the feed server-side so the latest articles are fetched before
   // the page renders. Errors are non-fatal — the page still renders with
   // whatever entries were already stored.
-  let refreshedFeed = feed as Feed
+  let refreshedFeed = feed as Feed;
   try {
     const { data: refreshed, error: refreshError } = await refreshFeed({
       client,
       path: { feedId },
-    })
+    });
     if (!refreshError && refreshed) {
-      refreshedFeed = refreshed as Feed
+      refreshedFeed = refreshed as Feed;
     }
   } catch {
     // refresh is best-effort
   }
 
-  return <FeedDetail feed={refreshedFeed} />
+  return <FeedDetail feed={refreshedFeed} />;
 }

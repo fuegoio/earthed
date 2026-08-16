@@ -112,5 +112,5 @@ export function Logo({ className }: { className?: string }) {
         </clipPath>
       </defs>
     </svg>
-  )
+  );
 }

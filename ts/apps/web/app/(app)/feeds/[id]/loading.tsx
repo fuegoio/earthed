@@ -1,5 +1,5 @@
-import { Skeleton } from "@workspace/ui/components/skeleton"
-import { EntryCardSkeleton } from "@/components/entry-card-skeleton"
+import { Skeleton } from "@workspace/ui/components/skeleton";
+import { EntryCardSkeleton } from "@/components/entry-card-skeleton";
 
 export default function FeedLoading() {
   return (
@@ -27,5 +27,5 @@ export default function FeedLoading() {
         ))}
       </div>
     </div>
-  )
+  );
 }

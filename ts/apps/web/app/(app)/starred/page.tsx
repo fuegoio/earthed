@@ -1,7 +1,7 @@
-import { PageHeader } from "@/components/page-header"
-import { EntryTimeline } from "@/components/entry-timeline"
+import { PageHeader } from "@/components/page-header";
+import { EntryTimeline } from "@/components/entry-timeline";
 
-export const metadata = { title: "Starred" }
+export const metadata = { title: "Starred" };
 
 export default function StarredPage() {
   return (
@@ -13,5 +13,5 @@ export default function StarredPage() {
         emptyDescription="Star articles you want to keep — they'll show up here for quick access."
       />
     </div>
-  )
+  );
 }

@@ -1,5 +1,5 @@
-import type { ReactNode } from "react"
-import { cn } from "@workspace/ui/lib/utils"
+import type { ReactNode } from "react";
+import { cn } from "@workspace/ui/lib/utils";
 
 /**
  * Shared page header used across the app for a consistent title bar.
@@ -17,31 +17,31 @@ export function PageHeader({
   metadata,
   className,
 }: {
-  title: ReactNode
-  icon?: ReactNode
-  actions?: ReactNode
-  metadata?: ReactNode
-  className?: string
+  title: ReactNode;
+  icon?: ReactNode;
+  actions?: ReactNode;
+  metadata?: ReactNode;
+  className?: string;
 }) {
   return (
-    <div className={cn("sticky top-0 z-10 border-b border-border bg-background px-4 py-3", className)}>
+    <div
+      className={cn("sticky top-0 z-10 border-b border-border bg-background px-4 py-3", className)}
+    >
       <div className="flex items-center justify-between gap-3">
-        <h1 className={cn(
-          "flex min-w-0 items-center gap-2 font-serif text-lg font-bold tracking-tight",
-          !icon && "pl-8"
-        )}>
+        <h1
+          className={cn(
+            "flex min-w-0 items-center gap-2 font-serif text-lg font-bold tracking-tight",
+            !icon && "pl-8",
+          )}
+        >
           {icon}
           <span className="truncate">{title}</span>
         </h1>
         {actions ? (
-          <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
-            {actions}
-          </div>
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">{actions}</div>
         ) : null}
       </div>
-      {metadata ? (
-        <div className="mt-1.5 text-sm text-muted-foreground">{metadata}</div>
-      ) : null}
+      {metadata ? <div className="mt-1.5 text-sm text-muted-foreground">{metadata}</div> : null}
     </div>
-  )
+  );
 }

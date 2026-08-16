@@ -15,7 +15,13 @@ const meta: Meta<typeof Card> = {
   title: "UI/Card",
   component: Card,
   tags: ["autodocs"],
-  decorators: [(Story) => <div className="max-w-sm"><Story /></div>],
+  decorators: [
+    (Story) => (
+      <div className="max-w-sm">
+        <Story />
+      </div>
+    ),
+  ],
 };
 
 export default meta;
@@ -35,7 +41,9 @@ export const Default: Story = {
       </CardContent>
       <CardFooter className="gap-2">
         <Button size="sm">Mark all read</Button>
-        <Button size="sm" variant="ghost">Dismiss</Button>
+        <Button size="sm" variant="ghost">
+          Dismiss
+        </Button>
       </CardFooter>
     </Card>
   ),
@@ -63,7 +71,9 @@ export const WithoutContent: Story = {
         <CardDescription>12 feeds · 847 unread</CardDescription>
       </CardHeader>
       <CardFooter>
-        <Button size="sm" variant="ghost"><Bell className="size-4" /> Subscribe</Button>
+        <Button size="sm" variant="ghost">
+          <Bell className="size-4" /> Subscribe
+        </Button>
       </CardFooter>
     </Card>
   ),

@@ -8,10 +8,10 @@ description: Deploy Planetary with official Docker images, configure environment
 Planetary publishes container images to GitHub Container Registry on
 every push to `main` and every tagged release:
 
-| Image | Registry |
-| --- | --- |
-| API | `ghcr.io/fuegoio/planetary-api` |
-| Web | `ghcr.io/fuegoio/planetary-web` |
+| Image | Registry                        |
+| ----- | ------------------------------- |
+| API   | `ghcr.io/fuegoio/planetary-api` |
+| Web   | `ghcr.io/fuegoio/planetary-web` |
 
 Images are tagged as follows:
 
@@ -144,29 +144,29 @@ docker build -f ts/apps/web/Dockerfile -t planetary-web ts/
 
 ### API
 
-| Variable | Default | Description |
-| --- | --- | --- |
-| `LIMEN_SECRET` | **required** | 32-byte secret for session signing. Generate with `openssl rand -hex 16`. |
-| `PLANETARY_DATABASE_URL` | `postgres://planetary:planetary@localhost:5432/planetary?sslmode=disable` | PostgreSQL connection string. |
-| `PLANETARY_HTTP_ADDR` | `:8080` | HTTP listen address. |
-| `PLANETARY_BASE_URL` | `http://localhost:8080` | Public URL of the API (used by Limen for auth redirects). |
-| `PLANETARY_WEB_URL` | `http://localhost:3000` | Public URL of the web frontend. |
-| `PLANETARY_LOG_FORMAT` | `pretty` | Log format: `pretty` or `json`. |
-| `PLANETARY_POLLING_FREQUENCY` | `60s` | How often the scheduler checks for feed updates. |
-| `PLANETARY_BATCH_SIZE` | `100` | Number of feeds to process per scheduling cycle. |
-| `PLANETARY_WORKER_POOL_SIZE` | `5` | Number of concurrent feed-processing workers. |
-| `PLANETARY_HTTP_CLIENT_TIMEOUT` | `20s` | Timeout for fetching remote feeds. |
-| `PLANETARY_HTTP_CLIENT_MAX_BODY` | `15728640` | Max feed body size in bytes (15 MB). |
-| `PLANETARY_CLEANUP_FREQUENCY` | `24h` | How often to run entry cleanup. |
-| `PLANETARY_ENTRY_MAX_AGE_DAYS` | `60` | Entries older than this are eligible for cleanup. |
-| `PLANETARY_DISABLE_SCHEDULER` | (unset) | Set to any non-empty value to disable the feed scheduler. |
+| Variable                         | Default                                                                   | Description                                                               |
+| -------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `LIMEN_SECRET`                   | **required**                                                              | 32-byte secret for session signing. Generate with `openssl rand -hex 16`. |
+| `PLANETARY_DATABASE_URL`         | `postgres://planetary:planetary@localhost:5432/planetary?sslmode=disable` | PostgreSQL connection string.                                             |
+| `PLANETARY_HTTP_ADDR`            | `:8080`                                                                   | HTTP listen address.                                                      |
+| `PLANETARY_BASE_URL`             | `http://localhost:8080`                                                   | Public URL of the API (used by Limen for auth redirects).                 |
+| `PLANETARY_WEB_URL`              | `http://localhost:3000`                                                   | Public URL of the web frontend.                                           |
+| `PLANETARY_LOG_FORMAT`           | `pretty`                                                                  | Log format: `pretty` or `json`.                                           |
+| `PLANETARY_POLLING_FREQUENCY`    | `60s`                                                                     | How often the scheduler checks for feed updates.                          |
+| `PLANETARY_BATCH_SIZE`           | `100`                                                                     | Number of feeds to process per scheduling cycle.                          |
+| `PLANETARY_WORKER_POOL_SIZE`     | `5`                                                                       | Number of concurrent feed-processing workers.                             |
+| `PLANETARY_HTTP_CLIENT_TIMEOUT`  | `20s`                                                                     | Timeout for fetching remote feeds.                                        |
+| `PLANETARY_HTTP_CLIENT_MAX_BODY` | `15728640`                                                                | Max feed body size in bytes (15 MB).                                      |
+| `PLANETARY_CLEANUP_FREQUENCY`    | `24h`                                                                     | How often to run entry cleanup.                                           |
+| `PLANETARY_ENTRY_MAX_AGE_DAYS`   | `60`                                                                      | Entries older than this are eligible for cleanup.                         |
+| `PLANETARY_DISABLE_SCHEDULER`    | (unset)                                                                   | Set to any non-empty value to disable the feed scheduler.                 |
 
 ### Web
 
-| Variable | Default | Description |
-| --- | --- | --- |
-| `PLANETARY_API_URL` | `http://localhost:8080` | Server-side API URL (must be reachable from the container). |
-| `NEXT_PUBLIC_PLANETARY_API_URL` | `http://localhost:8080` | Client-side API URL (must be reachable from the browser). |
+| Variable                        | Default                 | Description                                                 |
+| ------------------------------- | ----------------------- | ----------------------------------------------------------- |
+| `PLANETARY_API_URL`             | `http://localhost:8080` | Server-side API URL (must be reachable from the container). |
+| `NEXT_PUBLIC_PLANETARY_API_URL` | `http://localhost:8080` | Client-side API URL (must be reachable from the browser).   |
 
 ## Reverse proxy
 

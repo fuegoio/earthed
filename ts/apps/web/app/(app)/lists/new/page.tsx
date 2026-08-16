@@ -1,28 +1,28 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-import { ArrowLeft, Loader2, ListChecks } from "lucide-react"
-import { Button, buttonVariants } from "@workspace/ui/components/button"
-import { Input } from "@workspace/ui/components/input"
-import { Label } from "@workspace/ui/components/label"
-import { Textarea } from "@workspace/ui/components/textarea"
-import { getClient, createFeedList } from "@/lib/planetary"
-import { getApiErrorMessage } from "@/lib/errors"
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { ArrowLeft, Loader2, ListChecks } from "lucide-react";
+import { Button, buttonVariants } from "@workspace/ui/components/button";
+import { Input } from "@workspace/ui/components/input";
+import { Label } from "@workspace/ui/components/label";
+import { Textarea } from "@workspace/ui/components/textarea";
+import { getClient, createFeedList } from "@/lib/planetary";
+import { getApiErrorMessage } from "@/lib/errors";
 
 export default function NewFeedListPage() {
-  const router = useRouter()
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [isPublic, setIsPublic] = useState(false)
-  const [pending, setPending] = useState(false)
+  const router = useRouter();
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [isPublic, setIsPublic] = useState(false);
+  const [pending, setPending] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!title.trim()) return
-    setPending(true)
+    e.preventDefault();
+    if (!title.trim()) return;
+    setPending(true);
     try {
       const { data, error } = await createFeedList({
         client: await getClient(),
@@ -31,14 +31,14 @@ export default function NewFeedListPage() {
           description: description.trim(),
           is_public: isPublic,
         },
-      })
-      if (error) throw error
-      toast.success("Feed list created")
-      router.push(`/lists/${data!.id}`)
-      router.refresh()
+      });
+      if (error) throw error;
+      toast.success("Feed list created");
+      router.push(`/lists/${data!.id}`);
+      router.refresh();
     } catch (err) {
-      toast.error(getApiErrorMessage(err, "Could not create feed list"))
-      setPending(false)
+      toast.error(getApiErrorMessage(err, "Could not create feed list"));
+      setPending(false);
     }
   }
 
@@ -56,12 +56,10 @@ export default function NewFeedListPage() {
         <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10">
           <ListChecks className="size-6 text-primary" />
         </div>
-        <h1 className="font-serif text-2xl font-bold tracking-tight">
-          New feed list
-        </h1>
+        <h1 className="font-serif text-2xl font-bold tracking-tight">New feed list</h1>
         <p className="max-w-md text-sm text-muted-foreground">
-          A feed list is a curated collection of RSS feeds. Add feeds, then
-          share it publicly so others can follow and import them in one click.
+          A feed list is a curated collection of RSS feeds. Add feeds, then share it publicly so
+          others can follow and import them in one click.
         </p>
       </div>
 
@@ -100,8 +98,7 @@ export default function NewFeedListPage() {
           <span className="flex flex-col">
             <span className="text-sm font-medium">Make this list public</span>
             <span className="text-sm text-muted-foreground">
-              Public lists can be discovered and followed by other users. You
-              can change this later.
+              Public lists can be discovered and followed by other users. You can change this later.
             </span>
           </span>
         </label>
@@ -111,14 +108,11 @@ export default function NewFeedListPage() {
             {pending && <Loader2 className="size-4 animate-spin" />}
             Create list
           </Button>
-          <Link
-            href="/lists"
-            className={buttonVariants({ variant: "ghost" })}
-          >
+          <Link href="/lists" className={buttonVariants({ variant: "ghost" })}>
             Cancel
           </Link>
         </div>
       </form>
     </div>
-  )
+  );
 }

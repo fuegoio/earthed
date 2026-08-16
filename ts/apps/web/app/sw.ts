@@ -1,16 +1,16 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
-import { defaultCache } from "@serwist/turbopack/worker"
-import type { PrecacheEntry, SerwistGlobalConfig } from "serwist"
-import { Serwist, NetworkFirst, ExpirationPlugin } from "serwist"
+import { defaultCache } from "@serwist/turbopack/worker";
+import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
+import { Serwist, NetworkFirst, ExpirationPlugin } from "serwist";
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
-    __SW_MANIFEST: (PrecacheEntry | string)[] | undefined
+    __SW_MANIFEST: (PrecacheEntry | string)[] | undefined;
   }
 }
 
-declare const self: ServiceWorkerGlobalScope
+declare const self: ServiceWorkerGlobalScope;
 
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
@@ -59,11 +59,11 @@ const serwist = new Serwist({
       {
         url: "/~offline",
         matcher({ request }) {
-          return request.destination === "document"
+          return request.destination === "document";
         },
       },
     ],
   },
-})
+});
 
-serwist.addEventListeners()
+serwist.addEventListeners();

@@ -1,23 +1,19 @@
-import { redirect } from "next/navigation"
-import { getClient, getMe } from "@/lib/planetary"
-import { AppShell } from "@/components/app-shell"
+import { redirect } from "next/navigation";
+import { getClient, getMe } from "@/lib/planetary";
+import { AppShell } from "@/components/app-shell";
 
-export default async function AppLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  const client = await getClient()
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  const client = await getClient();
 
-  let user
+  let user;
   try {
-    const result = await getMe({ client })
-    user = result.data
+    const result = await getMe({ client });
+    user = result.data;
   } catch {
-    redirect("/login")
+    redirect("/login");
   }
 
-  if (!user) redirect("/login")
+  if (!user) redirect("/login");
 
-  return <AppShell userEmail={user.email}>{children}</AppShell>
+  return <AppShell userEmail={user.email}>{children}</AppShell>;
 }

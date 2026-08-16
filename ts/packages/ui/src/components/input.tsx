@@ -1,4 +1,4 @@
-import { cn } from "@workspace/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils";
 
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
@@ -14,11 +14,11 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
         "dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
         "file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground",
         "selection:bg-primary selection:text-primary-foreground",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
-export { Input }
+export { Input };

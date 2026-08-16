@@ -15,7 +15,13 @@ const meta: Meta<typeof Input> = {
       options: ["text", "email", "password", "search", "url", "number"],
     },
   },
-  decorators: [(Story) => <div className="max-w-sm"><Story /></div>],
+  decorators: [
+    (Story) => (
+      <div className="max-w-sm">
+        <Story />
+      </div>
+    ),
+  ],
 };
 
 export default meta;
@@ -26,7 +32,9 @@ export const Default: Story = {};
 export const WithLabel: Story = {
   render: () => (
     <div className="flex flex-col gap-2">
-      <label htmlFor="feed-url" className="text-sm font-medium">Feed URL</label>
+      <label htmlFor="feed-url" className="text-sm font-medium">
+        Feed URL
+      </label>
       <Input id="feed-url" type="url" placeholder="https://example.com/feed.xml" />
     </div>
   ),

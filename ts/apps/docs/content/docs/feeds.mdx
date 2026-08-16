@@ -170,13 +170,13 @@ fields are cleared and the count resets to 0.
 
 The scheduler runs by default. Configure it with environment variables:
 
-| Variable | Default | Description |
-| -------- | ------- | ----------- |
-| `PLANETARY_POLLING_FREQUENCY` | `60s` | How often the scheduler checks for due feeds |
-| `PLANETARY_BATCH_SIZE` | `100` | Max feeds processed per scheduler tick |
-| `PLANETARY_WORKER_POOL_SIZE` | `5` | Concurrent feed-processing workers |
-| `PLANETARY_HTTP_CLIENT_TIMEOUT` | `20s` | Timeout for fetching a single feed |
-| `PLANETARY_HTTP_CLIENT_MAX_BODY` | `15728640` | Max feed body size in bytes (15 MB) |
-| `PLANETARY_DISABLE_SCHEDULER` | (unset) | Set to any non-empty value to disable |
+| Variable                         | Default    | Description                                  |
+| -------------------------------- | ---------- | -------------------------------------------- |
+| `PLANETARY_POLLING_FREQUENCY`    | `60s`      | How often the scheduler checks for due feeds |
+| `PLANETARY_BATCH_SIZE`           | `100`      | Max feeds processed per scheduler tick       |
+| `PLANETARY_WORKER_POOL_SIZE`     | `5`        | Concurrent feed-processing workers           |
+| `PLANETARY_HTTP_CLIENT_TIMEOUT`  | `20s`      | Timeout for fetching a single feed           |
+| `PLANETARY_HTTP_CLIENT_MAX_BODY` | `15728640` | Max feed body size in bytes (15 MB)          |
+| `PLANETARY_DISABLE_SCHEDULER`    | (unset)    | Set to any non-empty value to disable        |
 
 See [Self-Hosting](/docs/self-hosting) for all environment variables.

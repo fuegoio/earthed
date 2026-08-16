@@ -1,5 +1,17 @@
 {
   "title": "Documentation",
   "root": true,
-  "pages": ["index", "getting-started", "web-ui", "feeds", "entries", "feed-lists", "authentication", "cli", "api-reference", "self-hosting", "architecture"]
+  "pages": [
+    "index",
+    "getting-started",
+    "web-ui",
+    "feeds",
+    "entries",
+    "feed-lists",
+    "authentication",
+    "cli",
+    "api-reference",
+    "self-hosting",
+    "architecture"
+  ]
 }

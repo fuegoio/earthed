@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { AlertDialog } from "@base-ui/react/alert-dialog"
-import { Loader2 } from "lucide-react"
-import { Button } from "@workspace/ui/components/button"
-import { cn } from "@workspace/ui/lib/utils"
+import { useState } from "react";
+import { AlertDialog } from "@base-ui/react/alert-dialog";
+import { Loader2 } from "lucide-react";
+import { Button } from "@workspace/ui/components/button";
+import { cn } from "@workspace/ui/lib/utils";
 
 /**
  * Reusable confirmation dialog built on base-ui's AlertDialog. The resource-
@@ -20,24 +20,24 @@ export function ConfirmDialog({
   destructive = true,
   onConfirm,
 }: {
-  trigger: React.ReactElement
-  title: string
-  description?: string
-  confirmLabel?: string
-  cancelLabel?: string
-  destructive?: boolean
-  onConfirm: () => Promise<void> | void
+  trigger: React.ReactElement;
+  title: string;
+  description?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  destructive?: boolean;
+  onConfirm: () => Promise<void> | void;
 }) {
-  const [open, setOpen] = useState(false)
-  const [pending, setPending] = useState(false)
+  const [open, setOpen] = useState(false);
+  const [pending, setPending] = useState(false);
 
   async function handleConfirm() {
-    setPending(true)
+    setPending(true);
     try {
-      await onConfirm()
-      setOpen(false)
+      await onConfirm();
+      setOpen(false);
     } finally {
-      setPending(false)
+      setPending(false);
     }
   }
 
@@ -52,7 +52,7 @@ export function ConfirmDialog({
         <AlertDialog.Popup
           className={cn(
             "fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2",
-            "rounded-lg border border-border bg-popover p-6 shadow-lg"
+            "rounded-lg border border-border bg-popover p-6 shadow-lg",
           )}
         >
           <AlertDialog.Title className="font-serif text-lg font-bold tracking-tight">
@@ -83,5 +83,5 @@ export function ConfirmDialog({
         </AlertDialog.Popup>
       </AlertDialog.Portal>
     </AlertDialog.Root>
-  )
+  );
 }

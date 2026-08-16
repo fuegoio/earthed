@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import { useState, useOptimistic, startTransition } from "react"
-import { useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
-import { ExternalLink, Circle, CheckCircle } from "lucide-react"
-import { Button, buttonVariants } from "@workspace/ui/components/button"
-import { StarToggle } from "@/components/star-toggle"
-import { FeedIcon } from "@/components/feed-icon"
-import { PageHeader } from "@/components/page-header"
-import { getClient, updateEntries } from "@/lib/planetary"
-import { getApiErrorMessage } from "@/lib/errors"
-import { formatDateTime } from "@/lib/format"
-import { cn } from "@workspace/ui/lib/utils"
-import type { Entry, Feed } from "@/lib/types"
+import { useState, useOptimistic, startTransition } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { ExternalLink, Circle, CheckCircle } from "lucide-react";
+import { Button, buttonVariants } from "@workspace/ui/components/button";
+import { StarToggle } from "@/components/star-toggle";
+import { FeedIcon } from "@/components/feed-icon";
+import { PageHeader } from "@/components/page-header";
+import { getClient, updateEntries } from "@/lib/planetary";
+import { getApiErrorMessage } from "@/lib/errors";
+import { formatDateTime } from "@/lib/format";
+import { cn } from "@workspace/ui/lib/utils";
+import type { Entry, Feed } from "@/lib/types";
 
 /**
  * Reading view for a single entry. Hacker News-style: just the title,
@@ -20,39 +20,33 @@ import type { Entry, Feed } from "@/lib/types"
  * Does NOT auto-mark as read on open; the user must explicitly mark or
  * open the link.
  */
-export function EntryReader({
-  entry: initialEntry,
-  feed,
-}: {
-  entry: Entry
-  feed?: Feed
-}) {
-  const queryClient = useQueryClient()
-  const [status, setStatus] = useState(initialEntry.status)
-  const [optimisticStatus, setOptimisticStatus] = useOptimistic(status)
-  const [pending, setPending] = useState(false)
+export function EntryReader({ entry: initialEntry, feed }: { entry: Entry; feed?: Feed }) {
+  const queryClient = useQueryClient();
+  const [status, setStatus] = useState(initialEntry.status);
+  const [optimisticStatus, setOptimisticStatus] = useOptimistic(status);
+  const [pending, setPending] = useState(false);
 
   function handleToggleRead() {
-    const next = optimisticStatus === "unread" ? "read" : "unread"
+    const next = optimisticStatus === "unread" ? "read" : "unread";
     startTransition(() => {
-      setOptimisticStatus(next)
-      setPending(true)
-    })
+      setOptimisticStatus(next);
+      setPending(true);
+    });
     void (async () => {
       const { error } = await updateEntries({
         client: await getClient(),
         body: { entry_ids: [initialEntry.id], status: next },
-      })
+      });
       if (error) {
-        toast.error(getApiErrorMessage(error, "Could not update entry"))
-        return
+        toast.error(getApiErrorMessage(error, "Could not update entry"));
+        return;
       }
-      setStatus(next)
-      await queryClient.invalidateQueries({ queryKey: ["entries"] })
-    })().finally(() => setPending(false))
+      setStatus(next);
+      await queryClient.invalidateQueries({ queryKey: ["entries"] });
+    })().finally(() => setPending(false));
   }
 
-  const isUnread = optimisticStatus === "unread"
+  const isUnread = optimisticStatus === "unread";
 
   return (
     <article className="mx-auto w-full max-w-3xl">
@@ -71,12 +65,7 @@ export function EntryReader({
                 Open
               </a>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleToggleRead}
-              disabled={pending}
-            >
+            <Button variant="ghost" size="sm" onClick={handleToggleRead} disabled={pending}>
               {isUnread ? (
                 <>
                   <Circle className="size-3.5" />
@@ -90,11 +79,7 @@ export function EntryReader({
               )}
             </Button>
             <div className="flex items-center gap-0.5">
-              <StarToggle
-                entryId={initialEntry.id}
-                starred={initialEntry.starred}
-                size="icon-sm"
-              />
+              <StarToggle entryId={initialEntry.id} starred={initialEntry.starred} size="icon-sm" />
             </div>
           </>
         }
@@ -102,25 +87,16 @@ export function EntryReader({
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
             {feed && (
               <span className="inline-flex items-center gap-1">
-                <FeedIcon
-                  siteUrl={feed.site_url}
-                  className="size-3.5 rounded-sm"
-                />
-                <span className="truncate font-medium text-foreground">
-                  {feed.title}
-                </span>
+                <FeedIcon siteUrl={feed.site_url} className="size-3.5 rounded-sm" />
+                <span className="truncate font-medium text-foreground">{feed.title}</span>
               </span>
             )}
             {feed && (initialEntry.author || initialEntry.published_at) && (
               <span aria-hidden>·</span>
             )}
             {initialEntry.author && <span>{initialEntry.author}</span>}
-            {initialEntry.author && initialEntry.published_at && (
-              <span aria-hidden>·</span>
-            )}
-            {initialEntry.published_at && (
-              <time>{formatDateTime(initialEntry.published_at)}</time>
-            )}
+            {initialEntry.author && initialEntry.published_at && <span aria-hidden>·</span>}
+            {initialEntry.published_at && <time>{formatDateTime(initialEntry.published_at)}</time>}
           </div>
         }
       />
@@ -144,5 +120,5 @@ export function EntryReader({
         </p>
       )}
     </article>
-  )
+  );
 }
