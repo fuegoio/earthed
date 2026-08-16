@@ -1,0 +1,42 @@
+{
+  "lexicon": 1,
+  "id": "io.planetary.actor.profile",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A Planetary user profile. Stored in the user's PDS repo under io.planetary.actor.profile/self.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": ["handle", "createdAt"],
+        "properties": {
+          "handle": {
+            "type": "string",
+            "maxLength": 64,
+            "description": "The user's Planetary handle (e.g. 'fuego'). Unique within the instance."
+          },
+          "bio": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "Short biography."
+          },
+          "displayName": {
+            "type": "string",
+            "maxLength": 255,
+            "description": "Human-readable display name."
+          },
+          "instanceUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Base URL of the Planetary instance this user belongs to."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "ISO 8601 timestamp when the profile was first created."
+          }
+        }
+      }
+    }
+  }
+}

@@ -135,6 +135,7 @@ func run() (int, error) {
 	mux.Handle("/auth/device/status", authInst.Middleware(humaMux))
 	mux.Handle("/v1/health", humaMux)
 	mux.Handle("/", authInst.Middleware(humaMux))
+	mux.Handle("/.well-known/atproto-did", apiHandler.WellKnownATProtoDIDHandler())
 	mux.Handle("/docs", humaRouter.Adapter())
 	mux.Handle("/openapi.json", humaRouter.Adapter())
 

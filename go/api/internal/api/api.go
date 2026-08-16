@@ -56,6 +56,7 @@ func OpenAPITags() []*huma.Tag {
 		{Name: "opml", Description: "OPML import/export"},
 		{Name: "feed-lists", Description: "Shareable feed list collections"},
 		{Name: "social", Description: "Social features: handles, follows, article sharing"},
+		{Name: "atproto", Description: "AT Protocol identity and PDS integration"},
 		{Name: "device", Description: "Device-flow login (CLI/TUI)"},
 	}
 }
@@ -71,6 +72,7 @@ func (a *API) RegisterRoutes() {
 	a.registerFeedListRoutes()
 	a.registerOPMLRoutes()
 	a.registerSocialRoutes()
+	a.registerATProtoRoutes()
 	a.registerDeviceRoutes()
 }
 
