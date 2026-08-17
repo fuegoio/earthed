@@ -8,6 +8,7 @@ export default function FeedLoading() {
       <div className="sticky top-0 z-10 bg-background">
         <div className="flex flex-col gap-3 border-b border-border px-4 py-3">
           <div className="flex items-center gap-2">
+            <Skeleton className="size-9 shrink-0 rounded-md lg:hidden" />
             <Skeleton className="size-5 shrink-0 rounded-md" />
             <Skeleton className="h-5 w-48" />
           </div>

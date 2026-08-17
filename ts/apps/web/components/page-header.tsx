@@ -1,8 +1,17 @@
+"use client";
+
 import type { ReactNode } from "react";
+import { Menu as MenuIcon } from "lucide-react";
+import { Button } from "@workspace/ui/components/button";
+import { useShell } from "@/components/shell-context";
 import { cn } from "@workspace/ui/lib/utils";
 
 /**
  * Shared page header used across the app for a consistent title bar.
+ *
+ * On mobile the sidebar menu button is inlined as the leading element so
+ * there is no separate top bar. On desktop the title has a small left
+ * indent that aligns with the sidebar-less layout.
  *
  * Renders a single border-bottom row with an optional leading icon, a
  * truncated serif title, and optional trailing actions. An optional
@@ -23,6 +32,8 @@ export function PageHeader({
   metadata?: ReactNode;
   className?: string;
 }) {
+  const shell = useShell();
+
   return (
     <div
       className={cn("sticky top-0 z-10 border-b border-border bg-background px-4 py-3", className)}
@@ -30,11 +41,22 @@ export function PageHeader({
       <div className="flex items-center justify-between gap-3">
         <h1
           className={cn(
-            "flex min-w-0 items-center gap-4 font-serif text-lg font-bold tracking-normal",
-            icon ? "pl-0" : "pl-8",
+            "flex min-w-0 items-center gap-2 font-serif text-lg font-bold tracking-normal",
           )}
         >
-          {icon}
+          {/* Mobile menu button — replaces the separate top bar */}
+          {shell && (
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Toggle sidebar"
+              onClick={shell.openSidebar}
+              className="-ml-2 shrink-0 lg:hidden"
+            >
+              <MenuIcon className="size-4" />
+            </Button>
+          )}
+          {icon && <span className="shrink-0">{icon}</span>}
           <span className="truncate">{title}</span>
         </h1>
         {actions ? (
