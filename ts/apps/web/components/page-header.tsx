@@ -63,7 +63,7 @@ export function PageHeader({
           <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">{actions}</div>
         ) : null}
       </div>
-      {metadata ? <div className="mt-1.5 text-sm text-muted-foreground">{metadata}</div> : null}
+      {metadata ? <div className="mt-1.5 pl-[52px] text-sm text-muted-foreground lg:pl-0">{metadata}</div> : null}
     </div>
   );
 }

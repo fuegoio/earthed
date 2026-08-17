@@ -12,6 +12,7 @@ export default function FeedLoading() {
             <Skeleton className="size-5 shrink-0 rounded-md" />
             <Skeleton className="h-5 w-48" />
           </div>
+          <Skeleton className="mt-1.5 h-4 w-64 ml-[52px] lg:ml-0" />
         </div>
         {/* Button row matching feed-detail's actions bar */}
         <div className="flex items-center gap-2 border-b border-border px-4 py-2 pl-[52px] lg:pl-4">
