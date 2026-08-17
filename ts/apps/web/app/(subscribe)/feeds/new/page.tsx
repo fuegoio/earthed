@@ -78,83 +78,94 @@ export default function SubscribeFeedPage() {
   const showPreview = !!preview;
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
-      <div className="flex flex-col gap-8">
-        {/* Header + URL input — always visible */}
-        <div className="flex flex-col gap-3">
-          <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10">
-            <Logo className="size-7" />
-          </div>
-          <h1 className="font-serif text-2xl font-bold tracking-normal">Subscribe to a feed</h1>
-          <p className="max-w-md text-sm text-muted-foreground">
-            Paste any website URL or feed link. We&apos;ll discover the RSS feed automatically and
-            show you what you&apos;ll get before you subscribe.
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="feed_url">Website or feed URL</Label>
-          <Input
-            id="feed_url"
-            type="url"
-            placeholder="https://example.com"
-            autoComplete="url"
-            spellCheck={false}
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            aria-invalid={!isUrlValid && debouncedUrl.length > 0}
-          />
-          {!isUrlValid && debouncedUrl.length > 0 && (
-            <p className="text-sm text-destructive">Enter a valid URL</p>
-          )}
-        </div>
-
-        {/* Live states below the input */}
-        {showLoading && (
-          <div className="flex flex-col items-center gap-4 py-8">
-            <Loader2 className="size-6 animate-spin text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">Fetching and parsing feed...</p>
-          </div>
-        )}
-
-        {showError && (
-          <div
-            role="alert"
-            className="rounded-md border border-destructive/50 bg-destructive/10 p-4 text-foreground"
-          >
-            <div className="flex items-center gap-2 font-medium">
-              <span className="text-destructive">Could not fetch feed</span>
+    <div className="flex h-full w-full flex-col">
+      {/* Scrollable body */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
+          <div className="flex flex-col gap-8">
+            {/* Header + URL input — always visible */}
+            <div className="flex flex-col gap-3">
+              <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10">
+                <Logo className="size-7" />
+              </div>
+              <h1 className="font-serif text-2xl font-bold tracking-normal">Subscribe to a feed</h1>
+              <p className="max-w-md text-sm text-muted-foreground">
+                Paste any website URL or feed link. We&apos;ll discover the RSS feed automatically and
+                show you what you&apos;ll get before you subscribe.
+              </p>
             </div>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {getApiErrorMessage(previewError, "Check the URL and try again")}
-            </p>
-          </div>
-        )}
 
-        {showPreview && !subscribing && (
-          <PreviewContent preview={preview} onSubscribe={handleSubscribe} />
-        )}
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="feed_url">Website or feed URL</Label>
+              <Input
+                id="feed_url"
+                type="url"
+                placeholder="https://example.com"
+                autoComplete="url"
+                spellCheck={false}
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                aria-invalid={!isUrlValid && debouncedUrl.length > 0}
+              />
+              {!isUrlValid && debouncedUrl.length > 0 && (
+                <p className="text-sm text-destructive">Enter a valid URL</p>
+              )}
+            </div>
 
-        {showPreview && subscribing && (
-          <div className="flex flex-col items-center gap-4 py-8">
-            <Loader2 className="size-6 animate-spin text-primary" />
-            <p className="text-sm text-muted-foreground">
-              Subscribing to &ldquo;{preview.title || preview.feed_url}&rdquo;...
-            </p>
+            {/* Live states below the input */}
+            {showLoading && (
+              <div className="flex flex-col items-center gap-4 py-8">
+                <Loader2 className="size-6 animate-spin text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">Fetching and parsing feed...</p>
+              </div>
+            )}
+
+            {showError && (
+              <div
+                role="alert"
+                className="rounded-md border border-destructive/50 bg-destructive/10 p-4 text-foreground"
+              >
+                <div className="flex items-center gap-2 font-medium">
+                  <span className="text-destructive">Could not fetch feed</span>
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {getApiErrorMessage(previewError, "Check the URL and try again")}
+                </p>
+              </div>
+            )}
+
+            {showPreview && !subscribing && (
+              <PreviewContent preview={preview} />
+            )}
+
+            {showPreview && subscribing && (
+              <div className="flex flex-col items-center gap-4 py-8">
+                <Loader2 className="size-6 animate-spin text-primary" />
+                <p className="text-sm text-muted-foreground">
+                  Subscribing to &ldquo;{preview.title || preview.feed_url}&rdquo;...
+                </p>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
+
+      {/* Subscribe button — pinned to the bottom */}
+      {showPreview && !subscribing && (
+        <div className="shrink-0 border-t border-border bg-background px-4 py-4 sm:px-6">
+          <div className="mx-auto w-full max-w-2xl">
+            <Button onClick={handleSubscribe} size="lg" className="w-full">
+              <Plus className="size-4" />
+              Subscribe to this feed
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-function PreviewContent({
-  preview,
-  onSubscribe,
-}: {
-  preview: PreviewFeedBody;
-  onSubscribe: () => void;
-}) {
+function PreviewContent({ preview }: { preview: PreviewFeedBody }) {
   const items = preview.items ?? [];
 
   return (
@@ -237,13 +248,6 @@ function PreviewContent({
         )}
       </div>
 
-      {/* Subscribe */}
-      <div className="flex flex-col gap-4">
-        <Button onClick={onSubscribe} size="lg">
-          <Plus className="size-4" />
-          Subscribe to this feed
-        </Button>
-      </div>
     </div>
   );
 }

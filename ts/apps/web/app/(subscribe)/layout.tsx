@@ -17,7 +17,7 @@ export default async function SubscribeLayout({ children }: { children: React.Re
   if (!user) redirect("/login");
 
   return (
-    <div className="flex min-h-svh flex-col">
+    <div className="flex h-svh flex-col">
       <header className="flex h-14 shrink-0 items-center border-b border-border px-4">
         <Link
           href="/"
@@ -27,7 +27,7 @@ export default async function SubscribeLayout({ children }: { children: React.Re
           Back
         </Link>
       </header>
-      <main className="flex-1">{children}</main>
+      <main className="flex min-h-0 flex-1">{children}</main>
     </div>
   );
 }
