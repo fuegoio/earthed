@@ -58,19 +58,15 @@ export default function FeedLoading() {
         </div>
         {/* Action bar: mark all read, refresh, folder picker */}
         <div className="flex items-center gap-2 border-b border-border px-4 py-2 pl-[52px] lg:pl-4">
-          <Button variant="outline" size="sm" disabled aria-hidden="true">
+          <button disabled aria-hidden="true" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "cursor-default")}>
             <CheckCheck className="size-3.5" />
             Mark all as read
-          </Button>
-          <Button variant="outline" size="sm" disabled aria-hidden="true">
+          </button>
+          <button disabled aria-hidden="true" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "cursor-default")}>
             <RefreshCw className="size-3.5" />
             Refresh
-          </Button>
-          <button
-            disabled
-            aria-hidden="true"
-            className={cn(buttonVariants({ variant: "outline", size: "sm" }), "cursor-default")}
-          >
+          </button>
+          <button disabled aria-hidden="true" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "cursor-default")}>
             <FolderOpen className="size-3.5" />
             <Skeleton className="h-3.5 w-16" />
             <ChevronDown className="size-3 text-muted-foreground" />
