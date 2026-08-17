@@ -39,11 +39,7 @@ export function PageHeader({
       className={cn("sticky top-0 z-10 border-b border-border bg-background px-4 py-3", className)}
     >
       <div className="flex items-center justify-between gap-3">
-        <h1
-          className={cn(
-            "flex min-w-0 items-center gap-2 font-serif text-lg font-bold tracking-normal",
-          )}
-        >
+        <div className="flex min-w-0 items-center gap-1.5">
           {/* Mobile menu button — replaces the separate top bar */}
           {shell && (
             <Button
@@ -56,14 +52,20 @@ export function PageHeader({
               <MenuIcon className="size-4" />
             </Button>
           )}
-          {icon && <span className="shrink-0">{icon}</span>}
-          <span className="truncate">{title}</span>
-        </h1>
+          <h1 className="flex min-w-0 items-center gap-2 font-serif text-lg font-bold tracking-wider">
+            {icon && <span className="shrink-0">{icon}</span>}
+            <span className="truncate">{title}</span>
+          </h1>
+        </div>
         {actions ? (
           <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">{actions}</div>
         ) : null}
       </div>
-      {metadata ? <div className="mt-1.5 min-h-[1.25rem] pl-[52px] text-sm text-muted-foreground lg:pl-0">{metadata}</div> : null}
+      {metadata ? (
+        <div className="mt-1.5 min-h-[1.25rem] pl-[52px] text-sm text-muted-foreground lg:pl-0">
+          {metadata}
+        </div>
+      ) : null}
     </div>
   );
 }
