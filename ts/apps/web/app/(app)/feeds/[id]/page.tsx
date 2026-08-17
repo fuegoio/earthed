@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
-import { getClient, getFeed, refreshFeed } from "@/lib/planetary";
+import { getClient, getFeed, refreshFeed, listFolders } from "@/lib/planetary";
 import { getApiErrorMessage, apiErrorStatus } from "@/lib/errors";
 import { ApiError } from "@/components/api-error";
 import { FeedDetail } from "@/components/feed-detail";
 import type { Metadata } from "next";
-import type { Feed } from "@/lib/types";
+import type { Feed, Folder } from "@/lib/types";
 
 export async function generateMetadata({
   params,
@@ -62,5 +62,8 @@ export default async function FeedPage({ params }: { params: Promise<{ id: strin
     // refresh is best-effort
   }
 
-  return <FeedDetail feed={refreshedFeed} />;
+  const { data: foldersData } = await listFolders({ client });
+  const folders = (foldersData ?? []) as Folder[];
+
+  return <FeedDetail feed={refreshedFeed} initialFolders={folders} />;
 }

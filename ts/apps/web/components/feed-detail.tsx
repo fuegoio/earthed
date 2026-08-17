@@ -37,7 +37,7 @@ import type { Feed, Folder } from "@/lib/types";
  * actions, plus the feed's entry timeline. The feed is refreshed server-side
  * before this component renders; the refresh button here is for on-demand use.
  */
-export function FeedDetail({ feed }: { feed: Feed }) {
+export function FeedDetail({ feed, initialFolders }: { feed: Feed; initialFolders?: Folder[] }) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [marking, setMarking] = useState(false);
@@ -48,6 +48,7 @@ export function FeedDetail({ feed }: { feed: Feed }) {
   const { data: folders } = useQuery<Folder[]>({
     queryKey: ["folders"],
     queryFn: async () => unwrap(listFolders({ client: await getClient() })),
+    initialData: initialFolders,
   });
 
   async function handleRefresh() {
