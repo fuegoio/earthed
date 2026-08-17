@@ -6,18 +6,18 @@ export default function FeedLoading() {
     <div className="mx-auto w-full max-w-3xl">
       {/* Header matching FeedDetail's sticky PageHeader */}
       <div className="sticky top-0 z-10 bg-background">
-        <div className="flex flex-col gap-3 border-b border-border px-4 py-3">
+        <div className="border-b border-border px-4 py-3">
           <div className="flex items-center gap-2">
-            <Skeleton className="size-9 shrink-0 rounded-md lg:hidden" />
+            <Skeleton className="-ml-2 size-9 shrink-0 rounded-md lg:hidden" />
             <Skeleton className="size-5 shrink-0 rounded-md" />
             <Skeleton className="h-5 w-48" />
           </div>
-          {/* Button row matching the actual actions */}
-          <div className="flex items-center gap-2">
-            <Skeleton className="h-7 w-20 rounded-md" />
-            <Skeleton className="h-7 w-24 rounded-md" />
-            <Skeleton className="h-7 w-7 rounded-md" />
-          </div>
+        </div>
+        {/* Button row matching feed-detail's actions bar */}
+        <div className="flex items-center gap-2 border-b border-border px-4 py-2 pl-[52px] lg:pl-4">
+          <Skeleton className="h-7 w-24 rounded-md" />
+          <Skeleton className="h-7 w-20 rounded-md" />
+          <Skeleton className="ml-auto h-7 w-7 rounded-md" />
         </div>
       </div>
       {/* Entry skeletons */}

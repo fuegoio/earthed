@@ -7,7 +7,7 @@ export default function Loading() {
       {/* Matches PageHeader: sticky top-0 border-b px-4 py-3 */}
       <div className="sticky top-0 z-10 border-b border-border bg-background px-4 py-3">
         <div className="flex items-center gap-2">
-          <Skeleton className="size-9 shrink-0 rounded-md lg:hidden" />
+          <Skeleton className="-ml-2 size-9 shrink-0 rounded-md lg:hidden" />
           <Skeleton className="h-6 w-32" />
         </div>
       </div>
