@@ -125,6 +125,8 @@ export function FeedDetail({ feed }: { feed: Feed }) {
     }
   }
 
+  const currentFolder = folders?.find((f) => f.id === feed.folder_id);
+
   return (
     <div className="mx-auto w-full max-w-3xl">
       <div className="sticky top-0 z-10 bg-background">
@@ -134,46 +136,17 @@ export function FeedDetail({ feed }: { feed: Feed }) {
           actions={
             <div className="flex items-center gap-1">
               <FeedRenameDialog feed={feed} />
-              <Menu.Root>
-                <Menu.Trigger
-                  disabled={movingFolder}
-                  aria-label="Move to folder"
-                  className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }))}
-                >
-                  {movingFolder ? (
-                    <Loader2 className="size-3.5 animate-spin" />
-                  ) : (
-                    <FolderOpen className="size-3.5" />
-                  )}
-                </Menu.Trigger>
-                <Menu.Portal>
-                  <Menu.Positioner
-                    className={cn(
-                      "z-50 min-w-48 overflow-hidden rounded-md border border-border bg-popover p-1",
-                      "shadow-md",
-                    )}
-                    align="end"
-                  >
-                    <Menu.Popup>
-                      <Menu.Item
-                        className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
-                        onClick={() => handleMoveFolder(undefined)}
-                      >
-                        No folder
-                      </Menu.Item>
-                      {folders?.map((f) => (
-                        <Menu.Item
-                          key={f.id}
-                          className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
-                          onClick={() => handleMoveFolder(f.id)}
-                        >
-                          {f.title}
-                        </Menu.Item>
-                      ))}
-                    </Menu.Popup>
-                  </Menu.Positioner>
-                </Menu.Portal>
-              </Menu.Root>
+              <ConfirmDialog
+                trigger={
+                  <Button variant="ghost" size="icon-sm" disabled={deleting} className="text-muted-foreground hover:text-destructive" aria-label="Unsubscribe from feed">
+                    {deleting ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />}
+                  </Button>
+                }
+                title="Unsubscribe from feed?"
+                description={`This removes "${feed.title}" and all its entries. This cannot be undone.`}
+                confirmLabel="Unsubscribe"
+                onConfirm={handleDelete}
+              />
               {feed.site_url && (
                 <a
                   href={feed.site_url}
@@ -207,26 +180,61 @@ export function FeedDetail({ feed }: { feed: Feed }) {
             </>
           }
         />
-        <div className="flex items-center gap-2 border-b border-border px-4 py-2 lg:pl-4 pl-[52px]">
-          <Button variant="outline" size="xs" onClick={handleMarkAllRead} disabled={marking}>
+        <div className="flex items-center gap-2 border-b border-border px-4 py-2 pl-[52px] lg:pl-4">
+          <Button variant="outline" size="sm" onClick={handleMarkAllRead} disabled={marking}>
             {marking ? <Loader2 className="animate-spin" /> : <CheckCheck />}
             Mark all as read
           </Button>
-          <Button variant="outline" size="xs" onClick={handleRefresh} disabled={refreshing}>
+          <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing}>
             {refreshing ? <Loader2 className="animate-spin" /> : <RefreshCw />}
             Refresh
           </Button>
-          <ConfirmDialog
-            trigger={
-              <Button variant="ghost" size="icon-xs" disabled={deleting} className="ml-auto text-muted-foreground" aria-label="Unsubscribe from feed">
-                {deleting ? <Loader2 className="animate-spin" /> : <Trash2 />}
-              </Button>
-            }
-            title="Unsubscribe from feed?"
-            description={`This removes "${feed.title}" and all its entries. This cannot be undone.`}
-            confirmLabel="Unsubscribe"
-            onConfirm={handleDelete}
-          />
+          <Menu.Root>
+            <Menu.Trigger
+              disabled={movingFolder}
+              aria-label="Move to folder"
+              className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+            >
+              {movingFolder ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <FolderOpen className="size-3.5" />
+              )}
+              <span className="max-w-[8rem] truncate">
+                {currentFolder ? currentFolder.title : "No folder"}
+              </span>
+            </Menu.Trigger>
+            <Menu.Portal>
+              <Menu.Positioner
+                className="z-50 min-w-48 overflow-hidden rounded-md border border-border bg-popover p-1 shadow-md"
+                align="start"
+              >
+                <Menu.Popup>
+                  <Menu.Item
+                    className={cn(
+                      "flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground",
+                      !feed.folder_id && "font-medium",
+                    )}
+                    onClick={() => handleMoveFolder(undefined)}
+                  >
+                    No folder
+                  </Menu.Item>
+                  {folders?.map((f) => (
+                    <Menu.Item
+                      key={f.id}
+                      className={cn(
+                        "flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground",
+                        feed.folder_id === f.id && "font-medium",
+                      )}
+                      onClick={() => handleMoveFolder(f.id)}
+                    >
+                      {f.title}
+                    </Menu.Item>
+                  ))}
+                </Menu.Popup>
+              </Menu.Positioner>
+            </Menu.Portal>
+          </Menu.Root>
         </div>
       </div>
       <EntryTimeline
