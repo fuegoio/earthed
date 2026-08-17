@@ -253,7 +253,7 @@ func (s *Store) UpdateFeedFetchState(ctx context.Context, feedID int, etag, last
 // ListFeedsDueForRefresh returns up to limit feeds whose next_check_at <= now.
 func (s *Store) ListFeedsDueForRefresh(ctx context.Context, limit int) ([]Feed, error) {
 	rows, err := s.DB.QueryContext(ctx,
-		`SELECT id, user_id, folder_id, feed_url, site_url, title,
+		`SELECT id, user_id, folder_id, feed_url, site_url, title, description,
 		        etag_header, last_modified_header, parsing_error, parsing_error_count,
 		        disabled, scraper_rules, rewrite_rules, crawler,
 		        next_check_at, last_fetch_at, created_at, updated_at
