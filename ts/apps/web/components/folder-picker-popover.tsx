@@ -162,7 +162,7 @@ export function FolderPickerPopover({
       </Popover.Trigger>
 
       <Popover.Portal>
-        <Popover.Positioner align="start" sideOffset={6}>
+        <Popover.Positioner align="start" sideOffset={2}>
           <Popover.Popup className="z-50 min-w-52 max-w-72 overflow-hidden rounded-md border border-border bg-popover p-1 shadow-md animate-in fade-in-0 zoom-in-95 duration-100">
             {/* "No folder" root option */}
             <button
@@ -171,11 +171,13 @@ export function FolderPickerPopover({
               className={cn(
                 "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors",
                 "hover:bg-accent hover:text-accent-foreground",
-                !currentFolderId && "bg-accent/60 font-medium text-accent-foreground",
+                !currentFolderId
+                  ? "bg-accent/60 font-medium text-accent-foreground"
+                  : "text-muted-foreground",
               )}
             >
               <span className="size-4 shrink-0" />
-              <FolderIcon className="size-3.5 shrink-0 text-muted-foreground" />
+              <span className="size-3.5 shrink-0" />
               <span className="flex-1 text-left">No folder</span>
               {!currentFolderId && <Check className="size-3.5 shrink-0 text-primary" />}
             </button>
