@@ -11,10 +11,9 @@ import {
   Loader2,
   RefreshCw,
   Rss,
-  FolderOpen,
 } from "lucide-react";
 import { FeedRenameDialog } from "@/components/feed-rename-dialog";
-import { Menu } from "@base-ui/react/menu";
+import { FolderPickerPopover } from "@/components/folder-picker-popover";
 import { Button, buttonVariants } from "@workspace/ui/components/button";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { FeedIcon } from "@/components/feed-icon";
@@ -125,8 +124,6 @@ export function FeedDetail({ feed }: { feed: Feed }) {
     }
   }
 
-  const currentFolder = folders?.find((f) => f.id === feed.folder_id);
-
   return (
     <div className="mx-auto w-full max-w-3xl">
       <div className="sticky top-0 z-10 bg-background">
@@ -189,52 +186,12 @@ export function FeedDetail({ feed }: { feed: Feed }) {
             {refreshing ? <Loader2 className="animate-spin" /> : <RefreshCw />}
             Refresh
           </Button>
-          <Menu.Root>
-            <Menu.Trigger
-              disabled={movingFolder}
-              aria-label="Move to folder"
-              className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
-            >
-              {movingFolder ? (
-                <Loader2 className="size-3.5 animate-spin" />
-              ) : (
-                <FolderOpen className="size-3.5" />
-              )}
-              <span className="max-w-[8rem] truncate">
-                {currentFolder ? currentFolder.title : "No folder"}
-              </span>
-            </Menu.Trigger>
-            <Menu.Portal>
-              <Menu.Positioner
-                className="z-50 min-w-48 overflow-hidden rounded-md border border-border bg-popover p-1 shadow-md"
-                align="start"
-              >
-                <Menu.Popup>
-                  <Menu.Item
-                    className={cn(
-                      "flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground",
-                      !feed.folder_id && "font-medium",
-                    )}
-                    onClick={() => handleMoveFolder(undefined)}
-                  >
-                    No folder
-                  </Menu.Item>
-                  {folders?.map((f) => (
-                    <Menu.Item
-                      key={f.id}
-                      className={cn(
-                        "flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground",
-                        feed.folder_id === f.id && "font-medium",
-                      )}
-                      onClick={() => handleMoveFolder(f.id)}
-                    >
-                      {f.title}
-                    </Menu.Item>
-                  ))}
-                </Menu.Popup>
-              </Menu.Positioner>
-            </Menu.Portal>
-          </Menu.Root>
+          <FolderPickerPopover
+            folders={folders}
+            currentFolderId={feed.folder_id}
+            disabled={movingFolder}
+            onSelect={(folderId) => handleMoveFolder(folderId)}
+          />
         </div>
       </div>
       <EntryTimeline
