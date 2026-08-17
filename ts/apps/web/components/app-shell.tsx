@@ -30,7 +30,7 @@ export function AppShell({
       <div className="flex w-full min-w-0 max-w-5xl shrink-0 overflow-hidden">
         <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} userEmail={userEmail} />
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="flex shrink-0 items-center gap-2 border-b border-border bg-background py-3 pl-1 pr-4 lg:hidden">
+          <header className="flex shrink-0 items-center gap-2 border-b border-border bg-background py-3 pl-2 pr-4 lg:hidden">
             <Button
               variant="ghost"
               size="icon"
