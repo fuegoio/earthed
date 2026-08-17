@@ -26,9 +26,8 @@ export default function FeedLoading() {
               <Button
                 variant="ghost"
                 size="icon"
-                disabled
                 aria-hidden="true"
-                className="-ml-2 shrink-0 lg:hidden"
+                className="-ml-2 shrink-0 pointer-events-none lg:hidden"
               >
                 <Menu className="size-4" />
               </Button>
@@ -39,16 +38,16 @@ export default function FeedLoading() {
             </div>
             {/* Actions: rename, delete, external link, rss */}
             <div className="flex shrink-0 items-center gap-1">
-              <Button variant="ghost" size="icon-sm" disabled aria-hidden="true" className="text-muted-foreground">
+              <Button variant="ghost" size="icon-sm" aria-hidden="true" className="pointer-events-none text-muted-foreground">
                 <Pencil className="size-3.5" />
               </Button>
-              <Button variant="ghost" size="icon-sm" disabled aria-hidden="true" className="text-muted-foreground">
+              <Button variant="ghost" size="icon-sm" aria-hidden="true" className="pointer-events-none text-muted-foreground">
                 <Trash2 className="size-3.5" />
               </Button>
-              <Button variant="ghost" size="icon-sm" disabled aria-hidden="true" className="text-muted-foreground">
+              <Button variant="ghost" size="icon-sm" aria-hidden="true" className="pointer-events-none text-muted-foreground">
                 <ExternalLink className="size-3.5" />
               </Button>
-              <Button variant="ghost" size="icon-sm" disabled aria-hidden="true" className="text-muted-foreground">
+              <Button variant="ghost" size="icon-sm" aria-hidden="true" className="pointer-events-none text-muted-foreground">
                 <Rss className="size-3.5" />
               </Button>
             </div>
@@ -58,15 +57,15 @@ export default function FeedLoading() {
         </div>
         {/* Action bar: mark all read, refresh, folder picker */}
         <div className="flex items-center gap-2 border-b border-border px-4 py-2 pl-[52px] lg:pl-4">
-          <button disabled aria-hidden="true" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "cursor-default")}>
+          <button aria-hidden="true" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "pointer-events-none")}>
             <CheckCheck className="size-3.5" />
             Mark all as read
           </button>
-          <button disabled aria-hidden="true" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "cursor-default")}>
+          <button aria-hidden="true" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "pointer-events-none")}>
             <RefreshCw className="size-3.5" />
             Refresh
           </button>
-          <button disabled aria-hidden="true" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "cursor-default")}>
+          <button aria-hidden="true" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "pointer-events-none")}>
             <FolderOpen className="size-3.5" />
             <Skeleton className="h-3.5 w-16" />
             <ChevronDown className="size-3 text-muted-foreground" />
