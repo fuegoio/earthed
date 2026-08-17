@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, Loader2, Rss, ExternalLink, Plus } from "lucide-react";
+import { Loader2, Rss, ExternalLink, Plus } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
+import { Logo } from "@/components/logo";
 import { getClient, previewFeed, createFeed } from "@/lib/planetary";
 import { getApiErrorMessage } from "@/lib/errors";
 import { subscribeFeedSchema, normalizeFeedURL } from "@/lib/schemas";
@@ -79,19 +79,11 @@ export default function SubscribeFeedPage() {
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
-      <Link
-        href="/"
-        className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-      >
-        <ArrowLeft className="size-3.5" />
-        Back
-      </Link>
-
       <div className="flex flex-col gap-8">
         {/* Header + URL input — always visible */}
         <div className="flex flex-col gap-3">
           <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10">
-            <Rss className="size-6 text-primary" />
+            <Logo className="size-7" />
           </div>
           <h1 className="font-serif text-2xl font-bold tracking-normal">Subscribe to a feed</h1>
           <p className="max-w-md text-sm text-muted-foreground">
