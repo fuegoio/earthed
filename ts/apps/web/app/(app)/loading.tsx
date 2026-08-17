@@ -12,7 +12,7 @@ export default function Loading() {
           <Button variant="ghost" size="icon" disabled aria-hidden="true" className="-ml-2 shrink-0 lg:hidden">
             <Menu className="size-4" />
           </Button>
-          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-7 w-32" />
         </div>
       </div>
       <div className="flex flex-col divide-y divide-border">

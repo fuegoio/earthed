@@ -53,8 +53,8 @@ export default function FeedLoading() {
               </Button>
             </div>
           </div>
-          {/* Description line */}
-          <Skeleton className="mt-1.5 h-4 w-56 ml-[52px] lg:ml-0" />
+          {/* Description line — matches PageHeader's min-h-[1.25rem] metadata div */}
+          <Skeleton className="mt-1.5 h-[1.25rem] w-56 ml-[52px] lg:ml-0" />
         </div>
         {/* Action bar: mark all read, refresh, folder picker */}
         <div className="flex items-center gap-2 border-b border-border px-4 py-2 pl-[52px] lg:pl-4">
