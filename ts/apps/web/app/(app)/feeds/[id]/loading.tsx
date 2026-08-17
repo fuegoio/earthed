@@ -23,7 +23,7 @@ export default function FeedLoading() {
           <div className="flex items-center justify-between gap-3">
             <div className="flex min-w-0 flex-1 items-center gap-2">
               {/* Menu button — mobile only, matches PageHeader */}
-              <button aria-hidden="true" className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "-ml-2 shrink-0 pointer-events-none lg:hidden")}>
+              <button aria-hidden="true" className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "-ml-2 shrink-0 pointer-events-none transition-none lg:hidden")}>
                 <Menu className="size-4" />
               </button>
               {/* Feed favicon placeholder */}
@@ -53,11 +53,11 @@ export default function FeedLoading() {
         {/* Action bar: mark all read, refresh, folder picker */}
         <div className="flex items-center gap-2 border-b border-border px-4 py-2 pl-[52px] lg:pl-4">
           <button aria-hidden="true" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "pointer-events-none")}>
-            <CheckCheck className="size-3.5" />
+            <CheckCheck />
             Mark all as read
           </button>
           <button aria-hidden="true" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "pointer-events-none")}>
-            <RefreshCw className="size-3.5" />
+            <RefreshCw />
             Refresh
           </button>
           <button aria-hidden="true" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "pointer-events-none")}>
