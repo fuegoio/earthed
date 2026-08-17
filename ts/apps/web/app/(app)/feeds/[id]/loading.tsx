@@ -10,7 +10,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { Skeleton } from "@workspace/ui/components/skeleton";
-import { Button, buttonVariants } from "@workspace/ui/components/button";
+import { buttonVariants } from "@workspace/ui/components/button";
 import { EntryCardSkeleton } from "@/components/entry-card-skeleton";
 import { cn } from "@workspace/ui/lib/utils";
 
@@ -23,14 +23,9 @@ export default function FeedLoading() {
           <div className="flex items-center justify-between gap-3">
             <div className="flex min-w-0 flex-1 items-center gap-2">
               {/* Menu button — mobile only, matches PageHeader */}
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-hidden="true"
-                className="-ml-2 shrink-0 pointer-events-none lg:hidden"
-              >
+              <button aria-hidden="true" className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "-ml-2 shrink-0 pointer-events-none lg:hidden")}>
                 <Menu className="size-4" />
-              </Button>
+              </button>
               {/* Feed favicon placeholder */}
               <Skeleton className="size-5 shrink-0 rounded-md" />
               {/* Feed title */}
@@ -38,18 +33,18 @@ export default function FeedLoading() {
             </div>
             {/* Actions: rename, delete, external link, rss */}
             <div className="flex shrink-0 items-center gap-1">
-              <Button variant="ghost" size="icon-sm" aria-hidden="true" className="pointer-events-none text-muted-foreground">
+              <button aria-hidden="true" className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }), "pointer-events-none text-muted-foreground")}>
                 <Pencil className="size-3.5" />
-              </Button>
-              <Button variant="ghost" size="icon-sm" aria-hidden="true" className="pointer-events-none text-muted-foreground">
+              </button>
+              <button aria-hidden="true" className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }), "pointer-events-none text-muted-foreground")}>
                 <Trash2 className="size-3.5" />
-              </Button>
-              <Button variant="ghost" size="icon-sm" aria-hidden="true" className="pointer-events-none text-muted-foreground">
+              </button>
+              <button aria-hidden="true" className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }), "pointer-events-none text-muted-foreground")}>
                 <ExternalLink className="size-3.5" />
-              </Button>
-              <Button variant="ghost" size="icon-sm" aria-hidden="true" className="pointer-events-none text-muted-foreground">
+              </button>
+              <button aria-hidden="true" className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }), "pointer-events-none text-muted-foreground")}>
                 <Rss className="size-3.5" />
-              </Button>
+              </button>
             </div>
           </div>
           {/* Description line — matches PageHeader's min-h-[1.25rem] metadata div */}
