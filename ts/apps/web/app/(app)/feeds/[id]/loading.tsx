@@ -72,7 +72,7 @@ export default function FeedLoading() {
             className={cn(buttonVariants({ variant: "outline", size: "sm" }), "cursor-default")}
           >
             <FolderOpen className="size-3.5" />
-            <span className="text-muted-foreground">No folder</span>
+            <Skeleton className="h-3.5 w-16" />
             <ChevronDown className="size-3 text-muted-foreground" />
           </button>
         </div>
