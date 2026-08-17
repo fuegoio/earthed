@@ -140,15 +140,17 @@ export function EntryCard({
       </div>
       <div className="flex shrink-0 items-start gap-0.5" onClick={(e) => e.stopPropagation()}>
         {entry.comments_url && (
-          <a
-            href={entry.comments_url}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              window.open(entry.comments_url!, "_blank", "noopener,noreferrer");
+            }}
             aria-label="View comments"
             className="flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
           >
             <MessageSquare className="size-3.5" />
-          </a>
+          </button>
         )}
         <StarToggle entryId={entry.id} starred={entry.starred} size="icon-sm" />
       </div>
