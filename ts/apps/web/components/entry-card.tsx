@@ -92,6 +92,7 @@ export function EntryCard({
       target={entry.url ? "_blank" : undefined}
       rel={entry.url ? "noopener noreferrer" : undefined}
       onClick={handleClick}
+      layout={animateExit ? "position" : false}
       initial={{ opacity: 0, y: 5 }}
       animate={{ opacity: unread ? 1 : 0.6, y: 0 }}
       // "row-hover" variant propagates to child motion elements that declare it.
@@ -99,6 +100,7 @@ export function EntryCard({
       transition={{
         opacity: { duration: 0.3, ease: EASE },
         y: { duration: 0.22, ease: EASE, delay: Math.min(staggerIndex ?? 0, 8) * 0.03 },
+        layout: { duration: 0.22, ease: EASE },
       }}
       className="group flex gap-3 px-4 py-3 hover:bg-muted/50"
     >
@@ -163,16 +165,17 @@ export function EntryCard({
 
   if (!animateExit) return inner;
 
-  // On filtered views (unread, starred) wrap in a collapsing container so
-  // the row animates out when AnimatePresence removes it from the list.
-  // overflow:hidden + scaleY collapses the row without animating height directly.
+  // On filtered views (unread, starred) wrap in a layout-animated container.
+  // layout="size" shrinks the wrapper's height to zero on exit while siblings
+  // translate into position. opacity fades the content out simultaneously.
   return (
     <motion.div
-      initial={{ scaleY: 1, opacity: 1, originY: 0 }}
-      animate={{ scaleY: 1, opacity: 1 }}
-      exit={{ scaleY: 0, opacity: 0 }}
-      transition={{ duration: 0.22, ease: EASE }}
-      style={{ overflow: "hidden", transformOrigin: "top" }}
+      layout="size"
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.22, ease: EASE, layout: { duration: 0.28, ease: EASE } }}
+      style={{ overflow: "hidden" }}
     >
       {inner}
     </motion.div>
