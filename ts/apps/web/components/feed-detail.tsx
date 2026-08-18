@@ -13,7 +13,6 @@ import {
   Rss,
 } from "lucide-react";
 import { FeedRenameDialog } from "@/components/feed-rename-dialog";
-import { FolderPickerPopover } from "@/components/folder-picker-popover";
 import { Button, buttonVariants } from "@workspace/ui/components/button";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { FeedIcon } from "@/components/feed-icon";
@@ -187,12 +186,24 @@ export function FeedDetail({ feed, initialFolders }: { feed: Feed; initialFolder
             {refreshing ? <Loader2 className="animate-spin" /> : <RefreshCw />}
             Refresh
           </Button>
-          <FolderPickerPopover
-            folders={folders}
-            currentFolderId={feed.folder_id}
+          <select
             disabled={movingFolder}
-            onSelect={(folderId) => handleMoveFolder(folderId)}
-          />
+            value={feed.folder_id ?? ""}
+            onChange={(e) =>
+              handleMoveFolder(e.target.value === "" ? undefined : Number(e.target.value))
+            }
+            className={cn(
+              buttonVariants({ variant: "outline", size: "sm" }),
+              "cursor-pointer pr-2",
+            )}
+          >
+            <option value="">No folder</option>
+            {(folders ?? []).map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.title}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
       <EntryTimeline
