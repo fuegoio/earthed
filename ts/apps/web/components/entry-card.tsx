@@ -151,7 +151,7 @@ export function EntryCard({
               window.open(entry.comments_url!, "_blank", "noopener,noreferrer");
             }}
             aria-label="View comments"
-            className="flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+            className="flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
           >
             <MessageSquare className="size-3.5" />
           </button>
