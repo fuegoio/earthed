@@ -490,7 +490,20 @@ func (m Model) renderEntryList(width int) string {
 	sb.WriteString(strings.Repeat("─", width) + "\n")
 
 	if len(m.entries) == 0 {
-		sb.WriteString("\n" + dimStyle.Render("  No entries here.") + "\n")
+		emptyMsg := "  No entries here."
+		if m.searching || m.searchQuery != "" {
+			emptyMsg = "  No results for your search."
+		} else if len(m.items) > 0 && m.sidebarCursor < len(m.items) {
+			switch m.items[m.sidebarCursor].kind {
+			case sidebarUnread:
+				emptyMsg = "  You're all caught up — nothing left to read."
+			case sidebarStarred:
+				emptyMsg = "  No starred articles yet."
+			case sidebarAll:
+				emptyMsg = "  Nothing here yet. Subscribe to feeds to get started."
+			}
+		}
+		sb.WriteString("\n" + dimStyle.Render(emptyMsg) + "\n")
 	} else {
 		isFocus := m.focus == focusEntries && !m.searching
 

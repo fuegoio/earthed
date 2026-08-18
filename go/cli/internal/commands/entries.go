@@ -17,12 +17,14 @@ var entriesCmd = &cobra.Command{
 
 var entriesListCmd = &cobra.Command{
 	Use:   "list",
-	Short: "List entries",
+	Short: "List unread entries",
 	Run: func(cmd *cobra.Command, _ []string) {
 		_, c := mustClient()
 		limit := int64(50)
+		status := planetary.ListEntriesParamsStatusUnread
 		resp, err := c.ListEntriesWithResponse(context.Background(), &planetary.ListEntriesParams{
-			Limit: &limit,
+			Limit:  &limit,
+			Status: &status,
 		})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error: %v\n", err)

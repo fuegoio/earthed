@@ -129,8 +129,9 @@ var (
 // NewModel creates a new TUI model with the given client.
 func NewModel(client *planetary.ClientWithResponses) Model {
 	return Model{
-		client: client,
-		focus:  focusEntries,
+		client:        client,
+		focus:         focusEntries,
+		sidebarCursor: 1, // start on Unread, matching the web default view
 	}
 }
 
