@@ -19,6 +19,7 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { FeedIcon } from "@/components/feed-icon";
 import { PageHeader } from "@/components/page-header";
 import { EntryTimeline } from "@/components/entry-timeline";
+import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import {
   getClient,
   markFeedRead,
@@ -198,7 +199,7 @@ export function FeedDetail({ feed, initialFolders }: { feed: Feed; initialFolder
           </div>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto">
+      <ScrollArea className="flex-1">
         <div className="mx-auto w-full max-w-3xl">
           <EntryTimeline
             filter={{ feed_id: feed.id }}
@@ -206,7 +207,7 @@ export function FeedDetail({ feed, initialFolders }: { feed: Feed; initialFolder
             emptyDescription="This feed hasn't produced any entries. It may not have been refreshed yet."
           />
         </div>
-      </div>
+      </ScrollArea>
     </div>
   );
 }
