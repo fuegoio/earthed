@@ -178,7 +178,7 @@ export function FeedDetail({ feed, initialFolders }: { feed: Feed; initialFolder
             </>
           }
         />
-        <div className="flex items-center gap-2 border-b border-border px-4 py-2 pl-[52px] lg:pl-4">
+        <div className="flex items-center gap-2 border-b border-border px-4 py-2 pl-[52px] lg:pl-[48px]">
           <Button variant="outline" size="sm" onClick={handleMarkAllRead} disabled={marking}>
             {marking ? <Loader2 className="animate-spin" /> : <CheckCheck />}
             Mark all as read
