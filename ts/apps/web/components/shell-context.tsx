@@ -4,6 +4,7 @@ import { createContext, useContext } from "react";
 
 type ShellContextValue = {
   openSidebar: () => void;
+  closeSidebar: () => void;
 };
 
 export const ShellContext = createContext<ShellContextValue | null>(null);

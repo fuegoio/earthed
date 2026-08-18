@@ -19,9 +19,10 @@ export function AppShell({
 
   const Sidebar = isSettings ? SettingsSidebar : AppSidebar;
   const openSidebar = useCallback(() => setSidebarOpen(true), []);
+  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
 
   return (
-    <ShellContext value={{ openSidebar }}>
+    <ShellContext value={{ openSidebar, closeSidebar }}>
       <div className="flex h-svh overflow-hidden">
         {/* Left filler — extends sidebar bg to the viewport edge on wide screens */}
         <div className="hidden flex-1 bg-sidebar lg:block" />

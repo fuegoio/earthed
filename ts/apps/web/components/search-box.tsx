@@ -4,17 +4,20 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
+import { useShell } from "@/components/shell-context";
 
 /** Topbar search box. Submits to /search?q=… using the current query as default. */
 export function SearchBox({ className }: { className?: string }) {
   const router = useRouter();
   const params = useSearchParams();
+  const shell = useShell();
   const [q, setQ] = useState(params.get("q") ?? "");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = q.trim();
     if (!trimmed) return;
+    shell?.closeSidebar();
     router.push(`/search?q=${encodeURIComponent(trimmed)}`);
   }
 
