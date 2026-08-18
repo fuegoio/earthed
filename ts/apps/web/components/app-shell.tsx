@@ -29,7 +29,7 @@ export function AppShell({
         <div className="flex w-full min-w-0 max-w-5xl shrink-0 overflow-hidden">
           <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} userEmail={userEmail} />
           <div className="flex min-w-0 flex-1 flex-col">
-            <main className="flex-1 overflow-y-auto bg-background">{children}</main>
+            <main className="flex-1 overflow-hidden bg-background">{children}</main>
           </div>
         </div>
 

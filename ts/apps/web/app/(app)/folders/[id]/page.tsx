@@ -5,6 +5,7 @@ import { ApiError } from "@/components/api-error";
 import { EntryTimeline } from "@/components/entry-timeline";
 import { PageHeader } from "@/components/page-header";
 import { FolderDeleteButton } from "@/components/folder-delete-button";
+import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { FolderIcon } from "lucide-react";
 import type { Metadata } from "next";
 import type { Folder } from "@/lib/types";
@@ -49,17 +50,23 @@ export default async function FolderPage({ params }: { params: Promise<{ id: str
   if (!folder) notFound();
 
   return (
-    <div className="mx-auto w-full max-w-3xl">
-      <PageHeader
-        title={folder.title}
-        icon={<FolderIcon className="size-4 text-muted-foreground" />}
-        actions={<FolderDeleteButton folder={folder} />}
-      />
-      <EntryTimeline
-        filter={{ folder_id: folder.id }}
-        emptyTitle="No articles in this folder"
-        emptyDescription="Feeds in this folder haven't produced any entries yet."
-      />
+    <div className="flex h-full flex-col overflow-hidden">
+      <div className="mx-auto w-full max-w-3xl shrink-0">
+        <PageHeader
+          title={folder.title}
+          icon={<FolderIcon className="size-4 text-muted-foreground" />}
+          actions={<FolderDeleteButton folder={folder} />}
+        />
+      </div>
+      <ScrollArea className="flex-1 min-h-0">
+        <div className="mx-auto w-full max-w-3xl">
+          <EntryTimeline
+            filter={{ folder_id: folder.id }}
+            emptyTitle="No articles in this folder"
+            emptyDescription="Feeds in this folder haven't produced any entries yet."
+          />
+        </div>
+      </ScrollArea>
     </div>
   );
 }
