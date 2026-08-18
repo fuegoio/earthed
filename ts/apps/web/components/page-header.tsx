@@ -36,7 +36,7 @@ export function PageHeader({
 
   return (
     <div
-      className={cn("sticky top-0 z-10 border-b border-border bg-background px-4 py-3", className)}
+      className={cn("sticky top-0 z-10 border-b border-border bg-background px-4 py-3 lg:pl-[48px]", className)}
     >
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-1.5">
