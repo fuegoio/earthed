@@ -101,7 +101,7 @@ export function AccountButton({ userEmail }: { userEmail: string }) {
         <Avatar.Root className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
           <Avatar.Fallback>{userEmail.charAt(0).toUpperCase()}</Avatar.Fallback>
         </Avatar.Root>
-        <span className="hidden truncate text-sm font-medium sm:inline">{userEmail}</span>
+        <span className="truncate text-sm font-medium">{userEmail}</span>
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner
