@@ -126,79 +126,87 @@ export function FeedDetail({ feed, initialFolders }: { feed: Feed; initialFolder
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col">
-      <PageHeader
-        className="static"
-        title={feed.title || "Untitled feed"}
-        icon={<FeedIcon siteUrl={feed.site_url} className="size-5 shrink-0 rounded-md" />}
-        actions={
-          <div className="flex items-center gap-1">
-            <FeedRenameDialog feed={feed} />
-            <ConfirmDialog
-              trigger={
-                <Button variant="ghost" size="icon-sm" disabled={deleting} className="text-muted-foreground hover:text-destructive" aria-label="Unsubscribe from feed">
-                  {deleting ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />}
-                </Button>
-              }
-              title="Unsubscribe from feed?"
-              description={`This removes "${feed.title}" and all its entries. This cannot be undone.`}
-              confirmLabel="Unsubscribe"
-              onConfirm={handleDelete}
+    <div className="flex h-full flex-col overflow-hidden">
+      <div className="shrink-0">
+        <div className="mx-auto w-full max-w-3xl">
+          <PageHeader
+            className="static"
+            title={feed.title || "Untitled feed"}
+            icon={<FeedIcon siteUrl={feed.site_url} className="size-5 shrink-0 rounded-md" />}
+            actions={
+              <div className="flex items-center gap-1">
+                <FeedRenameDialog feed={feed} />
+                <ConfirmDialog
+                  trigger={
+                    <Button variant="ghost" size="icon-sm" disabled={deleting} className="text-muted-foreground hover:text-destructive" aria-label="Unsubscribe from feed">
+                      {deleting ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />}
+                    </Button>
+                  }
+                  title="Unsubscribe from feed?"
+                  description={`This removes "${feed.title}" and all its entries. This cannot be undone.`}
+                  confirmLabel="Unsubscribe"
+                  onConfirm={handleDelete}
+                />
+                {feed.site_url && (
+                  <a
+                    href={feed.site_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Open website"
+                    className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }))}
+                  >
+                    <ExternalLink className="size-3.5" />
+                  </a>
+                )}
+                {feed.feed_url && (
+                  <a
+                    href={feed.feed_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Open feed XML"
+                    className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }))}
+                  >
+                    <Rss className="size-3.5" />
+                  </a>
+                )}
+              </div>
+            }
+            metadata={
+              <>
+                {feed.description && <p>{feed.description}</p>}
+                {feed.parsing_error && (
+                  <p className="mt-1 text-destructive">Last parse error: {feed.parsing_error}</p>
+                )}
+              </>
+            }
+          />
+          <div className="flex items-center gap-2 border-b border-border px-4 py-2 pl-[52px] lg:pl-[48px]">
+            <Button variant="outline" size="sm" onClick={handleMarkAllRead} disabled={marking}>
+              {marking ? <Loader2 className="animate-spin" /> : <CheckCheck />}
+              Mark all as read
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing}>
+              {refreshing ? <Loader2 className="animate-spin" /> : <RefreshCw />}
+              Refresh
+            </Button>
+            <FolderPickerPopover
+              folders={folders}
+              currentFolderId={feed.folder_id}
+              disabled={movingFolder}
+              onSelect={(folderId) => handleMoveFolder(folderId)}
             />
-            {feed.site_url && (
-              <a
-                href={feed.site_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Open website"
-                className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }))}
-              >
-                <ExternalLink className="size-3.5" />
-              </a>
-            )}
-            {feed.feed_url && (
-              <a
-                href={feed.feed_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Open feed XML"
-                className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }))}
-              >
-                <Rss className="size-3.5" />
-              </a>
-            )}
           </div>
-        }
-        metadata={
-          <>
-            {feed.description && <p>{feed.description}</p>}
-            {feed.parsing_error && (
-              <p className="mt-1 text-destructive">Last parse error: {feed.parsing_error}</p>
-            )}
-          </>
-        }
-      />
-      <div className="flex items-center gap-2 border-b border-border px-4 py-2 pl-[52px] lg:pl-[48px]">
-        <Button variant="outline" size="sm" onClick={handleMarkAllRead} disabled={marking}>
-          {marking ? <Loader2 className="animate-spin" /> : <CheckCheck />}
-          Mark all as read
-        </Button>
-        <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing}>
-          {refreshing ? <Loader2 className="animate-spin" /> : <RefreshCw />}
-          Refresh
-        </Button>
-        <FolderPickerPopover
-          folders={folders}
-          currentFolderId={feed.folder_id}
-          disabled={movingFolder}
-          onSelect={(folderId) => handleMoveFolder(folderId)}
-        />
+        </div>
       </div>
-      <EntryTimeline
-        filter={{ feed_id: feed.id }}
-        emptyTitle="No articles yet"
-        emptyDescription="This feed hasn't produced any entries. It may not have been refreshed yet."
-      />
+      <div className="flex-1 overflow-y-auto">
+        <div className="mx-auto w-full max-w-3xl">
+          <EntryTimeline
+            filter={{ feed_id: feed.id }}
+            emptyTitle="No articles yet"
+            emptyDescription="This feed hasn't produced any entries. It may not have been refreshed yet."
+          />
+        </div>
+      </div>
     </div>
   );
 }
