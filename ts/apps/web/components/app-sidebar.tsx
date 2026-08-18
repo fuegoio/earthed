@@ -46,7 +46,7 @@ export function isActive(pathname: string, href: string): boolean {
 function SidebarNav() {
   const pathname = usePathname();
   const navItems = [
-    { href: "/unread", label: "Unread", icon: Circle },
+    { href: "/", label: "Unread", icon: Circle },
     { href: "/all", label: "All", icon: LayoutList },
     { href: "/starred", label: "Starred", icon: Star },
     { href: "/lists", label: "Feed lists", icon: ListChecks },
