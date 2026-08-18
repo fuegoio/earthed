@@ -23,15 +23,19 @@ const EASE = [0.25, 1, 0.5, 1] as const;
  * marked unread again.
  *
  * Pass `staggerIndex` (0–7) to stagger the entrance animation on first load.
+ * Pass `animateExit` on filtered views (unread, starred) so the row collapses
+ * out when it leaves the list after a mutation.
  */
 export function EntryCard({
   entry,
   feed,
   staggerIndex,
+  animateExit = false,
 }: {
   entry: Entry;
   feed?: Feed;
   staggerIndex?: number;
+  animateExit?: boolean;
 }) {
   const queryClient = useQueryClient();
   const [readOptimistic, setReadOptimistic] = useOptimistic(entry.status === "read");
@@ -82,7 +86,7 @@ export function EntryCard({
     }
   }
 
-  return (
+  const inner = (
     <motion.a
       href={entry.url ?? "#"}
       target={entry.url ? "_blank" : undefined}
@@ -155,5 +159,22 @@ export function EntryCard({
         <StarToggle entryId={entry.id} starred={entry.starred} size="icon-sm" />
       </div>
     </motion.a>
+  );
+
+  if (!animateExit) return inner;
+
+  // On filtered views (unread, starred) wrap in a collapsing container so
+  // the row animates out when AnimatePresence removes it from the list.
+  // overflow:hidden + scaleY collapses the row without animating height directly.
+  return (
+    <motion.div
+      initial={{ scaleY: 1, opacity: 1, originY: 0 }}
+      animate={{ scaleY: 1, opacity: 1 }}
+      exit={{ scaleY: 0, opacity: 0 }}
+      transition={{ duration: 0.22, ease: EASE }}
+      style={{ overflow: "hidden", transformOrigin: "top" }}
+    >
+      {inner}
+    </motion.div>
   );
 }

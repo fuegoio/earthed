@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { useInfiniteQuery, useQuery, type InfiniteData } from "@tanstack/react-query";
 import { Rss, Sparkles } from "lucide-react";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { EntryCard } from "@/components/entry-card";
 import { EntryCardSkeleton } from "@/components/entry-card-skeleton";
 import {
@@ -38,17 +38,23 @@ const PAGE_SIZE = 50;
  *
  * Pass `emptyVariant="celebration"` for the "all caught up" unread empty state —
  * it renders a lighter, warmer state without a subscribe CTA.
+ *
+ * Pass `animateExit` on filtered views (unread, starred) so entries that leave
+ * the filter after a mutation animate out with a height-collapse + fade instead
+ * of disappearing instantly.
  */
 export function EntryTimeline({
   filter,
   emptyTitle = "Nothing here yet",
   emptyDescription = "Subscribe to feeds and your latest articles will appear here.",
   emptyVariant = "default",
+  animateExit = false,
 }: {
   filter: EntryFilter;
   emptyTitle?: string;
   emptyDescription?: string;
   emptyVariant?: "default" | "celebration";
+  animateExit?: boolean;
 }) {
   const { data: feeds } = useQuery<Feed[]>({
     queryKey: ["feeds"],
@@ -71,6 +77,7 @@ export function EntryTimeline({
       initialPageParam: 0,
       getNextPageParam: (lastPage, _all, lastParam) =>
         lastPage.length < PAGE_SIZE ? undefined : lastParam + PAGE_SIZE,
+      refetchInterval: 30_000,
     });
 
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -186,14 +193,17 @@ export function EntryTimeline({
 
   return (
     <div className="divide-y divide-border">
-      {entries.map((entry, i) => (
-        <EntryCard
-          key={entry.id}
-          entry={entry}
-          feed={feedMap.get(entry.feed_id)}
-          staggerIndex={i}
-        />
-      ))}
+      <AnimatePresence initial={false}>
+        {entries.map((entry, i) => (
+          <EntryCard
+            key={entry.id}
+            entry={entry}
+            feed={feedMap.get(entry.feed_id)}
+            staggerIndex={i}
+            animateExit={animateExit}
+          />
+        ))}
+      </AnimatePresence>
       <div ref={sentinelRef} className="h-px" />
       {isFetchingNextPage && (
         <div className="divide-y divide-border">

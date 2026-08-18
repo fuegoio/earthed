@@ -18,6 +18,7 @@ export default function UnreadPage() {
             emptyTitle="You're all caught up"
             emptyDescription="Nothing left to read. Enjoy the quiet — new articles will land here when your feeds update."
             emptyVariant="celebration"
+            animateExit
           />
         </div>
       </ScrollArea>
