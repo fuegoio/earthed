@@ -3,7 +3,8 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { useInfiniteQuery, useQuery, type InfiniteData } from "@tanstack/react-query";
-import { Rss } from "lucide-react";
+import { Rss, Sparkles } from "lucide-react";
+import { motion } from "motion/react";
 import { EntryCard } from "@/components/entry-card";
 import { EntryCardSkeleton } from "@/components/entry-card-skeleton";
 import {
@@ -19,6 +20,8 @@ import type { Entry, Feed } from "@/lib/types";
 import { buttonVariants } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
 
+const EASE = [0.25, 1, 0.5, 1] as const;
+
 export type EntryFilter = {
   feed_id?: number;
   folder_id?: number;
@@ -32,15 +35,20 @@ const PAGE_SIZE = 50;
 /**
  * Filtered, paginated entry list with infinite scroll. Fetches the user's feeds
  * in parallel so each card can show the owning feed's favicon + title.
+ *
+ * Pass `emptyVariant="celebration"` for the "all caught up" unread empty state —
+ * it renders a lighter, warmer state without a subscribe CTA.
  */
 export function EntryTimeline({
   filter,
   emptyTitle = "Nothing here yet",
   emptyDescription = "Subscribe to feeds and your latest articles will appear here.",
+  emptyVariant = "default",
 }: {
   filter: EntryFilter;
   emptyTitle?: string;
   emptyDescription?: string;
+  emptyVariant?: "default" | "celebration";
 }) {
   const { data: feeds } = useQuery<Feed[]>({
     queryKey: ["feeds"],
@@ -115,6 +123,47 @@ export function EntryTimeline({
   }
 
   if (entries.length === 0) {
+    if (emptyVariant === "celebration") {
+      return (
+        <motion.div
+          className="flex flex-col items-center justify-center px-4 py-20 text-center"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: EASE }}
+        >
+          <motion.div
+            className="mb-6 flex size-16 items-center justify-center rounded-full bg-primary/10"
+            initial={{ scale: 0.7, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5, ease: EASE, delay: 0.08 }}
+          >
+            <motion.div
+              animate={{ rotate: [0, -8, 8, -4, 4, 0] }}
+              transition={{ duration: 0.7, ease: EASE, delay: 0.3 }}
+            >
+              <Sparkles className="size-7 text-primary" />
+            </motion.div>
+          </motion.div>
+          <motion.h2
+            className="font-serif text-xl font-bold tracking-wide text-foreground"
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: EASE, delay: 0.15 }}
+          >
+            {emptyTitle}
+          </motion.h2>
+          <motion.p
+            className="mt-2 max-w-xs text-sm/relaxed text-muted-foreground"
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: EASE, delay: 0.22 }}
+          >
+            {emptyDescription}
+          </motion.p>
+        </motion.div>
+      );
+    }
+
     return (
       <div className="p-4">
         <Empty className="border">

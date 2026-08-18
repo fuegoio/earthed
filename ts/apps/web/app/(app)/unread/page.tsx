@@ -9,8 +9,9 @@ export default function UnreadPage() {
       <PageHeader title="Unread" />
       <EntryTimeline
         filter={{ status: "unread" }}
-        emptyTitle="No unread articles"
-        emptyDescription="You're all caught up. New articles will show up here as your feeds update."
+        emptyTitle="You're all caught up"
+        emptyDescription="Nothing left to read. Enjoy the quiet — new articles will land here when your feeds update."
+        emptyVariant="celebration"
       />
     </div>
   );
