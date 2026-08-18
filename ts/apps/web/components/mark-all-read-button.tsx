@@ -14,7 +14,7 @@ export function MarkAllReadButton() {
   const [pending, setPending] = useState(false);
 
   const { data: unreadCheck } = useQuery<Entry[]>({
-    queryKey: ["entries", { status: "unread" }],
+    queryKey: ["entries:unread-probe"],
     queryFn: async () => {
       const result = await listEntries({
         client: await getClient(),
@@ -39,6 +39,7 @@ export function MarkAllReadButton() {
       return;
     }
     await queryClient.invalidateQueries({ queryKey: ["entries"] });
+    await queryClient.invalidateQueries({ queryKey: ["entries:unread-probe"] });
   }
 
   return (
