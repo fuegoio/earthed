@@ -199,7 +199,7 @@ export function FeedDetail({ feed, initialFolders }: { feed: Feed; initialFolder
           </div>
         </div>
       </div>
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 min-h-0">
         <div className="mx-auto w-full max-w-3xl">
           <EntryTimeline
             filter={{ feed_id: feed.id }}
