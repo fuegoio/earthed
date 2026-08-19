@@ -1,8 +1,8 @@
 -- AT Protocol integration.
 --
--- Each user can connect their Planetary account to an AT Proto identity (DID).
+-- Each user can connect their Earthed account to an AT Proto identity (DID).
 -- The DID is the globally stable identifier; the PDS is where their repo lives.
--- When connected, Planetary writes io.planetary.* records to the PDS on every
+-- When connected, Earthed writes io.earthed.* records to the PDS on every
 -- relevant action (follow, share, feed subscription, profile update).
 --
 -- The atproto_rkey columns record the record key of the last written AT Proto

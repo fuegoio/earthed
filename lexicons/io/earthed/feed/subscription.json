@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "io.planetary.feed.subscription",
+  "id": "io.earthed.feed.subscription",
   "defs": {
     "main": {
       "type": "record",

@@ -1,14 +1,14 @@
--- Planetary relay tables.
+-- Earthed relay tables.
 --
--- The relay tracks a set of DIDs across federated Planetary instances.
+-- The relay tracks a set of DIDs across federated Earthed instances.
 -- For each tracked DID it maintains a persistent WebSocket subscription
--- to the DID's PDS repo stream and aggregates io.planetary.* record events
+-- to the DID's PDS repo stream and aggregates io.earthed.* record events
 -- into global counts.
 
--- Known Planetary instances that have announced users to this relay.
+-- Known Earthed instances that have announced users to this relay.
 CREATE TABLE IF NOT EXISTS instances (
   id          SERIAL PRIMARY KEY,
-  url         TEXT NOT NULL UNIQUE,        -- e.g. https://planetary.example.com
+  url         TEXT NOT NULL UNIQUE,        -- e.g. https://earthed.example.com
   first_seen  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   last_seen   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS tracked_dids (
   id          BIGSERIAL PRIMARY KEY,
   did         TEXT NOT NULL UNIQUE,
   pds_url     TEXT NOT NULL,               -- PDS base URL for this DID's repo
-  handle      TEXT NOT NULL DEFAULT '',    -- latest known Planetary handle
+  handle      TEXT NOT NULL DEFAULT '',    -- latest known Earthed handle
   instance_id INTEGER REFERENCES instances(id) ON DELETE SET NULL,
   -- Subscription state
   cursor_seq  BIGINT NOT NULL DEFAULT 0,   -- last seen repo event sequence

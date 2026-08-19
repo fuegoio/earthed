@@ -21,7 +21,7 @@ func NewWriter(pdsURL, did, accessToken string) *Writer {
 	}
 }
 
-// PutProfile writes (or replaces) the io.planetary.actor.profile record.
+// PutProfile writes (or replaces) the io.earthed.actor.profile record.
 func (w *Writer) PutProfile(ctx context.Context, handle, bio, displayName, instanceURL string, createdAt time.Time) error {
 	_, err := w.client.PutRecord(ctx, w.did, CollectionProfile, "self", ProfileRecord{
 		Type:        CollectionProfile,
@@ -34,7 +34,7 @@ func (w *Writer) PutProfile(ctx context.Context, handle, bio, displayName, insta
 	return err
 }
 
-// PutFollow writes an io.planetary.graph.follow record and returns the rkey.
+// PutFollow writes an io.earthed.graph.follow record and returns the rkey.
 func (w *Writer) PutFollow(ctx context.Context, subjectDID string) (string, error) {
 	rkey := NewTID()
 	_, err := w.client.PutRecord(ctx, w.did, CollectionFollow, rkey, FollowRecord{
@@ -48,12 +48,12 @@ func (w *Writer) PutFollow(ctx context.Context, subjectDID string) (string, erro
 	return rkey, nil
 }
 
-// DeleteFollow removes the io.planetary.graph.follow record at rkey.
+// DeleteFollow removes the io.earthed.graph.follow record at rkey.
 func (w *Writer) DeleteFollow(ctx context.Context, rkey string) error {
 	return w.client.DeleteRecord(ctx, w.did, CollectionFollow, rkey)
 }
 
-// PutShare writes an io.planetary.share.article record and returns the rkey.
+// PutShare writes an io.earthed.share.article record and returns the rkey.
 func (w *Writer) PutShare(ctx context.Context,
 	articleURL, title, description,
 	feedURL, feedTitle, feedSiteURL, author string,
@@ -81,12 +81,12 @@ func (w *Writer) PutShare(ctx context.Context,
 	return rkey, nil
 }
 
-// DeleteShare removes the io.planetary.share.article record at rkey.
+// DeleteShare removes the io.earthed.share.article record at rkey.
 func (w *Writer) DeleteShare(ctx context.Context, rkey string) error {
 	return w.client.DeleteRecord(ctx, w.did, CollectionShare, rkey)
 }
 
-// PutFeedSubscription writes an io.planetary.feed.subscription record
+// PutFeedSubscription writes an io.earthed.feed.subscription record
 // and returns the rkey.
 func (w *Writer) PutFeedSubscription(ctx context.Context, feedURL, siteURL, title string, createdAt time.Time) (string, error) {
 	rkey := NewTID()
@@ -103,12 +103,12 @@ func (w *Writer) PutFeedSubscription(ctx context.Context, feedURL, siteURL, titl
 	return rkey, nil
 }
 
-// DeleteFeedSubscription removes the io.planetary.feed.subscription record.
+// DeleteFeedSubscription removes the io.earthed.feed.subscription record.
 func (w *Writer) DeleteFeedSubscription(ctx context.Context, rkey string) error {
 	return w.client.DeleteRecord(ctx, w.did, CollectionSubscription, rkey)
 }
 
-// PutFeedList writes or replaces an io.planetary.feed.list record.
+// PutFeedList writes or replaces an io.earthed.feed.list record.
 // If rkey is empty, a new TID is generated.
 func (w *Writer) PutFeedList(ctx context.Context, rkey, title, description string, isPublic bool, feeds []FeedListEntry, createdAt time.Time) (string, error) {
 	if rkey == "" {
@@ -128,7 +128,7 @@ func (w *Writer) PutFeedList(ctx context.Context, rkey, title, description strin
 	return rkey, nil
 }
 
-// DeleteFeedList removes the io.planetary.feed.list record.
+// DeleteFeedList removes the io.earthed.feed.list record.
 func (w *Writer) DeleteFeedList(ctx context.Context, rkey string) error {
 	return w.client.DeleteRecord(ctx, w.did, CollectionFeedList, rkey)
 }

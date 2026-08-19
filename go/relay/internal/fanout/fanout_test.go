@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/fuegoio/planetary/go/relay/internal/store"
+	"github.com/fuegoio/earthed/go/relay/internal/store"
 )
 
 // --- In-memory stub store ---
@@ -161,7 +161,7 @@ func TestProcessOp_Follow_Create(t *testing.T) {
 	st := newStubStore()
 
 	records := map[string]map[string]any{
-		"io.planetary.graph.follow/rkeyf001": {
+		"io.earthed.graph.follow/rkeyf001": {
 			"subject":   "did:plc:bob",
 			"createdAt": "2025-01-01T00:00:00Z",
 		},
@@ -170,7 +170,7 @@ func TestProcessOp_Follow_Create(t *testing.T) {
 	f := fanoutWithStub(t, st, records)
 	f.processOp(context.Background(), "did:plc:alice", f.testPDSURL, repoOp{
 		Action: "create",
-		Path:   "io.planetary.graph.follow/rkeyf001",
+		Path:   "io.earthed.graph.follow/rkeyf001",
 	})
 
 	if st.followCounts["did:plc:bob"] != 1 {
@@ -193,7 +193,7 @@ func TestProcessOp_Follow_Delete(t *testing.T) {
 	f := fanoutWithStub(t, st, nil)
 	f.processOp(ctx, "did:plc:alice", f.testPDSURL, repoOp{
 		Action: "delete",
-		Path:   "io.planetary.graph.follow/rkeyf002",
+		Path:   "io.earthed.graph.follow/rkeyf002",
 	})
 
 	if st.followCounts["did:plc:bob"] != 0 {
@@ -208,7 +208,7 @@ func TestProcessOp_Share_Create(t *testing.T) {
 	st := newStubStore()
 
 	records := map[string]map[string]any{
-		"io.planetary.share.article/rkeys001": {
+		"io.earthed.share.article/rkeys001": {
 			"articleUrl": "https://example.com/article",
 			"feedUrl":    "https://feed.example.com/rss",
 			"title":      "Great Article",
@@ -219,7 +219,7 @@ func TestProcessOp_Share_Create(t *testing.T) {
 	f := fanoutWithStub(t, st, records)
 	f.processOp(context.Background(), "did:plc:alice", f.testPDSURL, repoOp{
 		Action: "create",
-		Path:   "io.planetary.share.article/rkeys001",
+		Path:   "io.earthed.share.article/rkeys001",
 	})
 
 	if !st.shares["did:plc:alice/rkeys001"] {
@@ -238,7 +238,7 @@ func TestProcessOp_Share_Delete(t *testing.T) {
 	f := fanoutWithStub(t, st, nil)
 	f.processOp(ctx, "did:plc:alice", f.testPDSURL, repoOp{
 		Action: "delete",
-		Path:   "io.planetary.share.article/rkeys002",
+		Path:   "io.earthed.share.article/rkeys002",
 	})
 
 	if st.shares["did:plc:alice/rkeys002"] {
@@ -252,7 +252,7 @@ func TestProcessOp_Share_Delete(t *testing.T) {
 func TestProcessOp_FeedSub_Create(t *testing.T) {
 	st := newStubStore()
 	records := map[string]map[string]any{
-		"io.planetary.feed.subscription/rkeysub001": {
+		"io.earthed.feed.subscription/rkeysub001": {
 			"feedUrl":   "https://example.com/rss",
 			"createdAt": "2025-01-01T00:00:00Z",
 		},
@@ -261,7 +261,7 @@ func TestProcessOp_FeedSub_Create(t *testing.T) {
 	f := fanoutWithStub(t, st, records)
 	f.processOp(context.Background(), "did:plc:alice", f.testPDSURL, repoOp{
 		Action: "create",
-		Path:   "io.planetary.feed.subscription/rkeysub001",
+		Path:   "io.earthed.feed.subscription/rkeysub001",
 	})
 
 	if st.feedSubs["did:plc:alice/rkeysub001"] != "https://example.com/rss" {
@@ -280,7 +280,7 @@ func TestProcessOp_FeedSub_Delete(t *testing.T) {
 	f := fanoutWithStub(t, st, nil)
 	f.processOp(ctx, "did:plc:alice", f.testPDSURL, repoOp{
 		Action: "delete",
-		Path:   "io.planetary.feed.subscription/rkeysub002",
+		Path:   "io.earthed.feed.subscription/rkeysub002",
 	})
 
 	if _, exists := st.feedSubs["did:plc:alice/rkeysub002"]; exists {
@@ -321,7 +321,7 @@ func TestHandleFollow_MissingSubject_Ignored(t *testing.T) {
 	st := newStubStore()
 	// PDS returns record with empty subject.
 	records := map[string]map[string]any{
-		"io.planetary.graph.follow/badfollow": {
+		"io.earthed.graph.follow/badfollow": {
 			"subject": "", // empty — should be dropped
 		},
 	}

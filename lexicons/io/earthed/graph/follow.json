@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "io.planetary.graph.follow",
+  "id": "io.earthed.graph.follow",
   "defs": {
     "main": {
       "type": "record",

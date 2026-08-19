@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "io.planetary.relay.getCounts",
+  "id": "io.earthed.relay.getCounts",
   "defs": {
     "main": {
       "type": "query",
