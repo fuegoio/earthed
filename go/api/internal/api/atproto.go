@@ -10,9 +10,9 @@ import (
 
 	"github.com/danielgtaylor/huma/v2"
 
-	"github.com/fuegoio/planetary/go/api/internal/atproto"
-	"github.com/fuegoio/planetary/go/api/internal/auth"
-	"github.com/fuegoio/planetary/go/api/internal/store"
+	"github.com/fuegoio/earthed/go/api/internal/atproto"
+	"github.com/fuegoio/earthed/go/api/internal/auth"
+	"github.com/fuegoio/earthed/go/api/internal/store"
 )
 
 // --- Input/output types ---
@@ -41,7 +41,7 @@ type ATProtoStatusOutput struct {
 func (a *API) registerATProtoRoutes() {
 	// GET /.well-known/atproto-did — lets users point an AT Proto handle at
 	// this instance. Returns the DID for the handle in the subdomain or query.
-	// e.g. "fuego.planetary.example" → look up handle "fuego" → return DID.
+	// e.g. "fuego.earthed.example" → look up handle "fuego" → return DID.
 	//
 	// This is registered on the bare mux in main.go at /.well-known/atproto-did;
 	// here we register the XRPC-namespaced version for discoverability.
@@ -76,7 +76,7 @@ func (a *API) registerATProtoRoutes() {
 	}, func(ctx context.Context, input *ConnectATProtoInput) (*ATProtoStatusOutput, error) {
 		userID := auth.UserIDFromCtx(ctx)
 
-		// Get the user's Planetary profile to include in the PDS profile record.
+		// Get the user's Earthed profile to include in the PDS profile record.
 		profile, err := a.store.GetProfileByUserID(ctx, userID)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
@@ -309,7 +309,7 @@ func (a *API) announceToRelay(ctx context.Context, did, pdsURL, handle string) {
 		InstanceURL string `json:"instanceUrl"`
 		Handle      string `json:"handle"`
 	}
-	if err := rc.Procedure(ctx, "io.planetary.relay.announceUser", announceIn{
+	if err := rc.Procedure(ctx, "io.earthed.relay.announceUser", announceIn{
 		DID:         did,
 		PDSUrl:      pdsURL,
 		InstanceURL: a.cfg.BaseURL,
@@ -323,7 +323,7 @@ func (a *API) announceToRelay(ctx context.Context, did, pdsURL, handle string) {
 // It resolves the host's subdomain (or ?handle= query param) to a DID.
 func (a *API) WellKnownATProtoDIDHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Extract handle from subdomain: "fuego.planetary.example" → "fuego"
+		// Extract handle from subdomain: "fuego.earthed.example" → "fuego"
 		host := r.Host
 		handle := r.URL.Query().Get("handle")
 		if handle == "" {

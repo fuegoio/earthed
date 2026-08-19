@@ -30,7 +30,7 @@ type TrackedDID struct {
 	LastEventAt *time.Time
 }
 
-// UpsertInstance records or refreshes a Planetary instance URL.
+// UpsertInstance records or refreshes a Earthed instance URL.
 func (s *Store) UpsertInstance(ctx context.Context, url string) (int, error) {
 	var id int
 	err := s.DB.QueryRowContext(ctx, `

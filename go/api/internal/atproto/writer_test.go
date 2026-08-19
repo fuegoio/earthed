@@ -51,7 +51,7 @@ func writerMock(t *testing.T) (pdsURL string, cap *captured) {
 func TestWriter_PutProfile(t *testing.T) {
 	pdsURL, cap := writerMock(t)
 	w := NewWriter(pdsURL, "did:plc:alice", "tok")
-	err := w.PutProfile(context.Background(), "alice", "My bio", "Alice", "https://planetary.example.com", time.Now())
+	err := w.PutProfile(context.Background(), "alice", "My bio", "Alice", "https://earthed.example.com", time.Now())
 	if err != nil {
 		t.Fatalf("PutProfile: %v", err)
 	}

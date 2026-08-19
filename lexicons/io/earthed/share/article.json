@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "io.planetary.share.article",
+  "id": "io.earthed.share.article",
   "defs": {
     "main": {
       "type": "record",
