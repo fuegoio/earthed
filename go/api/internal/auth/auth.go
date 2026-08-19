@@ -49,7 +49,9 @@ func New(cfg *config.Config, db *sql.DB, st *store.Store) (*Auth, error) {
 			limen.WithHTTPBasePath("/auth"),
 			limen.WithHTTPCSRFProtection(false),
 			limen.WithHTTPOriginCheck(false),
-			limen.WithHTTPCookieSecure(false),
+			limen.WithHTTPCookieSecure(cfg.CookieSecure),
+			limen.WithHTTPCookieSameSite(parseSameSite(cfg.CookieSameSite)),
+			limen.WithHTTPTrustedOrigins(cfg.TrustedOrigins),
 		),
 		Email: limen.NewDefaultEmailConfig(
 			limen.WithEmailVerification(
@@ -137,4 +139,18 @@ func bearerToken(r *http.Request) string {
 		return ""
 	}
 	return strings.TrimPrefix(auth, "Bearer ")
+}
+
+// parseSameSite maps the config string ("lax", "none", "strict") to the
+// net/http SameSite mode. Defaults to Lax for unrecognized values, matching
+// Limen's own default.
+func parseSameSite(s string) http.SameSite {
+	switch strings.ToLower(s) {
+	case "none":
+		return http.SameSiteNoneMode
+	case "strict":
+		return http.SameSiteStrictMode
+	default:
+		return http.SameSiteLaxMode
+	}
 }

@@ -43,6 +43,18 @@ server {
 }
 ```
 
+## Cross-origin sessions
+
+When the API and the web app are served from different origins (e.g. `api.earthed.app` and `app.earthed.app`), the browser will not send the default `SameSite=Lax` session cookie on cross-site requests, so login will silently fail. Configure the API container with:
+
+```
+EARTHED_COOKIE_SECURE=true
+EARTHED_COOKIE_SAMESITE=none
+EARTHED_TRUSTED_ORIGINS=https://app.earthed.app
+```
+
+`Secure` requires the API to be served over HTTPS. `SameSite=None` without `Secure` is rejected by browsers, so the API rejects that combination at startup. Set `EARTHED_TRUSTED_ORIGINS` to the web app origin(s) so the API only returns `Access-Control-Allow-Credentials` for trusted frontends.
+
 ## Database backup
 
 All feeds, entries, folders, and feed lists are in PostgreSQL. Back it up regularly.
