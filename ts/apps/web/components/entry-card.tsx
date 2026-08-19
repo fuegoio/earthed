@@ -7,6 +7,7 @@ import { motion } from "motion/react";
 import { MessageSquare } from "lucide-react";
 import { StarToggle } from "@/components/star-toggle";
 import { FeedIcon } from "@/components/feed-icon";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { getClient, updateEntries } from "@/lib/earthed";
 import { getApiErrorMessage } from "@/lib/errors";
 import { formatRelative, htmlSnippet } from "@/lib/format";
@@ -38,6 +39,7 @@ export function EntryCard({
   animateExit?: boolean;
 }) {
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
   const [readOptimistic, setReadOptimistic] = useOptimistic(entry.status === "read");
   const [pending, setPending] = useState(false);
 
@@ -138,7 +140,7 @@ export function EntryCard({
         >
           {entry.title || "Untitled"}
         </h3>
-        <p className="mt-1 line-clamp-2 min-h-[2.5rem] text-sm text-muted-foreground">
+        <p className="mt-1 line-clamp-4 min-h-[5rem] text-sm text-muted-foreground sm:line-clamp-2 sm:min-h-[2.5rem]">
           {snippet}
         </p>
       </div>
@@ -165,11 +167,13 @@ export function EntryCard({
 
   // On filtered views (unread, starred) wrap in a container that animates
   // both height and opacity simultaneously so the card collapses while fading
-  // and siblings translate up in the same motion.
+  // and siblings translate up in the same motion. The fixed height matches
+  // the card's natural row height: 4 snippet lines on mobile, 2 on >= sm.
+  const rowHeight = isMobile ? 168 : 108;
   return (
     <motion.div
-      initial={{ height: 108, opacity: 0 }}
-      animate={{ height: 108, opacity: 1 }}
+      initial={{ height: rowHeight, opacity: 0 }}
+      animate={{ height: rowHeight, opacity: 1 }}
       exit={{ height: 0, opacity: 0 }}
       transition={{ duration: 0.25, ease: EASE }}
       style={{ overflow: "hidden" }}

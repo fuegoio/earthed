@@ -27,9 +27,11 @@ export function EntryCardSkeleton() {
         </div>
         {/* title (text-sm line-clamp-2, ~20px per line) */}
         <Skeleton className="mt-1 h-5 w-3/4" />
-        {/* snippet (text-sm line-clamp-2, ~20px per line) */}
+        {/* snippet (text-sm line-clamp-2 on >= sm, line-clamp-4 on mobile) */}
         <Skeleton className="mt-1 h-4 w-full" />
         <Skeleton className="mt-1 h-4 w-2/3 mb-1" />
+        <Skeleton className="mt-1 h-4 w-full sm:hidden" />
+        <Skeleton className="mt-1 h-4 w-1/2 mb-1 sm:hidden" />
       </div>
       {/* right action */}
       <div className="flex shrink-0 items-start gap-0.5">
