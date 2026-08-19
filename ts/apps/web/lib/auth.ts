@@ -7,7 +7,7 @@ export type AuthResult = { data: { ok: true }; error: null } | { data: null; err
 
 async function authFetch(path: string, body: Record<string, unknown>): Promise<AuthResult> {
   try {
-    const res = await fetch(`${env.NEXT_PUBLIC_PLANETARY_API_URL}${path}`, {
+    const res = await fetch(`${env.NEXT_PUBLIC_EARTHED_API_URL}${path}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
@@ -49,7 +49,7 @@ export async function signup(values: { email: string; password: string }): Promi
 
 export async function signout(): Promise<void> {
   try {
-    await fetch(`${env.NEXT_PUBLIC_PLANETARY_API_URL}/api/auth/signout`, {
+    await fetch(`${env.NEXT_PUBLIC_EARTHED_API_URL}/api/auth/signout`, {
       method: "POST",
       credentials: "include",
     });

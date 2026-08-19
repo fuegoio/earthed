@@ -11,7 +11,7 @@ gen-sdk:
 	cd go/sdk && make gen
 
 gen-ts:
-	cd ts && pnpm --filter @planetary/api-client gen
+	cd ts && pnpm --filter @earthed/api-client gen
 
 # --- Go ---
 
@@ -69,4 +69,4 @@ fmt-ts:
 
 clean:
 	cd go/api && make clean
-	rm -f go/cli/planetary go/cli/planetary-tui
+	rm -f go/cli/earthed go/cli/earthed-tui

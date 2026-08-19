@@ -28,7 +28,7 @@ import {
   updateFeed,
   listFolders,
   unwrap,
-} from "@/lib/planetary";
+} from "@/lib/earthed";
 import { getApiErrorMessage } from "@/lib/errors";
 import { cn } from "@workspace/ui/lib/utils";
 import type { Feed, Folder } from "@/lib/types";

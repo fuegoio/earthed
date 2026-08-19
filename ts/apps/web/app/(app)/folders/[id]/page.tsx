@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getClient, listFolders } from "@/lib/planetary";
+import { getClient, listFolders } from "@/lib/earthed";
 import { getApiErrorMessage, apiErrorStatus } from "@/lib/errors";
 import { ApiError } from "@/components/api-error";
 import { EntryTimeline } from "@/components/entry-timeline";

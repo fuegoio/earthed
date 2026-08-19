@@ -6,7 +6,7 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/fuegoio/planetary/go/sdk/planetary"
+	"github.com/fuegoio/earthed/go/sdk/earthed"
 	"github.com/spf13/cobra"
 )
 
@@ -49,7 +49,7 @@ var tokensCreateCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		_, c := mustClient()
-		resp, err := c.CreateTokenWithResponse(context.Background(), planetary.CreateTokenJSONRequestBody{
+		resp, err := c.CreateTokenWithResponse(context.Background(), earthed.CreateTokenJSONRequestBody{
 			Label: args[0],
 		})
 		if err != nil {

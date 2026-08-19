@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Star } from "lucide-react";
 import { motion, useAnimationControls } from "motion/react";
 import { Button } from "@workspace/ui/components/button";
-import { getClient, toggleEntryStarred } from "@/lib/planetary";
+import { getClient, toggleEntryStarred } from "@/lib/earthed";
 import { getApiErrorMessage } from "@/lib/errors";
 import { cn } from "@workspace/ui/lib/utils";
 

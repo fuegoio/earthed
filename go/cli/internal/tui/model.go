@@ -1,4 +1,4 @@
-// Package tui implements the planetary TUI — an interactive feed browser.
+// Package tui implements the earthed TUI — an interactive feed browser.
 package tui
 
 import (
@@ -11,7 +11,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/fuegoio/planetary/go/sdk/planetary"
+	"github.com/fuegoio/earthed/go/sdk/earthed"
 )
 
 // focus tracks which panel has keyboard focus.
@@ -44,7 +44,7 @@ type sidebarItem struct {
 
 // Model holds the TUI state.
 type Model struct {
-	client  *planetary.ClientWithResponses
+	client  *earthed.ClientWithResponses
 	focus   focus
 	width   int
 	height  int
@@ -52,9 +52,9 @@ type Model struct {
 	err     string
 
 	// sidebar data
-	feeds         []planetary.Feed
-	folders       []planetary.Folder
-	feedsByID     map[int64]planetary.Feed
+	feeds         []earthed.Feed
+	folders       []earthed.Folder
+	feedsByID     map[int64]earthed.Feed
 	items         []sidebarItem
 	sidebarCursor int
 
@@ -63,7 +63,7 @@ type Model struct {
 	searchQuery string
 
 	// entries panel
-	entries       []planetary.Entry
+	entries       []earthed.Entry
 	entriesCursor int
 	entriesOffset int // index of first visible entry (scroll offset)
 }
@@ -127,7 +127,7 @@ var (
 )
 
 // NewModel creates a new TUI model with the given client.
-func NewModel(client *planetary.ClientWithResponses) Model {
+func NewModel(client *earthed.ClientWithResponses) Model {
 	return Model{
 		client:        client,
 		focus:         focusEntries,
@@ -143,23 +143,23 @@ func (m Model) Init() tea.Cmd {
 // ---- messages --------------------------------------------------------------
 
 type loadFeedsMsg struct {
-	feeds []planetary.Feed
+	feeds []earthed.Feed
 	err   error
 }
 
 type loadFoldersMsg struct {
-	folders []planetary.Folder
+	folders []earthed.Folder
 	err     error
 }
 
 type loadEntriesMsg struct {
-	entries []planetary.Entry
+	entries []earthed.Entry
 	err     error
 }
 
 type markReadMsg struct {
 	entryID int64
-	status  planetary.UpdateEntriesRequestStatus
+	status  earthed.UpdateEntriesRequestStatus
 	err     error
 }
 
@@ -171,7 +171,7 @@ type toggleStarMsg struct {
 
 // ---- commands --------------------------------------------------------------
 
-func loadFeeds(client *planetary.ClientWithResponses) tea.Cmd {
+func loadFeeds(client *earthed.ClientWithResponses) tea.Cmd {
 	return func() tea.Msg {
 		resp, err := client.ListFeedsWithResponse(context.Background())
 		if err != nil {
@@ -184,7 +184,7 @@ func loadFeeds(client *planetary.ClientWithResponses) tea.Cmd {
 	}
 }
 
-func loadFolders(client *planetary.ClientWithResponses) tea.Cmd {
+func loadFolders(client *earthed.ClientWithResponses) tea.Cmd {
 	return func() tea.Msg {
 		resp, err := client.ListFoldersWithResponse(context.Background())
 		if err != nil {
@@ -197,7 +197,7 @@ func loadFolders(client *planetary.ClientWithResponses) tea.Cmd {
 	}
 }
 
-func loadEntriesByParams(client *planetary.ClientWithResponses, params *planetary.ListEntriesParams) tea.Cmd {
+func loadEntriesByParams(client *earthed.ClientWithResponses, params *earthed.ListEntriesParams) tea.Cmd {
 	return func() tea.Msg {
 		if params.Limit == nil {
 			params.Limit = ptr(int64(200))
@@ -213,16 +213,16 @@ func loadEntriesByParams(client *planetary.ClientWithResponses, params *planetar
 	}
 }
 
-func searchEntries(client *planetary.ClientWithResponses, query string) tea.Cmd {
-	return loadEntriesByParams(client, &planetary.ListEntriesParams{
+func searchEntries(client *earthed.ClientWithResponses, query string) tea.Cmd {
+	return loadEntriesByParams(client, &earthed.ListEntriesParams{
 		Search: ptr(query),
 	})
 }
 
-func setEntryStatus(client *planetary.ClientWithResponses, entryID int64, status planetary.UpdateEntriesRequestStatus) tea.Cmd {
+func setEntryStatus(client *earthed.ClientWithResponses, entryID int64, status earthed.UpdateEntriesRequestStatus) tea.Cmd {
 	return func() tea.Msg {
 		ids := []int64{entryID}
-		_, err := client.UpdateEntriesWithResponse(context.Background(), planetary.UpdateEntriesRequest{
+		_, err := client.UpdateEntriesWithResponse(context.Background(), earthed.UpdateEntriesRequest{
 			EntryIds: &ids,
 			Status:   status,
 		})
@@ -230,9 +230,9 @@ func setEntryStatus(client *planetary.ClientWithResponses, entryID int64, status
 	}
 }
 
-func toggleStar(client *planetary.ClientWithResponses, entryID int64, starred bool) tea.Cmd {
+func toggleStar(client *earthed.ClientWithResponses, entryID int64, starred bool) tea.Cmd {
 	return func() tea.Msg {
-		_, err := client.ToggleEntryStarredWithResponse(context.Background(), entryID, planetary.ToggleEntryStarredRequest{
+		_, err := client.ToggleEntryStarredWithResponse(context.Background(), entryID, earthed.ToggleEntryStarredRequest{
 			Starred: starred,
 		})
 		return toggleStarMsg{entryID: entryID, starred: starred, err: err}
@@ -285,28 +285,28 @@ func (m *Model) rebuildSidebar() {
 	m.items = items
 
 	// rebuild lookup map
-	m.feedsByID = make(map[int64]planetary.Feed, len(m.feeds))
+	m.feedsByID = make(map[int64]earthed.Feed, len(m.feeds))
 	for _, f := range m.feeds {
 		m.feedsByID[f.Id] = f
 	}
 }
 
 // entriesParamsForItem returns API params matching the selected sidebar item.
-func entriesParamsForItem(item sidebarItem) *planetary.ListEntriesParams {
+func entriesParamsForItem(item sidebarItem) *earthed.ListEntriesParams {
 	switch item.kind {
 	case sidebarAll:
-		return &planetary.ListEntriesParams{}
+		return &earthed.ListEntriesParams{}
 	case sidebarUnread:
-		s := planetary.ListEntriesParamsStatusUnread
-		return &planetary.ListEntriesParams{Status: &s}
+		s := earthed.ListEntriesParamsStatusUnread
+		return &earthed.ListEntriesParams{Status: &s}
 	case sidebarStarred:
-		return &planetary.ListEntriesParams{Starred: ptr(true)}
+		return &earthed.ListEntriesParams{Starred: ptr(true)}
 	case sidebarFeed:
-		return &planetary.ListEntriesParams{FeedId: &item.feedID}
+		return &earthed.ListEntriesParams{FeedId: &item.feedID}
 	case sidebarFolder:
-		return &planetary.ListEntriesParams{FolderId: &item.folderID}
+		return &earthed.ListEntriesParams{FolderId: &item.folderID}
 	}
-	return &planetary.ListEntriesParams{}
+	return &earthed.ListEntriesParams{}
 }
 
 // ---- utility ---------------------------------------------------------------

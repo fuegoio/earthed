@@ -1,6 +1,6 @@
 ---
 title: Architecture
-description: How Planetary works — feed formats, the refresh pipeline, adaptive polling, and HTML sanitization.
+description: How Earthed works — feed formats, the refresh pipeline, adaptive polling, and HTML sanitization.
 ---
 
 The API server fetches feeds, parses them, sanitizes content, and stores entries in PostgreSQL. A background scheduler keeps everything up to date.
@@ -27,7 +27,7 @@ The fetcher performs an HTTP GET with conditional request headers:
 - `If-None-Match` — sent when the feed has a stored ETag.
 - `If-Modified-Since` — sent when the feed has a stored Last-Modified
   value.
-- `User-Agent: Planetary/1.0`
+- `User-Agent: Earthed/1.0`
 
 If the server responds with 304 Not Modified, the feed is skipped and
 the next check is scheduled in 60 minutes. The fetcher follows up to 10
@@ -54,7 +54,7 @@ the entry.
 
 ## Adaptive polling
 
-Instead of polling every feed at a fixed interval, Planetary estimates
+Instead of polling every feed at a fixed interval, Earthed estimates
 the ideal refresh frequency per feed:
 
 1. Collect the publication dates of all items in the feed.

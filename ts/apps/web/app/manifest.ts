@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Planetary",
-    short_name: "Planetary",
+    name: "Earthed",
+    short_name: "Earthed",
     description: "A modern, self-hostable RSS reader with a clean REST API.",
     start_url: "/",
     display: "standalone",

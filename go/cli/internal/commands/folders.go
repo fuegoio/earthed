@@ -6,7 +6,7 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/fuegoio/planetary/go/sdk/planetary"
+	"github.com/fuegoio/earthed/go/sdk/earthed"
 	"github.com/spf13/cobra"
 )
 
@@ -45,7 +45,7 @@ var foldersCreateCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		_, c := mustClient()
-		resp, err := c.CreateFolderWithResponse(context.Background(), planetary.CreateFolderJSONRequestBody{
+		resp, err := c.CreateFolderWithResponse(context.Background(), earthed.CreateFolderJSONRequestBody{
 			Title: args[0],
 		})
 		if err != nil {

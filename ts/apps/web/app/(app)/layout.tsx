@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getClient, getMe } from "@/lib/planetary";
+import { getClient, getMe } from "@/lib/earthed";
 import { AppShell } from "@/components/app-shell";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {

@@ -1,4 +1,4 @@
-// Package main is the planetary-tui entry point.
+// Package main is the earthed-tui entry point.
 package main
 
 import (
@@ -7,8 +7,8 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/fuegoio/planetary/go/cli/internal/client"
-	"github.com/fuegoio/planetary/go/cli/internal/tui"
+	"github.com/fuegoio/earthed/go/cli/internal/client"
+	"github.com/fuegoio/earthed/go/cli/internal/tui"
 )
 
 func main() {

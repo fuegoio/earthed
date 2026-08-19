@@ -9,8 +9,8 @@ import (
 
 	"github.com/danielgtaylor/huma/v2"
 
-	"github.com/fuegoio/planetary/go/api/internal/auth"
-	"github.com/fuegoio/planetary/go/api/internal/ratelimit"
+	"github.com/fuegoio/earthed/go/api/internal/auth"
+	"github.com/fuegoio/earthed/go/api/internal/ratelimit"
 )
 
 // Device-flow tuning constants.
@@ -271,7 +271,7 @@ type DeviceStatusOutput struct {
 // --- helpers ---
 
 // webURL returns the configured web origin for building verification URIs.
-// Defaults to localhost; set PLANETARY_WEB_URL for cloud deployments.
+// Defaults to localhost; set EARTHED_WEB_URL for cloud deployments.
 func (a *API) webURL() string {
 	if a.cfg != nil && a.cfg.WebURL != "" {
 		return strings.TrimRight(a.cfg.WebURL, "/")

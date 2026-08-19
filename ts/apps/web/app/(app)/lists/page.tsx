@@ -14,7 +14,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@workspace/ui/components/empty";
-import { getClient, listMyFeedLists, listFollowedFeedLists, unwrap } from "@/lib/planetary";
+import { getClient, listMyFeedLists, listFollowedFeedLists, unwrap } from "@/lib/earthed";
 import { cn } from "@workspace/ui/lib/utils";
 import type { FeedList } from "@/lib/types";
 

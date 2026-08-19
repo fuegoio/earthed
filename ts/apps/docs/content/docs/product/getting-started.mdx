@@ -1,6 +1,6 @@
 ---
 title: Getting Started
-description: Run Planetary locally, create an account, subscribe to a feed, and read entries.
+description: Run Earthed locally, create an account, subscribe to a feed, and read entries.
 ---
 
 ## Prerequisites
@@ -16,7 +16,7 @@ cd go/api
 make db-up
 ```
 
-This starts a PostgreSQL 16 container on port 5432 with database `planetary`, user `planetary`, password `planetary`.
+This starts a PostgreSQL 16 container on port 5432 with database `earthed`, user `earthed`, password `earthed`.
 
 ## 2. Configure environment
 
@@ -24,9 +24,9 @@ Create a `.env` file in `go/api/`:
 
 ```bash
 LIMEN_SECRET=<32-byte-secret>
-PLANETARY_DATABASE_URL=postgres://planetary:planetary@localhost:5432/planetary?sslmode=disable
-PLANETARY_BASE_URL=http://localhost:8080
-PLANETARY_WEB_URL=http://localhost:3000
+EARTHED_DATABASE_URL=postgres://earthed:earthed@localhost:5432/earthed?sslmode=disable
+EARTHED_BASE_URL=http://localhost:8080
+EARTHED_WEB_URL=http://localhost:3000
 ```
 
 `LIMEN_SECRET` is a 32-byte hex string used for session signing. Generate one with:
@@ -97,7 +97,7 @@ curl -X POST http://localhost:8080/api/v1/feeds \
   -d '{"feed_url":"https://blog.golang.org/feeds/posts/default"}'
 ```
 
-You can also pass a website URL — Planetary discovers the feed automatically from `<link rel="alternate">` tags.
+You can also pass a website URL — Earthed discovers the feed automatically from `<link rel="alternate">` tags.
 
 ## 8. Read entries
 
@@ -121,12 +121,12 @@ The web app is at `http://localhost:3000`. Sign in with the account you created 
 ```bash
 cd go/cli
 make build
-./planetary config set base_url http://localhost:8080
-./planetary config set token pla_your-token-here
+./earthed config set base_url http://localhost:8080
+./earthed config set token pla_your-token-here
 
-./planetary feeds list
-./planetary entries list
-./planetary-tui   # interactive TUI
+./earthed feeds list
+./earthed entries list
+./earthed-tui   # interactive TUI
 ```
 
 See [CLI](/docs/cli) for the full command reference.

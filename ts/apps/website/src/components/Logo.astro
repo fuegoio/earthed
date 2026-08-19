@@ -1,6 +1,6 @@
 ---
 /**
- * Planetary sun logo — inline SVG so it inherits the dawn animation.
+ * Earthed sun logo — inline SVG so it inherits the dawn animation.
  * Source: ../assets/logo.svg (12-ray sun in brand orange #FF6923).
  */
 interface Props {
@@ -17,9 +17,9 @@ const { class: className, static: isStatic = false } = Astro.props
   fill="none"
   xmlns="http://www.w3.org/2000/svg"
   role="img"
-  aria-label="Planetary sun logo"
+  aria-label="Earthed sun logo"
 >
-  <g clip-path="url(#planetary-logo-clip)">
+  <g clip-path="url(#earthed-logo-clip)">
     <circle cx="308" cy="307" r="160" fill="var(--primary)"></circle>
     <rect
       x="138.452"
@@ -119,7 +119,7 @@ const { class: className, static: isStatic = false } = Astro.props
     ></rect>
   </g>
   <defs>
-    <clipPath id="planetary-logo-clip">
+    <clipPath id="earthed-logo-clip">
       <rect width="615" height="615" fill="white"></rect>
     </clipPath>
   </defs>

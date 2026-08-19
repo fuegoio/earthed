@@ -11,7 +11,7 @@ RUN go mod download
 
 # Build. CGO is disabled so the binary is fully static and portable.
 COPY go/api/ ./
-RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /out/planetary ./cmd/planetary/
+RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /out/earthed ./cmd/earthed/
 
 # ---- runtime stage ----
 FROM alpine:3.20
@@ -21,13 +21,13 @@ FROM alpine:3.20
 RUN apk add --no-cache ca-certificates tzdata
 
 WORKDIR /app
-COPY --from=builder /out/planetary /app/planetary
+COPY --from=builder /out/earthed /app/earthed
 
 # Non-root user for the HTTP server.
-RUN adduser -D -u 10001 planetary \
- && chown -R planetary:planetary /app
-USER planetary
+RUN adduser -D -u 10001 earthed \
+ && chown -R earthed:earthed /app
+USER earthed
 
 EXPOSE 8080
 
-ENTRYPOINT ["/app/planetary"]
+ENTRYPOINT ["/app/earthed"]

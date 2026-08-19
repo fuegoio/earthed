@@ -3,10 +3,10 @@
 // ---------------------------------------------------------------------------
 
 /**
- * The `@planetary/api-client` resolves failed responses as the parsed JSON body
+ * The `@earthed/api-client` resolves failed responses as the parsed JSON body
  * (not an `Error` instance) — the SDK functions return a `{ data, error }`
- * discriminated union and `unwrap()` in `lib/planetary.ts` throws `error` on
- * failure. The Planetary API (huma) serializes errors using the `ErrorModel`
+ * discriminated union and `unwrap()` in `lib/earthed.ts` throws `error` on
+ * failure. The Earthed API (huma) serializes errors using the `ErrorModel`
  * schema:
  *
  *   {

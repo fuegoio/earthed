@@ -1,4 +1,4 @@
-import { createPlanetaryClient, type PlanetaryClient } from "@planetary/api-client";
+import { createEarthedClient, type EarthedClient } from "@earthed/api-client";
 import { attachApiLogger } from "./logger";
 import { env } from "./env";
 
@@ -22,7 +22,7 @@ export async function unwrap<T>(
   return data as T;
 }
 
-export async function getClient(cookieHeader?: string): Promise<PlanetaryClient> {
+export async function getClient(cookieHeader?: string): Promise<EarthedClient> {
   const isServer = typeof window === "undefined";
   const headers: Record<string, string> = {};
 
@@ -32,8 +32,8 @@ export async function getClient(cookieHeader?: string): Promise<PlanetaryClient>
     if (ch) headers.Cookie = ch;
   }
 
-  const client = createPlanetaryClient({
-    baseUrl: isServer ? env.PLANETARY_API_URL : env.NEXT_PUBLIC_PLANETARY_API_URL,
+  const client = createEarthedClient({
+    baseUrl: isServer ? env.EARTHED_API_URL : env.NEXT_PUBLIC_EARTHED_API_URL,
     fetch: fetchNoStore,
     headers: Object.keys(headers).length > 0 ? headers : undefined,
     credentials: isServer ? undefined : "include",
@@ -44,4 +44,4 @@ export async function getClient(cookieHeader?: string): Promise<PlanetaryClient>
   return client;
 }
 
-export * from "@planetary/api-client";
+export * from "@earthed/api-client";

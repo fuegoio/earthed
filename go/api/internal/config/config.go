@@ -29,20 +29,20 @@ type Config struct {
 // Load reads configuration from environment variables and validates it.
 func Load() (*Config, error) {
 	cfg := &Config{
-		HTTPAddr:     env("PLANETARY_HTTP_ADDR", ":8080"),
-		DatabaseURL:  env("PLANETARY_DATABASE_URL", "postgres://planetary:planetary@localhost:5432/planetary?sslmode=disable"),
-		BaseURL:      env("PLANETARY_BASE_URL", "http://localhost:8080"),
-		WebURL:       env("PLANETARY_WEB_URL", "http://localhost:3000"),
+		HTTPAddr:     env("EARTHED_HTTP_ADDR", ":8080"),
+		DatabaseURL:  env("EARTHED_DATABASE_URL", "postgres://earthed:earthed@localhost:5432/earthed?sslmode=disable"),
+		BaseURL:      env("EARTHED_BASE_URL", "http://localhost:8080"),
+		WebURL:       env("EARTHED_WEB_URL", "http://localhost:3000"),
 		LimenSecret:  env("LIMEN_SECRET", ""),
-		LogFormat:    env("PLANETARY_LOG_FORMAT", "pretty"),
-		PollingFreq:  envDuration("PLANETARY_POLLING_FREQUENCY", 60*time.Second),
-		BatchSize:    envInt("PLANETARY_BATCH_SIZE", 100),
-		WorkerPool:   envInt("PLANETARY_WORKER_POOL_SIZE", 5),
-		HTTPTimeout:  envDuration("PLANETARY_HTTP_CLIENT_TIMEOUT", 20*time.Second),
-		HTTPMaxBody:  int64(envInt("PLANETARY_HTTP_CLIENT_MAX_BODY", 15*1024*1024)),
-		CleanupFreq:  envDuration("PLANETARY_CLEANUP_FREQUENCY", 24*time.Hour),
-		EntryMaxAge:  envInt("PLANETARY_ENTRY_MAX_AGE_DAYS", 60),
-		DisableSched: env("PLANETARY_DISABLE_SCHEDULER", "") != "",
+		LogFormat:    env("EARTHED_LOG_FORMAT", "pretty"),
+		PollingFreq:  envDuration("EARTHED_POLLING_FREQUENCY", 60*time.Second),
+		BatchSize:    envInt("EARTHED_BATCH_SIZE", 100),
+		WorkerPool:   envInt("EARTHED_WORKER_POOL_SIZE", 5),
+		HTTPTimeout:  envDuration("EARTHED_HTTP_CLIENT_TIMEOUT", 20*time.Second),
+		HTTPMaxBody:  int64(envInt("EARTHED_HTTP_CLIENT_MAX_BODY", 15*1024*1024)),
+		CleanupFreq:  envDuration("EARTHED_CLEANUP_FREQUENCY", 24*time.Hour),
+		EntryMaxAge:  envInt("EARTHED_ENTRY_MAX_AGE_DAYS", 60),
+		DisableSched: env("EARTHED_DISABLE_SCHEDULER", "") != "",
 	}
 
 	if cfg.LimenSecret == "" {

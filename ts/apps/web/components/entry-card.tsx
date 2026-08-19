@@ -7,7 +7,7 @@ import { motion } from "motion/react";
 import { MessageSquare } from "lucide-react";
 import { StarToggle } from "@/components/star-toggle";
 import { FeedIcon } from "@/components/feed-icon";
-import { getClient, updateEntries } from "@/lib/planetary";
+import { getClient, updateEntries } from "@/lib/earthed";
 import { getApiErrorMessage } from "@/lib/errors";
 import { formatRelative, htmlSnippet } from "@/lib/format";
 import { cn } from "@workspace/ui/lib/utils";

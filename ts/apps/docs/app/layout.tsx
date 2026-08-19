@@ -8,8 +8,8 @@ const merriweather = Merriweather({ subsets: ["latin"], variable: "--font-serif"
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "Planetary Docs",
-  description: "Documentation for Planetary, a self-hosted RSS reader",
+  title: "Earthed Docs",
+  description: "Documentation for Earthed, a self-hosted RSS reader",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/fuegoio/planetary/go/sdk/planetary"
+	"github.com/fuegoio/earthed/go/sdk/earthed"
 )
 
 // parseInt64 parses a string to int64, exiting on error.
@@ -14,7 +14,7 @@ func parseInt64(s string) (int64, error) {
 }
 
 // printError prints an API error response to stderr.
-func printError(status int, errModel *planetary.ErrorModel) {
+func printError(status int, errModel *earthed.ErrorModel) {
 	if errModel != nil && errModel.Detail != nil {
 		fmt.Fprintf(os.Stderr, "error (%d): %s\n", status, *errModel.Detail)
 		return

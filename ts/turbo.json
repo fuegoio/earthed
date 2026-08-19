@@ -6,7 +6,7 @@
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**"],
-      "env": ["PLANETARY_API_URL", "NEXT_PUBLIC_PLANETARY_API_URL", "LOG_LEVEL"]
+      "env": ["EARTHED_API_URL", "NEXT_PUBLIC_EARTHED_API_URL", "LOG_LEVEL"]
     },
     "lint": {
       "dependsOn": ["^lint"]

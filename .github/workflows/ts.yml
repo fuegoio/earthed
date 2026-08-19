@@ -47,7 +47,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/planetary-docs
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/earthed-docs
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}
@@ -90,7 +90,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/planetary-web
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/earthed-web
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}
@@ -133,7 +133,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/planetary-website
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/earthed-website
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}

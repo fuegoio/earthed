@@ -7,15 +7,15 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Documentation conventions
 
-This directory is the docs site for Planetary. Content lives in
+This directory is the docs site for Earthed. Content lives in
 `content/docs/` as MDX files, split into three sections.
 
 ### Sections
 
-**`content/docs/product/`** — usage documentation for end users of Planetary.
+**`content/docs/product/`** — usage documentation for end users of Earthed.
 Covers what things are and how to use them: subscribing to feeds, reading
 entries, using the web UI, the CLI, feed lists, authentication. Audience: anyone
-using a running Planetary instance.
+using a running Earthed instance.
 
 - No environment variables, no Docker, no server config.
 - No internal pipeline details (adaptive polling algorithm, sanitization
@@ -24,7 +24,7 @@ using a running Planetary instance.
 - If a section is about running or configuring the server, it does not belong here.
 
 **`content/docs/self-hosting/`** — everything needed to deploy and operate
-Planetary: Docker Compose setup, all environment variables, reverse proxy config,
+Earthed: Docker Compose setup, all environment variables, reverse proxy config,
 database backups, log format, scheduler tuning. Audience: people running their
 own instance.
 

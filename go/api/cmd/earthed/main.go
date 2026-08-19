@@ -1,4 +1,4 @@
-// Package main implements the Planetary API server entry point.
+// Package main implements the Earthed API server entry point.
 package main
 
 import (
@@ -15,18 +15,18 @@ import (
 	"github.com/danielgtaylor/huma/v2/adapters/humago"
 	"github.com/joho/godotenv"
 
-	"github.com/fuegoio/planetary/go/api/internal/api"
-	"github.com/fuegoio/planetary/go/api/internal/auth"
-	"github.com/fuegoio/planetary/go/api/internal/config"
-	"github.com/fuegoio/planetary/go/api/internal/cors"
-	"github.com/fuegoio/planetary/go/api/internal/httplog"
-	"github.com/fuegoio/planetary/go/api/internal/logging"
-	"github.com/fuegoio/planetary/go/api/internal/migrations"
-	"github.com/fuegoio/planetary/go/api/internal/reader/fetcher"
-	"github.com/fuegoio/planetary/go/api/internal/reader/processor"
-	"github.com/fuegoio/planetary/go/api/internal/scheduler"
-	"github.com/fuegoio/planetary/go/api/internal/store"
-	"github.com/fuegoio/planetary/go/api/internal/worker"
+	"github.com/fuegoio/earthed/go/api/internal/api"
+	"github.com/fuegoio/earthed/go/api/internal/auth"
+	"github.com/fuegoio/earthed/go/api/internal/config"
+	"github.com/fuegoio/earthed/go/api/internal/cors"
+	"github.com/fuegoio/earthed/go/api/internal/httplog"
+	"github.com/fuegoio/earthed/go/api/internal/logging"
+	"github.com/fuegoio/earthed/go/api/internal/migrations"
+	"github.com/fuegoio/earthed/go/api/internal/reader/fetcher"
+	"github.com/fuegoio/earthed/go/api/internal/reader/processor"
+	"github.com/fuegoio/earthed/go/api/internal/scheduler"
+	"github.com/fuegoio/earthed/go/api/internal/store"
+	"github.com/fuegoio/earthed/go/api/internal/worker"
 
 	_ "github.com/lib/pq"
 )
@@ -58,7 +58,7 @@ func run() (int, error) {
 	// a running Postgres or a LIMEN_SECRET.
 	if *dumpOpenAPI {
 		humaMux := http.NewServeMux()
-		humaConfig := huma.DefaultConfig("Planetary API", "1.0.0")
+		humaConfig := huma.DefaultConfig("Earthed API", "1.0.0")
 		humaConfig.Servers = []*huma.Server{{URL: "/api"}}
 		humaConfig.Tags = api.OpenAPITags()
 		humaRouter := humago.New(humaMux, humaConfig)
@@ -113,12 +113,12 @@ func run() (int, error) {
 	}
 
 	humaMux := http.NewServeMux()
-	humaConfig := huma.DefaultConfig("Planetary API", "1.0.0")
+	humaConfig := huma.DefaultConfig("Earthed API", "1.0.0")
 	humaConfig.Servers = []*huma.Server{{URL: "/api"}}
 	humaConfig.Tags = api.OpenAPITags()
 	humaRouter := humago.New(humaMux, humaConfig)
 
-	f := fetcher.New(cfg.HTTPTimeout, cfg.HTTPMaxBody, "Planetary")
+	f := fetcher.New(cfg.HTTPTimeout, cfg.HTTPMaxBody, "Earthed")
 	apiHandler := api.New(humaRouter, st, authInst, cfg, f)
 	apiHandler.RegisterRoutes()
 

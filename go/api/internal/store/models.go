@@ -146,7 +146,7 @@ type User struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-// Store wraps a *sql.DB with query helpers for the Planetary schema.
+// Store wraps a *sql.DB with query helpers for the Earthed schema.
 type Store struct {
 	DB *sql.DB
 }
