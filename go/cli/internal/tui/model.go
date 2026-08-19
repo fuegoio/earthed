@@ -131,7 +131,7 @@ func NewModel(client *earthed.ClientWithResponses) Model {
 	return Model{
 		client:        client,
 		focus:         focusEntries,
-		sidebarCursor: 1, // start on Unread, matching the web default view
+		sidebarCursor: 0, // start on Unread (first tab, matching the web default view)
 	}
 }
 
@@ -260,8 +260,8 @@ func openURL(url string) tea.Cmd {
 // rebuildSidebar constructs the flat sidebar item list from feeds and folders.
 func (m *Model) rebuildSidebar() {
 	items := []sidebarItem{
-		{kind: sidebarAll, label: "All"},
 		{kind: sidebarUnread, label: "Unread"},
+		{kind: sidebarAll, label: "All"},
 		{kind: sidebarStarred, label: "Starred"},
 	}
 
