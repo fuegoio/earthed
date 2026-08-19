@@ -50,7 +50,7 @@ export const AddFeedListFeedInputBodySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/AddFeedListFeedInputBody.json'
+                'https://example.com/schemas/AddFeedListFeedInputBody.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -82,7 +82,7 @@ export const CreateFeedInputBodySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/CreateFeedInputBody.json'
+                'https://example.com/schemas/CreateFeedInputBody.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -110,7 +110,7 @@ export const CreateFeedListInputBodySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/CreateFeedListInputBody.json'
+                'https://example.com/schemas/CreateFeedListInputBody.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -142,7 +142,7 @@ export const CreateFolderInputBodySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/CreateFolderInputBody.json'
+                'https://example.com/schemas/CreateFolderInputBody.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -170,7 +170,7 @@ export const CreateTokenInputBodySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/CreateTokenInputBody.json'
+                'https://example.com/schemas/CreateTokenInputBody.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -194,7 +194,7 @@ export const DeviceCodeOutputBodySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/DeviceCodeOutputBody.json'
+                'https://example.com/schemas/DeviceCodeOutputBody.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -238,7 +238,7 @@ export const DeviceConfirmBodySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/DeviceConfirmBody.json'
+                'https://example.com/schemas/DeviceConfirmBody.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -260,7 +260,7 @@ export const DeviceConfirmInputBodySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/DeviceConfirmInputBody.json'
+                'https://example.com/schemas/DeviceConfirmInputBody.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -287,7 +287,7 @@ export const DeviceStatusBodySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/DeviceStatusBody.json'
+                'https://example.com/schemas/DeviceStatusBody.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -309,7 +309,7 @@ export const DeviceTokenInputBodySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/DeviceTokenInputBody.json'
+                'https://example.com/schemas/DeviceTokenInputBody.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -332,7 +332,7 @@ export const DeviceTokenOutputBodySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/DeviceTokenOutputBody.json'
+                'https://example.com/schemas/DeviceTokenOutputBody.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -395,7 +395,7 @@ export const EntrySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/Entry.json'
+                'https://example.com/schemas/Entry.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -503,7 +503,7 @@ export const ErrorModelSchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/ErrorModel.json'
+                'https://example.com/schemas/ErrorModel.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -568,7 +568,7 @@ export const FeedSchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/Feed.json'
+                'https://example.com/schemas/Feed.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -655,7 +655,7 @@ export const FeedListSchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/FeedList.json'
+                'https://example.com/schemas/FeedList.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -724,7 +724,7 @@ export const FeedListFeedSchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/FeedListFeed.json'
+                'https://example.com/schemas/FeedListFeed.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -769,7 +769,7 @@ export const FolderSchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/Folder.json'
+                'https://example.com/schemas/Folder.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -820,7 +820,7 @@ export const HealthResponseSchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/HealthResponse.json'
+                'https://example.com/schemas/HealthResponse.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -842,7 +842,7 @@ export const Import_feed_listResponseSchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/Import-feed-listResponse.json'
+                'https://example.com/schemas/Import-feed-listResponse.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -895,7 +895,7 @@ export const OPMLImportResultBodySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/OPMLImportResultBody.json'
+                'https://example.com/schemas/OPMLImportResultBody.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -948,7 +948,7 @@ export const PreviewFeedBodySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/PreviewFeedBody.json'
+                'https://example.com/schemas/PreviewFeedBody.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -994,7 +994,7 @@ export const PreviewFeedInputBodySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/PreviewFeedInputBody.json'
+                'https://example.com/schemas/PreviewFeedInputBody.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -1059,7 +1059,7 @@ export const Toggle_entry_starredRequestSchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/Toggle-entry-starredRequest.json'
+                'https://example.com/schemas/Toggle-entry-starredRequest.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -1081,7 +1081,7 @@ export const TokenOutputBodySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/TokenOutputBody.json'
+                'https://example.com/schemas/TokenOutputBody.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -1117,7 +1117,7 @@ export const Update_entriesRequestSchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/Update-entriesRequest.json'
+                'https://example.com/schemas/Update-entriesRequest.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -1155,7 +1155,7 @@ export const UpdateFeedInputBodySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/UpdateFeedInputBody.json'
+                'https://example.com/schemas/UpdateFeedInputBody.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -1179,7 +1179,7 @@ export const UpdateFeedListInputBodySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/UpdateFeedListInputBody.json'
+                'https://example.com/schemas/UpdateFeedListInputBody.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -1211,7 +1211,7 @@ export const UpdateFolderInputBodySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/UpdateFolderInputBody.json'
+                'https://example.com/schemas/UpdateFolderInputBody.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -1239,7 +1239,7 @@ export const UpdateMeInputBodySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/UpdateMeInputBody.json'
+                'https://example.com/schemas/UpdateMeInputBody.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -1269,7 +1269,7 @@ export const UserSchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/User.json'
+                'https://example.com/schemas/User.json'
             ],
             format: 'uri',
             readOnly: true,

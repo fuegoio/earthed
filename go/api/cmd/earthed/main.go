@@ -59,7 +59,7 @@ func run() (int, error) {
 	if *dumpOpenAPI {
 		humaMux := http.NewServeMux()
 		humaConfig := huma.DefaultConfig("Earthed API", "1.0.0")
-		humaConfig.Servers = []*huma.Server{{URL: "/api"}}
+		humaConfig.Servers = []*huma.Server{{URL: ""}}
 		humaConfig.Tags = api.OpenAPITags()
 		humaRouter := humago.New(humaMux, humaConfig)
 
@@ -114,7 +114,7 @@ func run() (int, error) {
 
 	humaMux := http.NewServeMux()
 	humaConfig := huma.DefaultConfig("Earthed API", "1.0.0")
-	humaConfig.Servers = []*huma.Server{{URL: "/api"}}
+	humaConfig.Servers = []*huma.Server{{URL: ""}}
 	humaConfig.Tags = api.OpenAPITags()
 	humaRouter := humago.New(humaMux, humaConfig)
 
@@ -124,17 +124,17 @@ func run() (int, error) {
 
 	mux := http.NewServeMux()
 
-	mux.Handle("/api/auth/", authInst.Handler())
+	mux.Handle("/auth/", authInst.Handler())
 	// Public device-flow endpoints (issue + poll) must be reachable without
 	// a session; the confirm + status endpoints sit behind the middleware
 	// because they require an authenticated user to approve the grant.
 	for _, p := range api.PublicDevicePaths {
 		mux.Handle(p, humaMux)
 	}
-	mux.Handle("/api/auth/device/confirm", authInst.Middleware(humaMux))
-	mux.Handle("/api/auth/device/status", authInst.Middleware(humaMux))
-	mux.Handle("/api/v1/health", humaMux)
-	mux.Handle("/api/", authInst.Middleware(humaMux))
+	mux.Handle("/auth/device/confirm", authInst.Middleware(humaMux))
+	mux.Handle("/auth/device/status", authInst.Middleware(humaMux))
+	mux.Handle("/v1/health", humaMux)
+	mux.Handle("/", authInst.Middleware(humaMux))
 	mux.Handle("/docs", humaRouter.Adapter())
 	mux.Handle("/openapi.json", humaRouter.Adapter())
 

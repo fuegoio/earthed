@@ -11,8 +11,8 @@ const DEFAULT_BASE_URL = "http://localhost:8080";
 export interface EarthedClientOptions extends Config {
   /**
    * Base URL of the Earthed API (no trailing slash). Paths in the spec already
-   * include the `/api/v1` prefix, so this should be the host only
-   * (e.g. `http://localhost:8080`).
+   * include the `/v1` (or `/auth`) prefix, so this should be the host only
+   * (e.g. `http://localhost:8080` or `https://api.earthed.app`).
    */
   baseUrl?: string;
 }

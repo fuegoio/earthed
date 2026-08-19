@@ -46,7 +46,7 @@ func New(cfg *config.Config, db *sql.DB, st *store.Store) (*Auth, error) {
 		Database: sqladapter.NewPostgreSQL(db),
 		Secret:   []byte(cfg.LimenSecret),
 		HTTP: limen.NewDefaultHTTPConfig(
-			limen.WithHTTPBasePath("/api/auth"),
+			limen.WithHTTPBasePath("/auth"),
 			limen.WithHTTPCSRFProtection(false),
 			limen.WithHTTPOriginCheck(false),
 			limen.WithHTTPCookieSecure(false),

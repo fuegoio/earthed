@@ -35,7 +35,7 @@ export function DeviceConfirm() {
     setState("submitting")
     try {
       const res = await fetch(
-        `${env.NEXT_PUBLIC_EARTHED_API_URL}/api/auth/device/confirm`,
+        `${env.NEXT_PUBLIC_EARTHED_API_URL}/auth/device/confirm`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

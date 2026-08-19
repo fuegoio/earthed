@@ -37,19 +37,19 @@ async function authFetch(path: string, body: Record<string, unknown>): Promise<A
 }
 
 export async function signin(values: { email: string; password: string }): Promise<AuthResult> {
-  return authFetch("/api/auth/signin/credential", {
+  return authFetch("/auth/signin/credential", {
     credential: values.email,
     password: values.password,
   });
 }
 
 export async function signup(values: { email: string; password: string }): Promise<AuthResult> {
-  return authFetch("/api/auth/signup/credential", values);
+  return authFetch("/auth/signup/credential", values);
 }
 
 export async function signout(): Promise<void> {
   try {
-    await fetch(`${env.NEXT_PUBLIC_EARTHED_API_URL}/api/auth/signout`, {
+    await fetch(`${env.NEXT_PUBLIC_EARTHED_API_URL}/auth/signout`, {
       method: "POST",
       credentials: "include",
     });
