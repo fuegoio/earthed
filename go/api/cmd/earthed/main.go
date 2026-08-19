@@ -24,6 +24,7 @@ import (
 	"github.com/fuegoio/earthed/go/api/internal/migrations"
 	"github.com/fuegoio/earthed/go/api/internal/reader/fetcher"
 	"github.com/fuegoio/earthed/go/api/internal/reader/processor"
+	"github.com/fuegoio/earthed/go/api/internal/reader/xclient"
 	"github.com/fuegoio/earthed/go/api/internal/scheduler"
 	"github.com/fuegoio/earthed/go/api/internal/store"
 	"github.com/fuegoio/earthed/go/api/internal/worker"
@@ -63,7 +64,7 @@ func run() (int, error) {
 		humaConfig.Tags = api.OpenAPITags()
 		humaRouter := humago.New(humaMux, humaConfig)
 
-		apiHandler := api.New(humaRouter, nil, nil, nil, nil)
+		apiHandler := api.New(humaRouter, nil, nil, nil, nil, nil)
 		apiHandler.RegisterRoutes()
 
 		b, err := humaRouter.OpenAPI().MarshalJSON()
@@ -119,7 +120,8 @@ func run() (int, error) {
 	humaRouter := humago.New(humaMux, humaConfig)
 
 	f := fetcher.New(cfg.HTTPTimeout, cfg.HTTPMaxBody, "Earthed")
-	apiHandler := api.New(humaRouter, st, authInst, cfg, f)
+	xc := xclient.New(cfg.XAPIBaseURL, cfg.XAPIBearer, "Earthed", cfg.HTTPTimeout)
+	apiHandler := api.New(humaRouter, st, authInst, cfg, f, xc)
 	apiHandler.RegisterRoutes()
 
 	mux := http.NewServeMux()
@@ -139,7 +141,7 @@ func run() (int, error) {
 	mux.Handle("/openapi.json", humaRouter.Adapter())
 
 	if !cfg.DisableSched {
-		proc := processor.New(st, f)
+		proc := processor.New(st, f, xc)
 		pool := worker.New(proc, cfg.WorkerPool)
 		sched := scheduler.New(st, pool, cfg.PollingFreq, cfg.BatchSize)
 		go sched.Start(ctx)

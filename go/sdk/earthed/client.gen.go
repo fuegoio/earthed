@@ -204,6 +204,7 @@ type Entry struct {
 	CommentsUrl *string      `json:"comments_url,omitempty"`
 	Description *string      `json:"description,omitempty"`
 	Enclosures  *[]Enclosure `json:"enclosures,omitempty"`
+	EntryType   string       `json:"entry_type"`
 	FeedId      int64        `json:"feed_id"`
 	Hash        string       `json:"hash"`
 	Id          int64        `json:"id"`
@@ -284,6 +285,7 @@ type Feed struct {
 	RewriteRules      *string    `json:"rewrite_rules,omitempty"`
 	ScraperRules      *string    `json:"scraper_rules,omitempty"`
 	SiteUrl           string     `json:"site_url"`
+	Source            string     `json:"source"`
 	Title             string     `json:"title"`
 	UpdatedAt         time.Time  `json:"updated_at"`
 	UserId            int64      `json:"user_id"`
@@ -404,6 +406,42 @@ type PreviewFeedItem struct {
 	Tags        *[]string `json:"tags,omitempty"`
 	Title       string    `json:"title"`
 	Url         string    `json:"url"`
+}
+
+// PreviewXFeedBody defines model for PreviewXFeedBody.
+type PreviewXFeedBody struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: /api/schemas/PreviewXFeedBody.json
+	Schema   *string            `json:"$schema,omitempty"`
+	FeedUrl  string             `json:"feed_url"`
+	Items    *[]PreviewFeedItem `json:"items"`
+	SiteUrl  string             `json:"site_url"`
+	Title    string             `json:"title"`
+	Username string             `json:"username"`
+}
+
+// PreviewXFeedInputBody defines model for PreviewXFeedInputBody.
+type PreviewXFeedInputBody struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: /api/schemas/PreviewXFeedInputBody.json
+	Schema *string `json:"$schema,omitempty"`
+
+	// Username X @username (with or without the leading @)
+	Username string `json:"username"`
+}
+
+// SubscribeXFeedInputBody defines model for SubscribeXFeedInputBody.
+type SubscribeXFeedInputBody struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: /api/schemas/SubscribeXFeedInputBody.json
+	Schema   *string `json:"$schema,omitempty"`
+	FolderId *int64  `json:"folder_id,omitempty"`
+
+	// Username X @username (with or without the leading @)
+	Username string `json:"username"`
 }
 
 // ToggleEntryStarredRequest defines model for Toggle-entry-starredRequest.
@@ -545,6 +583,12 @@ type CreateFeedJSONRequestBody = CreateFeedInputBody
 
 // PreviewFeedJSONRequestBody defines body for PreviewFeed for application/json ContentType.
 type PreviewFeedJSONRequestBody = PreviewFeedInputBody
+
+// SubscribeXFeedJSONRequestBody defines body for SubscribeXFeed for application/json ContentType.
+type SubscribeXFeedJSONRequestBody = SubscribeXFeedInputBody
+
+// PreviewXFeedJSONRequestBody defines body for PreviewXFeed for application/json ContentType.
+type PreviewXFeedJSONRequestBody = PreviewXFeedInputBody
 
 // UpdateFeedJSONRequestBody defines body for UpdateFeed for application/json ContentType.
 type UpdateFeedJSONRequestBody = UpdateFeedInputBody
@@ -834,6 +878,42 @@ type ClientInterface interface {
 	//
 	// Corresponds with POST /api/v1/feeds/preview (the `PreviewFeed` operationId).
 	PreviewFeed(ctx context.Context, body PreviewFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// SubscribeXFeedWithBody Subscribe to an X (Twitter) user timeline
+	//
+	// Subscribes to a person's X timeline via the official X API v2. The username is resolved to a numeric user ID and a feed with source "x" is created. Entries are stored with entry_type "post" so consumers can render them differently from RSS articles.
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with POST /api/v1/feeds/x (the `SubscribeXFeed` operationId).
+	SubscribeXFeedWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// SubscribeXFeed Subscribe to an X (Twitter) user timeline
+	//
+	// Subscribes to a person's X timeline via the official X API v2. The username is resolved to a numeric user ID and a feed with source "x" is created. Entries are stored with entry_type "post" so consumers can render them differently from RSS articles.
+	//
+	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with POST /api/v1/feeds/x (the `SubscribeXFeed` operationId).
+	SubscribeXFeed(ctx context.Context, body SubscribeXFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PreviewXFeedWithBody Preview an X (Twitter) user timeline
+	//
+	// Fetches a person's recent X posts via the official X API v2 without persisting anything.
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with POST /api/v1/feeds/x/preview (the `PreviewXFeed` operationId).
+	PreviewXFeedWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PreviewXFeed Preview an X (Twitter) user timeline
+	//
+	// Fetches a person's recent X posts via the official X API v2 without persisting anything.
+	//
+	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with POST /api/v1/feeds/x/preview (the `PreviewXFeed` operationId).
+	PreviewXFeed(ctx context.Context, body PreviewXFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteFeed Delete a feed
 	//
@@ -1497,6 +1577,82 @@ func (c *Client) PreviewFeedWithBody(ctx context.Context, contentType string, bo
 // Corresponds with POST /api/v1/feeds/preview (the `PreviewFeed` operationId).
 func (c *Client) PreviewFeed(ctx context.Context, body PreviewFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPreviewFeedRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// SubscribeXFeedWithBody Subscribe to an X (Twitter) user timeline
+//
+// Subscribes to a person's X timeline via the official X API v2. The username is resolved to a numeric user ID and a feed with source "x" is created. Entries are stored with entry_type "post" so consumers can render them differently from RSS articles.
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with POST /api/v1/feeds/x (the `SubscribeXFeed` operationId).
+func (c *Client) SubscribeXFeedWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSubscribeXFeedRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// SubscribeXFeed Subscribe to an X (Twitter) user timeline
+//
+// Subscribes to a person's X timeline via the official X API v2. The username is resolved to a numeric user ID and a feed with source "x" is created. Entries are stored with entry_type "post" so consumers can render them differently from RSS articles.
+//
+// Takes a body of the `application/json` content type.
+//
+// Corresponds with POST /api/v1/feeds/x (the `SubscribeXFeed` operationId).
+func (c *Client) SubscribeXFeed(ctx context.Context, body SubscribeXFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSubscribeXFeedRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// PreviewXFeedWithBody Preview an X (Twitter) user timeline
+//
+// Fetches a person's recent X posts via the official X API v2 without persisting anything.
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with POST /api/v1/feeds/x/preview (the `PreviewXFeed` operationId).
+func (c *Client) PreviewXFeedWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPreviewXFeedRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// PreviewXFeed Preview an X (Twitter) user timeline
+//
+// Fetches a person's recent X posts via the official X API v2 without persisting anything.
+//
+// Takes a body of the `application/json` content type.
+//
+// Corresponds with POST /api/v1/feeds/x/preview (the `PreviewXFeed` operationId).
+func (c *Client) PreviewXFeed(ctx context.Context, body PreviewXFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPreviewXFeedRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -2868,6 +3024,86 @@ func NewPreviewFeedRequestWithBody(server string, contentType string, body io.Re
 	return req, nil
 }
 
+// NewSubscribeXFeedRequest calls the generic SubscribeXFeed builder with application/json body
+func NewSubscribeXFeedRequest(server string, body SubscribeXFeedJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewSubscribeXFeedRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewSubscribeXFeedRequestWithBody constructs an http.Request for the SubscribeXFeed method, with any body, and a specified content type
+func NewSubscribeXFeedRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/feeds/x")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPreviewXFeedRequest calls the generic PreviewXFeed builder with application/json body
+func NewPreviewXFeedRequest(server string, body PreviewXFeedJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPreviewXFeedRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPreviewXFeedRequestWithBody constructs an http.Request for the PreviewXFeed method, with any body, and a specified content type
+func NewPreviewXFeedRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/feeds/x/preview")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewDeleteFeedRequest constructs an http.Request for the DeleteFeed method
 func NewDeleteFeedRequest(server string, feedId int64) (*http.Request, error) {
 	var err error
@@ -3748,6 +3984,42 @@ type ClientWithResponsesInterface interface {
 	//
 	// Corresponds with POST /api/v1/feeds/preview (the `PreviewFeed` operationId).
 	PreviewFeedWithResponse(ctx context.Context, body PreviewFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*PreviewFeedResp, error)
+
+	// SubscribeXFeedWithBodyWithResponse Subscribe to an X (Twitter) user timeline
+	//
+	// Subscribes to a person's X timeline via the official X API v2. The username is resolved to a numeric user ID and a feed with source "x" is created. Entries are stored with entry_type "post" so consumers can render them differently from RSS articles.
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v1/feeds/x (the `SubscribeXFeed` operationId).
+	SubscribeXFeedWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SubscribeXFeedResp, error)
+
+	// SubscribeXFeedWithResponse Subscribe to an X (Twitter) user timeline
+	//
+	// Subscribes to a person's X timeline via the official X API v2. The username is resolved to a numeric user ID and a feed with source "x" is created. Entries are stored with entry_type "post" so consumers can render them differently from RSS articles.
+	//
+	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v1/feeds/x (the `SubscribeXFeed` operationId).
+	SubscribeXFeedWithResponse(ctx context.Context, body SubscribeXFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*SubscribeXFeedResp, error)
+
+	// PreviewXFeedWithBodyWithResponse Preview an X (Twitter) user timeline
+	//
+	// Fetches a person's recent X posts via the official X API v2 without persisting anything.
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v1/feeds/x/preview (the `PreviewXFeed` operationId).
+	PreviewXFeedWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PreviewXFeedResp, error)
+
+	// PreviewXFeedWithResponse Preview an X (Twitter) user timeline
+	//
+	// Fetches a person's recent X posts via the official X API v2 without persisting anything.
+	//
+	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v1/feeds/x/preview (the `PreviewXFeed` operationId).
+	PreviewXFeedWithResponse(ctx context.Context, body PreviewXFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*PreviewXFeedResp, error)
 
 	// DeleteFeedWithResponse Delete a feed
 	//
@@ -4981,6 +5253,102 @@ func (r PreviewFeedResp) StatusCode() int {
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
 func (r PreviewFeedResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type SubscribeXFeedResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *Feed
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r SubscribeXFeedResp) GetJSON200() *Feed {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r SubscribeXFeedResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r SubscribeXFeedResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r SubscribeXFeedResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r SubscribeXFeedResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r SubscribeXFeedResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type PreviewXFeedResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *PreviewXFeedBody
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r PreviewXFeedResp) GetJSON200() *PreviewXFeedBody {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r PreviewXFeedResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r PreviewXFeedResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r PreviewXFeedResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PreviewXFeedResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r PreviewXFeedResp) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
@@ -6236,6 +6604,66 @@ func (c *ClientWithResponses) PreviewFeedWithResponse(ctx context.Context, body 
 	return ParsePreviewFeedResp(rsp)
 }
 
+// SubscribeXFeedWithBodyWithResponse Subscribe to an X (Twitter) user timeline
+//
+// Subscribes to a person's X timeline via the official X API v2. The username is resolved to a numeric user ID and a feed with source "x" is created. Entries are stored with entry_type "post" so consumers can render them differently from RSS articles.
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v1/feeds/x (the `SubscribeXFeed` operationId).
+func (c *ClientWithResponses) SubscribeXFeedWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SubscribeXFeedResp, error) {
+	rsp, err := c.SubscribeXFeedWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseSubscribeXFeedResp(rsp)
+}
+
+// SubscribeXFeedWithResponse Subscribe to an X (Twitter) user timeline
+//
+// Subscribes to a person's X timeline via the official X API v2. The username is resolved to a numeric user ID and a feed with source "x" is created. Entries are stored with entry_type "post" so consumers can render them differently from RSS articles.
+//
+// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v1/feeds/x (the `SubscribeXFeed` operationId).
+func (c *ClientWithResponses) SubscribeXFeedWithResponse(ctx context.Context, body SubscribeXFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*SubscribeXFeedResp, error) {
+	rsp, err := c.SubscribeXFeed(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseSubscribeXFeedResp(rsp)
+}
+
+// PreviewXFeedWithBodyWithResponse Preview an X (Twitter) user timeline
+//
+// Fetches a person's recent X posts via the official X API v2 without persisting anything.
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v1/feeds/x/preview (the `PreviewXFeed` operationId).
+func (c *ClientWithResponses) PreviewXFeedWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PreviewXFeedResp, error) {
+	rsp, err := c.PreviewXFeedWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePreviewXFeedResp(rsp)
+}
+
+// PreviewXFeedWithResponse Preview an X (Twitter) user timeline
+//
+// Fetches a person's recent X posts via the official X API v2 without persisting anything.
+//
+// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v1/feeds/x/preview (the `PreviewXFeed` operationId).
+func (c *ClientWithResponses) PreviewXFeedWithResponse(ctx context.Context, body PreviewXFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*PreviewXFeedResp, error) {
+	rsp, err := c.PreviewXFeed(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePreviewXFeedResp(rsp)
+}
+
 // DeleteFeedWithResponse Delete a feed
 //
 // Returns a wrapper object for the known response body format(s).
@@ -7267,6 +7695,72 @@ func ParsePreviewFeedResp(rsp *http.Response) (*PreviewFeedResp, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest PreviewFeedBody
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseSubscribeXFeedResp parses an HTTP response from a SubscribeXFeedWithResponse call
+func ParseSubscribeXFeedResp(rsp *http.Response) (*SubscribeXFeedResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &SubscribeXFeedResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Feed
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePreviewXFeedResp parses an HTTP response from a PreviewXFeedWithResponse call
+func ParsePreviewXFeedResp(rsp *http.Response) (*PreviewXFeedResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PreviewXFeedResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PreviewXFeedBody
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

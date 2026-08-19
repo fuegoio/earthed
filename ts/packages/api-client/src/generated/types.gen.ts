@@ -134,6 +134,7 @@ export type Entry = {
     comments_url?: string;
     description?: string;
     enclosures?: Array<Enclosure> | null;
+    entry_type: string;
     feed_id: number;
     hash: string;
     id: number;
@@ -211,6 +212,7 @@ export type Feed = {
     rewrite_rules?: string;
     scraper_rules?: string;
     site_url: string;
+    source: string;
     title: string;
     updated_at: string;
     user_id: number;
@@ -322,6 +324,41 @@ export type PreviewFeedItem = {
     tags?: Array<string> | null;
     title: string;
     url: string;
+};
+
+export type PreviewXFeedBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    feed_url: string;
+    items: Array<PreviewFeedItem> | null;
+    site_url: string;
+    title: string;
+    username: string;
+};
+
+export type PreviewXFeedInputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    /**
+     * X @username (with or without the leading @)
+     */
+    username: string;
+};
+
+export type SubscribeXFeedInputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    folder_id?: number;
+    /**
+     * X @username (with or without the leading @)
+     */
+    username: string;
 };
 
 export type ToggleEntryStarredRequest = {
@@ -465,6 +502,7 @@ export type EntryWritable = {
     comments_url?: string;
     description?: string;
     enclosures?: Array<Enclosure> | null;
+    entry_type: string;
     feed_id: number;
     hash: string;
     id: number;
@@ -519,6 +557,7 @@ export type FeedWritable = {
     rewrite_rules?: string;
     scraper_rules?: string;
     site_url: string;
+    source: string;
     title: string;
     updated_at: string;
     user_id: number;
@@ -588,6 +627,29 @@ export type PreviewFeedBodyWritable = {
 
 export type PreviewFeedInputBodyWritable = {
     feed_url: string;
+};
+
+export type PreviewXFeedBodyWritable = {
+    feed_url: string;
+    items: Array<PreviewFeedItem> | null;
+    site_url: string;
+    title: string;
+    username: string;
+};
+
+export type PreviewXFeedInputBodyWritable = {
+    /**
+     * X @username (with or without the leading @)
+     */
+    username: string;
+};
+
+export type SubscribeXFeedInputBodyWritable = {
+    folder_id?: number;
+    /**
+     * X @username (with or without the leading @)
+     */
+    username: string;
 };
 
 export type ToggleEntryStarredRequestWritable = {
@@ -1243,6 +1305,56 @@ export type PreviewFeedResponses = {
 };
 
 export type PreviewFeedResponse = PreviewFeedResponses[keyof PreviewFeedResponses];
+
+export type SubscribeXFeedData = {
+    body: SubscribeXFeedInputBodyWritable;
+    path?: never;
+    query?: never;
+    url: '/api/v1/feeds/x';
+};
+
+export type SubscribeXFeedErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type SubscribeXFeedError = SubscribeXFeedErrors[keyof SubscribeXFeedErrors];
+
+export type SubscribeXFeedResponses = {
+    /**
+     * OK
+     */
+    200: Feed;
+};
+
+export type SubscribeXFeedResponse = SubscribeXFeedResponses[keyof SubscribeXFeedResponses];
+
+export type PreviewXFeedData = {
+    body: PreviewXFeedInputBodyWritable;
+    path?: never;
+    query?: never;
+    url: '/api/v1/feeds/x/preview';
+};
+
+export type PreviewXFeedErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type PreviewXFeedError = PreviewXFeedErrors[keyof PreviewXFeedErrors];
+
+export type PreviewXFeedResponses = {
+    /**
+     * OK
+     */
+    200: PreviewXFeedBody;
+};
+
+export type PreviewXFeedResponse = PreviewXFeedResponses[keyof PreviewXFeedResponses];
 
 export type DeleteFeedData = {
     body?: never;

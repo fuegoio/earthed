@@ -14,22 +14,63 @@ import (
 	"github.com/fuegoio/earthed/go/api/internal/reader/parser"
 	"github.com/fuegoio/earthed/go/api/internal/reader/sanitizer"
 	"github.com/fuegoio/earthed/go/api/internal/store"
+	"github.com/fuegoio/earthed/go/api/internal/reader/xclient"
 )
 
 // Processor coordinates the fetch-parse-store pipeline for a single feed.
 type Processor struct {
 	store   *store.Store
 	fetcher *fetcher.Fetcher
+	xclient *xclient.Client
 }
 
-// New returns a Processor bound to the given store and fetcher.
-func New(st *store.Store, f *fetcher.Fetcher) *Processor {
-	return &Processor{store: st, fetcher: f}
+// New returns a Processor bound to the given store, fetcher, and X API client.
+// The xclient may be nil when the X API is not configured; X-source feeds are
+// skipped with a recorded error in that case.
+func New(st *store.Store, f *fetcher.Fetcher, xc *xclient.Client) *Processor {
+	return &Processor{store: st, fetcher: f, xclient: xc}
 }
 
-// ProcessFeed refreshes a single feed: fetches its URL, parses the response,
-// sanitizes the HTML content, and inserts new entries into the store.
+// ProcessFeed refreshes a single feed: fetches its source, normalizes the
+// response, sanitizes the content, and inserts new entries into the store.
+// Feeds with source "x" are fetched from the official X API v2; all others
+// are fetched and parsed as RSS/Atom/JSON.
 func (p *Processor) ProcessFeed(ctx context.Context, feed *store.Feed) error {
+	if feed.Source == store.SourceX {
+		return p.processXFeed(ctx, feed)
+	}
+	return p.processRSSFeed(ctx, feed)
+}
+
+// processXFeed refreshes an X-timeline feed by fetching the user's posts from
+// the official X API v2 and storing them with entry_type "post".
+func (p *Processor) processXFeed(ctx context.Context, feed *store.Feed) error {
+	if p.xclient == nil || !p.xclient.Enabled() {
+		_ = p.store.UpdateFeedFetchState(ctx, feed.ID, feed.EtagHeader, feed.LastModified, "X API not configured", feed.ParsingErrorCount+1, time.Now().Add(60*time.Minute), "")
+		return fmt.Errorf("process X feed %d: %w", feed.ID, xclient.ErrNotConfigured)
+	}
+
+	// feed.FeedURL stores the numeric X user ID (resolved at subscribe time).
+	parsed, err := p.xclient.FetchTimeline(ctx, feed.FeedURL)
+	if err != nil {
+		_ = p.store.UpdateFeedFetchState(ctx, feed.ID, feed.EtagHeader, feed.LastModified, err.Error(), feed.ParsingErrorCount+1, time.Now().Add(15*time.Minute), "")
+		return fmt.Errorf("fetch X timeline %d: %w", feed.ID, err)
+	}
+
+	entryCount := p.storeItems(ctx, feed, parsed, store.EntryTypePost)
+
+	description := ""
+	if parsed.Title != "" {
+		description = parsed.Title
+	}
+	_ = p.store.UpdateFeedFetchState(ctx, feed.ID, "", "", "", 0, time.Now().Add(30*time.Minute), description)
+	slog.Info("X timeline refreshed", "feed_id", feed.ID, "user_id", feed.FeedURL, "items", entryCount)
+	return nil
+}
+
+// processRSSFeed refreshes an RSS/Atom/JSON feed: fetches its URL, parses the
+// response, sanitizes the HTML content, and inserts new entries into the store.
+func (p *Processor) processRSSFeed(ctx context.Context, feed *store.Feed) error {
 	result, err := p.fetcher.Fetch(ctx, feed.FeedURL, feed.EtagHeader, feed.LastModified)
 	if err != nil {
 		_ = p.store.UpdateFeedFetchState(ctx, feed.ID, feed.EtagHeader, feed.LastModified, err.Error(), feed.ParsingErrorCount+1, time.Now().Add(15*time.Minute), "")
@@ -69,6 +110,20 @@ func (p *Processor) ProcessFeed(ctx context.Context, feed *store.Feed) error {
 		return fmt.Errorf("parse feed %d: %w", feed.ID, err)
 	}
 
+	itemCount := p.storeItems(ctx, feed, parsed, store.EntryTypeArticle)
+
+	nextCheck := computeNextCheck(parsed.Items)
+	_ = p.store.UpdateFeedFetchState(ctx, feed.ID, result.ETag, result.LastModified, "", 0, nextCheck, parsed.Description)
+	slog.Info("feed refreshed", "feed_id", feed.ID, "url", feed.FeedURL, "items", itemCount)
+
+	return nil
+}
+
+// storeItems sanitizes and persists the items of a parsed feed, returning the
+// number of items processed. entryType controls how consumers render the
+// entries (e.g. "article" for RSS, "post" for X timelines).
+func (p *Processor) storeItems(ctx context.Context, feed *store.Feed, parsed *parser.Feed, entryType string) int {
+	count := 0
 	for _, item := range parsed.Items {
 		content := item.Content
 		if content == "" {
@@ -88,7 +143,7 @@ func (p *Processor) ProcessFeed(ctx context.Context, feed *store.Feed) error {
 
 		hash := hashItem(item)
 		description := truncate(sanitizer.StripHTML(item.Description), 400)
-		entryID, err := p.store.CreateEntry(ctx, feed.UserID, feed.ID, hash, item.Title, item.Link, item.CommentsURL, item.Author, sanitized, description, publishedAt, item.Tags)
+		entryID, err := p.store.CreateEntry(ctx, feed.UserID, feed.ID, hash, item.Title, item.Link, item.CommentsURL, item.Author, sanitized, description, entryType, publishedAt, item.Tags)
 		if err != nil {
 			slog.Error("create entry failed", "feed_id", feed.ID, "hash", hash, "err", err)
 			continue
@@ -101,13 +156,9 @@ func (p *Processor) ProcessFeed(ctx context.Context, feed *store.Feed) error {
 				}
 			}
 		}
+		count++
 	}
-
-	nextCheck := computeNextCheck(parsed.Items)
-	_ = p.store.UpdateFeedFetchState(ctx, feed.ID, result.ETag, result.LastModified, "", 0, nextCheck, parsed.Description)
-	slog.Info("feed refreshed", "feed_id", feed.ID, "url", feed.FeedURL, "items", len(parsed.Items))
-
-	return nil
+	return count
 }
 
 func hashItem(item parser.Item) string {

@@ -17,6 +17,13 @@ type Folder struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+// SourceRSS marks a feed fetched and parsed as RSS/Atom/JSON Feed.
+const SourceRSS = "rss"
+
+// SourceX marks a feed fetched from a person's X timeline via the official
+// X API v2.
+const SourceX = "x"
+
 // Feed represents a single RSS/Atom/JSON Feed subscription owned by a user.
 type Feed struct {
 	ID                int        `json:"id"`
@@ -26,6 +33,7 @@ type Feed struct {
 	SiteURL           string     `json:"site_url"`
 	Title             string     `json:"title"`
 	Description       string     `json:"description,omitempty"`
+	Source            string     `json:"source"`
 	EtagHeader        string     `json:"-"`
 	LastModified      string     `json:"-"`
 	ParsingError      string     `json:"parsing_error,omitempty"`
@@ -40,6 +48,12 @@ type Feed struct {
 	UpdatedAt         time.Time  `json:"updated_at"`
 }
 
+// EntryTypeArticle marks an entry rendered as a regular article (RSS/Atom).
+const EntryTypeArticle = "article"
+
+// EntryTypePost marks an entry rendered as an X (Twitter) post.
+const EntryTypePost = "post"
+
 // Entry is a single article/item belonging to a feed.
 type Entry struct {
 	ID          int64       `json:"id"`
@@ -52,6 +66,7 @@ type Entry struct {
 	Author      string      `json:"author,omitempty"`
 	Content     string      `json:"-"`
 	Description string      `json:"description,omitempty"`
+	EntryType   string      `json:"entry_type"`
 	Status      string      `json:"status"`
 	Starred     bool        `json:"starred"`
 	PublishedAt time.Time   `json:"published_at"`

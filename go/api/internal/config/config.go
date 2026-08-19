@@ -14,6 +14,8 @@ type Config struct {
 	DatabaseURL  string
 	BaseURL      string
 	WebURL       string
+	XAPIBaseURL  string
+	XAPIBearer   string
 	LimenSecret  string
 	LogFormat    string
 	PollingFreq  time.Duration
@@ -33,6 +35,8 @@ func Load() (*Config, error) {
 		DatabaseURL:  env("EARTHED_DATABASE_URL", "postgres://earthed:earthed@localhost:5432/earthed?sslmode=disable"),
 		BaseURL:      env("EARTHED_BASE_URL", "http://localhost:8080"),
 		WebURL:       env("EARTHED_WEB_URL", "http://localhost:3000"),
+		XAPIBaseURL:  env("X_API_BASE_URL", ""),
+		XAPIBearer:   env("X_API_BEARER_TOKEN", ""),
 		LimenSecret:  env("LIMEN_SECRET", ""),
 		LogFormat:    env("EARTHED_LOG_FORMAT", "pretty"),
 		PollingFreq:  envDuration("EARTHED_POLLING_FREQUENCY", 60*time.Second),
