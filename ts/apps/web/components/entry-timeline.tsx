@@ -15,7 +15,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@workspace/ui/components/empty";
-import { getClient, listEntries, listFeeds, unwrap } from "@/lib/planetary";
+import { getClient, listEntries, listFeeds, unwrap } from "@/lib/earthed";
 import type { Entry, Feed } from "@/lib/types";
 import { buttonVariants } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";

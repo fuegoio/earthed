@@ -16,9 +16,9 @@ import (
 // have migrations applied.
 func testDB(t *testing.T) *Store {
 	t.Helper()
-	dsn := os.Getenv("PLANETARY_DATABASE_URL")
+	dsn := os.Getenv("EARTHED_DATABASE_URL")
 	if dsn == "" {
-		dsn = "postgres://planetary:planetary@localhost:5432/planetary?sslmode=disable"
+		dsn = "postgres://earthed:earthed@localhost:5432/earthed?sslmode=disable"
 	}
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {

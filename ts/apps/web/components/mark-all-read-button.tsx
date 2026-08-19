@@ -5,7 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { CheckCheck } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
-import { getClient, listEntries, updateEntries } from "@/lib/planetary";
+import { getClient, listEntries, updateEntries } from "@/lib/earthed";
 import { getApiErrorMessage } from "@/lib/errors";
 import type { Entry } from "@/lib/types";
 

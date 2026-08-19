@@ -1,19 +1,19 @@
-// Package commands implements the planetary CLI subcommands.
+// Package commands implements the earthed CLI subcommands.
 package commands
 
 import (
 	"fmt"
 	"os"
 
-	"github.com/fuegoio/planetary/go/cli/internal/client"
-	"github.com/fuegoio/planetary/go/sdk/planetary"
+	"github.com/fuegoio/earthed/go/cli/internal/client"
+	"github.com/fuegoio/earthed/go/sdk/earthed"
 	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "planetary",
-	Short: "Planetary RSS reader CLI",
-	Long:  "Planetary is a self-hosted RSS reader. This CLI lets you manage feeds, entries, folders, and API tokens from the terminal.",
+	Use:   "earthed",
+	Short: "Earthed RSS reader CLI",
+	Long:  "Earthed is a self-hosted RSS reader. This CLI lets you manage feeds, entries, folders, and API tokens from the terminal.",
 }
 
 // Execute runs the root command.
@@ -24,7 +24,7 @@ func Execute() {
 }
 
 // mustClient loads the config and creates a client. It exits on error.
-func mustClient() (*client.Config, *planetary.ClientWithResponses) {
+func mustClient() (*client.Config, *earthed.ClientWithResponses) {
 	cfg, err := client.LoadConfig()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: load config: %v\n", err)

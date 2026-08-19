@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getClient, getFeed, refreshFeed, listFolders } from "@/lib/planetary";
+import { getClient, getFeed, refreshFeed, listFolders } from "@/lib/earthed";
 import { getApiErrorMessage, apiErrorStatus } from "@/lib/errors";
 import { ApiError } from "@/components/api-error";
 import { FeedDetail } from "@/components/feed-detail";

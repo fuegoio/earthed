@@ -24,7 +24,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@workspace/ui/components/empty";
-import { getClient, listTokens, createToken, deleteToken, unwrap } from "@/lib/planetary";
+import { getClient, listTokens, createToken, deleteToken, unwrap } from "@/lib/earthed";
 import { getApiErrorMessage } from "@/lib/errors";
 import { formatDateTime } from "@/lib/format";
 import type { APIToken, CreatedToken } from "@/lib/types";
@@ -128,7 +128,7 @@ export function TokenManager() {
               </EmptyMedia>
               <EmptyTitle>No API tokens</EmptyTitle>
               <EmptyDescription>
-                Create a token to use the Planetary CLI or integrate other clients.
+                Create a token to use the Earthed CLI or integrate other clients.
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
@@ -187,7 +187,7 @@ export function TokenManager() {
                     id="token-label"
                     value={label}
                     onChange={(e) => setLabel(e.target.value)}
-                    placeholder="e.g. planetary-cli"
+                    placeholder="e.g. earthed-cli"
                     autoFocus
                   />
                 </div>

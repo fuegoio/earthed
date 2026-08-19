@@ -1,4 +1,4 @@
-// Package cors provides a permissive CORS middleware for the Planetary HTTP API.
+// Package cors provides a permissive CORS middleware for the Earthed HTTP API.
 package cors
 
 import (

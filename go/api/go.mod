@@ -1,4 +1,4 @@
-module github.com/fuegoio/planetary/go/api
+module github.com/fuegoio/earthed/go/api
 
 go 1.25.0
 
@@ -10,6 +10,7 @@ require (
 	github.com/thecodearcher/limen v0.1.4
 	github.com/thecodearcher/limen/adapters/sql v0.1.2
 	github.com/thecodearcher/limen/plugins/credential-password v0.1.4
+	golang.org/x/net v0.58.0
 )
 
 require (
@@ -217,7 +218,6 @@ require (
 	golang.org/x/crypto v0.55.0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20260209203927-2842357ff358 // indirect
 	golang.org/x/mod v0.38.0 // indirect
-	golang.org/x/net v0.58.0 // indirect
 	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/text v0.41.0 // indirect

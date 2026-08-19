@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { FileDown, Upload, FileText, Loader2, CheckCircle2 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
-import { getClient, exportOpml, importOpml } from "@/lib/planetary";
+import { getClient, exportOpml, importOpml } from "@/lib/earthed";
 import { getApiErrorMessage } from "@/lib/errors";
 
 interface ImportResult {
@@ -36,7 +36,7 @@ export function OpmlManager() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "planetary-subscriptions.opml";
+      a.download = "earthed-subscriptions.opml";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

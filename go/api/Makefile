@@ -1,16 +1,16 @@
 .PHONY: build run migrate gen-openapi test fmt fmt-check vet lint clean db-up db-down db-reset
 
 build:
-	go build -o planetary ./cmd/planetary/
+	go build -o earthed ./cmd/earthed/
 
 run: build
-	./planetary
+	./earthed
 
 migrate: build
-	./planetary --migrate
+	./earthed --migrate
 
 gen-openapi: build
-	./planetary --openapi 2>/dev/null | python3 -m json.tool > openapi.json
+	./earthed --openapi 2>/dev/null | python3 -m json.tool > openapi.json
 	cp openapi.json ../../ts/apps/docs/openapi/openapi.json
 	cd ../../ts/packages/api-client && pnpm gen
 
@@ -30,7 +30,7 @@ lint:
 	go tool golangci-lint run ./...
 
 clean:
-	rm -f planetary
+	rm -f earthed
 
 db-up:
 	docker compose up -d
@@ -39,4 +39,4 @@ db-down:
 	docker compose down
 
 db-reset:
-	docker exec planetary-postgres psql -U planetary -d postgres -c "DROP DATABASE IF EXISTS planetary;" -c "CREATE DATABASE planetary;"
+	docker exec earthed-postgres psql -U earthed -d postgres -c "DROP DATABASE IF EXISTS earthed;" -c "CREATE DATABASE earthed;"

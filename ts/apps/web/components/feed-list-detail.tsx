@@ -54,7 +54,7 @@ import {
   unfollowFeedList,
   importFeedList,
   unwrap,
-} from "@/lib/planetary";
+} from "@/lib/earthed";
 import { getApiErrorMessage } from "@/lib/errors";
 import type { Feed, FeedList, FeedListFeed } from "@/lib/types";
 

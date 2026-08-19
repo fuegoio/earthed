@@ -1,5 +1,5 @@
 /**
- * Planetary API Client
+ * Earthed API Client
  * Generated using @hey-api/openapi-ts
  */
 
@@ -8,9 +8,9 @@ import type { Config } from "./generated/client/types.gen";
 
 const DEFAULT_BASE_URL = "http://localhost:8080";
 
-export interface PlanetaryClientOptions extends Config {
+export interface EarthedClientOptions extends Config {
   /**
-   * Base URL of the Planetary API (no trailing slash). Paths in the spec already
+   * Base URL of the Earthed API (no trailing slash). Paths in the spec already
    * include the `/api/v1` prefix, so this should be the host only
    * (e.g. `http://localhost:8080`).
    */
@@ -18,13 +18,13 @@ export interface PlanetaryClientOptions extends Config {
 }
 
 /**
- * Create a typed client for the Planetary API.
+ * Create a typed client for the Earthed API.
  *
  * The returned client exposes typed methods for all API operations and a
  * `config`/`interceptors` surface compatible with the hey-api client-fetch
  * plugins (used by `lib/logger.ts` for request logging).
  */
-export function createPlanetaryClient(options: PlanetaryClientOptions = {}) {
+export function createEarthedClient(options: EarthedClientOptions = {}) {
   const client = createClient({
     baseUrl: options.baseUrl ?? DEFAULT_BASE_URL,
     ...options,
@@ -32,7 +32,7 @@ export function createPlanetaryClient(options: PlanetaryClientOptions = {}) {
   return client;
 }
 
-export type PlanetaryClient = ReturnType<typeof createPlanetaryClient>;
+export type EarthedClient = ReturnType<typeof createEarthedClient>;
 
 // Re-export all generated types and functions
 export * from "./generated/sdk.gen";

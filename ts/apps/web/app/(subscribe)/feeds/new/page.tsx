@@ -9,7 +9,7 @@ import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { Logo } from "@/components/logo";
-import { getClient, previewFeed, createFeed } from "@/lib/planetary";
+import { getClient, previewFeed, createFeed } from "@/lib/earthed";
 import { getApiErrorMessage } from "@/lib/errors";
 import { subscribeFeedSchema, normalizeFeedURL } from "@/lib/schemas";
 import type { PreviewFeedBody } from "@/lib/types";

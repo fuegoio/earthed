@@ -1,5 +1,5 @@
 // Package store wraps *sql.DB with domain-specific query helpers for the
-// Planetary RSS reader schema.
+// Earthed RSS reader schema.
 package store
 
 import (

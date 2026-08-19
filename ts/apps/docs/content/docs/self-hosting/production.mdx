@@ -1,6 +1,6 @@
 ---
 title: Production
-description: Reverse proxy setup and database backups for a production Planetary deployment.
+description: Reverse proxy setup and database backups for a production Earthed deployment.
 ---
 
 ## Reverse proxy
@@ -41,10 +41,10 @@ All feeds, entries, folders, and feed lists are in PostgreSQL. Back it up regula
 
 ```bash
 # Create a backup
-docker compose exec postgres pg_dump -U planetary planetary > backup.sql
+docker compose exec postgres pg_dump -U earthed earthed > backup.sql
 
 # Restore from a backup
-cat backup.sql | docker compose exec -T postgres psql -U planetary planetary
+cat backup.sql | docker compose exec -T postgres psql -U earthed earthed
 ```
 
 Schedule `pg_dump` with a cron job and store backups off-site for automated backups.

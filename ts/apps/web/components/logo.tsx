@@ -7,7 +7,7 @@ export function Logo({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      <g clipPath="url(#planetary-logo-clip)">
+      <g clipPath="url(#earthed-logo-clip)">
         <circle cx="308" cy="307" r="160" fill="#FF6923" />
         <rect
           x="138.452"
@@ -107,7 +107,7 @@ export function Logo({ className }: { className?: string }) {
         />
       </g>
       <defs>
-        <clipPath id="planetary-logo-clip">
+        <clipPath id="earthed-logo-clip">
           <rect width="615" height="615" fill="white" />
         </clipPath>
       </defs>

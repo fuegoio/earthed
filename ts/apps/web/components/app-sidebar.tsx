@@ -18,7 +18,7 @@ import { useTheme } from "next-themes";
 import { Menu } from "@base-ui/react/menu";
 import { Avatar } from "@base-ui/react/avatar";
 import { Skeleton } from "@workspace/ui/components/skeleton";
-import { getClient, listFeeds, listFolders, unwrap } from "@/lib/planetary";
+import { getClient, listFeeds, listFolders, unwrap } from "@/lib/earthed";
 import { signout } from "@/lib/auth";
 import { Logo } from "@/components/logo";
 import { OfflineBadge } from "@/components/offline-badge";
@@ -155,7 +155,7 @@ function SidebarContent({ userEmail }: { userEmail: string }) {
       <div className="flex h-14 shrink-0 items-center gap-2 px-4 w-full">
         <Link href="/" className="flex items-center gap-2 font-serif text-lg font-bold px-1">
           <Logo className="size-5" />
-          Planetary
+          Earthed
         </Link>
         <div className="flex-1" />
         <OfflineBadge />

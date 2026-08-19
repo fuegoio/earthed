@@ -2,9 +2,9 @@
 @import "@workspace/ui/tokens.css";
 
 /*
- * Planetary marketing site — design tokens
+ * Earthed marketing site — design tokens
  * Color tokens are shared from @workspace/ui (tokens.css) so every
- * Planetary surface uses the same palette. The brand orange
+ * Earthed surface uses the same palette. The brand orange
  * (--primary, oklch 0.80 0.19 39) is the sun. Marketing-specific
  * tokens (sky, glow, haze) layer on top for the dawn hero.
  */
@@ -104,7 +104,7 @@ button {
    2. Sun rises from the left in one smooth continuous arc.
    3. As the sun nears its resting position, the glow blooms and the sky
       warms (the sky tint lifts).
-   4. "Planetary" wordmark fades + lifts in, followed by the tagline
+   4. "Earthed" wordmark fades + lifts in, followed by the tagline
       and CTAs.
    Elements start hidden (opacity:0) and animate to visible.
    The reduced-motion media query at the bottom resets them to

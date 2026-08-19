@@ -48,6 +48,6 @@ yarn-error.log*
 next-env.d.ts
 
 # go
-go/api/planetary
-go/cli/planetary
-go/cli/planetary-tui
+go/api/earthed
+go/cli/earthed
+go/cli/earthed-tui

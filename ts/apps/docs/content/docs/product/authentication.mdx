@@ -1,11 +1,11 @@
 ---
 title: Authentication
-description: Authenticate with the Planetary API using session cookies or bearer tokens.
+description: Authenticate with the Earthed API using session cookies or bearer tokens.
 ---
 
 All endpoints under `/api/v1/` require authentication. The only exception is `GET /api/v1/health`.
 
-Planetary supports two credential types:
+Earthed supports two credential types:
 
 - **Session cookie** — used by the web frontend. The browser sends it automatically after sign-in.
 - **Bearer token** — used by the CLI, scripts, and custom integrations. Send it in the `Authorization` header.
@@ -114,7 +114,7 @@ Tokens follow the format `pla_` followed by 64 hex characters (32 random
 bytes). They are 69 characters long.
 
 Tokens created via the web UI or the `tokens create` command do not
-expire. Tokens issued via the device flow (`planetary login`) expire
+expire. Tokens issued via the device flow (`earthed login`) expire
 after 14 days.
 
 ## CORS

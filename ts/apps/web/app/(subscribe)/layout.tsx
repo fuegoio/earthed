@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { getClient, getMe } from "@/lib/planetary";
+import { getClient, getMe } from "@/lib/earthed";
 
 export default async function SubscribeLayout({ children }: { children: React.ReactNode }) {
   const client = await getClient();

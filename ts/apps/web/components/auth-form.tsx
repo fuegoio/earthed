@@ -76,7 +76,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
       <CardHeader className="items-center text-center">
         <CardTitle className="text-xl">{isSignup ? "Create your account" : "Sign in"}</CardTitle>
         <CardDescription>
-          {isSignup ? "Start reading your feeds with Planetary" : "Welcome back to Planetary"}
+          {isSignup ? "Start reading your feeds with Earthed" : "Welcome back to Earthed"}
         </CardDescription>
       </CardHeader>
       <CardContent>

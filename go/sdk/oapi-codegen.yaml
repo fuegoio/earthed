@@ -1,9 +1,9 @@
-# oapi-codegen configuration for the Planetary Go SDK.
+# oapi-codegen configuration for the Earthed Go SDK.
 # Regenerate with: make gen (from go/sdk/)
-package: planetary
+package: earthed
 generate:
   models: true
   client: true
-output: planetary/client.gen.go
+output: earthed/client.gen.go
 output-options:
   response-type-suffix: Resp

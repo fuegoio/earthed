@@ -31,7 +31,7 @@ docs: clarify API token creation flow
 The docs site lives in `ts/apps/docs/` and is a Fumadocs (Next.js) workspace. It
 renders the API reference from `go/api/openapi.json` and ships hand-written
 guides under `ts/apps/docs/content/docs/`. The documentation is **public-facing**:
-it should only contain information useful to users of Planetary, not
+it should only contain information useful to users of Earthed, not
 internal implementation details (package layout, file paths, database
 schema, test coverage, etc. belong in code comments or internal docs,
 not in the docs site).

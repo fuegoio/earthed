@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/fuegoio/planetary/go/cli/internal/client"
+	"github.com/fuegoio/earthed/go/cli/internal/client"
 	"github.com/spf13/cobra"
 )
 

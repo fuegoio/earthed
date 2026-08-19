@@ -17,7 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
-import { getClient, createFolder } from "@/lib/planetary";
+import { getClient, createFolder } from "@/lib/earthed";
 import { getApiErrorMessage } from "@/lib/errors";
 
 /** Dialog for creating a new folder. Invalidates ["folders"] on success. */

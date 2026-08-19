@@ -18,10 +18,10 @@ accessible from the CLI and TUI, not just the web UI.
 
 ## Product Purpose
 
-Planetary is a self-hostable RSS reader with a Go backend, a clean REST API,
+Earthed is a self-hostable RSS reader with a Go backend, a clean REST API,
 and multiple interfaces (web, CLI, TUI). It fetches and parses RSS 2.0, Atom
 1.0, RDF, and JSON Feed into a single timeline. Success looks like a
-developer choosing Planetary as their daily reader because it's fast, the
+developer choosing Earthed as their daily reader because it's fast, the
 reading experience is pleasant, and the API and CLI let them integrate it
 into their workflow.
 
@@ -54,7 +54,7 @@ articles.
   not sterile. Typography, spacing, and color should make reading a pleasure,
   not a task.
 - **Complete, not cluttered.** Power and completeness without density.
-  Planetary has feeds, categories, search, entries, tokens, and settings —
+  Earthed has feeds, categories, search, entries, tokens, and settings —
   but they should never feel overwhelming. Progressive disclosure over
   feature dumping.
 - **Modern craft.** Developer-friendly means the design itself should be

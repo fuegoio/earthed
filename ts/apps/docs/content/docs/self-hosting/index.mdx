@@ -1,14 +1,14 @@
 ---
 title: Docker Compose
-description: Deploy Planetary with Docker Compose.
+description: Deploy Earthed with Docker Compose.
 ---
 
-Planetary publishes images to GitHub Container Registry on every push to `main` and every release:
+Earthed publishes images to GitHub Container Registry on every push to `main` and every release:
 
 | Image | Registry                        |
 | ----- | ------------------------------- |
-| API   | `ghcr.io/fuegoio/planetary-api` |
-| Web   | `ghcr.io/fuegoio/planetary-web` |
+| API   | `ghcr.io/fuegoio/earthed-api` |
+| Web   | `ghcr.io/fuegoio/earthed-web` |
 
 Tags: `latest` (main branch), `1.2.3` / `v1.2.3` (release), `1.2` (minor), `1` (major), `sha-<short>` (commit).
 
@@ -21,26 +21,26 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: planetary
+      POSTGRES_USER: earthed
       POSTGRES_PASSWORD: <db-password>
-      POSTGRES_DB: planetary
+      POSTGRES_DB: earthed
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U planetary"]
+      test: ["CMD-SHELL", "pg_isready -U earthed"]
       interval: 5s
       timeout: 3s
       retries: 10
 
   api:
-    image: ghcr.io/fuegoio/planetary-api:latest
+    image: ghcr.io/fuegoio/earthed-api:latest
     ports:
       - "8080:8080"
     environment:
       LIMEN_SECRET: <32-byte-secret>
-      PLANETARY_DATABASE_URL: postgres://planetary:<db-password>@postgres:5432/planetary?sslmode=disable
-      PLANETARY_BASE_URL: https://api.your-domain.com
-      PLANETARY_WEB_URL: https://your-domain.com
+      EARTHED_DATABASE_URL: postgres://earthed:<db-password>@postgres:5432/earthed?sslmode=disable
+      EARTHED_BASE_URL: https://api.your-domain.com
+      EARTHED_WEB_URL: https://your-domain.com
     depends_on:
       postgres:
         condition: service_healthy
@@ -51,12 +51,12 @@ services:
       retries: 3
 
   web:
-    image: ghcr.io/fuegoio/planetary-web:latest
+    image: ghcr.io/fuegoio/earthed-web:latest
     ports:
       - "3000:3000"
     environment:
-      PLANETARY_API_URL: http://api:8080
-      NEXT_PUBLIC_PLANETARY_API_URL: https://api.your-domain.com
+      EARTHED_API_URL: http://api:8080
+      NEXT_PUBLIC_EARTHED_API_URL: https://api.your-domain.com
     depends_on:
       api:
         condition: service_healthy
@@ -74,7 +74,7 @@ docker compose up -d
 Run database migrations on first start:
 
 ```bash
-docker compose exec api /app/planetary --migrate
+docker compose exec api /app/earthed --migrate
 ```
 
-`PLANETARY_API_URL` is the server-side URL the web container uses to reach the API over the Docker network. `NEXT_PUBLIC_PLANETARY_API_URL` is baked into the browser bundle and must be publicly reachable.
+`EARTHED_API_URL` is the server-side URL the web container uses to reach the API over the Docker network. `NEXT_PUBLIC_EARTHED_API_URL` is baked into the browser bundle and must be publicly reachable.

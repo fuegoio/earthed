@@ -1,4 +1,4 @@
-// Package auth wires the Limen identity provider to the Planetary HTTP API
+// Package auth wires the Limen identity provider to the Earthed HTTP API
 // and exposes session and bearer-token middleware.
 package auth
 
@@ -14,15 +14,15 @@ import (
 	sqladapter "github.com/thecodearcher/limen/adapters/sql"
 	credentialpassword "github.com/thecodearcher/limen/plugins/credential-password"
 
-	"github.com/fuegoio/planetary/go/api/internal/config"
-	"github.com/fuegoio/planetary/go/api/internal/store"
+	"github.com/fuegoio/earthed/go/api/internal/config"
+	"github.com/fuegoio/earthed/go/api/internal/store"
 )
 
 type contextKey int
 
 const userKey contextKey = iota
 
-// Auth bundles the Limen instance with the Planetary store and database.
+// Auth bundles the Limen instance with the Earthed store and database.
 type Auth struct {
 	Limen *limen.Limen
 	Store *store.Store

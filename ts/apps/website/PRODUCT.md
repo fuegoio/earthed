@@ -19,9 +19,9 @@ page speaks to them before they ever sign up.
 
 ## Product Purpose
 
-Planetary is a self-hostable RSS reader with a Go backend, a clean REST API,
+Earthed is a self-hostable RSS reader with a Go backend, a clean REST API,
 and multiple interfaces (web, CLI, TUI). The marketing site exists to convince
-developers that RSS is still worth their time and that Planetary is the reader
+developers that RSS is still worth their time and that Earthed is the reader
 worth committing to. Success looks like a developer clicking "Login" to try
 the hosted version, or "Self-host" to run their own — because the page made
 them believe RSS can be pleasant again.

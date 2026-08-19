@@ -1,11 +1,11 @@
-# Planetary
+# Earthed
 
 A self-hosted RSS reader.
 
 ## Repository structure
 
 ```
-planetary/
+earthed/
 ├── go/                      # Go (API server, SDK, CLI/TUI)
 │   ├── go.work              # Go workspace — links all modules
 │   ├── api/                 # API server (huma, PostgreSQL)
@@ -46,10 +46,10 @@ make run            # start the API server on :8080
 ```bash
 cd go/cli
 make build
-./planetary config set base_url http://localhost:8080
-./planetary config set token <your-api-token>
-./planetary feeds list
-./planetary-tui      # interactive TUI
+./earthed config set base_url http://localhost:8080
+./earthed config set token <your-api-token>
+./earthed feeds list
+./earthed-tui      # interactive TUI
 ```
 
 ### Web frontend
