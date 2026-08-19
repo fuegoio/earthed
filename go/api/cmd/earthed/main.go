@@ -148,7 +148,7 @@ func run() (int, error) {
 	log.Printf("HTTP server listening on %s", cfg.HTTPAddr)
 	srv := &http.Server{
 		Addr:              cfg.HTTPAddr,
-		Handler:           httplog.Middleware(cors.Middleware(mux)),
+		Handler:           httplog.Middleware(cors.Middleware(cfg.TrustedOrigins)(mux)),
 		ReadHeaderTimeout: 10 * time.Second,
 	}
 
