@@ -8,51 +8,51 @@ Feed lists are curated, shareable collections of feeds. A list stores feed URLs 
 ## Create a feed list
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/feed-lists \
+curl -X POST http://localhost:8080/v1/feed-lists \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer pla_your-token" \
   -d '{"title":"Best engineering blogs","description":"A curated set.","is_public":true}'
 ```
 
-Set `is_public` to `true` so others can discover and follow the list. Change it later with `PATCH /api/v1/feed-lists/{listId}`.
+Set `is_public` to `true` so others can discover and follow the list. Change it later with `PATCH /v1/feed-lists/{listId}`.
 
 ## Add feeds to a list
 
 Only the list owner can add feeds. A `title` is optional but recommended so the list reads well before import.
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/feed-lists/1/feeds \
+curl -X POST http://localhost:8080/v1/feed-lists/1/feeds \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer pla_your-token" \
   -d '{"feed_url":"https://blog.golang.org/feeds/posts/default","title":"The Go Blog"}'
 ```
 
-Adding the same URL twice is a no-op. Remove a feed with `DELETE /api/v1/feed-lists/{listId}/feeds/{itemId}`.
+Adding the same URL twice is a no-op. Remove a feed with `DELETE /v1/feed-lists/{listId}/feeds/{itemId}`.
 
 ## Discover and follow
 
 Browse public lists:
 
 ```bash
-curl http://localhost:8080/api/v1/feed-lists/discover \
+curl http://localhost:8080/v1/feed-lists/discover \
   -H "Authorization: Bearer pla_your-token"
 ```
 
 Follow a list to bookmark it:
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/feed-lists/1/follow \
+curl -X POST http://localhost:8080/v1/feed-lists/1/follow \
   -H "Authorization: Bearer pla_your-token"
 ```
 
-You cannot follow your own list or a private list. Your followed lists are at `GET /api/v1/feed-lists/followed`. Unfollow with `DELETE /api/v1/feed-lists/{listId}/follow`.
+You cannot follow your own list or a private list. Your followed lists are at `GET /v1/feed-lists/followed`. Unfollow with `DELETE /v1/feed-lists/{listId}/follow`.
 
 ## Import a list's feeds
 
 Following a list does not subscribe you to its feeds. To subscribe to every feed in a list at once:
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/feed-lists/1/import \
+curl -X POST http://localhost:8080/v1/feed-lists/1/import \
   -H "Authorization: Bearer pla_your-token"
 ```
 
@@ -69,7 +69,7 @@ Import is idempotent — feeds you already subscribe to are skipped.
 ## Update a feed list
 
 ```bash
-curl -X PATCH http://localhost:8080/api/v1/feed-lists/1 \
+curl -X PATCH http://localhost:8080/v1/feed-lists/1 \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer pla_your-token" \
   -d '{"title":"Updated title","is_public":false}'
@@ -80,10 +80,10 @@ Only the owner can update or delete a list.
 ## Delete a feed list
 
 ```bash
-curl -X DELETE http://localhost:8080/api/v1/feed-lists/1 \
+curl -X DELETE http://localhost:8080/v1/feed-lists/1 \
   -H "Authorization: Bearer pla_your-token"
 ```
 
 ## Visibility
 
-A list is visible to its owner, anyone following it, and — if public — everyone. `GET /api/v1/feed-lists/{listId}` returns the list with its feeds, follow status, and owner email to any user who can see it.
+A list is visible to its owner, anyone following it, and — if public — everyone. `GET /v1/feed-lists/{listId}` returns the list with its feeds, follow status, and owner email to any user who can see it.

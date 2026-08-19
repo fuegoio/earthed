@@ -22,7 +22,7 @@ const serwist = new Serwist({
     // online, and the last successful response is cached for offline use.
     // Only GETs are matched; mutations (PUT/POST/DELETE) pass through.
     {
-      matcher: ({ url }) => url.pathname.startsWith("/api/v1/"),
+      matcher: ({ url }) => url.pathname.startsWith("/v1/"),
       method: "GET",
       handler: new NetworkFirst({
         cacheName: "api-cache",

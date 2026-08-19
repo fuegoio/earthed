@@ -7,23 +7,31 @@ description: Reverse proxy setup and database backups for a production Earthed d
 
 Neither service terminates TLS directly. Put both behind a reverse proxy (nginx, Caddy, Traefik).
 
-Example nginx configuration:
+Example nginx configuration. The API runs on its own subdomain (`api.your-domain.com`); the web app is served from the main domain.
 
 ```nginx
 server {
     listen 443 ssl;
-    server_name your-domain.com;
+    server_name api.your-domain.com;
 
     ssl_certificate /path/to/cert.pem;
     ssl_certificate_key /path/to/key.pem;
 
-    location /api/ {
+    location / {
         proxy_pass http://localhost:8080;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
+}
+
+server {
+    listen 443 ssl;
+    server_name your-domain.com;
+
+    ssl_certificate /path/to/cert.pem;
+    ssl_certificate_key /path/to/key.pem;
 
     location / {
         proxy_pass http://localhost:3000;

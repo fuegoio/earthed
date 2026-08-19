@@ -75,7 +75,7 @@ type APIToken struct {
 type AddFeedListFeedInputBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/AddFeedListFeedInputBody.json
+	// Examples: https://example.com/schemas/AddFeedListFeedInputBody.json
 	Schema  *string `json:"$schema,omitempty"`
 	FeedUrl string  `json:"feed_url"`
 	SiteUrl *string `json:"site_url,omitempty"`
@@ -86,7 +86,7 @@ type AddFeedListFeedInputBody struct {
 type CreateFeedInputBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/CreateFeedInputBody.json
+	// Examples: https://example.com/schemas/CreateFeedInputBody.json
 	Schema   *string `json:"$schema,omitempty"`
 	FeedUrl  string  `json:"feed_url"`
 	FolderId *int64  `json:"folder_id,omitempty"`
@@ -96,7 +96,7 @@ type CreateFeedInputBody struct {
 type CreateFeedListInputBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/CreateFeedListInputBody.json
+	// Examples: https://example.com/schemas/CreateFeedListInputBody.json
 	Schema      *string `json:"$schema,omitempty"`
 	Description *string `json:"description,omitempty"`
 	IsPublic    bool    `json:"is_public"`
@@ -107,7 +107,7 @@ type CreateFeedListInputBody struct {
 type CreateFolderInputBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/CreateFolderInputBody.json
+	// Examples: https://example.com/schemas/CreateFolderInputBody.json
 	Schema   *string `json:"$schema,omitempty"`
 	ParentId *int64  `json:"parent_id,omitempty"`
 	Title    string  `json:"title"`
@@ -117,7 +117,7 @@ type CreateFolderInputBody struct {
 type CreateTokenInputBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/CreateTokenInputBody.json
+	// Examples: https://example.com/schemas/CreateTokenInputBody.json
 	Schema *string `json:"$schema,omitempty"`
 	Label  string  `json:"label"`
 }
@@ -126,7 +126,7 @@ type CreateTokenInputBody struct {
 type DeviceCodeOutputBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/DeviceCodeOutputBody.json
+	// Examples: https://example.com/schemas/DeviceCodeOutputBody.json
 	Schema                  *string `json:"$schema,omitempty"`
 	DeviceCode              string  `json:"device_code"`
 	ExpiresIn               int64   `json:"expires_in"`
@@ -140,7 +140,7 @@ type DeviceCodeOutputBody struct {
 type DeviceConfirmBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/DeviceConfirmBody.json
+	// Examples: https://example.com/schemas/DeviceConfirmBody.json
 	Schema     *string `json:"$schema,omitempty"`
 	Authorized bool    `json:"authorized"`
 }
@@ -149,7 +149,7 @@ type DeviceConfirmBody struct {
 type DeviceConfirmInputBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/DeviceConfirmInputBody.json
+	// Examples: https://example.com/schemas/DeviceConfirmInputBody.json
 	Schema   *string `json:"$schema,omitempty"`
 	Deny     *bool   `json:"deny,omitempty"`
 	UserCode string  `json:"user_code"`
@@ -159,7 +159,7 @@ type DeviceConfirmInputBody struct {
 type DeviceStatusBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/DeviceStatusBody.json
+	// Examples: https://example.com/schemas/DeviceStatusBody.json
 	Schema *string `json:"$schema,omitempty"`
 	Status string  `json:"status"`
 }
@@ -168,7 +168,7 @@ type DeviceStatusBody struct {
 type DeviceTokenInputBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/DeviceTokenInputBody.json
+	// Examples: https://example.com/schemas/DeviceTokenInputBody.json
 	Schema     *string `json:"$schema,omitempty"`
 	DeviceCode string  `json:"device_code"`
 }
@@ -177,7 +177,7 @@ type DeviceTokenInputBody struct {
 type DeviceTokenOutputBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/DeviceTokenOutputBody.json
+	// Examples: https://example.com/schemas/DeviceTokenOutputBody.json
 	Schema      *string `json:"$schema,omitempty"`
 	AccessToken string  `json:"access_token"`
 	ExpiresIn   int64   `json:"expires_in"`
@@ -197,7 +197,7 @@ type Enclosure struct {
 type Entry struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/Entry.json
+	// Examples: https://example.com/schemas/Entry.json
 	Schema      *string      `json:"$schema,omitempty"`
 	Author      *string      `json:"author,omitempty"`
 	ChangedAt   time.Time    `json:"changed_at"`
@@ -232,7 +232,7 @@ type ErrorDetail struct {
 type ErrorModel struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/ErrorModel.json
+	// Examples: https://example.com/schemas/ErrorModel.json
 	Schema *string `json:"$schema,omitempty"`
 
 	// Detail A human-readable explanation specific to this occurrence of the problem.
@@ -268,7 +268,7 @@ type ErrorModel struct {
 type Feed struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/Feed.json
+	// Examples: https://example.com/schemas/Feed.json
 	Schema            *string    `json:"$schema,omitempty"`
 	Crawler           bool       `json:"crawler"`
 	CreatedAt         time.Time  `json:"created_at"`
@@ -293,7 +293,7 @@ type Feed struct {
 type FeedList struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/FeedList.json
+	// Examples: https://example.com/schemas/FeedList.json
 	Schema      *string         `json:"$schema,omitempty"`
 	CreatedAt   time.Time       `json:"created_at"`
 	Description *string         `json:"description,omitempty"`
@@ -312,7 +312,7 @@ type FeedList struct {
 type FeedListFeed struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/FeedListFeed.json
+	// Examples: https://example.com/schemas/FeedListFeed.json
 	Schema     *string `json:"$schema,omitempty"`
 	FeedListId int64   `json:"feed_list_id"`
 	FeedUrl    string  `json:"feed_url"`
@@ -326,7 +326,7 @@ type FeedListFeed struct {
 type Folder struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/Folder.json
+	// Examples: https://example.com/schemas/Folder.json
 	Schema    *string   `json:"$schema,omitempty"`
 	CreatedAt time.Time `json:"created_at"`
 	Id        int64     `json:"id"`
@@ -341,7 +341,7 @@ type Folder struct {
 type HealthResponse struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/HealthResponse.json
+	// Examples: https://example.com/schemas/HealthResponse.json
 	Schema *string `json:"$schema,omitempty"`
 	Status string  `json:"status"`
 }
@@ -350,7 +350,7 @@ type HealthResponse struct {
 type ImportFeedListResponse struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/Import-feed-listResponse.json
+	// Examples: https://example.com/schemas/Import-feed-listResponse.json
 	Schema   *string   `json:"$schema,omitempty"`
 	Errors   *[]string `json:"errors,omitempty"`
 	Failed   int64     `json:"failed"`
@@ -363,7 +363,7 @@ type ImportFeedListResponse struct {
 type OPMLImportResultBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/OPMLImportResultBody.json
+	// Examples: https://example.com/schemas/OPMLImportResultBody.json
 	Schema   *string   `json:"$schema,omitempty"`
 	Errors   *[]string `json:"errors,omitempty"`
 	Failed   int64     `json:"failed"`
@@ -376,7 +376,7 @@ type OPMLImportResultBody struct {
 type PreviewFeedBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/PreviewFeedBody.json
+	// Examples: https://example.com/schemas/PreviewFeedBody.json
 	Schema      *string            `json:"$schema,omitempty"`
 	Description *string            `json:"description,omitempty"`
 	FaviconUrl  *string            `json:"favicon_url,omitempty"`
@@ -390,7 +390,7 @@ type PreviewFeedBody struct {
 type PreviewFeedInputBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/PreviewFeedInputBody.json
+	// Examples: https://example.com/schemas/PreviewFeedInputBody.json
 	Schema  *string `json:"$schema,omitempty"`
 	FeedUrl string  `json:"feed_url"`
 }
@@ -410,7 +410,7 @@ type PreviewFeedItem struct {
 type ToggleEntryStarredRequest struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/Toggle-entry-starredRequest.json
+	// Examples: https://example.com/schemas/Toggle-entry-starredRequest.json
 	Schema  *string `json:"$schema,omitempty"`
 	Starred bool    `json:"starred"`
 }
@@ -419,7 +419,7 @@ type ToggleEntryStarredRequest struct {
 type TokenOutputBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/TokenOutputBody.json
+	// Examples: https://example.com/schemas/TokenOutputBody.json
 	Schema    *string   `json:"$schema,omitempty"`
 	CreatedAt time.Time `json:"created_at"`
 	Id        int64     `json:"id"`
@@ -431,7 +431,7 @@ type TokenOutputBody struct {
 type UpdateEntriesRequest struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/Update-entriesRequest.json
+	// Examples: https://example.com/schemas/Update-entriesRequest.json
 	Schema   *string                    `json:"$schema,omitempty"`
 	EntryIds *[]int64                   `json:"entry_ids"`
 	Status   UpdateEntriesRequestStatus `json:"status"`
@@ -444,7 +444,7 @@ type UpdateEntriesRequestStatus string
 type UpdateFeedInputBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/UpdateFeedInputBody.json
+	// Examples: https://example.com/schemas/UpdateFeedInputBody.json
 	Schema   *string `json:"$schema,omitempty"`
 	FolderId *int64  `json:"folder_id,omitempty"`
 	Title    *string `json:"title,omitempty"`
@@ -454,7 +454,7 @@ type UpdateFeedInputBody struct {
 type UpdateFeedListInputBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/UpdateFeedListInputBody.json
+	// Examples: https://example.com/schemas/UpdateFeedListInputBody.json
 	Schema      *string `json:"$schema,omitempty"`
 	Description *string `json:"description,omitempty"`
 	IsPublic    bool    `json:"is_public"`
@@ -465,7 +465,7 @@ type UpdateFeedListInputBody struct {
 type UpdateFolderInputBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/UpdateFolderInputBody.json
+	// Examples: https://example.com/schemas/UpdateFolderInputBody.json
 	Schema   *string `json:"$schema,omitempty"`
 	ParentId *int64  `json:"parent_id,omitempty"`
 	Title    string  `json:"title"`
@@ -475,7 +475,7 @@ type UpdateFolderInputBody struct {
 type UpdateMeInputBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/UpdateMeInputBody.json
+	// Examples: https://example.com/schemas/UpdateMeInputBody.json
 	Schema    *string             `json:"$schema,omitempty"`
 	Email     openapi_types.Email `json:"email"`
 	FirstName string              `json:"first_name"`
@@ -485,7 +485,7 @@ type UpdateMeInputBody struct {
 type User struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
-	// Examples: /api/schemas/User.json
+	// Examples: https://example.com/schemas/User.json
 	Schema    *string   `json:"$schema,omitempty"`
 	CreatedAt time.Time `json:"created_at"`
 	Email     string    `json:"email"`
@@ -637,184 +637,184 @@ type ClientInterface interface {
 
 	// DeviceCode Begin device-flow login (issue a device code)
 	//
-	// Corresponds with POST /api/auth/device/code (the `DeviceCode` operationId).
+	// Corresponds with POST /auth/device/code (the `DeviceCode` operationId).
 	DeviceCode(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeviceConfirmWithBody Approve or deny a device-flow login (authenticated user)
 	//
 	// Takes any type of body and a specified content type.
 	//
-	// Corresponds with POST /api/auth/device/confirm (the `DeviceConfirm` operationId).
+	// Corresponds with POST /auth/device/confirm (the `DeviceConfirm` operationId).
 	DeviceConfirmWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeviceConfirm Approve or deny a device-flow login (authenticated user)
 	//
 	// Takes a body of the `application/json` content type.
 	//
-	// Corresponds with POST /api/auth/device/confirm (the `DeviceConfirm` operationId).
+	// Corresponds with POST /auth/device/confirm (the `DeviceConfirm` operationId).
 	DeviceConfirm(ctx context.Context, body DeviceConfirmJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeviceStatus Check device-flow status by user code (authenticated user)
 	//
-	// Corresponds with GET /api/auth/device/status (the `DeviceStatus` operationId).
+	// Corresponds with GET /auth/device/status (the `DeviceStatus` operationId).
 	DeviceStatus(ctx context.Context, params *DeviceStatusParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeviceTokenWithBody Poll for device-flow login result
 	//
 	// Takes any type of body and a specified content type.
 	//
-	// Corresponds with POST /api/auth/device/token (the `DeviceToken` operationId).
+	// Corresponds with POST /auth/device/token (the `DeviceToken` operationId).
 	DeviceTokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeviceToken Poll for device-flow login result
 	//
 	// Takes a body of the `application/json` content type.
 	//
-	// Corresponds with POST /api/auth/device/token (the `DeviceToken` operationId).
+	// Corresponds with POST /auth/device/token (the `DeviceToken` operationId).
 	DeviceToken(ctx context.Context, body DeviceTokenJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListEntries List entries
 	//
-	// Corresponds with GET /api/v1/entries (the `ListEntries` operationId).
+	// Corresponds with GET /v1/entries (the `ListEntries` operationId).
 	ListEntries(ctx context.Context, params *ListEntriesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateEntriesWithBody Bulk update entry status
 	//
 	// Takes any type of body and a specified content type.
 	//
-	// Corresponds with PUT /api/v1/entries (the `UpdateEntries` operationId).
+	// Corresponds with PUT /v1/entries (the `UpdateEntries` operationId).
 	UpdateEntriesWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateEntries Bulk update entry status
 	//
 	// Takes a body of the `application/json` content type.
 	//
-	// Corresponds with PUT /api/v1/entries (the `UpdateEntries` operationId).
+	// Corresponds with PUT /v1/entries (the `UpdateEntries` operationId).
 	UpdateEntries(ctx context.Context, body UpdateEntriesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetEntry Get an entry
 	//
-	// Corresponds with GET /api/v1/entries/{entryId} (the `GetEntry` operationId).
+	// Corresponds with GET /v1/entries/{entryId} (the `GetEntry` operationId).
 	GetEntry(ctx context.Context, entryId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ToggleEntryStarredWithBody Toggle starred on an entry
 	//
 	// Takes any type of body and a specified content type.
 	//
-	// Corresponds with PUT /api/v1/entries/{entryId}/starred (the `ToggleEntryStarred` operationId).
+	// Corresponds with PUT /v1/entries/{entryId}/starred (the `ToggleEntryStarred` operationId).
 	ToggleEntryStarredWithBody(ctx context.Context, entryId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ToggleEntryStarred Toggle starred on an entry
 	//
 	// Takes a body of the `application/json` content type.
 	//
-	// Corresponds with PUT /api/v1/entries/{entryId}/starred (the `ToggleEntryStarred` operationId).
+	// Corresponds with PUT /v1/entries/{entryId}/starred (the `ToggleEntryStarred` operationId).
 	ToggleEntryStarred(ctx context.Context, entryId int64, body ToggleEntryStarredJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListMyFeedLists List my feed lists
 	//
-	// Corresponds with GET /api/v1/feed-lists (the `ListMyFeedLists` operationId).
+	// Corresponds with GET /v1/feed-lists (the `ListMyFeedLists` operationId).
 	ListMyFeedLists(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateFeedListWithBody Create a feed list
 	//
 	// Takes any type of body and a specified content type.
 	//
-	// Corresponds with POST /api/v1/feed-lists (the `CreateFeedList` operationId).
+	// Corresponds with POST /v1/feed-lists (the `CreateFeedList` operationId).
 	CreateFeedListWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateFeedList Create a feed list
 	//
 	// Takes a body of the `application/json` content type.
 	//
-	// Corresponds with POST /api/v1/feed-lists (the `CreateFeedList` operationId).
+	// Corresponds with POST /v1/feed-lists (the `CreateFeedList` operationId).
 	CreateFeedList(ctx context.Context, body CreateFeedListJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DiscoverFeedLists Discover public feed lists
 	//
-	// Corresponds with GET /api/v1/feed-lists/discover (the `DiscoverFeedLists` operationId).
+	// Corresponds with GET /v1/feed-lists/discover (the `DiscoverFeedLists` operationId).
 	DiscoverFeedLists(ctx context.Context, params *DiscoverFeedListsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListFollowedFeedLists List feed lists I follow
 	//
-	// Corresponds with GET /api/v1/feed-lists/followed (the `ListFollowedFeedLists` operationId).
+	// Corresponds with GET /v1/feed-lists/followed (the `ListFollowedFeedLists` operationId).
 	ListFollowedFeedLists(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteFeedList Delete a feed list
 	//
-	// Corresponds with DELETE /api/v1/feed-lists/{listId} (the `DeleteFeedList` operationId).
+	// Corresponds with DELETE /v1/feed-lists/{listId} (the `DeleteFeedList` operationId).
 	DeleteFeedList(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetFeedList Get a feed list
 	//
-	// Corresponds with GET /api/v1/feed-lists/{listId} (the `GetFeedList` operationId).
+	// Corresponds with GET /v1/feed-lists/{listId} (the `GetFeedList` operationId).
 	GetFeedList(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateFeedListWithBody Update a feed list
 	//
 	// Takes any type of body and a specified content type.
 	//
-	// Corresponds with PATCH /api/v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
+	// Corresponds with PATCH /v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
 	UpdateFeedListWithBody(ctx context.Context, listId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateFeedList Update a feed list
 	//
 	// Takes a body of the `application/json` content type.
 	//
-	// Corresponds with PATCH /api/v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
+	// Corresponds with PATCH /v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
 	UpdateFeedList(ctx context.Context, listId int64, body UpdateFeedListJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AddFeedListFeedWithBody Add a feed to a feed list
 	//
 	// Takes any type of body and a specified content type.
 	//
-	// Corresponds with POST /api/v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
+	// Corresponds with POST /v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
 	AddFeedListFeedWithBody(ctx context.Context, listId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AddFeedListFeed Add a feed to a feed list
 	//
 	// Takes a body of the `application/json` content type.
 	//
-	// Corresponds with POST /api/v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
+	// Corresponds with POST /v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
 	AddFeedListFeed(ctx context.Context, listId int64, body AddFeedListFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RemoveFeedListFeed Remove a feed from a feed list
 	//
-	// Corresponds with DELETE /api/v1/feed-lists/{listId}/feeds/{itemId} (the `RemoveFeedListFeed` operationId).
+	// Corresponds with DELETE /v1/feed-lists/{listId}/feeds/{itemId} (the `RemoveFeedListFeed` operationId).
 	RemoveFeedListFeed(ctx context.Context, listId int64, itemId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UnfollowFeedList Unfollow a feed list
 	//
-	// Corresponds with DELETE /api/v1/feed-lists/{listId}/follow (the `UnfollowFeedList` operationId).
+	// Corresponds with DELETE /v1/feed-lists/{listId}/follow (the `UnfollowFeedList` operationId).
 	UnfollowFeedList(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// FollowFeedList Follow a feed list
 	//
-	// Corresponds with POST /api/v1/feed-lists/{listId}/follow (the `FollowFeedList` operationId).
+	// Corresponds with POST /v1/feed-lists/{listId}/follow (the `FollowFeedList` operationId).
 	FollowFeedList(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ImportFeedList Subscribe to all feeds in a feed list
 	//
-	// Corresponds with POST /api/v1/feed-lists/{listId}/import (the `ImportFeedList` operationId).
+	// Corresponds with POST /v1/feed-lists/{listId}/import (the `ImportFeedList` operationId).
 	ImportFeedList(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListFeeds List feeds
 	//
-	// Corresponds with GET /api/v1/feeds (the `ListFeeds` operationId).
+	// Corresponds with GET /v1/feeds (the `ListFeeds` operationId).
 	ListFeeds(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateFeedWithBody Subscribe to a feed
 	//
 	// Takes any type of body and a specified content type.
 	//
-	// Corresponds with POST /api/v1/feeds (the `CreateFeed` operationId).
+	// Corresponds with POST /v1/feeds (the `CreateFeed` operationId).
 	CreateFeedWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateFeed Subscribe to a feed
 	//
 	// Takes a body of the `application/json` content type.
 	//
-	// Corresponds with POST /api/v1/feeds (the `CreateFeed` operationId).
+	// Corresponds with POST /v1/feeds (the `CreateFeed` operationId).
 	CreateFeed(ctx context.Context, body CreateFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PreviewFeedWithBody Preview a feed without subscribing
@@ -823,7 +823,7 @@ type ClientInterface interface {
 	//
 	// Takes any type of body and a specified content type.
 	//
-	// Corresponds with POST /api/v1/feeds/preview (the `PreviewFeed` operationId).
+	// Corresponds with POST /v1/feeds/preview (the `PreviewFeed` operationId).
 	PreviewFeedWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PreviewFeed Preview a feed without subscribing
@@ -832,17 +832,17 @@ type ClientInterface interface {
 	//
 	// Takes a body of the `application/json` content type.
 	//
-	// Corresponds with POST /api/v1/feeds/preview (the `PreviewFeed` operationId).
+	// Corresponds with POST /v1/feeds/preview (the `PreviewFeed` operationId).
 	PreviewFeed(ctx context.Context, body PreviewFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteFeed Delete a feed
 	//
-	// Corresponds with DELETE /api/v1/feeds/{feedId} (the `DeleteFeed` operationId).
+	// Corresponds with DELETE /v1/feeds/{feedId} (the `DeleteFeed` operationId).
 	DeleteFeed(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetFeed Get a feed
 	//
-	// Corresponds with GET /api/v1/feeds/{feedId} (the `GetFeed` operationId).
+	// Corresponds with GET /v1/feeds/{feedId} (the `GetFeed` operationId).
 	GetFeed(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateFeedWithBody Update a feed
@@ -851,7 +851,7 @@ type ClientInterface interface {
 	//
 	// Takes any type of body and a specified content type.
 	//
-	// Corresponds with PATCH /api/v1/feeds/{feedId} (the `UpdateFeed` operationId).
+	// Corresponds with PATCH /v1/feeds/{feedId} (the `UpdateFeed` operationId).
 	UpdateFeedWithBody(ctx context.Context, feedId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateFeed Update a feed
@@ -860,43 +860,43 @@ type ClientInterface interface {
 	//
 	// Takes a body of the `application/json` content type.
 	//
-	// Corresponds with PATCH /api/v1/feeds/{feedId} (the `UpdateFeed` operationId).
+	// Corresponds with PATCH /v1/feeds/{feedId} (the `UpdateFeed` operationId).
 	UpdateFeed(ctx context.Context, feedId int64, body UpdateFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// MarkFeedRead Mark all entries in a feed as read
 	//
-	// Corresponds with POST /api/v1/feeds/{feedId}/mark-all-read (the `MarkFeedRead` operationId).
+	// Corresponds with POST /v1/feeds/{feedId}/mark-all-read (the `MarkFeedRead` operationId).
 	MarkFeedRead(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RefreshFeed Refresh a feed
 	//
 	// Manually fetch and parse the feed, inserting any new entries. Use this to get the latest articles without waiting for the scheduler.
 	//
-	// Corresponds with POST /api/v1/feeds/{feedId}/refresh (the `RefreshFeed` operationId).
+	// Corresponds with POST /v1/feeds/{feedId}/refresh (the `RefreshFeed` operationId).
 	RefreshFeed(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListFolders List folders
 	//
-	// Corresponds with GET /api/v1/folders (the `ListFolders` operationId).
+	// Corresponds with GET /v1/folders (the `ListFolders` operationId).
 	ListFolders(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateFolderWithBody Create a folder
 	//
 	// Takes any type of body and a specified content type.
 	//
-	// Corresponds with POST /api/v1/folders (the `CreateFolder` operationId).
+	// Corresponds with POST /v1/folders (the `CreateFolder` operationId).
 	CreateFolderWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateFolder Create a folder
 	//
 	// Takes a body of the `application/json` content type.
 	//
-	// Corresponds with POST /api/v1/folders (the `CreateFolder` operationId).
+	// Corresponds with POST /v1/folders (the `CreateFolder` operationId).
 	CreateFolder(ctx context.Context, body CreateFolderJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteFolder Delete a folder
 	//
-	// Corresponds with DELETE /api/v1/folders/{folderId} (the `DeleteFolder` operationId).
+	// Corresponds with DELETE /v1/folders/{folderId} (the `DeleteFolder` operationId).
 	DeleteFolder(ctx context.Context, folderId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateFolderWithBody Update a folder
@@ -905,7 +905,7 @@ type ClientInterface interface {
 	//
 	// Takes any type of body and a specified content type.
 	//
-	// Corresponds with PATCH /api/v1/folders/{folderId} (the `UpdateFolder` operationId).
+	// Corresponds with PATCH /v1/folders/{folderId} (the `UpdateFolder` operationId).
 	UpdateFolderWithBody(ctx context.Context, folderId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateFolder Update a folder
@@ -914,43 +914,43 @@ type ClientInterface interface {
 	//
 	// Takes a body of the `application/json` content type.
 	//
-	// Corresponds with PATCH /api/v1/folders/{folderId} (the `UpdateFolder` operationId).
+	// Corresponds with PATCH /v1/folders/{folderId} (the `UpdateFolder` operationId).
 	UpdateFolder(ctx context.Context, folderId int64, body UpdateFolderJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Health Health check
 	//
-	// Corresponds with GET /api/v1/health (the `Health` operationId).
+	// Corresponds with GET /v1/health (the `Health` operationId).
 	Health(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteMe Delete current user account
 	//
-	// Corresponds with DELETE /api/v1/me (the `DeleteMe` operationId).
+	// Corresponds with DELETE /v1/me (the `DeleteMe` operationId).
 	DeleteMe(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetMe Get current user
 	//
-	// Corresponds with GET /api/v1/me (the `GetMe` operationId).
+	// Corresponds with GET /v1/me (the `GetMe` operationId).
 	GetMe(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateMeWithBody Update current user profile
 	//
 	// Takes any type of body and a specified content type.
 	//
-	// Corresponds with PATCH /api/v1/me (the `UpdateMe` operationId).
+	// Corresponds with PATCH /v1/me (the `UpdateMe` operationId).
 	UpdateMeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateMe Update current user profile
 	//
 	// Takes a body of the `application/json` content type.
 	//
-	// Corresponds with PATCH /api/v1/me (the `UpdateMe` operationId).
+	// Corresponds with PATCH /v1/me (the `UpdateMe` operationId).
 	UpdateMe(ctx context.Context, body UpdateMeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ExportOpml Export feeds as OPML
 	//
 	// Returns all feed subscriptions and folders as an OPML XML document.
 	//
-	// Corresponds with GET /api/v1/opml/export (the `ExportOpml` operationId).
+	// Corresponds with GET /v1/opml/export (the `ExportOpml` operationId).
 	ExportOpml(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ImportOpmlWithBody Import feeds from an OPML file
@@ -959,37 +959,37 @@ type ClientInterface interface {
 	//
 	// Takes any type of body and a specified content type.
 	//
-	// Corresponds with POST /api/v1/opml/import (the `ImportOpml` operationId).
+	// Corresponds with POST /v1/opml/import (the `ImportOpml` operationId).
 	ImportOpmlWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListTokens List API tokens
 	//
-	// Corresponds with GET /api/v1/tokens (the `ListTokens` operationId).
+	// Corresponds with GET /v1/tokens (the `ListTokens` operationId).
 	ListTokens(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateTokenWithBody Create an API token
 	//
 	// Takes any type of body and a specified content type.
 	//
-	// Corresponds with POST /api/v1/tokens (the `CreateToken` operationId).
+	// Corresponds with POST /v1/tokens (the `CreateToken` operationId).
 	CreateTokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateToken Create an API token
 	//
 	// Takes a body of the `application/json` content type.
 	//
-	// Corresponds with POST /api/v1/tokens (the `CreateToken` operationId).
+	// Corresponds with POST /v1/tokens (the `CreateToken` operationId).
 	CreateToken(ctx context.Context, body CreateTokenJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteToken Delete an API token
 	//
-	// Corresponds with DELETE /api/v1/tokens/{tokenId} (the `DeleteToken` operationId).
+	// Corresponds with DELETE /v1/tokens/{tokenId} (the `DeleteToken` operationId).
 	DeleteToken(ctx context.Context, tokenId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 // DeviceCode Begin device-flow login (issue a device code)
 //
-// Corresponds with POST /api/auth/device/code (the `DeviceCode` operationId).
+// Corresponds with POST /auth/device/code (the `DeviceCode` operationId).
 func (c *Client) DeviceCode(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeviceCodeRequest(c.Server)
 	if err != nil {
@@ -1006,7 +1006,7 @@ func (c *Client) DeviceCode(ctx context.Context, reqEditors ...RequestEditorFn) 
 //
 // Takes any type of body and a specified content type.
 //
-// Corresponds with POST /api/auth/device/confirm (the `DeviceConfirm` operationId).
+// Corresponds with POST /auth/device/confirm (the `DeviceConfirm` operationId).
 func (c *Client) DeviceConfirmWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeviceConfirmRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -1023,7 +1023,7 @@ func (c *Client) DeviceConfirmWithBody(ctx context.Context, contentType string, 
 //
 // Takes a body of the `application/json` content type.
 //
-// Corresponds with POST /api/auth/device/confirm (the `DeviceConfirm` operationId).
+// Corresponds with POST /auth/device/confirm (the `DeviceConfirm` operationId).
 func (c *Client) DeviceConfirm(ctx context.Context, body DeviceConfirmJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeviceConfirmRequest(c.Server, body)
 	if err != nil {
@@ -1038,7 +1038,7 @@ func (c *Client) DeviceConfirm(ctx context.Context, body DeviceConfirmJSONReques
 
 // DeviceStatus Check device-flow status by user code (authenticated user)
 //
-// Corresponds with GET /api/auth/device/status (the `DeviceStatus` operationId).
+// Corresponds with GET /auth/device/status (the `DeviceStatus` operationId).
 func (c *Client) DeviceStatus(ctx context.Context, params *DeviceStatusParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeviceStatusRequest(c.Server, params)
 	if err != nil {
@@ -1055,7 +1055,7 @@ func (c *Client) DeviceStatus(ctx context.Context, params *DeviceStatusParams, r
 //
 // Takes any type of body and a specified content type.
 //
-// Corresponds with POST /api/auth/device/token (the `DeviceToken` operationId).
+// Corresponds with POST /auth/device/token (the `DeviceToken` operationId).
 func (c *Client) DeviceTokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeviceTokenRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -1072,7 +1072,7 @@ func (c *Client) DeviceTokenWithBody(ctx context.Context, contentType string, bo
 //
 // Takes a body of the `application/json` content type.
 //
-// Corresponds with POST /api/auth/device/token (the `DeviceToken` operationId).
+// Corresponds with POST /auth/device/token (the `DeviceToken` operationId).
 func (c *Client) DeviceToken(ctx context.Context, body DeviceTokenJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeviceTokenRequest(c.Server, body)
 	if err != nil {
@@ -1087,7 +1087,7 @@ func (c *Client) DeviceToken(ctx context.Context, body DeviceTokenJSONRequestBod
 
 // ListEntries List entries
 //
-// Corresponds with GET /api/v1/entries (the `ListEntries` operationId).
+// Corresponds with GET /v1/entries (the `ListEntries` operationId).
 func (c *Client) ListEntries(ctx context.Context, params *ListEntriesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListEntriesRequest(c.Server, params)
 	if err != nil {
@@ -1104,7 +1104,7 @@ func (c *Client) ListEntries(ctx context.Context, params *ListEntriesParams, req
 //
 // Takes any type of body and a specified content type.
 //
-// Corresponds with PUT /api/v1/entries (the `UpdateEntries` operationId).
+// Corresponds with PUT /v1/entries (the `UpdateEntries` operationId).
 func (c *Client) UpdateEntriesWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateEntriesRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -1121,7 +1121,7 @@ func (c *Client) UpdateEntriesWithBody(ctx context.Context, contentType string, 
 //
 // Takes a body of the `application/json` content type.
 //
-// Corresponds with PUT /api/v1/entries (the `UpdateEntries` operationId).
+// Corresponds with PUT /v1/entries (the `UpdateEntries` operationId).
 func (c *Client) UpdateEntries(ctx context.Context, body UpdateEntriesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateEntriesRequest(c.Server, body)
 	if err != nil {
@@ -1136,7 +1136,7 @@ func (c *Client) UpdateEntries(ctx context.Context, body UpdateEntriesJSONReques
 
 // GetEntry Get an entry
 //
-// Corresponds with GET /api/v1/entries/{entryId} (the `GetEntry` operationId).
+// Corresponds with GET /v1/entries/{entryId} (the `GetEntry` operationId).
 func (c *Client) GetEntry(ctx context.Context, entryId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetEntryRequest(c.Server, entryId)
 	if err != nil {
@@ -1153,7 +1153,7 @@ func (c *Client) GetEntry(ctx context.Context, entryId int64, reqEditors ...Requ
 //
 // Takes any type of body and a specified content type.
 //
-// Corresponds with PUT /api/v1/entries/{entryId}/starred (the `ToggleEntryStarred` operationId).
+// Corresponds with PUT /v1/entries/{entryId}/starred (the `ToggleEntryStarred` operationId).
 func (c *Client) ToggleEntryStarredWithBody(ctx context.Context, entryId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewToggleEntryStarredRequestWithBody(c.Server, entryId, contentType, body)
 	if err != nil {
@@ -1170,7 +1170,7 @@ func (c *Client) ToggleEntryStarredWithBody(ctx context.Context, entryId int64, 
 //
 // Takes a body of the `application/json` content type.
 //
-// Corresponds with PUT /api/v1/entries/{entryId}/starred (the `ToggleEntryStarred` operationId).
+// Corresponds with PUT /v1/entries/{entryId}/starred (the `ToggleEntryStarred` operationId).
 func (c *Client) ToggleEntryStarred(ctx context.Context, entryId int64, body ToggleEntryStarredJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewToggleEntryStarredRequest(c.Server, entryId, body)
 	if err != nil {
@@ -1185,7 +1185,7 @@ func (c *Client) ToggleEntryStarred(ctx context.Context, entryId int64, body Tog
 
 // ListMyFeedLists List my feed lists
 //
-// Corresponds with GET /api/v1/feed-lists (the `ListMyFeedLists` operationId).
+// Corresponds with GET /v1/feed-lists (the `ListMyFeedLists` operationId).
 func (c *Client) ListMyFeedLists(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListMyFeedListsRequest(c.Server)
 	if err != nil {
@@ -1202,7 +1202,7 @@ func (c *Client) ListMyFeedLists(ctx context.Context, reqEditors ...RequestEdito
 //
 // Takes any type of body and a specified content type.
 //
-// Corresponds with POST /api/v1/feed-lists (the `CreateFeedList` operationId).
+// Corresponds with POST /v1/feed-lists (the `CreateFeedList` operationId).
 func (c *Client) CreateFeedListWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateFeedListRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -1219,7 +1219,7 @@ func (c *Client) CreateFeedListWithBody(ctx context.Context, contentType string,
 //
 // Takes a body of the `application/json` content type.
 //
-// Corresponds with POST /api/v1/feed-lists (the `CreateFeedList` operationId).
+// Corresponds with POST /v1/feed-lists (the `CreateFeedList` operationId).
 func (c *Client) CreateFeedList(ctx context.Context, body CreateFeedListJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateFeedListRequest(c.Server, body)
 	if err != nil {
@@ -1234,7 +1234,7 @@ func (c *Client) CreateFeedList(ctx context.Context, body CreateFeedListJSONRequ
 
 // DiscoverFeedLists Discover public feed lists
 //
-// Corresponds with GET /api/v1/feed-lists/discover (the `DiscoverFeedLists` operationId).
+// Corresponds with GET /v1/feed-lists/discover (the `DiscoverFeedLists` operationId).
 func (c *Client) DiscoverFeedLists(ctx context.Context, params *DiscoverFeedListsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDiscoverFeedListsRequest(c.Server, params)
 	if err != nil {
@@ -1249,7 +1249,7 @@ func (c *Client) DiscoverFeedLists(ctx context.Context, params *DiscoverFeedList
 
 // ListFollowedFeedLists List feed lists I follow
 //
-// Corresponds with GET /api/v1/feed-lists/followed (the `ListFollowedFeedLists` operationId).
+// Corresponds with GET /v1/feed-lists/followed (the `ListFollowedFeedLists` operationId).
 func (c *Client) ListFollowedFeedLists(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListFollowedFeedListsRequest(c.Server)
 	if err != nil {
@@ -1264,7 +1264,7 @@ func (c *Client) ListFollowedFeedLists(ctx context.Context, reqEditors ...Reques
 
 // DeleteFeedList Delete a feed list
 //
-// Corresponds with DELETE /api/v1/feed-lists/{listId} (the `DeleteFeedList` operationId).
+// Corresponds with DELETE /v1/feed-lists/{listId} (the `DeleteFeedList` operationId).
 func (c *Client) DeleteFeedList(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteFeedListRequest(c.Server, listId)
 	if err != nil {
@@ -1279,7 +1279,7 @@ func (c *Client) DeleteFeedList(ctx context.Context, listId int64, reqEditors ..
 
 // GetFeedList Get a feed list
 //
-// Corresponds with GET /api/v1/feed-lists/{listId} (the `GetFeedList` operationId).
+// Corresponds with GET /v1/feed-lists/{listId} (the `GetFeedList` operationId).
 func (c *Client) GetFeedList(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetFeedListRequest(c.Server, listId)
 	if err != nil {
@@ -1296,7 +1296,7 @@ func (c *Client) GetFeedList(ctx context.Context, listId int64, reqEditors ...Re
 //
 // Takes any type of body and a specified content type.
 //
-// Corresponds with PATCH /api/v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
+// Corresponds with PATCH /v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
 func (c *Client) UpdateFeedListWithBody(ctx context.Context, listId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateFeedListRequestWithBody(c.Server, listId, contentType, body)
 	if err != nil {
@@ -1313,7 +1313,7 @@ func (c *Client) UpdateFeedListWithBody(ctx context.Context, listId int64, conte
 //
 // Takes a body of the `application/json` content type.
 //
-// Corresponds with PATCH /api/v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
+// Corresponds with PATCH /v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
 func (c *Client) UpdateFeedList(ctx context.Context, listId int64, body UpdateFeedListJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateFeedListRequest(c.Server, listId, body)
 	if err != nil {
@@ -1330,7 +1330,7 @@ func (c *Client) UpdateFeedList(ctx context.Context, listId int64, body UpdateFe
 //
 // Takes any type of body and a specified content type.
 //
-// Corresponds with POST /api/v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
+// Corresponds with POST /v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
 func (c *Client) AddFeedListFeedWithBody(ctx context.Context, listId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAddFeedListFeedRequestWithBody(c.Server, listId, contentType, body)
 	if err != nil {
@@ -1347,7 +1347,7 @@ func (c *Client) AddFeedListFeedWithBody(ctx context.Context, listId int64, cont
 //
 // Takes a body of the `application/json` content type.
 //
-// Corresponds with POST /api/v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
+// Corresponds with POST /v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
 func (c *Client) AddFeedListFeed(ctx context.Context, listId int64, body AddFeedListFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAddFeedListFeedRequest(c.Server, listId, body)
 	if err != nil {
@@ -1362,7 +1362,7 @@ func (c *Client) AddFeedListFeed(ctx context.Context, listId int64, body AddFeed
 
 // RemoveFeedListFeed Remove a feed from a feed list
 //
-// Corresponds with DELETE /api/v1/feed-lists/{listId}/feeds/{itemId} (the `RemoveFeedListFeed` operationId).
+// Corresponds with DELETE /v1/feed-lists/{listId}/feeds/{itemId} (the `RemoveFeedListFeed` operationId).
 func (c *Client) RemoveFeedListFeed(ctx context.Context, listId int64, itemId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRemoveFeedListFeedRequest(c.Server, listId, itemId)
 	if err != nil {
@@ -1377,7 +1377,7 @@ func (c *Client) RemoveFeedListFeed(ctx context.Context, listId int64, itemId in
 
 // UnfollowFeedList Unfollow a feed list
 //
-// Corresponds with DELETE /api/v1/feed-lists/{listId}/follow (the `UnfollowFeedList` operationId).
+// Corresponds with DELETE /v1/feed-lists/{listId}/follow (the `UnfollowFeedList` operationId).
 func (c *Client) UnfollowFeedList(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUnfollowFeedListRequest(c.Server, listId)
 	if err != nil {
@@ -1392,7 +1392,7 @@ func (c *Client) UnfollowFeedList(ctx context.Context, listId int64, reqEditors 
 
 // FollowFeedList Follow a feed list
 //
-// Corresponds with POST /api/v1/feed-lists/{listId}/follow (the `FollowFeedList` operationId).
+// Corresponds with POST /v1/feed-lists/{listId}/follow (the `FollowFeedList` operationId).
 func (c *Client) FollowFeedList(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewFollowFeedListRequest(c.Server, listId)
 	if err != nil {
@@ -1407,7 +1407,7 @@ func (c *Client) FollowFeedList(ctx context.Context, listId int64, reqEditors ..
 
 // ImportFeedList Subscribe to all feeds in a feed list
 //
-// Corresponds with POST /api/v1/feed-lists/{listId}/import (the `ImportFeedList` operationId).
+// Corresponds with POST /v1/feed-lists/{listId}/import (the `ImportFeedList` operationId).
 func (c *Client) ImportFeedList(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewImportFeedListRequest(c.Server, listId)
 	if err != nil {
@@ -1422,7 +1422,7 @@ func (c *Client) ImportFeedList(ctx context.Context, listId int64, reqEditors ..
 
 // ListFeeds List feeds
 //
-// Corresponds with GET /api/v1/feeds (the `ListFeeds` operationId).
+// Corresponds with GET /v1/feeds (the `ListFeeds` operationId).
 func (c *Client) ListFeeds(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListFeedsRequest(c.Server)
 	if err != nil {
@@ -1439,7 +1439,7 @@ func (c *Client) ListFeeds(ctx context.Context, reqEditors ...RequestEditorFn) (
 //
 // Takes any type of body and a specified content type.
 //
-// Corresponds with POST /api/v1/feeds (the `CreateFeed` operationId).
+// Corresponds with POST /v1/feeds (the `CreateFeed` operationId).
 func (c *Client) CreateFeedWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateFeedRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -1456,7 +1456,7 @@ func (c *Client) CreateFeedWithBody(ctx context.Context, contentType string, bod
 //
 // Takes a body of the `application/json` content type.
 //
-// Corresponds with POST /api/v1/feeds (the `CreateFeed` operationId).
+// Corresponds with POST /v1/feeds (the `CreateFeed` operationId).
 func (c *Client) CreateFeed(ctx context.Context, body CreateFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateFeedRequest(c.Server, body)
 	if err != nil {
@@ -1475,7 +1475,7 @@ func (c *Client) CreateFeed(ctx context.Context, body CreateFeedJSONRequestBody,
 //
 // Takes any type of body and a specified content type.
 //
-// Corresponds with POST /api/v1/feeds/preview (the `PreviewFeed` operationId).
+// Corresponds with POST /v1/feeds/preview (the `PreviewFeed` operationId).
 func (c *Client) PreviewFeedWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPreviewFeedRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -1494,7 +1494,7 @@ func (c *Client) PreviewFeedWithBody(ctx context.Context, contentType string, bo
 //
 // Takes a body of the `application/json` content type.
 //
-// Corresponds with POST /api/v1/feeds/preview (the `PreviewFeed` operationId).
+// Corresponds with POST /v1/feeds/preview (the `PreviewFeed` operationId).
 func (c *Client) PreviewFeed(ctx context.Context, body PreviewFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPreviewFeedRequest(c.Server, body)
 	if err != nil {
@@ -1509,7 +1509,7 @@ func (c *Client) PreviewFeed(ctx context.Context, body PreviewFeedJSONRequestBod
 
 // DeleteFeed Delete a feed
 //
-// Corresponds with DELETE /api/v1/feeds/{feedId} (the `DeleteFeed` operationId).
+// Corresponds with DELETE /v1/feeds/{feedId} (the `DeleteFeed` operationId).
 func (c *Client) DeleteFeed(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteFeedRequest(c.Server, feedId)
 	if err != nil {
@@ -1524,7 +1524,7 @@ func (c *Client) DeleteFeed(ctx context.Context, feedId int64, reqEditors ...Req
 
 // GetFeed Get a feed
 //
-// Corresponds with GET /api/v1/feeds/{feedId} (the `GetFeed` operationId).
+// Corresponds with GET /v1/feeds/{feedId} (the `GetFeed` operationId).
 func (c *Client) GetFeed(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetFeedRequest(c.Server, feedId)
 	if err != nil {
@@ -1543,7 +1543,7 @@ func (c *Client) GetFeed(ctx context.Context, feedId int64, reqEditors ...Reques
 //
 // Takes any type of body and a specified content type.
 //
-// Corresponds with PATCH /api/v1/feeds/{feedId} (the `UpdateFeed` operationId).
+// Corresponds with PATCH /v1/feeds/{feedId} (the `UpdateFeed` operationId).
 func (c *Client) UpdateFeedWithBody(ctx context.Context, feedId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateFeedRequestWithBody(c.Server, feedId, contentType, body)
 	if err != nil {
@@ -1562,7 +1562,7 @@ func (c *Client) UpdateFeedWithBody(ctx context.Context, feedId int64, contentTy
 //
 // Takes a body of the `application/json` content type.
 //
-// Corresponds with PATCH /api/v1/feeds/{feedId} (the `UpdateFeed` operationId).
+// Corresponds with PATCH /v1/feeds/{feedId} (the `UpdateFeed` operationId).
 func (c *Client) UpdateFeed(ctx context.Context, feedId int64, body UpdateFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateFeedRequest(c.Server, feedId, body)
 	if err != nil {
@@ -1577,7 +1577,7 @@ func (c *Client) UpdateFeed(ctx context.Context, feedId int64, body UpdateFeedJS
 
 // MarkFeedRead Mark all entries in a feed as read
 //
-// Corresponds with POST /api/v1/feeds/{feedId}/mark-all-read (the `MarkFeedRead` operationId).
+// Corresponds with POST /v1/feeds/{feedId}/mark-all-read (the `MarkFeedRead` operationId).
 func (c *Client) MarkFeedRead(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewMarkFeedReadRequest(c.Server, feedId)
 	if err != nil {
@@ -1594,7 +1594,7 @@ func (c *Client) MarkFeedRead(ctx context.Context, feedId int64, reqEditors ...R
 //
 // Manually fetch and parse the feed, inserting any new entries. Use this to get the latest articles without waiting for the scheduler.
 //
-// Corresponds with POST /api/v1/feeds/{feedId}/refresh (the `RefreshFeed` operationId).
+// Corresponds with POST /v1/feeds/{feedId}/refresh (the `RefreshFeed` operationId).
 func (c *Client) RefreshFeed(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRefreshFeedRequest(c.Server, feedId)
 	if err != nil {
@@ -1609,7 +1609,7 @@ func (c *Client) RefreshFeed(ctx context.Context, feedId int64, reqEditors ...Re
 
 // ListFolders List folders
 //
-// Corresponds with GET /api/v1/folders (the `ListFolders` operationId).
+// Corresponds with GET /v1/folders (the `ListFolders` operationId).
 func (c *Client) ListFolders(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListFoldersRequest(c.Server)
 	if err != nil {
@@ -1626,7 +1626,7 @@ func (c *Client) ListFolders(ctx context.Context, reqEditors ...RequestEditorFn)
 //
 // Takes any type of body and a specified content type.
 //
-// Corresponds with POST /api/v1/folders (the `CreateFolder` operationId).
+// Corresponds with POST /v1/folders (the `CreateFolder` operationId).
 func (c *Client) CreateFolderWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateFolderRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -1643,7 +1643,7 @@ func (c *Client) CreateFolderWithBody(ctx context.Context, contentType string, b
 //
 // Takes a body of the `application/json` content type.
 //
-// Corresponds with POST /api/v1/folders (the `CreateFolder` operationId).
+// Corresponds with POST /v1/folders (the `CreateFolder` operationId).
 func (c *Client) CreateFolder(ctx context.Context, body CreateFolderJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateFolderRequest(c.Server, body)
 	if err != nil {
@@ -1658,7 +1658,7 @@ func (c *Client) CreateFolder(ctx context.Context, body CreateFolderJSONRequestB
 
 // DeleteFolder Delete a folder
 //
-// Corresponds with DELETE /api/v1/folders/{folderId} (the `DeleteFolder` operationId).
+// Corresponds with DELETE /v1/folders/{folderId} (the `DeleteFolder` operationId).
 func (c *Client) DeleteFolder(ctx context.Context, folderId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteFolderRequest(c.Server, folderId)
 	if err != nil {
@@ -1677,7 +1677,7 @@ func (c *Client) DeleteFolder(ctx context.Context, folderId int64, reqEditors ..
 //
 // Takes any type of body and a specified content type.
 //
-// Corresponds with PATCH /api/v1/folders/{folderId} (the `UpdateFolder` operationId).
+// Corresponds with PATCH /v1/folders/{folderId} (the `UpdateFolder` operationId).
 func (c *Client) UpdateFolderWithBody(ctx context.Context, folderId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateFolderRequestWithBody(c.Server, folderId, contentType, body)
 	if err != nil {
@@ -1696,7 +1696,7 @@ func (c *Client) UpdateFolderWithBody(ctx context.Context, folderId int64, conte
 //
 // Takes a body of the `application/json` content type.
 //
-// Corresponds with PATCH /api/v1/folders/{folderId} (the `UpdateFolder` operationId).
+// Corresponds with PATCH /v1/folders/{folderId} (the `UpdateFolder` operationId).
 func (c *Client) UpdateFolder(ctx context.Context, folderId int64, body UpdateFolderJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateFolderRequest(c.Server, folderId, body)
 	if err != nil {
@@ -1711,7 +1711,7 @@ func (c *Client) UpdateFolder(ctx context.Context, folderId int64, body UpdateFo
 
 // Health Health check
 //
-// Corresponds with GET /api/v1/health (the `Health` operationId).
+// Corresponds with GET /v1/health (the `Health` operationId).
 func (c *Client) Health(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewHealthRequest(c.Server)
 	if err != nil {
@@ -1726,7 +1726,7 @@ func (c *Client) Health(ctx context.Context, reqEditors ...RequestEditorFn) (*ht
 
 // DeleteMe Delete current user account
 //
-// Corresponds with DELETE /api/v1/me (the `DeleteMe` operationId).
+// Corresponds with DELETE /v1/me (the `DeleteMe` operationId).
 func (c *Client) DeleteMe(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteMeRequest(c.Server)
 	if err != nil {
@@ -1741,7 +1741,7 @@ func (c *Client) DeleteMe(ctx context.Context, reqEditors ...RequestEditorFn) (*
 
 // GetMe Get current user
 //
-// Corresponds with GET /api/v1/me (the `GetMe` operationId).
+// Corresponds with GET /v1/me (the `GetMe` operationId).
 func (c *Client) GetMe(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetMeRequest(c.Server)
 	if err != nil {
@@ -1758,7 +1758,7 @@ func (c *Client) GetMe(ctx context.Context, reqEditors ...RequestEditorFn) (*htt
 //
 // Takes any type of body and a specified content type.
 //
-// Corresponds with PATCH /api/v1/me (the `UpdateMe` operationId).
+// Corresponds with PATCH /v1/me (the `UpdateMe` operationId).
 func (c *Client) UpdateMeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateMeRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -1775,7 +1775,7 @@ func (c *Client) UpdateMeWithBody(ctx context.Context, contentType string, body 
 //
 // Takes a body of the `application/json` content type.
 //
-// Corresponds with PATCH /api/v1/me (the `UpdateMe` operationId).
+// Corresponds with PATCH /v1/me (the `UpdateMe` operationId).
 func (c *Client) UpdateMe(ctx context.Context, body UpdateMeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateMeRequest(c.Server, body)
 	if err != nil {
@@ -1792,7 +1792,7 @@ func (c *Client) UpdateMe(ctx context.Context, body UpdateMeJSONRequestBody, req
 //
 // Returns all feed subscriptions and folders as an OPML XML document.
 //
-// Corresponds with GET /api/v1/opml/export (the `ExportOpml` operationId).
+// Corresponds with GET /v1/opml/export (the `ExportOpml` operationId).
 func (c *Client) ExportOpml(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewExportOpmlRequest(c.Server)
 	if err != nil {
@@ -1811,7 +1811,7 @@ func (c *Client) ExportOpml(ctx context.Context, reqEditors ...RequestEditorFn) 
 //
 // Takes any type of body and a specified content type.
 //
-// Corresponds with POST /api/v1/opml/import (the `ImportOpml` operationId).
+// Corresponds with POST /v1/opml/import (the `ImportOpml` operationId).
 func (c *Client) ImportOpmlWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewImportOpmlRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -1826,7 +1826,7 @@ func (c *Client) ImportOpmlWithBody(ctx context.Context, contentType string, bod
 
 // ListTokens List API tokens
 //
-// Corresponds with GET /api/v1/tokens (the `ListTokens` operationId).
+// Corresponds with GET /v1/tokens (the `ListTokens` operationId).
 func (c *Client) ListTokens(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListTokensRequest(c.Server)
 	if err != nil {
@@ -1843,7 +1843,7 @@ func (c *Client) ListTokens(ctx context.Context, reqEditors ...RequestEditorFn) 
 //
 // Takes any type of body and a specified content type.
 //
-// Corresponds with POST /api/v1/tokens (the `CreateToken` operationId).
+// Corresponds with POST /v1/tokens (the `CreateToken` operationId).
 func (c *Client) CreateTokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateTokenRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -1860,7 +1860,7 @@ func (c *Client) CreateTokenWithBody(ctx context.Context, contentType string, bo
 //
 // Takes a body of the `application/json` content type.
 //
-// Corresponds with POST /api/v1/tokens (the `CreateToken` operationId).
+// Corresponds with POST /v1/tokens (the `CreateToken` operationId).
 func (c *Client) CreateToken(ctx context.Context, body CreateTokenJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateTokenRequest(c.Server, body)
 	if err != nil {
@@ -1875,7 +1875,7 @@ func (c *Client) CreateToken(ctx context.Context, body CreateTokenJSONRequestBod
 
 // DeleteToken Delete an API token
 //
-// Corresponds with DELETE /api/v1/tokens/{tokenId} (the `DeleteToken` operationId).
+// Corresponds with DELETE /v1/tokens/{tokenId} (the `DeleteToken` operationId).
 func (c *Client) DeleteToken(ctx context.Context, tokenId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteTokenRequest(c.Server, tokenId)
 	if err != nil {
@@ -1897,7 +1897,7 @@ func NewDeviceCodeRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/auth/device/code")
+	operationPath := fmt.Sprintf("/auth/device/code")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1935,7 +1935,7 @@ func NewDeviceConfirmRequestWithBody(server string, contentType string, body io.
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/auth/device/confirm")
+	operationPath := fmt.Sprintf("/auth/device/confirm")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1964,7 +1964,7 @@ func NewDeviceStatusRequest(server string, params *DeviceStatusParams) (*http.Re
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/auth/device/status")
+	operationPath := fmt.Sprintf("/auth/device/status")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2029,7 +2029,7 @@ func NewDeviceTokenRequestWithBody(server string, contentType string, body io.Re
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/auth/device/token")
+	operationPath := fmt.Sprintf("/auth/device/token")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2058,7 +2058,7 @@ func NewListEntriesRequest(server string, params *ListEntriesParams) (*http.Requ
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/entries")
+	operationPath := fmt.Sprintf("/v1/entries")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2195,7 +2195,7 @@ func NewUpdateEntriesRequestWithBody(server string, contentType string, body io.
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/entries")
+	operationPath := fmt.Sprintf("/v1/entries")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2231,7 +2231,7 @@ func NewGetEntryRequest(server string, entryId int64) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/entries/%s", pathParam0)
+	operationPath := fmt.Sprintf("/v1/entries/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2276,7 +2276,7 @@ func NewToggleEntryStarredRequestWithBody(server string, entryId int64, contentT
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/entries/%s/starred", pathParam0)
+	operationPath := fmt.Sprintf("/v1/entries/%s/starred", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2305,7 +2305,7 @@ func NewListMyFeedListsRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/feed-lists")
+	operationPath := fmt.Sprintf("/v1/feed-lists")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2343,7 +2343,7 @@ func NewCreateFeedListRequestWithBody(server string, contentType string, body io
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/feed-lists")
+	operationPath := fmt.Sprintf("/v1/feed-lists")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2372,7 +2372,7 @@ func NewDiscoverFeedListsRequest(server string, params *DiscoverFeedListsParams)
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/feed-lists/discover")
+	operationPath := fmt.Sprintf("/v1/feed-lists/discover")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2438,7 +2438,7 @@ func NewListFollowedFeedListsRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/feed-lists/followed")
+	operationPath := fmt.Sprintf("/v1/feed-lists/followed")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2472,7 +2472,7 @@ func NewDeleteFeedListRequest(server string, listId int64) (*http.Request, error
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/feed-lists/%s", pathParam0)
+	operationPath := fmt.Sprintf("/v1/feed-lists/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2506,7 +2506,7 @@ func NewGetFeedListRequest(server string, listId int64) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/feed-lists/%s", pathParam0)
+	operationPath := fmt.Sprintf("/v1/feed-lists/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2551,7 +2551,7 @@ func NewUpdateFeedListRequestWithBody(server string, listId int64, contentType s
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/feed-lists/%s", pathParam0)
+	operationPath := fmt.Sprintf("/v1/feed-lists/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2598,7 +2598,7 @@ func NewAddFeedListFeedRequestWithBody(server string, listId int64, contentType 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/feed-lists/%s/feeds", pathParam0)
+	operationPath := fmt.Sprintf("/v1/feed-lists/%s/feeds", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2641,7 +2641,7 @@ func NewRemoveFeedListFeedRequest(server string, listId int64, itemId int64) (*h
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/feed-lists/%s/feeds/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/v1/feed-lists/%s/feeds/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2675,7 +2675,7 @@ func NewUnfollowFeedListRequest(server string, listId int64) (*http.Request, err
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/feed-lists/%s/follow", pathParam0)
+	operationPath := fmt.Sprintf("/v1/feed-lists/%s/follow", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2709,7 +2709,7 @@ func NewFollowFeedListRequest(server string, listId int64) (*http.Request, error
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/feed-lists/%s/follow", pathParam0)
+	operationPath := fmt.Sprintf("/v1/feed-lists/%s/follow", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2743,7 +2743,7 @@ func NewImportFeedListRequest(server string, listId int64) (*http.Request, error
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/feed-lists/%s/import", pathParam0)
+	operationPath := fmt.Sprintf("/v1/feed-lists/%s/import", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2770,7 +2770,7 @@ func NewListFeedsRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/feeds")
+	operationPath := fmt.Sprintf("/v1/feeds")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2808,7 +2808,7 @@ func NewCreateFeedRequestWithBody(server string, contentType string, body io.Rea
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/feeds")
+	operationPath := fmt.Sprintf("/v1/feeds")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2848,7 +2848,7 @@ func NewPreviewFeedRequestWithBody(server string, contentType string, body io.Re
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/feeds/preview")
+	operationPath := fmt.Sprintf("/v1/feeds/preview")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2884,7 +2884,7 @@ func NewDeleteFeedRequest(server string, feedId int64) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/feeds/%s", pathParam0)
+	operationPath := fmt.Sprintf("/v1/feeds/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2918,7 +2918,7 @@ func NewGetFeedRequest(server string, feedId int64) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/feeds/%s", pathParam0)
+	operationPath := fmt.Sprintf("/v1/feeds/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2963,7 +2963,7 @@ func NewUpdateFeedRequestWithBody(server string, feedId int64, contentType strin
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/feeds/%s", pathParam0)
+	operationPath := fmt.Sprintf("/v1/feeds/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2999,7 +2999,7 @@ func NewMarkFeedReadRequest(server string, feedId int64) (*http.Request, error) 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/feeds/%s/mark-all-read", pathParam0)
+	operationPath := fmt.Sprintf("/v1/feeds/%s/mark-all-read", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -3033,7 +3033,7 @@ func NewRefreshFeedRequest(server string, feedId int64) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/feeds/%s/refresh", pathParam0)
+	operationPath := fmt.Sprintf("/v1/feeds/%s/refresh", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -3060,7 +3060,7 @@ func NewListFoldersRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/folders")
+	operationPath := fmt.Sprintf("/v1/folders")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -3098,7 +3098,7 @@ func NewCreateFolderRequestWithBody(server string, contentType string, body io.R
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/folders")
+	operationPath := fmt.Sprintf("/v1/folders")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -3134,7 +3134,7 @@ func NewDeleteFolderRequest(server string, folderId int64) (*http.Request, error
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/folders/%s", pathParam0)
+	operationPath := fmt.Sprintf("/v1/folders/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -3179,7 +3179,7 @@ func NewUpdateFolderRequestWithBody(server string, folderId int64, contentType s
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/folders/%s", pathParam0)
+	operationPath := fmt.Sprintf("/v1/folders/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -3208,7 +3208,7 @@ func NewHealthRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/health")
+	operationPath := fmt.Sprintf("/v1/health")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -3235,7 +3235,7 @@ func NewDeleteMeRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/me")
+	operationPath := fmt.Sprintf("/v1/me")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -3262,7 +3262,7 @@ func NewGetMeRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/me")
+	operationPath := fmt.Sprintf("/v1/me")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -3300,7 +3300,7 @@ func NewUpdateMeRequestWithBody(server string, contentType string, body io.Reade
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/me")
+	operationPath := fmt.Sprintf("/v1/me")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -3329,7 +3329,7 @@ func NewExportOpmlRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/opml/export")
+	operationPath := fmt.Sprintf("/v1/opml/export")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -3356,7 +3356,7 @@ func NewImportOpmlRequestWithBody(server string, contentType string, body io.Rea
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/opml/import")
+	operationPath := fmt.Sprintf("/v1/opml/import")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -3385,7 +3385,7 @@ func NewListTokensRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/tokens")
+	operationPath := fmt.Sprintf("/v1/tokens")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -3423,7 +3423,7 @@ func NewCreateTokenRequestWithBody(server string, contentType string, body io.Re
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/tokens")
+	operationPath := fmt.Sprintf("/v1/tokens")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -3459,7 +3459,7 @@ func NewDeleteTokenRequest(server string, tokenId int64) (*http.Request, error) 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/tokens/%s", pathParam0)
+	operationPath := fmt.Sprintf("/v1/tokens/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -3525,210 +3525,210 @@ type ClientWithResponsesInterface interface {
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/auth/device/code (the `DeviceCode` operationId).
+	// Corresponds with POST /auth/device/code (the `DeviceCode` operationId).
 	DeviceCodeWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*DeviceCodeResp, error)
 
 	// DeviceConfirmWithBodyWithResponse Approve or deny a device-flow login (authenticated user)
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/auth/device/confirm (the `DeviceConfirm` operationId).
+	// Corresponds with POST /auth/device/confirm (the `DeviceConfirm` operationId).
 	DeviceConfirmWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeviceConfirmResp, error)
 
 	// DeviceConfirmWithResponse Approve or deny a device-flow login (authenticated user)
 	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/auth/device/confirm (the `DeviceConfirm` operationId).
+	// Corresponds with POST /auth/device/confirm (the `DeviceConfirm` operationId).
 	DeviceConfirmWithResponse(ctx context.Context, body DeviceConfirmJSONRequestBody, reqEditors ...RequestEditorFn) (*DeviceConfirmResp, error)
 
 	// DeviceStatusWithResponse Check device-flow status by user code (authenticated user)
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with GET /api/auth/device/status (the `DeviceStatus` operationId).
+	// Corresponds with GET /auth/device/status (the `DeviceStatus` operationId).
 	DeviceStatusWithResponse(ctx context.Context, params *DeviceStatusParams, reqEditors ...RequestEditorFn) (*DeviceStatusResp, error)
 
 	// DeviceTokenWithBodyWithResponse Poll for device-flow login result
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/auth/device/token (the `DeviceToken` operationId).
+	// Corresponds with POST /auth/device/token (the `DeviceToken` operationId).
 	DeviceTokenWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeviceTokenResp, error)
 
 	// DeviceTokenWithResponse Poll for device-flow login result
 	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/auth/device/token (the `DeviceToken` operationId).
+	// Corresponds with POST /auth/device/token (the `DeviceToken` operationId).
 	DeviceTokenWithResponse(ctx context.Context, body DeviceTokenJSONRequestBody, reqEditors ...RequestEditorFn) (*DeviceTokenResp, error)
 
 	// ListEntriesWithResponse List entries
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with GET /api/v1/entries (the `ListEntries` operationId).
+	// Corresponds with GET /v1/entries (the `ListEntries` operationId).
 	ListEntriesWithResponse(ctx context.Context, params *ListEntriesParams, reqEditors ...RequestEditorFn) (*ListEntriesResp, error)
 
 	// UpdateEntriesWithBodyWithResponse Bulk update entry status
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with PUT /api/v1/entries (the `UpdateEntries` operationId).
+	// Corresponds with PUT /v1/entries (the `UpdateEntries` operationId).
 	UpdateEntriesWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateEntriesResp, error)
 
 	// UpdateEntriesWithResponse Bulk update entry status
 	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with PUT /api/v1/entries (the `UpdateEntries` operationId).
+	// Corresponds with PUT /v1/entries (the `UpdateEntries` operationId).
 	UpdateEntriesWithResponse(ctx context.Context, body UpdateEntriesJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateEntriesResp, error)
 
 	// GetEntryWithResponse Get an entry
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with GET /api/v1/entries/{entryId} (the `GetEntry` operationId).
+	// Corresponds with GET /v1/entries/{entryId} (the `GetEntry` operationId).
 	GetEntryWithResponse(ctx context.Context, entryId int64, reqEditors ...RequestEditorFn) (*GetEntryResp, error)
 
 	// ToggleEntryStarredWithBodyWithResponse Toggle starred on an entry
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with PUT /api/v1/entries/{entryId}/starred (the `ToggleEntryStarred` operationId).
+	// Corresponds with PUT /v1/entries/{entryId}/starred (the `ToggleEntryStarred` operationId).
 	ToggleEntryStarredWithBodyWithResponse(ctx context.Context, entryId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ToggleEntryStarredResp, error)
 
 	// ToggleEntryStarredWithResponse Toggle starred on an entry
 	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with PUT /api/v1/entries/{entryId}/starred (the `ToggleEntryStarred` operationId).
+	// Corresponds with PUT /v1/entries/{entryId}/starred (the `ToggleEntryStarred` operationId).
 	ToggleEntryStarredWithResponse(ctx context.Context, entryId int64, body ToggleEntryStarredJSONRequestBody, reqEditors ...RequestEditorFn) (*ToggleEntryStarredResp, error)
 
 	// ListMyFeedListsWithResponse List my feed lists
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with GET /api/v1/feed-lists (the `ListMyFeedLists` operationId).
+	// Corresponds with GET /v1/feed-lists (the `ListMyFeedLists` operationId).
 	ListMyFeedListsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListMyFeedListsResp, error)
 
 	// CreateFeedListWithBodyWithResponse Create a feed list
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/v1/feed-lists (the `CreateFeedList` operationId).
+	// Corresponds with POST /v1/feed-lists (the `CreateFeedList` operationId).
 	CreateFeedListWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateFeedListResp, error)
 
 	// CreateFeedListWithResponse Create a feed list
 	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/v1/feed-lists (the `CreateFeedList` operationId).
+	// Corresponds with POST /v1/feed-lists (the `CreateFeedList` operationId).
 	CreateFeedListWithResponse(ctx context.Context, body CreateFeedListJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateFeedListResp, error)
 
 	// DiscoverFeedListsWithResponse Discover public feed lists
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with GET /api/v1/feed-lists/discover (the `DiscoverFeedLists` operationId).
+	// Corresponds with GET /v1/feed-lists/discover (the `DiscoverFeedLists` operationId).
 	DiscoverFeedListsWithResponse(ctx context.Context, params *DiscoverFeedListsParams, reqEditors ...RequestEditorFn) (*DiscoverFeedListsResp, error)
 
 	// ListFollowedFeedListsWithResponse List feed lists I follow
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with GET /api/v1/feed-lists/followed (the `ListFollowedFeedLists` operationId).
+	// Corresponds with GET /v1/feed-lists/followed (the `ListFollowedFeedLists` operationId).
 	ListFollowedFeedListsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListFollowedFeedListsResp, error)
 
 	// DeleteFeedListWithResponse Delete a feed list
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with DELETE /api/v1/feed-lists/{listId} (the `DeleteFeedList` operationId).
+	// Corresponds with DELETE /v1/feed-lists/{listId} (the `DeleteFeedList` operationId).
 	DeleteFeedListWithResponse(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*DeleteFeedListResp, error)
 
 	// GetFeedListWithResponse Get a feed list
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with GET /api/v1/feed-lists/{listId} (the `GetFeedList` operationId).
+	// Corresponds with GET /v1/feed-lists/{listId} (the `GetFeedList` operationId).
 	GetFeedListWithResponse(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*GetFeedListResp, error)
 
 	// UpdateFeedListWithBodyWithResponse Update a feed list
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with PATCH /api/v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
+	// Corresponds with PATCH /v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
 	UpdateFeedListWithBodyWithResponse(ctx context.Context, listId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateFeedListResp, error)
 
 	// UpdateFeedListWithResponse Update a feed list
 	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with PATCH /api/v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
+	// Corresponds with PATCH /v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
 	UpdateFeedListWithResponse(ctx context.Context, listId int64, body UpdateFeedListJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateFeedListResp, error)
 
 	// AddFeedListFeedWithBodyWithResponse Add a feed to a feed list
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
+	// Corresponds with POST /v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
 	AddFeedListFeedWithBodyWithResponse(ctx context.Context, listId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddFeedListFeedResp, error)
 
 	// AddFeedListFeedWithResponse Add a feed to a feed list
 	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
+	// Corresponds with POST /v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
 	AddFeedListFeedWithResponse(ctx context.Context, listId int64, body AddFeedListFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*AddFeedListFeedResp, error)
 
 	// RemoveFeedListFeedWithResponse Remove a feed from a feed list
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with DELETE /api/v1/feed-lists/{listId}/feeds/{itemId} (the `RemoveFeedListFeed` operationId).
+	// Corresponds with DELETE /v1/feed-lists/{listId}/feeds/{itemId} (the `RemoveFeedListFeed` operationId).
 	RemoveFeedListFeedWithResponse(ctx context.Context, listId int64, itemId int64, reqEditors ...RequestEditorFn) (*RemoveFeedListFeedResp, error)
 
 	// UnfollowFeedListWithResponse Unfollow a feed list
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with DELETE /api/v1/feed-lists/{listId}/follow (the `UnfollowFeedList` operationId).
+	// Corresponds with DELETE /v1/feed-lists/{listId}/follow (the `UnfollowFeedList` operationId).
 	UnfollowFeedListWithResponse(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*UnfollowFeedListResp, error)
 
 	// FollowFeedListWithResponse Follow a feed list
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/v1/feed-lists/{listId}/follow (the `FollowFeedList` operationId).
+	// Corresponds with POST /v1/feed-lists/{listId}/follow (the `FollowFeedList` operationId).
 	FollowFeedListWithResponse(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*FollowFeedListResp, error)
 
 	// ImportFeedListWithResponse Subscribe to all feeds in a feed list
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/v1/feed-lists/{listId}/import (the `ImportFeedList` operationId).
+	// Corresponds with POST /v1/feed-lists/{listId}/import (the `ImportFeedList` operationId).
 	ImportFeedListWithResponse(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*ImportFeedListResp, error)
 
 	// ListFeedsWithResponse List feeds
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with GET /api/v1/feeds (the `ListFeeds` operationId).
+	// Corresponds with GET /v1/feeds (the `ListFeeds` operationId).
 	ListFeedsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListFeedsResp, error)
 
 	// CreateFeedWithBodyWithResponse Subscribe to a feed
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/v1/feeds (the `CreateFeed` operationId).
+	// Corresponds with POST /v1/feeds (the `CreateFeed` operationId).
 	CreateFeedWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateFeedResp, error)
 
 	// CreateFeedWithResponse Subscribe to a feed
 	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/v1/feeds (the `CreateFeed` operationId).
+	// Corresponds with POST /v1/feeds (the `CreateFeed` operationId).
 	CreateFeedWithResponse(ctx context.Context, body CreateFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateFeedResp, error)
 
 	// PreviewFeedWithBodyWithResponse Preview a feed without subscribing
@@ -3737,7 +3737,7 @@ type ClientWithResponsesInterface interface {
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/v1/feeds/preview (the `PreviewFeed` operationId).
+	// Corresponds with POST /v1/feeds/preview (the `PreviewFeed` operationId).
 	PreviewFeedWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PreviewFeedResp, error)
 
 	// PreviewFeedWithResponse Preview a feed without subscribing
@@ -3746,21 +3746,21 @@ type ClientWithResponsesInterface interface {
 	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/v1/feeds/preview (the `PreviewFeed` operationId).
+	// Corresponds with POST /v1/feeds/preview (the `PreviewFeed` operationId).
 	PreviewFeedWithResponse(ctx context.Context, body PreviewFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*PreviewFeedResp, error)
 
 	// DeleteFeedWithResponse Delete a feed
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with DELETE /api/v1/feeds/{feedId} (the `DeleteFeed` operationId).
+	// Corresponds with DELETE /v1/feeds/{feedId} (the `DeleteFeed` operationId).
 	DeleteFeedWithResponse(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*DeleteFeedResp, error)
 
 	// GetFeedWithResponse Get a feed
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with GET /api/v1/feeds/{feedId} (the `GetFeed` operationId).
+	// Corresponds with GET /v1/feeds/{feedId} (the `GetFeed` operationId).
 	GetFeedWithResponse(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*GetFeedResp, error)
 
 	// UpdateFeedWithBodyWithResponse Update a feed
@@ -3769,7 +3769,7 @@ type ClientWithResponsesInterface interface {
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with PATCH /api/v1/feeds/{feedId} (the `UpdateFeed` operationId).
+	// Corresponds with PATCH /v1/feeds/{feedId} (the `UpdateFeed` operationId).
 	UpdateFeedWithBodyWithResponse(ctx context.Context, feedId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateFeedResp, error)
 
 	// UpdateFeedWithResponse Update a feed
@@ -3778,14 +3778,14 @@ type ClientWithResponsesInterface interface {
 	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with PATCH /api/v1/feeds/{feedId} (the `UpdateFeed` operationId).
+	// Corresponds with PATCH /v1/feeds/{feedId} (the `UpdateFeed` operationId).
 	UpdateFeedWithResponse(ctx context.Context, feedId int64, body UpdateFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateFeedResp, error)
 
 	// MarkFeedReadWithResponse Mark all entries in a feed as read
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/v1/feeds/{feedId}/mark-all-read (the `MarkFeedRead` operationId).
+	// Corresponds with POST /v1/feeds/{feedId}/mark-all-read (the `MarkFeedRead` operationId).
 	MarkFeedReadWithResponse(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*MarkFeedReadResp, error)
 
 	// RefreshFeedWithResponse Refresh a feed
@@ -3794,35 +3794,35 @@ type ClientWithResponsesInterface interface {
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/v1/feeds/{feedId}/refresh (the `RefreshFeed` operationId).
+	// Corresponds with POST /v1/feeds/{feedId}/refresh (the `RefreshFeed` operationId).
 	RefreshFeedWithResponse(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*RefreshFeedResp, error)
 
 	// ListFoldersWithResponse List folders
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with GET /api/v1/folders (the `ListFolders` operationId).
+	// Corresponds with GET /v1/folders (the `ListFolders` operationId).
 	ListFoldersWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListFoldersResp, error)
 
 	// CreateFolderWithBodyWithResponse Create a folder
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/v1/folders (the `CreateFolder` operationId).
+	// Corresponds with POST /v1/folders (the `CreateFolder` operationId).
 	CreateFolderWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateFolderResp, error)
 
 	// CreateFolderWithResponse Create a folder
 	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/v1/folders (the `CreateFolder` operationId).
+	// Corresponds with POST /v1/folders (the `CreateFolder` operationId).
 	CreateFolderWithResponse(ctx context.Context, body CreateFolderJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateFolderResp, error)
 
 	// DeleteFolderWithResponse Delete a folder
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with DELETE /api/v1/folders/{folderId} (the `DeleteFolder` operationId).
+	// Corresponds with DELETE /v1/folders/{folderId} (the `DeleteFolder` operationId).
 	DeleteFolderWithResponse(ctx context.Context, folderId int64, reqEditors ...RequestEditorFn) (*DeleteFolderResp, error)
 
 	// UpdateFolderWithBodyWithResponse Update a folder
@@ -3831,7 +3831,7 @@ type ClientWithResponsesInterface interface {
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with PATCH /api/v1/folders/{folderId} (the `UpdateFolder` operationId).
+	// Corresponds with PATCH /v1/folders/{folderId} (the `UpdateFolder` operationId).
 	UpdateFolderWithBodyWithResponse(ctx context.Context, folderId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateFolderResp, error)
 
 	// UpdateFolderWithResponse Update a folder
@@ -3840,42 +3840,42 @@ type ClientWithResponsesInterface interface {
 	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with PATCH /api/v1/folders/{folderId} (the `UpdateFolder` operationId).
+	// Corresponds with PATCH /v1/folders/{folderId} (the `UpdateFolder` operationId).
 	UpdateFolderWithResponse(ctx context.Context, folderId int64, body UpdateFolderJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateFolderResp, error)
 
 	// HealthWithResponse Health check
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with GET /api/v1/health (the `Health` operationId).
+	// Corresponds with GET /v1/health (the `Health` operationId).
 	HealthWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*HealthResp, error)
 
 	// DeleteMeWithResponse Delete current user account
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with DELETE /api/v1/me (the `DeleteMe` operationId).
+	// Corresponds with DELETE /v1/me (the `DeleteMe` operationId).
 	DeleteMeWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*DeleteMeResp, error)
 
 	// GetMeWithResponse Get current user
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with GET /api/v1/me (the `GetMe` operationId).
+	// Corresponds with GET /v1/me (the `GetMe` operationId).
 	GetMeWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetMeResp, error)
 
 	// UpdateMeWithBodyWithResponse Update current user profile
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with PATCH /api/v1/me (the `UpdateMe` operationId).
+	// Corresponds with PATCH /v1/me (the `UpdateMe` operationId).
 	UpdateMeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateMeResp, error)
 
 	// UpdateMeWithResponse Update current user profile
 	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with PATCH /api/v1/me (the `UpdateMe` operationId).
+	// Corresponds with PATCH /v1/me (the `UpdateMe` operationId).
 	UpdateMeWithResponse(ctx context.Context, body UpdateMeJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateMeResp, error)
 
 	// ExportOpmlWithResponse Export feeds as OPML
@@ -3884,7 +3884,7 @@ type ClientWithResponsesInterface interface {
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with GET /api/v1/opml/export (the `ExportOpml` operationId).
+	// Corresponds with GET /v1/opml/export (the `ExportOpml` operationId).
 	ExportOpmlWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ExportOpmlResp, error)
 
 	// ImportOpmlWithBodyWithResponse Import feeds from an OPML file
@@ -3893,35 +3893,35 @@ type ClientWithResponsesInterface interface {
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/v1/opml/import (the `ImportOpml` operationId).
+	// Corresponds with POST /v1/opml/import (the `ImportOpml` operationId).
 	ImportOpmlWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ImportOpmlResp, error)
 
 	// ListTokensWithResponse List API tokens
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with GET /api/v1/tokens (the `ListTokens` operationId).
+	// Corresponds with GET /v1/tokens (the `ListTokens` operationId).
 	ListTokensWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListTokensResp, error)
 
 	// CreateTokenWithBodyWithResponse Create an API token
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/v1/tokens (the `CreateToken` operationId).
+	// Corresponds with POST /v1/tokens (the `CreateToken` operationId).
 	CreateTokenWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTokenResp, error)
 
 	// CreateTokenWithResponse Create an API token
 	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with POST /api/v1/tokens (the `CreateToken` operationId).
+	// Corresponds with POST /v1/tokens (the `CreateToken` operationId).
 	CreateTokenWithResponse(ctx context.Context, body CreateTokenJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateTokenResp, error)
 
 	// DeleteTokenWithResponse Delete an API token
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
-	// Corresponds with DELETE /api/v1/tokens/{tokenId} (the `DeleteToken` operationId).
+	// Corresponds with DELETE /v1/tokens/{tokenId} (the `DeleteToken` operationId).
 	DeleteTokenWithResponse(ctx context.Context, tokenId int64, reqEditors ...RequestEditorFn) (*DeleteTokenResp, error)
 }
 
@@ -5820,7 +5820,7 @@ func (r DeleteTokenResp) ContentType() string {
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/auth/device/code (the `DeviceCode` operationId).
+// Corresponds with POST /auth/device/code (the `DeviceCode` operationId).
 func (c *ClientWithResponses) DeviceCodeWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*DeviceCodeResp, error) {
 	rsp, err := c.DeviceCode(ctx, reqEditors...)
 	if err != nil {
@@ -5833,7 +5833,7 @@ func (c *ClientWithResponses) DeviceCodeWithResponse(ctx context.Context, reqEdi
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/auth/device/confirm (the `DeviceConfirm` operationId).
+// Corresponds with POST /auth/device/confirm (the `DeviceConfirm` operationId).
 func (c *ClientWithResponses) DeviceConfirmWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeviceConfirmResp, error) {
 	rsp, err := c.DeviceConfirmWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
@@ -5846,7 +5846,7 @@ func (c *ClientWithResponses) DeviceConfirmWithBodyWithResponse(ctx context.Cont
 //
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/auth/device/confirm (the `DeviceConfirm` operationId).
+// Corresponds with POST /auth/device/confirm (the `DeviceConfirm` operationId).
 func (c *ClientWithResponses) DeviceConfirmWithResponse(ctx context.Context, body DeviceConfirmJSONRequestBody, reqEditors ...RequestEditorFn) (*DeviceConfirmResp, error) {
 	rsp, err := c.DeviceConfirm(ctx, body, reqEditors...)
 	if err != nil {
@@ -5859,7 +5859,7 @@ func (c *ClientWithResponses) DeviceConfirmWithResponse(ctx context.Context, bod
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with GET /api/auth/device/status (the `DeviceStatus` operationId).
+// Corresponds with GET /auth/device/status (the `DeviceStatus` operationId).
 func (c *ClientWithResponses) DeviceStatusWithResponse(ctx context.Context, params *DeviceStatusParams, reqEditors ...RequestEditorFn) (*DeviceStatusResp, error) {
 	rsp, err := c.DeviceStatus(ctx, params, reqEditors...)
 	if err != nil {
@@ -5872,7 +5872,7 @@ func (c *ClientWithResponses) DeviceStatusWithResponse(ctx context.Context, para
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/auth/device/token (the `DeviceToken` operationId).
+// Corresponds with POST /auth/device/token (the `DeviceToken` operationId).
 func (c *ClientWithResponses) DeviceTokenWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeviceTokenResp, error) {
 	rsp, err := c.DeviceTokenWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
@@ -5885,7 +5885,7 @@ func (c *ClientWithResponses) DeviceTokenWithBodyWithResponse(ctx context.Contex
 //
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/auth/device/token (the `DeviceToken` operationId).
+// Corresponds with POST /auth/device/token (the `DeviceToken` operationId).
 func (c *ClientWithResponses) DeviceTokenWithResponse(ctx context.Context, body DeviceTokenJSONRequestBody, reqEditors ...RequestEditorFn) (*DeviceTokenResp, error) {
 	rsp, err := c.DeviceToken(ctx, body, reqEditors...)
 	if err != nil {
@@ -5898,7 +5898,7 @@ func (c *ClientWithResponses) DeviceTokenWithResponse(ctx context.Context, body 
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with GET /api/v1/entries (the `ListEntries` operationId).
+// Corresponds with GET /v1/entries (the `ListEntries` operationId).
 func (c *ClientWithResponses) ListEntriesWithResponse(ctx context.Context, params *ListEntriesParams, reqEditors ...RequestEditorFn) (*ListEntriesResp, error) {
 	rsp, err := c.ListEntries(ctx, params, reqEditors...)
 	if err != nil {
@@ -5911,7 +5911,7 @@ func (c *ClientWithResponses) ListEntriesWithResponse(ctx context.Context, param
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with PUT /api/v1/entries (the `UpdateEntries` operationId).
+// Corresponds with PUT /v1/entries (the `UpdateEntries` operationId).
 func (c *ClientWithResponses) UpdateEntriesWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateEntriesResp, error) {
 	rsp, err := c.UpdateEntriesWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
@@ -5924,7 +5924,7 @@ func (c *ClientWithResponses) UpdateEntriesWithBodyWithResponse(ctx context.Cont
 //
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with PUT /api/v1/entries (the `UpdateEntries` operationId).
+// Corresponds with PUT /v1/entries (the `UpdateEntries` operationId).
 func (c *ClientWithResponses) UpdateEntriesWithResponse(ctx context.Context, body UpdateEntriesJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateEntriesResp, error) {
 	rsp, err := c.UpdateEntries(ctx, body, reqEditors...)
 	if err != nil {
@@ -5937,7 +5937,7 @@ func (c *ClientWithResponses) UpdateEntriesWithResponse(ctx context.Context, bod
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with GET /api/v1/entries/{entryId} (the `GetEntry` operationId).
+// Corresponds with GET /v1/entries/{entryId} (the `GetEntry` operationId).
 func (c *ClientWithResponses) GetEntryWithResponse(ctx context.Context, entryId int64, reqEditors ...RequestEditorFn) (*GetEntryResp, error) {
 	rsp, err := c.GetEntry(ctx, entryId, reqEditors...)
 	if err != nil {
@@ -5950,7 +5950,7 @@ func (c *ClientWithResponses) GetEntryWithResponse(ctx context.Context, entryId 
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with PUT /api/v1/entries/{entryId}/starred (the `ToggleEntryStarred` operationId).
+// Corresponds with PUT /v1/entries/{entryId}/starred (the `ToggleEntryStarred` operationId).
 func (c *ClientWithResponses) ToggleEntryStarredWithBodyWithResponse(ctx context.Context, entryId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ToggleEntryStarredResp, error) {
 	rsp, err := c.ToggleEntryStarredWithBody(ctx, entryId, contentType, body, reqEditors...)
 	if err != nil {
@@ -5963,7 +5963,7 @@ func (c *ClientWithResponses) ToggleEntryStarredWithBodyWithResponse(ctx context
 //
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with PUT /api/v1/entries/{entryId}/starred (the `ToggleEntryStarred` operationId).
+// Corresponds with PUT /v1/entries/{entryId}/starred (the `ToggleEntryStarred` operationId).
 func (c *ClientWithResponses) ToggleEntryStarredWithResponse(ctx context.Context, entryId int64, body ToggleEntryStarredJSONRequestBody, reqEditors ...RequestEditorFn) (*ToggleEntryStarredResp, error) {
 	rsp, err := c.ToggleEntryStarred(ctx, entryId, body, reqEditors...)
 	if err != nil {
@@ -5976,7 +5976,7 @@ func (c *ClientWithResponses) ToggleEntryStarredWithResponse(ctx context.Context
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with GET /api/v1/feed-lists (the `ListMyFeedLists` operationId).
+// Corresponds with GET /v1/feed-lists (the `ListMyFeedLists` operationId).
 func (c *ClientWithResponses) ListMyFeedListsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListMyFeedListsResp, error) {
 	rsp, err := c.ListMyFeedLists(ctx, reqEditors...)
 	if err != nil {
@@ -5989,7 +5989,7 @@ func (c *ClientWithResponses) ListMyFeedListsWithResponse(ctx context.Context, r
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/v1/feed-lists (the `CreateFeedList` operationId).
+// Corresponds with POST /v1/feed-lists (the `CreateFeedList` operationId).
 func (c *ClientWithResponses) CreateFeedListWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateFeedListResp, error) {
 	rsp, err := c.CreateFeedListWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
@@ -6002,7 +6002,7 @@ func (c *ClientWithResponses) CreateFeedListWithBodyWithResponse(ctx context.Con
 //
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/v1/feed-lists (the `CreateFeedList` operationId).
+// Corresponds with POST /v1/feed-lists (the `CreateFeedList` operationId).
 func (c *ClientWithResponses) CreateFeedListWithResponse(ctx context.Context, body CreateFeedListJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateFeedListResp, error) {
 	rsp, err := c.CreateFeedList(ctx, body, reqEditors...)
 	if err != nil {
@@ -6015,7 +6015,7 @@ func (c *ClientWithResponses) CreateFeedListWithResponse(ctx context.Context, bo
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with GET /api/v1/feed-lists/discover (the `DiscoverFeedLists` operationId).
+// Corresponds with GET /v1/feed-lists/discover (the `DiscoverFeedLists` operationId).
 func (c *ClientWithResponses) DiscoverFeedListsWithResponse(ctx context.Context, params *DiscoverFeedListsParams, reqEditors ...RequestEditorFn) (*DiscoverFeedListsResp, error) {
 	rsp, err := c.DiscoverFeedLists(ctx, params, reqEditors...)
 	if err != nil {
@@ -6028,7 +6028,7 @@ func (c *ClientWithResponses) DiscoverFeedListsWithResponse(ctx context.Context,
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with GET /api/v1/feed-lists/followed (the `ListFollowedFeedLists` operationId).
+// Corresponds with GET /v1/feed-lists/followed (the `ListFollowedFeedLists` operationId).
 func (c *ClientWithResponses) ListFollowedFeedListsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListFollowedFeedListsResp, error) {
 	rsp, err := c.ListFollowedFeedLists(ctx, reqEditors...)
 	if err != nil {
@@ -6041,7 +6041,7 @@ func (c *ClientWithResponses) ListFollowedFeedListsWithResponse(ctx context.Cont
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with DELETE /api/v1/feed-lists/{listId} (the `DeleteFeedList` operationId).
+// Corresponds with DELETE /v1/feed-lists/{listId} (the `DeleteFeedList` operationId).
 func (c *ClientWithResponses) DeleteFeedListWithResponse(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*DeleteFeedListResp, error) {
 	rsp, err := c.DeleteFeedList(ctx, listId, reqEditors...)
 	if err != nil {
@@ -6054,7 +6054,7 @@ func (c *ClientWithResponses) DeleteFeedListWithResponse(ctx context.Context, li
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with GET /api/v1/feed-lists/{listId} (the `GetFeedList` operationId).
+// Corresponds with GET /v1/feed-lists/{listId} (the `GetFeedList` operationId).
 func (c *ClientWithResponses) GetFeedListWithResponse(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*GetFeedListResp, error) {
 	rsp, err := c.GetFeedList(ctx, listId, reqEditors...)
 	if err != nil {
@@ -6067,7 +6067,7 @@ func (c *ClientWithResponses) GetFeedListWithResponse(ctx context.Context, listI
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with PATCH /api/v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
+// Corresponds with PATCH /v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
 func (c *ClientWithResponses) UpdateFeedListWithBodyWithResponse(ctx context.Context, listId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateFeedListResp, error) {
 	rsp, err := c.UpdateFeedListWithBody(ctx, listId, contentType, body, reqEditors...)
 	if err != nil {
@@ -6080,7 +6080,7 @@ func (c *ClientWithResponses) UpdateFeedListWithBodyWithResponse(ctx context.Con
 //
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with PATCH /api/v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
+// Corresponds with PATCH /v1/feed-lists/{listId} (the `UpdateFeedList` operationId).
 func (c *ClientWithResponses) UpdateFeedListWithResponse(ctx context.Context, listId int64, body UpdateFeedListJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateFeedListResp, error) {
 	rsp, err := c.UpdateFeedList(ctx, listId, body, reqEditors...)
 	if err != nil {
@@ -6093,7 +6093,7 @@ func (c *ClientWithResponses) UpdateFeedListWithResponse(ctx context.Context, li
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
+// Corresponds with POST /v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
 func (c *ClientWithResponses) AddFeedListFeedWithBodyWithResponse(ctx context.Context, listId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddFeedListFeedResp, error) {
 	rsp, err := c.AddFeedListFeedWithBody(ctx, listId, contentType, body, reqEditors...)
 	if err != nil {
@@ -6106,7 +6106,7 @@ func (c *ClientWithResponses) AddFeedListFeedWithBodyWithResponse(ctx context.Co
 //
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
+// Corresponds with POST /v1/feed-lists/{listId}/feeds (the `AddFeedListFeed` operationId).
 func (c *ClientWithResponses) AddFeedListFeedWithResponse(ctx context.Context, listId int64, body AddFeedListFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*AddFeedListFeedResp, error) {
 	rsp, err := c.AddFeedListFeed(ctx, listId, body, reqEditors...)
 	if err != nil {
@@ -6119,7 +6119,7 @@ func (c *ClientWithResponses) AddFeedListFeedWithResponse(ctx context.Context, l
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with DELETE /api/v1/feed-lists/{listId}/feeds/{itemId} (the `RemoveFeedListFeed` operationId).
+// Corresponds with DELETE /v1/feed-lists/{listId}/feeds/{itemId} (the `RemoveFeedListFeed` operationId).
 func (c *ClientWithResponses) RemoveFeedListFeedWithResponse(ctx context.Context, listId int64, itemId int64, reqEditors ...RequestEditorFn) (*RemoveFeedListFeedResp, error) {
 	rsp, err := c.RemoveFeedListFeed(ctx, listId, itemId, reqEditors...)
 	if err != nil {
@@ -6132,7 +6132,7 @@ func (c *ClientWithResponses) RemoveFeedListFeedWithResponse(ctx context.Context
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with DELETE /api/v1/feed-lists/{listId}/follow (the `UnfollowFeedList` operationId).
+// Corresponds with DELETE /v1/feed-lists/{listId}/follow (the `UnfollowFeedList` operationId).
 func (c *ClientWithResponses) UnfollowFeedListWithResponse(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*UnfollowFeedListResp, error) {
 	rsp, err := c.UnfollowFeedList(ctx, listId, reqEditors...)
 	if err != nil {
@@ -6145,7 +6145,7 @@ func (c *ClientWithResponses) UnfollowFeedListWithResponse(ctx context.Context, 
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/v1/feed-lists/{listId}/follow (the `FollowFeedList` operationId).
+// Corresponds with POST /v1/feed-lists/{listId}/follow (the `FollowFeedList` operationId).
 func (c *ClientWithResponses) FollowFeedListWithResponse(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*FollowFeedListResp, error) {
 	rsp, err := c.FollowFeedList(ctx, listId, reqEditors...)
 	if err != nil {
@@ -6158,7 +6158,7 @@ func (c *ClientWithResponses) FollowFeedListWithResponse(ctx context.Context, li
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/v1/feed-lists/{listId}/import (the `ImportFeedList` operationId).
+// Corresponds with POST /v1/feed-lists/{listId}/import (the `ImportFeedList` operationId).
 func (c *ClientWithResponses) ImportFeedListWithResponse(ctx context.Context, listId int64, reqEditors ...RequestEditorFn) (*ImportFeedListResp, error) {
 	rsp, err := c.ImportFeedList(ctx, listId, reqEditors...)
 	if err != nil {
@@ -6171,7 +6171,7 @@ func (c *ClientWithResponses) ImportFeedListWithResponse(ctx context.Context, li
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with GET /api/v1/feeds (the `ListFeeds` operationId).
+// Corresponds with GET /v1/feeds (the `ListFeeds` operationId).
 func (c *ClientWithResponses) ListFeedsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListFeedsResp, error) {
 	rsp, err := c.ListFeeds(ctx, reqEditors...)
 	if err != nil {
@@ -6184,7 +6184,7 @@ func (c *ClientWithResponses) ListFeedsWithResponse(ctx context.Context, reqEdit
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/v1/feeds (the `CreateFeed` operationId).
+// Corresponds with POST /v1/feeds (the `CreateFeed` operationId).
 func (c *ClientWithResponses) CreateFeedWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateFeedResp, error) {
 	rsp, err := c.CreateFeedWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
@@ -6197,7 +6197,7 @@ func (c *ClientWithResponses) CreateFeedWithBodyWithResponse(ctx context.Context
 //
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/v1/feeds (the `CreateFeed` operationId).
+// Corresponds with POST /v1/feeds (the `CreateFeed` operationId).
 func (c *ClientWithResponses) CreateFeedWithResponse(ctx context.Context, body CreateFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateFeedResp, error) {
 	rsp, err := c.CreateFeed(ctx, body, reqEditors...)
 	if err != nil {
@@ -6212,7 +6212,7 @@ func (c *ClientWithResponses) CreateFeedWithResponse(ctx context.Context, body C
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/v1/feeds/preview (the `PreviewFeed` operationId).
+// Corresponds with POST /v1/feeds/preview (the `PreviewFeed` operationId).
 func (c *ClientWithResponses) PreviewFeedWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PreviewFeedResp, error) {
 	rsp, err := c.PreviewFeedWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
@@ -6227,7 +6227,7 @@ func (c *ClientWithResponses) PreviewFeedWithBodyWithResponse(ctx context.Contex
 //
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/v1/feeds/preview (the `PreviewFeed` operationId).
+// Corresponds with POST /v1/feeds/preview (the `PreviewFeed` operationId).
 func (c *ClientWithResponses) PreviewFeedWithResponse(ctx context.Context, body PreviewFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*PreviewFeedResp, error) {
 	rsp, err := c.PreviewFeed(ctx, body, reqEditors...)
 	if err != nil {
@@ -6240,7 +6240,7 @@ func (c *ClientWithResponses) PreviewFeedWithResponse(ctx context.Context, body 
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with DELETE /api/v1/feeds/{feedId} (the `DeleteFeed` operationId).
+// Corresponds with DELETE /v1/feeds/{feedId} (the `DeleteFeed` operationId).
 func (c *ClientWithResponses) DeleteFeedWithResponse(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*DeleteFeedResp, error) {
 	rsp, err := c.DeleteFeed(ctx, feedId, reqEditors...)
 	if err != nil {
@@ -6253,7 +6253,7 @@ func (c *ClientWithResponses) DeleteFeedWithResponse(ctx context.Context, feedId
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with GET /api/v1/feeds/{feedId} (the `GetFeed` operationId).
+// Corresponds with GET /v1/feeds/{feedId} (the `GetFeed` operationId).
 func (c *ClientWithResponses) GetFeedWithResponse(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*GetFeedResp, error) {
 	rsp, err := c.GetFeed(ctx, feedId, reqEditors...)
 	if err != nil {
@@ -6268,7 +6268,7 @@ func (c *ClientWithResponses) GetFeedWithResponse(ctx context.Context, feedId in
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with PATCH /api/v1/feeds/{feedId} (the `UpdateFeed` operationId).
+// Corresponds with PATCH /v1/feeds/{feedId} (the `UpdateFeed` operationId).
 func (c *ClientWithResponses) UpdateFeedWithBodyWithResponse(ctx context.Context, feedId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateFeedResp, error) {
 	rsp, err := c.UpdateFeedWithBody(ctx, feedId, contentType, body, reqEditors...)
 	if err != nil {
@@ -6283,7 +6283,7 @@ func (c *ClientWithResponses) UpdateFeedWithBodyWithResponse(ctx context.Context
 //
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with PATCH /api/v1/feeds/{feedId} (the `UpdateFeed` operationId).
+// Corresponds with PATCH /v1/feeds/{feedId} (the `UpdateFeed` operationId).
 func (c *ClientWithResponses) UpdateFeedWithResponse(ctx context.Context, feedId int64, body UpdateFeedJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateFeedResp, error) {
 	rsp, err := c.UpdateFeed(ctx, feedId, body, reqEditors...)
 	if err != nil {
@@ -6296,7 +6296,7 @@ func (c *ClientWithResponses) UpdateFeedWithResponse(ctx context.Context, feedId
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/v1/feeds/{feedId}/mark-all-read (the `MarkFeedRead` operationId).
+// Corresponds with POST /v1/feeds/{feedId}/mark-all-read (the `MarkFeedRead` operationId).
 func (c *ClientWithResponses) MarkFeedReadWithResponse(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*MarkFeedReadResp, error) {
 	rsp, err := c.MarkFeedRead(ctx, feedId, reqEditors...)
 	if err != nil {
@@ -6311,7 +6311,7 @@ func (c *ClientWithResponses) MarkFeedReadWithResponse(ctx context.Context, feed
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/v1/feeds/{feedId}/refresh (the `RefreshFeed` operationId).
+// Corresponds with POST /v1/feeds/{feedId}/refresh (the `RefreshFeed` operationId).
 func (c *ClientWithResponses) RefreshFeedWithResponse(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*RefreshFeedResp, error) {
 	rsp, err := c.RefreshFeed(ctx, feedId, reqEditors...)
 	if err != nil {
@@ -6324,7 +6324,7 @@ func (c *ClientWithResponses) RefreshFeedWithResponse(ctx context.Context, feedI
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with GET /api/v1/folders (the `ListFolders` operationId).
+// Corresponds with GET /v1/folders (the `ListFolders` operationId).
 func (c *ClientWithResponses) ListFoldersWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListFoldersResp, error) {
 	rsp, err := c.ListFolders(ctx, reqEditors...)
 	if err != nil {
@@ -6337,7 +6337,7 @@ func (c *ClientWithResponses) ListFoldersWithResponse(ctx context.Context, reqEd
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/v1/folders (the `CreateFolder` operationId).
+// Corresponds with POST /v1/folders (the `CreateFolder` operationId).
 func (c *ClientWithResponses) CreateFolderWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateFolderResp, error) {
 	rsp, err := c.CreateFolderWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
@@ -6350,7 +6350,7 @@ func (c *ClientWithResponses) CreateFolderWithBodyWithResponse(ctx context.Conte
 //
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/v1/folders (the `CreateFolder` operationId).
+// Corresponds with POST /v1/folders (the `CreateFolder` operationId).
 func (c *ClientWithResponses) CreateFolderWithResponse(ctx context.Context, body CreateFolderJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateFolderResp, error) {
 	rsp, err := c.CreateFolder(ctx, body, reqEditors...)
 	if err != nil {
@@ -6363,7 +6363,7 @@ func (c *ClientWithResponses) CreateFolderWithResponse(ctx context.Context, body
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with DELETE /api/v1/folders/{folderId} (the `DeleteFolder` operationId).
+// Corresponds with DELETE /v1/folders/{folderId} (the `DeleteFolder` operationId).
 func (c *ClientWithResponses) DeleteFolderWithResponse(ctx context.Context, folderId int64, reqEditors ...RequestEditorFn) (*DeleteFolderResp, error) {
 	rsp, err := c.DeleteFolder(ctx, folderId, reqEditors...)
 	if err != nil {
@@ -6378,7 +6378,7 @@ func (c *ClientWithResponses) DeleteFolderWithResponse(ctx context.Context, fold
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with PATCH /api/v1/folders/{folderId} (the `UpdateFolder` operationId).
+// Corresponds with PATCH /v1/folders/{folderId} (the `UpdateFolder` operationId).
 func (c *ClientWithResponses) UpdateFolderWithBodyWithResponse(ctx context.Context, folderId int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateFolderResp, error) {
 	rsp, err := c.UpdateFolderWithBody(ctx, folderId, contentType, body, reqEditors...)
 	if err != nil {
@@ -6393,7 +6393,7 @@ func (c *ClientWithResponses) UpdateFolderWithBodyWithResponse(ctx context.Conte
 //
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with PATCH /api/v1/folders/{folderId} (the `UpdateFolder` operationId).
+// Corresponds with PATCH /v1/folders/{folderId} (the `UpdateFolder` operationId).
 func (c *ClientWithResponses) UpdateFolderWithResponse(ctx context.Context, folderId int64, body UpdateFolderJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateFolderResp, error) {
 	rsp, err := c.UpdateFolder(ctx, folderId, body, reqEditors...)
 	if err != nil {
@@ -6406,7 +6406,7 @@ func (c *ClientWithResponses) UpdateFolderWithResponse(ctx context.Context, fold
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with GET /api/v1/health (the `Health` operationId).
+// Corresponds with GET /v1/health (the `Health` operationId).
 func (c *ClientWithResponses) HealthWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*HealthResp, error) {
 	rsp, err := c.Health(ctx, reqEditors...)
 	if err != nil {
@@ -6419,7 +6419,7 @@ func (c *ClientWithResponses) HealthWithResponse(ctx context.Context, reqEditors
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with DELETE /api/v1/me (the `DeleteMe` operationId).
+// Corresponds with DELETE /v1/me (the `DeleteMe` operationId).
 func (c *ClientWithResponses) DeleteMeWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*DeleteMeResp, error) {
 	rsp, err := c.DeleteMe(ctx, reqEditors...)
 	if err != nil {
@@ -6432,7 +6432,7 @@ func (c *ClientWithResponses) DeleteMeWithResponse(ctx context.Context, reqEdito
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with GET /api/v1/me (the `GetMe` operationId).
+// Corresponds with GET /v1/me (the `GetMe` operationId).
 func (c *ClientWithResponses) GetMeWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetMeResp, error) {
 	rsp, err := c.GetMe(ctx, reqEditors...)
 	if err != nil {
@@ -6445,7 +6445,7 @@ func (c *ClientWithResponses) GetMeWithResponse(ctx context.Context, reqEditors 
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with PATCH /api/v1/me (the `UpdateMe` operationId).
+// Corresponds with PATCH /v1/me (the `UpdateMe` operationId).
 func (c *ClientWithResponses) UpdateMeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateMeResp, error) {
 	rsp, err := c.UpdateMeWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
@@ -6458,7 +6458,7 @@ func (c *ClientWithResponses) UpdateMeWithBodyWithResponse(ctx context.Context, 
 //
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with PATCH /api/v1/me (the `UpdateMe` operationId).
+// Corresponds with PATCH /v1/me (the `UpdateMe` operationId).
 func (c *ClientWithResponses) UpdateMeWithResponse(ctx context.Context, body UpdateMeJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateMeResp, error) {
 	rsp, err := c.UpdateMe(ctx, body, reqEditors...)
 	if err != nil {
@@ -6473,7 +6473,7 @@ func (c *ClientWithResponses) UpdateMeWithResponse(ctx context.Context, body Upd
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with GET /api/v1/opml/export (the `ExportOpml` operationId).
+// Corresponds with GET /v1/opml/export (the `ExportOpml` operationId).
 func (c *ClientWithResponses) ExportOpmlWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ExportOpmlResp, error) {
 	rsp, err := c.ExportOpml(ctx, reqEditors...)
 	if err != nil {
@@ -6488,7 +6488,7 @@ func (c *ClientWithResponses) ExportOpmlWithResponse(ctx context.Context, reqEdi
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/v1/opml/import (the `ImportOpml` operationId).
+// Corresponds with POST /v1/opml/import (the `ImportOpml` operationId).
 func (c *ClientWithResponses) ImportOpmlWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ImportOpmlResp, error) {
 	rsp, err := c.ImportOpmlWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
@@ -6501,7 +6501,7 @@ func (c *ClientWithResponses) ImportOpmlWithBodyWithResponse(ctx context.Context
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with GET /api/v1/tokens (the `ListTokens` operationId).
+// Corresponds with GET /v1/tokens (the `ListTokens` operationId).
 func (c *ClientWithResponses) ListTokensWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListTokensResp, error) {
 	rsp, err := c.ListTokens(ctx, reqEditors...)
 	if err != nil {
@@ -6514,7 +6514,7 @@ func (c *ClientWithResponses) ListTokensWithResponse(ctx context.Context, reqEdi
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/v1/tokens (the `CreateToken` operationId).
+// Corresponds with POST /v1/tokens (the `CreateToken` operationId).
 func (c *ClientWithResponses) CreateTokenWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTokenResp, error) {
 	rsp, err := c.CreateTokenWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
@@ -6527,7 +6527,7 @@ func (c *ClientWithResponses) CreateTokenWithBodyWithResponse(ctx context.Contex
 //
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
-// Corresponds with POST /api/v1/tokens (the `CreateToken` operationId).
+// Corresponds with POST /v1/tokens (the `CreateToken` operationId).
 func (c *ClientWithResponses) CreateTokenWithResponse(ctx context.Context, body CreateTokenJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateTokenResp, error) {
 	rsp, err := c.CreateToken(ctx, body, reqEditors...)
 	if err != nil {
@@ -6540,7 +6540,7 @@ func (c *ClientWithResponses) CreateTokenWithResponse(ctx context.Context, body 
 //
 // Returns a wrapper object for the known response body format(s).
 //
-// Corresponds with DELETE /api/v1/tokens/{tokenId} (the `DeleteToken` operationId).
+// Corresponds with DELETE /v1/tokens/{tokenId} (the `DeleteToken` operationId).
 func (c *ClientWithResponses) DeleteTokenWithResponse(ctx context.Context, tokenId int64, reqEditors ...RequestEditorFn) (*DeleteTokenResp, error) {
 	rsp, err := c.DeleteToken(ctx, tokenId, reqEditors...)
 	if err != nil {

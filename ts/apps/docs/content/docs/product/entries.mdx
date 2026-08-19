@@ -10,7 +10,7 @@ Entries are individual articles fetched from your feed subscriptions. Each entry
 Results are ordered by `published_at` descending (newest first).
 
 ```bash
-curl "http://localhost:8080/api/v1/entries?limit=10" \
+curl "http://localhost:8080/v1/entries?limit=10" \
   -H "Authorization: Bearer pla_your-token"
 ```
 
@@ -30,26 +30,26 @@ Filters can be combined freely. When both `feed_id` and `folder_id` are provided
 
 ```bash
 # Unread entries in a specific feed
-curl "http://localhost:8080/api/v1/entries?feed_id=1&status=unread" \
+curl "http://localhost:8080/v1/entries?feed_id=1&status=unread" \
   -H "Authorization: Bearer pla_your-token"
 
 # Starred entries across all feeds
-curl "http://localhost:8080/api/v1/entries?starred=true" \
+curl "http://localhost:8080/v1/entries?starred=true" \
   -H "Authorization: Bearer pla_your-token"
 
 # Full-text search combined with a status filter
-curl "http://localhost:8080/api/v1/entries?search=docker&status=unread" \
+curl "http://localhost:8080/v1/entries?search=docker&status=unread" \
   -H "Authorization: Bearer pla_your-token"
 
 # Second page of results
-curl "http://localhost:8080/api/v1/entries?limit=50&offset=50" \
+curl "http://localhost:8080/v1/entries?limit=50&offset=50" \
   -H "Authorization: Bearer pla_your-token"
 ```
 
 ## Get a single entry
 
 ```bash
-curl http://localhost:8080/api/v1/entries/42 \
+curl http://localhost:8080/v1/entries/42 \
   -H "Authorization: Bearer pla_your-token"
 ```
 
@@ -70,7 +70,7 @@ New entries start as `unread`. `changed_at` tracks when the status last changed.
 Update the status of multiple entries in one request. Any valid status works: `read`, `unread`, or `removed`.
 
 ```bash
-curl -X PUT http://localhost:8080/api/v1/entries \
+curl -X PUT http://localhost:8080/v1/entries \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer pla_your-token" \
   -d '{"entry_ids":[42,43,44],"status":"read"}'
@@ -79,7 +79,7 @@ curl -X PUT http://localhost:8080/api/v1/entries \
 To mark all entries in a feed as read at once:
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/feeds/1/mark-all-read \
+curl -X POST http://localhost:8080/v1/feeds/1/mark-all-read \
   -H "Authorization: Bearer pla_your-token"
 ```
 
@@ -88,7 +88,7 @@ curl -X POST http://localhost:8080/api/v1/feeds/1/mark-all-read \
 Star an entry to bookmark it. The `starred` flag is independent of status — a `removed` entry that is starred still appears when filtering with `starred=true`.
 
 ```bash
-curl -X PUT http://localhost:8080/api/v1/entries/42/starred \
+curl -X PUT http://localhost:8080/v1/entries/42/starred \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer pla_your-token" \
   -d '{"starred":true}'

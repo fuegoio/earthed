@@ -3,7 +3,7 @@ title: Authentication
 description: Authenticate with the Earthed API using session cookies or bearer tokens.
 ---
 
-All endpoints under `/api/v1/` require authentication. The only exception is `GET /api/v1/health`.
+All endpoints under `/v1/` require authentication. The only exception is `GET /v1/health`.
 
 Earthed supports two credential types:
 
@@ -22,10 +22,10 @@ confirmation page on the web frontend, and polls the API until the user
 approves or denies the request.
 
 ```
-POST /api/auth/device/code     → issue a device code (public)
-POST /api/auth/device/token    → poll for the result (public)
-POST /api/auth/device/confirm  → approve or deny (requires session)
-GET  /api/auth/device/status   → check status by user code (requires session)
+POST /auth/device/code     → issue a device code (public)
+POST /auth/device/token    → poll for the result (public)
+POST /auth/device/confirm  → approve or deny (requires session)
+GET  /auth/device/status   → check status by user code (requires session)
 ```
 
 Tokens issued via the device flow expire after 14 days and are labeled
@@ -35,12 +35,12 @@ returned only to the CLI that initiated the flow.
 
 ## Session authentication
 
-Session endpoints live at `/api/auth/` and do not require authentication.
+Session endpoints live at `/auth/` and do not require authentication.
 
 Sign up:
 
 ```bash
-curl -X POST http://localhost:8080/api/auth/signup \
+curl -X POST http://localhost:8080/auth/signup \
   -H "Content-Type: application/json" \
   -d '{"email":"user@example.com","password":"your-password"}'
 ```
@@ -48,7 +48,7 @@ curl -X POST http://localhost:8080/api/auth/signup \
 Sign in to get a session cookie:
 
 ```bash
-curl -X POST http://localhost:8080/api/auth/signin \
+curl -X POST http://localhost:8080/auth/signin \
   -H "Content-Type: application/json" \
   -d '{"email":"user@example.com","password":"your-password"}' \
   -c cookies.txt
@@ -57,7 +57,7 @@ curl -X POST http://localhost:8080/api/auth/signin \
 Pass the cookie in subsequent requests:
 
 ```bash
-curl http://localhost:8080/api/v1/me \
+curl http://localhost:8080/v1/me \
   -b cookies.txt
 ```
 
@@ -70,7 +70,7 @@ API tokens are prefixed with `pla_` and stored as SHA-256 hashes. The raw token 
 Create a token (requires an active session or an existing token):
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/tokens \
+curl -X POST http://localhost:8080/v1/tokens \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer pla_existing-token" \
   -d '{"label":"my-script"}'
@@ -88,21 +88,21 @@ curl -X POST http://localhost:8080/api/v1/tokens \
 Use the token:
 
 ```bash
-curl http://localhost:8080/api/v1/feeds \
+curl http://localhost:8080/v1/feeds \
   -H "Authorization: Bearer pla_a1b2c3d4e5f6..."
 ```
 
 List tokens (raw values are never returned, only labels and metadata):
 
 ```bash
-curl http://localhost:8080/api/v1/tokens \
+curl http://localhost:8080/v1/tokens \
   -H "Authorization: Bearer pla_your-token"
 ```
 
 Revoke a token by ID:
 
 ```bash
-curl -X DELETE http://localhost:8080/api/v1/tokens/1 \
+curl -X DELETE http://localhost:8080/v1/tokens/1 \
   -H "Authorization: Bearer pla_your-token"
 ```
 

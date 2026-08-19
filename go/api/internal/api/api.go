@@ -78,7 +78,7 @@ func (a *API) registerHealthRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "health",
 		Method:      http.MethodGet,
-		Path:        "/api/v1/health",
+		Path:        "/v1/health",
 		Summary:     "Health check",
 		Tags:        []string{"health"},
 	}, func(ctx context.Context, _ *struct{}) (*struct {
@@ -113,7 +113,7 @@ func (a *API) registerMeRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "get-me",
 		Method:      http.MethodGet,
-		Path:        "/api/v1/me",
+		Path:        "/v1/me",
 		Summary:     "Get current user",
 		Tags:        []string{"users"},
 	}, func(ctx context.Context, _ *struct{}) (*MeOutput, error) {
@@ -131,7 +131,7 @@ func (a *API) registerMeRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "update-me",
 		Method:      http.MethodPatch,
-		Path:        "/api/v1/me",
+		Path:        "/v1/me",
 		Summary:     "Update current user profile",
 		Tags:        []string{"users"},
 	}, func(ctx context.Context, input *UpdateMeInput) (*MeOutput, error) {
@@ -149,7 +149,7 @@ func (a *API) registerMeRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "delete-me",
 		Method:      http.MethodDelete,
-		Path:        "/api/v1/me",
+		Path:        "/v1/me",
 		Summary:     "Delete current user account",
 		Tags:        []string{"users"},
 	}, func(ctx context.Context, _ *struct{}) (*struct{}, error) {
@@ -190,7 +190,7 @@ func (a *API) registerFolderRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "create-folder",
 		Method:      http.MethodPost,
-		Path:        "/api/v1/folders",
+		Path:        "/v1/folders",
 		Summary:     "Create a folder",
 		Tags:        []string{"folders"},
 	}, func(ctx context.Context, input *CreateFolderInput) (*FolderOutput, error) {
@@ -205,7 +205,7 @@ func (a *API) registerFolderRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "list-folders",
 		Method:      http.MethodGet,
-		Path:        "/api/v1/folders",
+		Path:        "/v1/folders",
 		Summary:     "List folders",
 		Tags:        []string{"folders"},
 	}, func(ctx context.Context, _ *struct{}) (*FolderListOutput, error) {
@@ -223,7 +223,7 @@ func (a *API) registerFolderRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "update-folder",
 		Method:      http.MethodPatch,
-		Path:        "/api/v1/folders/{folderId}",
+		Path:        "/v1/folders/{folderId}",
 		Summary:     "Update a folder",
 		Description: "Update the title and/or parent folder of a folder. Set parent_id to move or nest the folder.",
 		Tags:        []string{"folders"},
@@ -242,7 +242,7 @@ func (a *API) registerFolderRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "delete-folder",
 		Method:      http.MethodDelete,
-		Path:        "/api/v1/folders/{folderId}",
+		Path:        "/v1/folders/{folderId}",
 		Summary:     "Delete a folder",
 		Tags:        []string{"folders"},
 	}, func(ctx context.Context, input *struct {
@@ -314,7 +314,7 @@ func (a *API) registerFeedRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "create-feed",
 		Method:      http.MethodPost,
-		Path:        "/api/v1/feeds",
+		Path:        "/v1/feeds",
 		Summary:     "Subscribe to a feed",
 		Tags:        []string{"feeds"},
 	}, func(ctx context.Context, input *CreateFeedInput) (*FeedOutput, error) {
@@ -329,7 +329,7 @@ func (a *API) registerFeedRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "list-feeds",
 		Method:      http.MethodGet,
-		Path:        "/api/v1/feeds",
+		Path:        "/v1/feeds",
 		Summary:     "List feeds",
 		Tags:        []string{"feeds"},
 	}, func(ctx context.Context, _ *struct{}) (*FeedListOutput, error) {
@@ -347,7 +347,7 @@ func (a *API) registerFeedRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "get-feed",
 		Method:      http.MethodGet,
-		Path:        "/api/v1/feeds/{feedId}",
+		Path:        "/v1/feeds/{feedId}",
 		Summary:     "Get a feed",
 		Tags:        []string{"feeds"},
 	}, func(ctx context.Context, input *struct {
@@ -367,7 +367,7 @@ func (a *API) registerFeedRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "delete-feed",
 		Method:      http.MethodDelete,
-		Path:        "/api/v1/feeds/{feedId}",
+		Path:        "/v1/feeds/{feedId}",
 		Summary:     "Delete a feed",
 		Tags:        []string{"feeds"},
 	}, func(ctx context.Context, input *struct {
@@ -383,7 +383,7 @@ func (a *API) registerFeedRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "update-feed",
 		Method:      http.MethodPatch,
-		Path:        "/api/v1/feeds/{feedId}",
+		Path:        "/v1/feeds/{feedId}",
 		Summary:     "Update a feed",
 		Description: "Update the folder assignment and/or title of a feed.",
 		Tags:        []string{"feeds"},
@@ -417,7 +417,7 @@ func (a *API) registerFeedRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "mark-feed-read",
 		Method:      http.MethodPost,
-		Path:        "/api/v1/feeds/{feedId}/mark-all-read",
+		Path:        "/v1/feeds/{feedId}/mark-all-read",
 		Summary:     "Mark all entries in a feed as read",
 		Tags:        []string{"feeds"},
 	}, func(ctx context.Context, input *struct {
@@ -433,7 +433,7 @@ func (a *API) registerFeedRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "refresh-feed",
 		Method:      http.MethodPost,
-		Path:        "/api/v1/feeds/{feedId}/refresh",
+		Path:        "/v1/feeds/{feedId}/refresh",
 		Summary:     "Refresh a feed",
 		Description: "Manually fetch and parse the feed, inserting any new entries. Use this to get the latest articles without waiting for the scheduler.",
 		Tags:        []string{"feeds"},
@@ -467,7 +467,7 @@ func (a *API) registerFeedRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "preview-feed",
 		Method:      http.MethodPost,
-		Path:        "/api/v1/feeds/preview",
+		Path:        "/v1/feeds/preview",
 		Summary:     "Preview a feed without subscribing",
 		Description: "Fetches and parses a feed URL, returning feed metadata and recent entries without persisting anything.",
 		Tags:        []string{"feeds"},
@@ -560,7 +560,7 @@ func (a *API) registerEntryRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "list-entries",
 		Method:      http.MethodGet,
-		Path:        "/api/v1/entries",
+		Path:        "/v1/entries",
 		Summary:     "List entries",
 		Tags:        []string{"entries"},
 	}, func(ctx context.Context, input *struct {
@@ -601,7 +601,7 @@ func (a *API) registerEntryRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "get-entry",
 		Method:      http.MethodGet,
-		Path:        "/api/v1/entries/{entryId}",
+		Path:        "/v1/entries/{entryId}",
 		Summary:     "Get an entry",
 		Tags:        []string{"entries"},
 	}, func(ctx context.Context, input *struct {
@@ -621,7 +621,7 @@ func (a *API) registerEntryRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "update-entries",
 		Method:      http.MethodPut,
-		Path:        "/api/v1/entries",
+		Path:        "/v1/entries",
 		Summary:     "Bulk update entry status",
 		Tags:        []string{"entries"},
 	}, func(ctx context.Context, input *struct {
@@ -640,7 +640,7 @@ func (a *API) registerEntryRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "toggle-entry-starred",
 		Method:      http.MethodPut,
-		Path:        "/api/v1/entries/{entryId}/starred",
+		Path:        "/v1/entries/{entryId}/starred",
 		Summary:     "Toggle starred on an entry",
 		Tags:        []string{"entries"},
 	}, func(ctx context.Context, input *struct {
@@ -682,7 +682,7 @@ func (a *API) registerTokenRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "create-token",
 		Method:      http.MethodPost,
-		Path:        "/api/v1/tokens",
+		Path:        "/v1/tokens",
 		Summary:     "Create an API token",
 		Tags:        []string{"tokens"},
 	}, func(ctx context.Context, input *CreateTokenInput) (*TokenOutput, error) {
@@ -711,7 +711,7 @@ func (a *API) registerTokenRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "list-tokens",
 		Method:      http.MethodGet,
-		Path:        "/api/v1/tokens",
+		Path:        "/v1/tokens",
 		Summary:     "List API tokens",
 		Tags:        []string{"tokens"},
 	}, func(ctx context.Context, _ *struct{}) (*TokenListOutput, error) {
@@ -729,7 +729,7 @@ func (a *API) registerTokenRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "delete-token",
 		Method:      http.MethodDelete,
-		Path:        "/api/v1/tokens/{tokenId}",
+		Path:        "/v1/tokens/{tokenId}",
 		Summary:     "Delete an API token",
 		Tags:        []string{"tokens"},
 	}, func(ctx context.Context, input *struct {
@@ -852,7 +852,7 @@ func (a *API) registerFeedListRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "create-feed-list",
 		Method:      http.MethodPost,
-		Path:        "/api/v1/feed-lists",
+		Path:        "/v1/feed-lists",
 		Summary:     "Create a feed list",
 		Tags:        []string{"feed-lists"},
 	}, func(ctx context.Context, input *CreateFeedListInput) (*FeedListDetailOutput, error) {
@@ -867,7 +867,7 @@ func (a *API) registerFeedListRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "list-my-feed-lists",
 		Method:      http.MethodGet,
-		Path:        "/api/v1/feed-lists",
+		Path:        "/v1/feed-lists",
 		Summary:     "List my feed lists",
 		Tags:        []string{"feed-lists"},
 	}, func(ctx context.Context, _ *struct{}) (*FeedListListOutput, error) {
@@ -885,7 +885,7 @@ func (a *API) registerFeedListRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "list-followed-feed-lists",
 		Method:      http.MethodGet,
-		Path:        "/api/v1/feed-lists/followed",
+		Path:        "/v1/feed-lists/followed",
 		Summary:     "List feed lists I follow",
 		Tags:        []string{"feed-lists"},
 	}, func(ctx context.Context, _ *struct{}) (*FeedListListOutput, error) {
@@ -903,7 +903,7 @@ func (a *API) registerFeedListRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "discover-feed-lists",
 		Method:      http.MethodGet,
-		Path:        "/api/v1/feed-lists/discover",
+		Path:        "/v1/feed-lists/discover",
 		Summary:     "Discover public feed lists",
 		Tags:        []string{"feed-lists"},
 	}, func(ctx context.Context, input *struct {
@@ -927,7 +927,7 @@ func (a *API) registerFeedListRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "get-feed-list",
 		Method:      http.MethodGet,
-		Path:        "/api/v1/feed-lists/{listId}",
+		Path:        "/v1/feed-lists/{listId}",
 		Summary:     "Get a feed list",
 		Tags:        []string{"feed-lists"},
 	}, func(ctx context.Context, input *struct {
@@ -956,7 +956,7 @@ func (a *API) registerFeedListRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "update-feed-list",
 		Method:      http.MethodPatch,
-		Path:        "/api/v1/feed-lists/{listId}",
+		Path:        "/v1/feed-lists/{listId}",
 		Summary:     "Update a feed list",
 		Tags:        []string{"feed-lists"},
 	}, func(ctx context.Context, input *UpdateFeedListInput) (*FeedListDetailOutput, error) {
@@ -974,7 +974,7 @@ func (a *API) registerFeedListRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "delete-feed-list",
 		Method:      http.MethodDelete,
-		Path:        "/api/v1/feed-lists/{listId}",
+		Path:        "/v1/feed-lists/{listId}",
 		Summary:     "Delete a feed list",
 		Tags:        []string{"feed-lists"},
 	}, func(ctx context.Context, input *struct {
@@ -990,7 +990,7 @@ func (a *API) registerFeedListRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "add-feed-list-feed",
 		Method:      http.MethodPost,
-		Path:        "/api/v1/feed-lists/{listId}/feeds",
+		Path:        "/v1/feed-lists/{listId}/feeds",
 		Summary:     "Add a feed to a feed list",
 		Tags:        []string{"feed-lists"},
 	}, func(ctx context.Context, input *AddFeedListFeedInput) (*struct {
@@ -1016,7 +1016,7 @@ func (a *API) registerFeedListRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "remove-feed-list-feed",
 		Method:      http.MethodDelete,
-		Path:        "/api/v1/feed-lists/{listId}/feeds/{itemId}",
+		Path:        "/v1/feed-lists/{listId}/feeds/{itemId}",
 		Summary:     "Remove a feed from a feed list",
 		Tags:        []string{"feed-lists"},
 	}, func(ctx context.Context, input *struct {
@@ -1036,7 +1036,7 @@ func (a *API) registerFeedListRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "follow-feed-list",
 		Method:      http.MethodPost,
-		Path:        "/api/v1/feed-lists/{listId}/follow",
+		Path:        "/v1/feed-lists/{listId}/follow",
 		Summary:     "Follow a feed list",
 		Tags:        []string{"feed-lists"},
 	}, func(ctx context.Context, input *struct {
@@ -1060,7 +1060,7 @@ func (a *API) registerFeedListRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "unfollow-feed-list",
 		Method:      http.MethodDelete,
-		Path:        "/api/v1/feed-lists/{listId}/follow",
+		Path:        "/v1/feed-lists/{listId}/follow",
 		Summary:     "Unfollow a feed list",
 		Tags:        []string{"feed-lists"},
 	}, func(ctx context.Context, input *struct {
@@ -1076,7 +1076,7 @@ func (a *API) registerFeedListRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "import-feed-list",
 		Method:      http.MethodPost,
-		Path:        "/api/v1/feed-lists/{listId}/import",
+		Path:        "/v1/feed-lists/{listId}/import",
 		Summary:     "Subscribe to all feeds in a feed list",
 		Tags:        []string{"feed-lists"},
 	}, func(ctx context.Context, input *struct {
@@ -1188,7 +1188,7 @@ func (a *API) registerOPMLRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "export-opml",
 		Method:      http.MethodGet,
-		Path:        "/api/v1/opml/export",
+		Path:        "/v1/opml/export",
 		Summary:     "Export feeds as OPML",
 		Description: "Returns all feed subscriptions and folders as an OPML XML document.",
 		Tags:        []string{"opml"},
@@ -1248,7 +1248,7 @@ func (a *API) registerOPMLRoutes() {
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "import-opml",
 		Method:      http.MethodPost,
-		Path:        "/api/v1/opml/import",
+		Path:        "/v1/opml/import",
 		Summary:     "Import feeds from an OPML file",
 		Description: "Parses an OPML XML document and subscribes the user to all feeds found. Folders are created as needed. Existing subscriptions are skipped.",
 		Tags:        []string{"opml"},

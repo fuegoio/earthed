@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-// deviceCodeResponse is the body returned by POST /api/auth/device/code.
+// deviceCodeResponse is the body returned by POST /auth/device/code.
 type deviceCodeResponse struct {
 	DeviceCode              string `json:"device_code"`
 	UserCode                string `json:"user_code"`
@@ -23,7 +23,7 @@ type deviceCodeResponse struct {
 	Interval                int    `json:"interval"`
 }
 
-// deviceTokenResponse is the success body returned by POST /api/auth/device/token.
+// deviceTokenResponse is the success body returned by POST /auth/device/token.
 type deviceTokenResponse struct {
 	AccessToken string `json:"access_token"`
 	TokenType   string `json:"token_type"`
@@ -119,7 +119,7 @@ func Login(ctx context.Context, baseURL string, openBrowser bool, out io.Writer)
 }
 
 func requestDeviceCode(ctx context.Context, baseURL string) (*deviceCodeResponse, error) {
-	req, _ := http.NewRequestWithContext(ctx, http.MethodPost, baseURL+"/api/auth/device/code", nil)
+	req, _ := http.NewRequestWithContext(ctx, http.MethodPost, baseURL+"/auth/device/code", nil)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -140,7 +140,7 @@ func requestDeviceCode(ctx context.Context, baseURL string) (*deviceCodeResponse
 // response (pending/slow_down/denied/expired), or a wait hint (seconds).
 func pollDeviceToken(ctx context.Context, baseURL, deviceCode string) (*deviceTokenResponse, *deviceTokenErrorResponse, int) {
 	payload, _ := json.Marshal(map[string]string{"device_code": deviceCode})
-	req, _ := http.NewRequestWithContext(ctx, http.MethodPost, baseURL+"/api/auth/device/token", bytes.NewReader(payload))
+	req, _ := http.NewRequestWithContext(ctx, http.MethodPost, baseURL+"/auth/device/token", bytes.NewReader(payload))
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {

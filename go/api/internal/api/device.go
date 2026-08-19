@@ -31,24 +31,24 @@ const (
 )
 
 // PublicDevicePaths is the set of device-flow paths mounted outside the
-// auth middleware (mirrors /api/v1/health). main.go reads this.
+// auth middleware (mirrors /v1/health). main.go reads this.
 var PublicDevicePaths = []string{
-	"/api/auth/device/code",
-	"/api/auth/device/token",
+	"/auth/device/code",
+	"/auth/device/token",
 }
 
 // registerDeviceRoutes registers the RFC 8628 device-authorization grant
-// endpoints under /api/auth/device/*. The public issue/poll endpoints are
-// mounted outside the auth middleware in main.go (like /api/v1/health);
+// endpoints under /auth/device/*. The public issue/poll endpoints are
+// mounted outside the auth middleware in main.go (like /v1/health);
 // the confirm/status endpoints sit behind the session-cookie middleware.
 func (a *API) registerDeviceRoutes() {
 	limiter := ratelimit.New()
 
-	// --- POST /api/auth/device/code (public) ---
+	// --- POST /auth/device/code (public) ---
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "device-code",
 		Method:      http.MethodPost,
-		Path:        "/api/auth/device/code",
+		Path:        "/auth/device/code",
 		Summary:     "Begin device-flow login (issue a device code)",
 		Tags:        []string{"device"},
 	}, func(ctx context.Context, input *DeviceCodeInput) (*DeviceCodeOutput, error) {
@@ -81,11 +81,11 @@ func (a *API) registerDeviceRoutes() {
 		}}, nil
 	})
 
-	// --- POST /api/auth/device/token (public, polled by the CLI) ---
+	// --- POST /auth/device/token (public, polled by the CLI) ---
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "device-token",
 		Method:      http.MethodPost,
-		Path:        "/api/auth/device/token",
+		Path:        "/auth/device/token",
 		Summary:     "Poll for device-flow login result",
 		Tags:        []string{"device"},
 	}, func(ctx context.Context, input *DeviceTokenInput) (*DeviceTokenOutput, error) {
@@ -135,11 +135,11 @@ func (a *API) registerDeviceRoutes() {
 		return nil, deviceError("authorization_pending")
 	})
 
-	// --- POST /api/auth/device/confirm (session-cookie auth) ---
+	// --- POST /auth/device/confirm (session-cookie auth) ---
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "device-confirm",
 		Method:      http.MethodPost,
-		Path:        "/api/auth/device/confirm",
+		Path:        "/auth/device/confirm",
 		Summary:     "Approve or deny a device-flow login (authenticated user)",
 		Tags:        []string{"device"},
 	}, func(ctx context.Context, input *DeviceConfirmInput) (*DeviceConfirmOutput, error) {
@@ -187,11 +187,11 @@ func (a *API) registerDeviceRoutes() {
 		return &DeviceConfirmOutput{Body: DeviceConfirmBody{Authorized: true}}, nil
 	})
 
-	// --- GET /api/auth/device/status (session-cookie auth) ---
+	// --- GET /auth/device/status (session-cookie auth) ---
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "device-status",
 		Method:      http.MethodGet,
-		Path:        "/api/auth/device/status",
+		Path:        "/auth/device/status",
 		Summary:     "Check device-flow status by user code (authenticated user)",
 		Tags:        []string{"device"},
 	}, func(ctx context.Context, input *DeviceStatusInput) (*DeviceStatusOutput, error) {
