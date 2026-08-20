@@ -119,10 +119,18 @@ after 14 days.
 
 ## CORS
 
-The API enables permissive CORS for all origins. When an `Origin`
-header is present in the request, the API reflects it back with
-`Access-Control-Allow-Credentials: true`. When no `Origin` header is
-present, `Access-Control-Allow-Origin: *` is used.
+By default (local development), the API reflects any request `Origin` back with
+`Access-Control-Allow-Credentials: true`. Requests with no `Origin` header get
+`Access-Control-Allow-Origin: *`.
+
+In production, configure a list of trusted origins. The API then only sends
+`Access-Control-Allow-Credentials: true` for origins on that list; untrusted
+origins receive no `Access-Control-Allow-Origin` header. This bounds
+credentialed cross-site requests (cookie-bearing) to frontends you control.
+
+See [Configuration](/self-hosting/configuration) and
+[Cross-origin sessions](/self-hosting/production#cross-origin-sessions) for
+setting trusted origins and the related cookie flags (`Secure`, `SameSite`).
 
 Allowed methods: GET, POST, PUT, PATCH, DELETE, OPTIONS.
 Allowed headers: Accept, Authorization, Content-Type, X-Requested-With.
