@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useOptimistic, startTransition } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, type InfiniteData, type QueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { motion } from "motion/react";
 import { MessageSquare } from "lucide-react";
@@ -15,6 +15,29 @@ import { cn } from "@workspace/ui/lib/utils";
 import type { Entry, Feed } from "@/lib/types";
 
 const EASE = [0.25, 1, 0.5, 1] as const;
+
+/**
+ * Patch an entry's status across all cached `["entries"]` queries in place,
+ * without refetching. On filtered views (e.g. Unread) this keeps the row
+ * visible — dimmed to "read" — after it's marked read, so the user can still
+ * star it or open comments before it leaves on the next genuine refetch
+ * (navigation, manual refresh, or another article opening).
+ */
+function patchEntryStatus(
+  queryClient: QueryClient,
+  entryId: number,
+  status: Entry["status"],
+) {
+  queryClient.setQueriesData<InfiniteData<Entry[]>>({ queryKey: ["entries"] }, (data) => {
+    if (!data?.pages) return data;
+    return {
+      ...data,
+      pages: data.pages.map((page) =>
+        page.map((e) => (e.id === entryId ? { ...e, status } : e)),
+      ),
+    };
+  });
+}
 
 /**
  * A single entry row in a timeline. The entire row is a link that opens
@@ -83,7 +106,11 @@ export function EntryCard({
           toast.error(getApiErrorMessage(error, "Could not mark as read"));
           return;
         }
-        await queryClient.invalidateQueries({ queryKey: ["entries"] });
+        // Patch the cache in place rather than refetching: refetching the
+        // server-filtered Unread list would drop this row immediately, before
+        // the user can star it or open comments. It leaves on the next real
+        // refetch (navigation, manual refresh, opening another article).
+        patchEntryStatus(queryClient, entry.id, "read");
       })();
     }
   }
