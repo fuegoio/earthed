@@ -2,9 +2,12 @@
 import Base from "../layouts/Base.astro"
 import Logo from "../components/Logo.astro"
 
-// CTA targets — reasonable defaults, wire to real endpoints later.
-const loginUrl = "https://app.earthed.dev"
-const selfHostUrl = "https://github.com/earthed-dev/earthed"
+// CTA targets. The marketing site is served at the same origin as the app
+// (earthed.app) for logged-out visitors, so "Login" is a same-origin link to
+// the app's /login route (the web proxy routes it to the Next app). After
+// signing in, the proxy serves the app at "/".
+const loginUrl = "/login"
+const selfHostUrl = "https://github.com/fuegoio/earthed"
 ---
 
 <Base>

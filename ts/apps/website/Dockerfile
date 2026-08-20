@@ -23,11 +23,23 @@ WORKDIR /app/apps/website
 RUN pnpm run build
 
 # ---- runtime stage ----
-FROM nginx:alpine AS runner
-WORKDIR /usr/share/nginx/html
+# The website is the front door for earthed.app: an Astro SSR server that
+# serves its own pages and proxies every other path to the Next.js app
+# (APP_URL, e.g. http://web:3000). See src/middleware.ts and
+# src/pages/[...path].ts.
+FROM node:22-alpine AS runner
+WORKDIR /app
 
+ENV NODE_ENV=production
+# Next.js app origin to proxy unknown paths to. Override in compose.
+ENV APP_URL=http://web:3000
+ENV HOST=0.0.0.0
+ENV PORT=80
+
+# Astro's @astrojs/node standalone build outputs the server at
+# dist/server/entry.mjs and serves static client assets from dist/client/.
 COPY --from=builder /app/apps/website/dist ./
 
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["node", "server/entry.mjs"]
