@@ -4,7 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Share2 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
-import { getClient, shareArticle, unshareArticle } from "@/lib/planetary";
+import { getClient, shareArticle, unshareArticle } from "@/lib/earthed";
 import { getApiErrorMessage } from "@/lib/errors";
 import { cn } from "@workspace/ui/lib/utils";
 import type { Entry, Feed } from "@/lib/types";

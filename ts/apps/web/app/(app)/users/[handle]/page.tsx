@@ -23,7 +23,7 @@ import {
   followUser,
   unfollowUser,
   unwrap,
-} from "@/lib/planetary";
+} from "@/lib/earthed";
 import { getApiErrorMessage } from "@/lib/errors";
 import { cn } from "@workspace/ui/lib/utils";
 import type { PublicProfileResponse } from "@/lib/types";
