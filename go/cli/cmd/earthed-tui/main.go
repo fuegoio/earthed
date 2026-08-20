@@ -3,6 +3,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"os"
 
@@ -21,9 +22,17 @@ func main() {
 	// If no token is configured, run the device-flow login before entering
 	// the alt-screen TUI so the prompts render normally on the terminal.
 	// Pass --login to force a re-login even when a token is present.
-	forceLogin := len(os.Args) > 1 && os.Args[1] == "--login"
+	forceLogin := false
+	serverURL := client.DefaultServerURL
+	fs := flag.NewFlagSet("earthed-tui", flag.ContinueOnError)
+	fs.BoolVar(&forceLogin, "login", false, "force a re-login even when a token is present")
+	fs.StringVar(&serverURL, "server", client.DefaultServerURL, "web app (server) URL to open for approval")
+	if err := fs.Parse(os.Args[1:]); err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
 	if cfg.Token == "" || forceLogin {
-		result, err := client.Login(context.Background(), cfg.BaseURL, true, os.Stdout)
+		result, err := client.Login(context.Background(), cfg.BaseURL, serverURL, true, os.Stdout)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error: login: %v\n", err)
 			os.Exit(1)

@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -41,26 +42,41 @@ type LoginResult struct {
 	ExpiresIn int
 }
 
+// DefaultServerURL is the default web app (server) the CLI points users to in
+// order to approve a device-flow login.
+const DefaultServerURL = "https://earthed.app"
+
 // Login runs the device-flow login against the given API base URL. It prints
 // the user code and verification URL, opens the browser if possible, and polls
 // until the user approves, denies, or the grant expires. On success it returns
 // the token to persist.
 //
+// serverURL is the web app (server) where the user approves the login; it is
+// used to build the verification URL the user opens. When empty, the
+// verification URL returned by the API is used as-is.
+//
 // openBrowser controls whether the verification URL is opened automatically;
 // set it false for --no-browser or headless sessions. The URL and code are
 // always printed regardless.
-func Login(ctx context.Context, baseURL string, openBrowser bool, out io.Writer) (*LoginResult, error) {
+func Login(ctx context.Context, baseURL, serverURL string, openBrowser bool, out io.Writer) (*LoginResult, error) {
 	// 1. Request a device code.
 	codeResp, err := requestDeviceCode(ctx, baseURL)
 	if err != nil {
 		return nil, fmt.Errorf("request device code: %w", err)
 	}
 
+	// Build the verification URL. Prefer the caller-provided server (web app)
+	// so self-hosted or custom deployments can override the API's default.
+	verificationURIComplete := codeResp.VerificationURIComplete
+	if serverURL != "" {
+		verificationURIComplete = strings.TrimRight(serverURL, "/") + "/device?user_code=" + codeResp.UserCode
+	}
+
 	// 2. Show the code + URL, and open the browser if asked.
 	fmt.Fprintf(out, "\nYour confirmation code:  %s\n\n", codeResp.UserCode)
-	fmt.Fprintf(out, "Open this URL in a browser to approve:\n  %s\n\n", codeResp.VerificationURIComplete)
+	fmt.Fprintf(out, "Open this URL in a browser to approve:\n  %s\n\n", verificationURIComplete)
 	if openBrowser {
-		if err := openURL(codeResp.VerificationURIComplete); err != nil {
+		if err := openURL(verificationURIComplete); err != nil {
 			fmt.Fprintf(out, "(could not open browser automatically: %v)\n", err)
 		}
 	}

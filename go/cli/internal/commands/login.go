@@ -11,6 +11,7 @@ import (
 var (
 	loginNoBrowser bool
 	loginBaseURL   string
+	loginServerURL string
 )
 
 var loginCmd = &cobra.Command{
@@ -35,7 +36,7 @@ in.`,
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
-		result, err := client.Login(ctx, cfg.BaseURL, !loginNoBrowser, cmd.OutOrStdout())
+		result, err := client.Login(ctx, cfg.BaseURL, loginServerURL, !loginNoBrowser, cmd.OutOrStdout())
 		if err != nil {
 			client.ExitOnError(err)
 		}
@@ -51,5 +52,6 @@ in.`,
 func init() {
 	loginCmd.Flags().BoolVar(&loginNoBrowser, "no-browser", false, "Print the URL instead of opening a browser")
 	loginCmd.Flags().StringVar(&loginBaseURL, "url", "", "API base URL (overrides config)")
+	loginCmd.Flags().StringVar(&loginServerURL, "server", client.DefaultServerURL, "Web app (server) URL to open for approval")
 	rootCmd.AddCommand(loginCmd)
 }
