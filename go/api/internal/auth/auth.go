@@ -45,14 +45,7 @@ func New(cfg *config.Config, db *sql.DB, st *store.Store) (*Auth, error) {
 		BaseURL:  cfg.BaseURL,
 		Database: sqladapter.NewPostgreSQL(db),
 		Secret:   []byte(cfg.LimenSecret),
-		HTTP: limen.NewDefaultHTTPConfig(
-			limen.WithHTTPBasePath("/auth"),
-			limen.WithHTTPCSRFProtection(false),
-			limen.WithHTTPOriginCheck(false),
-			limen.WithHTTPCookieSecure(cfg.CookieSecure),
-			limen.WithHTTPCookieSameSite(parseSameSite(cfg.CookieSameSite)),
-			limen.WithHTTPTrustedOrigins(cfg.TrustedOrigins),
-		),
+		HTTP: limen.NewDefaultHTTPConfig(httpCookieOpts(cfg)...),
 		Email: limen.NewDefaultEmailConfig(
 			limen.WithEmailVerification(
 				limen.WithSendEmailVerificationMail(func(email, token string) {
@@ -153,4 +146,24 @@ func parseSameSite(s string) http.SameSite {
 	default:
 		return http.SameSiteLaxMode
 	}
+}
+
+// httpCookieOpts builds the Limen HTTP cookie/session options from config.
+// When CookieDomain is set, the session cookie is shared across that
+// registrable domain and its subdomains (cross-subdomain), so the web app
+// and API running on different subdomains share one session. When empty the
+// cookie stays host-only (the default for same-origin local development).
+func httpCookieOpts(cfg *config.Config) []limen.HTTPConfigOption {
+	opts := []limen.HTTPConfigOption{
+		limen.WithHTTPBasePath("/auth"),
+		limen.WithHTTPCSRFProtection(false),
+		limen.WithHTTPOriginCheck(false),
+		limen.WithHTTPCookieSecure(cfg.CookieSecure),
+		limen.WithHTTPCookieSameSite(parseSameSite(cfg.CookieSameSite)),
+		limen.WithHTTPTrustedOrigins(cfg.TrustedOrigins),
+	}
+	if cfg.CookieDomain != "" {
+		opts = append(opts, limen.WithHTTPCookieCrossSubdomainEnabled(cfg.CookieDomain))
+	}
+	return opts
 }

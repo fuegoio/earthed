@@ -99,3 +99,27 @@ func TestLoadTrustedOriginsNormalizesTrailingSlash(t *testing.T) {
 		t.Fatalf("expected exactly one normalized %q entry, got %d in %v", "https://example.com", count, cfg.TrustedOrigins)
 	}
 }
+
+// CookieDomain loads as a bare host and is trimmed.
+func TestLoadCookieDomain(t *testing.T) {
+	env := baseEnv()
+	env["EARTHED_COOKIE_DOMAIN"] = "  earthed.app  "
+	setEnv(t, env)
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	if cfg.CookieDomain != "earthed.app" {
+		t.Fatalf("expected CookieDomain %q, got %q", "earthed.app", cfg.CookieDomain)
+	}
+}
+
+// CookieDomain rejects URLs (must be a bare host).
+func TestLoadCookieDomainRejectsURL(t *testing.T) {
+	env := baseEnv()
+	env["EARTHED_COOKIE_DOMAIN"] = "https://earthed.app"
+	setEnv(t, env)
+	if _, err := Load(); err == nil {
+		t.Fatalf("expected error for URL cookie domain, got nil")
+	}
+}

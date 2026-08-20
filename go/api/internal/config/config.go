@@ -27,6 +27,7 @@ type Config struct {
 	DisableSched   bool
 	CookieSecure   bool
 	CookieSameSite string
+	CookieDomain   string
 	TrustedOrigins []string
 }
 
@@ -49,6 +50,7 @@ func Load() (*Config, error) {
 		DisableSched:   env("EARTHED_DISABLE_SCHEDULER", "") != "",
 		CookieSecure:   envBool("EARTHED_COOKIE_SECURE", false),
 		CookieSameSite: env("EARTHED_COOKIE_SAMESITE", "lax"),
+		CookieDomain:   strings.TrimSpace(env("EARTHED_COOKIE_DOMAIN", "")),
 		TrustedOrigins: envList("EARTHED_TRUSTED_ORIGINS"),
 	}
 
@@ -67,6 +69,15 @@ func Load() (*Config, error) {
 	// SameSite=None requires Secure, otherwise browsers reject the cookie.
 	if cfg.CookieSameSite == "none" && !cfg.CookieSecure {
 		return nil, fmt.Errorf("EARTHED_COOKIE_SAMESITE=none requires EARTHED_COOKIE_SECURE=true (browsers reject SameSite=None without Secure)")
+	}
+
+	// CookieDomain must be a bare host (e.g. "earthed.app"), not a URL.
+	// When set, the session cookie is shared across that registrable domain and
+	// its subdomains so the web app and API (on a subdomain) share the session.
+	if cfg.CookieDomain != "" {
+		if strings.Contains(cfg.CookieDomain, "://") || strings.ContainsAny(cfg.CookieDomain, "/:") {
+			return nil, fmt.Errorf("EARTHED_COOKIE_DOMAIN must be a bare host (e.g. \"earthed.app\"), not a URL; got %q", cfg.CookieDomain)
+		}
 	}
 
 	// When an explicit trusted-origins allowlist is set, always include the

@@ -21,8 +21,9 @@ description: Environment variables for the API and web containers.
 | `EARTHED_CLEANUP_FREQUENCY`    | `24h`                                                                     | How often to run entry cleanup                             |
 | `EARTHED_ENTRY_MAX_AGE_DAYS`   | `60`                                                                      | Entries older than this are eligible for cleanup           |
 | `EARTHED_DISABLE_SCHEDULER`    | (unset)                                                                   | Set to any non-empty value to disable the scheduler        |
-| `EARTHED_COOKIE_SECURE`        | `false`                                                                   | Mark session cookies as `Secure` (required for cross-origin cookies over HTTPS) |
+| `EARTHED_COOKIE_SECURE`        | `false`                                                                   | Mark session cookies as `Secure` (required for cookies over HTTPS) |
 | `EARTHED_COOKIE_SAMESITE`      | `lax`                                                                     | Cookie SameSite mode: `lax`, `none`, or `strict`. `none` requires `EARTHED_COOKIE_SECURE=true` |
+| `EARTHED_COOKIE_DOMAIN`        | (unset)                                                                   | Bare host to set as the cookie `Domain` (e.g. `earthed.app`), so the session is shared across subdomains. Set to the registrable domain shared by the API and web app |
 | `EARTHED_TRUSTED_ORIGINS`      | (unset)                                                                   | Comma-separated list of allowed browser origins (e.g. `https://app.earthed.app`). When unset, any origin is allowed (dev only). When set, `EARTHED_WEB_URL` is always included automatically |
 
 ## Web

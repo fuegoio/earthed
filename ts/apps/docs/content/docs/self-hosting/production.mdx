@@ -45,15 +45,31 @@ server {
 
 ## Cross-origin sessions
 
-When the API and the web app are served from different origins (e.g. `api.earthed.app` and `app.earthed.app`), the browser will not send the default `SameSite=Lax` session cookie on cross-site requests, so login will silently fail. Configure the API container with:
+When the API and the web app are served from different origins (e.g. `api.earthed.app` and `app.earthed.app`), the default session cookie is host-only on the API domain, so the web app never receives it. How you fix this depends on whether the two share a registrable domain.
+
+### Same registrable domain (subdomains)
+
+If the API and web app share a registrable domain (e.g. `api.earthed.app` and `app.earthed.app` both under `earthed.app`), set the cookie `Domain` to that registrable domain. The browser then sends the session cookie to both the web app and the API (requests between them are same-site, so the default `SameSite=Lax` works):
+
+```
+EARTHED_COOKIE_SECURE=true
+EARTHED_COOKIE_DOMAIN=earthed.app
+EARTHED_TRUSTED_ORIGINS=https://app.earthed.app
+```
+
+`EARTHED_COOKIE_DOMAIN` must be a bare host (no scheme or path). `Secure` requires the API to be served over HTTPS.
+
+### Different registrable domains
+
+If the API and web app are on entirely different registrable domains (e.g. `api.earthed.app` and `myapp.com`), a shared cookie domain is not possible. Use `SameSite=None` so the browser sends the cookie cross-site:
 
 ```
 EARTHED_COOKIE_SECURE=true
 EARTHED_COOKIE_SAMESITE=none
-EARTHED_TRUSTED_ORIGINS=https://app.earthed.app
+EARTHED_TRUSTED_ORIGINS=https://myapp.com
 ```
 
-`Secure` requires the API to be served over HTTPS. `SameSite=None` without `Secure` is rejected by browsers, so the API rejects that combination at startup. Set `EARTHED_TRUSTED_ORIGINS` to the web app origin(s) so the API only returns `Access-Control-Allow-Credentials` for trusted frontends. The value of `EARTHED_WEB_URL` is always added to the allowlist automatically, so you only need to list any additional origins.
+`SameSite=None` without `Secure` is rejected by browsers, so the API rejects that combination at startup. Set `EARTHED_TRUSTED_ORIGINS` to the web app origin(s) so the API only returns `Access-Control-Allow-Credentials` for trusted frontends. The value of `EARTHED_WEB_URL` is always added to the allowlist automatically, so you only need to list any additional origins.
 
 ## Database backup
 
