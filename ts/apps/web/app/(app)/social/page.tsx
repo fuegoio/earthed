@@ -13,7 +13,7 @@ import {
   EmptyTitle,
 } from "@workspace/ui/components/empty";
 import { PageHeader } from "@/components/page-header";
-import { getClient, socialTimeline, listFollowing, unwrap } from "@/lib/planetary";
+import { getClient, socialTimeline, listFollowing, unwrap } from "@/lib/earthed";
 import type { SharedArticle, UserProfile } from "@/lib/types";
 
 const PAGE_SIZE = 50;
