@@ -18,20 +18,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
-import { signin, signup } from "@/lib/auth";
+import { signin, signup, safeRedirect } from "@/lib/auth";
 import { signinSchema, signupSchema, type SigninValues, type SignupValues } from "@/lib/schemas";
 
 type Mode = "signin" | "signup";
-
-// safeRedirect returns a same-origin path from a redirect query param, or "/"
-// if the value is missing/external/protocol-relative. Prevents open redirects
-// via ?redirect=https://evil.com or //evil.com.
-function safeRedirect(value: string | null): string {
-  if (!value) return "/";
-  // Must be a root-relative path: starts with "/" and not "//" (protocol-relative).
-  if (value.startsWith("/") && !value.startsWith("//")) return value;
-  return "/";
-}
 
 export function AuthForm({ mode }: { mode: Mode }) {
   const searchParams = useSearchParams();
