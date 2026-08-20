@@ -59,3 +59,16 @@ export async function signout(): Promise<void> {
 }
 
 export { SESSION_COOKIE };
+
+/**
+ * safeRedirect returns a same-origin path from a redirect query param, or "/"
+ * if the value is missing/external/protocol-relative. Prevents open redirects
+ * via ?redirect=https://evil.com or //evil.com. Pure/isomorphic — safe to
+ * call from both server components and client components.
+ */
+export function safeRedirect(value: string | null | undefined): string {
+  if (!value) return "/";
+  // Must be a root-relative path: starts with "/" and not "//" (protocol-relative).
+  if (value.startsWith("/") && !value.startsWith("//")) return value;
+  return "/";
+}
