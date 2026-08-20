@@ -19,288 +19,9 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 /**
- * Begin device-flow login (issue a device code)
- */
-export const deviceCode = <ThrowOnError extends boolean = false>(options?: Options<DeviceCodeData, ThrowOnError>): RequestResult<DeviceCodeResponses, DeviceCodeErrors, ThrowOnError> => (options?.client ?? client).post<DeviceCodeResponses, DeviceCodeErrors, ThrowOnError>({ url: '/api/auth/device/code', ...options });
-
-/**
- * Approve or deny a device-flow login (authenticated user)
- */
-export const deviceConfirm = <ThrowOnError extends boolean = false>(options: Options<DeviceConfirmData, ThrowOnError>): RequestResult<DeviceConfirmResponses, DeviceConfirmErrors, ThrowOnError> => (options.client ?? client).post<DeviceConfirmResponses, DeviceConfirmErrors, ThrowOnError>({
-    url: '/api/auth/device/confirm',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Check device-flow status by user code (authenticated user)
- */
-export const deviceStatus = <ThrowOnError extends boolean = false>(options?: Options<DeviceStatusData, ThrowOnError>): RequestResult<DeviceStatusResponses, DeviceStatusErrors, ThrowOnError> => (options?.client ?? client).get<DeviceStatusResponses, DeviceStatusErrors, ThrowOnError>({ url: '/api/auth/device/status', ...options });
-
-/**
- * Poll for device-flow login result
- */
-export const deviceToken = <ThrowOnError extends boolean = false>(options: Options<DeviceTokenData, ThrowOnError>): RequestResult<DeviceTokenResponses, DeviceTokenErrors, ThrowOnError> => (options.client ?? client).post<DeviceTokenResponses, DeviceTokenErrors, ThrowOnError>({
-    url: '/api/auth/device/token',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * List entries
- */
-export const listEntries = <ThrowOnError extends boolean = false>(options?: Options<ListEntriesData, ThrowOnError>): RequestResult<ListEntriesResponses, ListEntriesErrors, ThrowOnError> => (options?.client ?? client).get<ListEntriesResponses, ListEntriesErrors, ThrowOnError>({ url: '/api/v1/entries', ...options });
-
-/**
- * Bulk update entry status
- */
-export const updateEntries = <ThrowOnError extends boolean = false>(options: Options<UpdateEntriesData, ThrowOnError>): RequestResult<UpdateEntriesResponses, UpdateEntriesErrors, ThrowOnError> => (options.client ?? client).put<UpdateEntriesResponses, UpdateEntriesErrors, ThrowOnError>({
-    url: '/api/v1/entries',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Get an entry
- */
-export const getEntry = <ThrowOnError extends boolean = false>(options: Options<GetEntryData, ThrowOnError>): RequestResult<GetEntryResponses, GetEntryErrors, ThrowOnError> => (options.client ?? client).get<GetEntryResponses, GetEntryErrors, ThrowOnError>({ url: '/api/v1/entries/{entryId}', ...options });
-
-/**
- * Toggle starred on an entry
- */
-export const toggleEntryStarred = <ThrowOnError extends boolean = false>(options: Options<ToggleEntryStarredData, ThrowOnError>): RequestResult<ToggleEntryStarredResponses, ToggleEntryStarredErrors, ThrowOnError> => (options.client ?? client).put<ToggleEntryStarredResponses, ToggleEntryStarredErrors, ThrowOnError>({
-    url: '/api/v1/entries/{entryId}/starred',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * List my feed lists
- */
-export const listMyFeedLists = <ThrowOnError extends boolean = false>(options?: Options<ListMyFeedListsData, ThrowOnError>): RequestResult<ListMyFeedListsResponses, ListMyFeedListsErrors, ThrowOnError> => (options?.client ?? client).get<ListMyFeedListsResponses, ListMyFeedListsErrors, ThrowOnError>({ url: '/api/v1/feed-lists', ...options });
-
-/**
- * Create a feed list
- */
-export const createFeedList = <ThrowOnError extends boolean = false>(options: Options<CreateFeedListData, ThrowOnError>): RequestResult<CreateFeedListResponses, CreateFeedListErrors, ThrowOnError> => (options.client ?? client).post<CreateFeedListResponses, CreateFeedListErrors, ThrowOnError>({
-    url: '/api/v1/feed-lists',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Discover public feed lists
- */
-export const discoverFeedLists = <ThrowOnError extends boolean = false>(options?: Options<DiscoverFeedListsData, ThrowOnError>): RequestResult<DiscoverFeedListsResponses, DiscoverFeedListsErrors, ThrowOnError> => (options?.client ?? client).get<DiscoverFeedListsResponses, DiscoverFeedListsErrors, ThrowOnError>({ url: '/api/v1/feed-lists/discover', ...options });
-
-/**
- * List feed lists I follow
- */
-export const listFollowedFeedLists = <ThrowOnError extends boolean = false>(options?: Options<ListFollowedFeedListsData, ThrowOnError>): RequestResult<ListFollowedFeedListsResponses, ListFollowedFeedListsErrors, ThrowOnError> => (options?.client ?? client).get<ListFollowedFeedListsResponses, ListFollowedFeedListsErrors, ThrowOnError>({ url: '/api/v1/feed-lists/followed', ...options });
-
-/**
- * Delete a feed list
- */
-export const deleteFeedList = <ThrowOnError extends boolean = false>(options: Options<DeleteFeedListData, ThrowOnError>): RequestResult<DeleteFeedListResponses, DeleteFeedListErrors, ThrowOnError> => (options.client ?? client).delete<DeleteFeedListResponses, DeleteFeedListErrors, ThrowOnError>({ url: '/api/v1/feed-lists/{listId}', ...options });
-
-/**
- * Get a feed list
- */
-export const getFeedList = <ThrowOnError extends boolean = false>(options: Options<GetFeedListData, ThrowOnError>): RequestResult<GetFeedListResponses, GetFeedListErrors, ThrowOnError> => (options.client ?? client).get<GetFeedListResponses, GetFeedListErrors, ThrowOnError>({ url: '/api/v1/feed-lists/{listId}', ...options });
-
-/**
- * Update a feed list
- */
-export const updateFeedList = <ThrowOnError extends boolean = false>(options: Options<UpdateFeedListData, ThrowOnError>): RequestResult<UpdateFeedListResponses, UpdateFeedListErrors, ThrowOnError> => (options.client ?? client).patch<UpdateFeedListResponses, UpdateFeedListErrors, ThrowOnError>({
-    url: '/api/v1/feed-lists/{listId}',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Add a feed to a feed list
- */
-export const addFeedListFeed = <ThrowOnError extends boolean = false>(options: Options<AddFeedListFeedData, ThrowOnError>): RequestResult<AddFeedListFeedResponses, AddFeedListFeedErrors, ThrowOnError> => (options.client ?? client).post<AddFeedListFeedResponses, AddFeedListFeedErrors, ThrowOnError>({
-    url: '/api/v1/feed-lists/{listId}/feeds',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Remove a feed from a feed list
- */
-export const removeFeedListFeed = <ThrowOnError extends boolean = false>(options: Options<RemoveFeedListFeedData, ThrowOnError>): RequestResult<RemoveFeedListFeedResponses, RemoveFeedListFeedErrors, ThrowOnError> => (options.client ?? client).delete<RemoveFeedListFeedResponses, RemoveFeedListFeedErrors, ThrowOnError>({ url: '/api/v1/feed-lists/{listId}/feeds/{itemId}', ...options });
-
-/**
- * Unfollow a feed list
- */
-export const unfollowFeedList = <ThrowOnError extends boolean = false>(options: Options<UnfollowFeedListData, ThrowOnError>): RequestResult<UnfollowFeedListResponses, UnfollowFeedListErrors, ThrowOnError> => (options.client ?? client).delete<UnfollowFeedListResponses, UnfollowFeedListErrors, ThrowOnError>({ url: '/api/v1/feed-lists/{listId}/follow', ...options });
-
-/**
- * Follow a feed list
- */
-export const followFeedList = <ThrowOnError extends boolean = false>(options: Options<FollowFeedListData, ThrowOnError>): RequestResult<FollowFeedListResponses, FollowFeedListErrors, ThrowOnError> => (options.client ?? client).post<FollowFeedListResponses, FollowFeedListErrors, ThrowOnError>({ url: '/api/v1/feed-lists/{listId}/follow', ...options });
-
-/**
- * Subscribe to all feeds in a feed list
- */
-export const importFeedList = <ThrowOnError extends boolean = false>(options: Options<ImportFeedListData, ThrowOnError>): RequestResult<ImportFeedListResponses, ImportFeedListErrors, ThrowOnError> => (options.client ?? client).post<ImportFeedListResponses, ImportFeedListErrors, ThrowOnError>({ url: '/api/v1/feed-lists/{listId}/import', ...options });
-
-/**
- * List feeds
- */
-export const listFeeds = <ThrowOnError extends boolean = false>(options?: Options<ListFeedsData, ThrowOnError>): RequestResult<ListFeedsResponses, ListFeedsErrors, ThrowOnError> => (options?.client ?? client).get<ListFeedsResponses, ListFeedsErrors, ThrowOnError>({ url: '/api/v1/feeds', ...options });
-
-/**
- * Subscribe to a feed
- */
-export const createFeed = <ThrowOnError extends boolean = false>(options: Options<CreateFeedData, ThrowOnError>): RequestResult<CreateFeedResponses, CreateFeedErrors, ThrowOnError> => (options.client ?? client).post<CreateFeedResponses, CreateFeedErrors, ThrowOnError>({
-    url: '/api/v1/feeds',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Preview a feed without subscribing
- *
- * Fetches and parses a feed URL, returning feed metadata and recent entries without persisting anything.
- */
-export const previewFeed = <ThrowOnError extends boolean = false>(options: Options<PreviewFeedData, ThrowOnError>): RequestResult<PreviewFeedResponses, PreviewFeedErrors, ThrowOnError> => (options.client ?? client).post<PreviewFeedResponses, PreviewFeedErrors, ThrowOnError>({
-    url: '/api/v1/feeds/preview',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Delete a feed
- */
-export const deleteFeed = <ThrowOnError extends boolean = false>(options: Options<DeleteFeedData, ThrowOnError>): RequestResult<DeleteFeedResponses, DeleteFeedErrors, ThrowOnError> => (options.client ?? client).delete<DeleteFeedResponses, DeleteFeedErrors, ThrowOnError>({ url: '/api/v1/feeds/{feedId}', ...options });
-
-/**
- * Get a feed
- */
-export const getFeed = <ThrowOnError extends boolean = false>(options: Options<GetFeedData, ThrowOnError>): RequestResult<GetFeedResponses, GetFeedErrors, ThrowOnError> => (options.client ?? client).get<GetFeedResponses, GetFeedErrors, ThrowOnError>({ url: '/api/v1/feeds/{feedId}', ...options });
-
-/**
- * Update a feed
- *
- * Update the folder assignment and/or title of a feed.
- */
-export const updateFeed = <ThrowOnError extends boolean = false>(options: Options<UpdateFeedData, ThrowOnError>): RequestResult<UpdateFeedResponses, UpdateFeedErrors, ThrowOnError> => (options.client ?? client).patch<UpdateFeedResponses, UpdateFeedErrors, ThrowOnError>({
-    url: '/api/v1/feeds/{feedId}',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Mark all entries in a feed as read
- */
-export const markFeedRead = <ThrowOnError extends boolean = false>(options: Options<MarkFeedReadData, ThrowOnError>): RequestResult<MarkFeedReadResponses, MarkFeedReadErrors, ThrowOnError> => (options.client ?? client).post<MarkFeedReadResponses, MarkFeedReadErrors, ThrowOnError>({ url: '/api/v1/feeds/{feedId}/mark-all-read', ...options });
-
-/**
- * Refresh a feed
- *
- * Manually fetch and parse the feed, inserting any new entries. Use this to get the latest articles without waiting for the scheduler.
- */
-export const refreshFeed = <ThrowOnError extends boolean = false>(options: Options<RefreshFeedData, ThrowOnError>): RequestResult<RefreshFeedResponses, RefreshFeedErrors, ThrowOnError> => (options.client ?? client).post<RefreshFeedResponses, RefreshFeedErrors, ThrowOnError>({ url: '/api/v1/feeds/{feedId}/refresh', ...options });
-
-/**
  * Get subscriber count and public profiles for a feed
  */
 export const feedSubscribers = <ThrowOnError extends boolean = false>(options: Options<FeedSubscribersData, ThrowOnError>): RequestResult<FeedSubscribersResponses, FeedSubscribersErrors, ThrowOnError> => (options.client ?? client).get<FeedSubscribersResponses, FeedSubscribersErrors, ThrowOnError>({ url: '/api/v1/feeds/{feedId}/subscribers', ...options });
-
-/**
- * List folders
- */
-export const listFolders = <ThrowOnError extends boolean = false>(options?: Options<ListFoldersData, ThrowOnError>): RequestResult<ListFoldersResponses, ListFoldersErrors, ThrowOnError> => (options?.client ?? client).get<ListFoldersResponses, ListFoldersErrors, ThrowOnError>({ url: '/api/v1/folders', ...options });
-
-/**
- * Create a folder
- */
-export const createFolder = <ThrowOnError extends boolean = false>(options: Options<CreateFolderData, ThrowOnError>): RequestResult<CreateFolderResponses, CreateFolderErrors, ThrowOnError> => (options.client ?? client).post<CreateFolderResponses, CreateFolderErrors, ThrowOnError>({
-    url: '/api/v1/folders',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Delete a folder
- */
-export const deleteFolder = <ThrowOnError extends boolean = false>(options: Options<DeleteFolderData, ThrowOnError>): RequestResult<DeleteFolderResponses, DeleteFolderErrors, ThrowOnError> => (options.client ?? client).delete<DeleteFolderResponses, DeleteFolderErrors, ThrowOnError>({ url: '/api/v1/folders/{folderId}', ...options });
-
-/**
- * Update a folder
- *
- * Update the title and/or parent folder of a folder. Set parent_id to move or nest the folder.
- */
-export const updateFolder = <ThrowOnError extends boolean = false>(options: Options<UpdateFolderData, ThrowOnError>): RequestResult<UpdateFolderResponses, UpdateFolderErrors, ThrowOnError> => (options.client ?? client).patch<UpdateFolderResponses, UpdateFolderErrors, ThrowOnError>({
-    url: '/api/v1/folders/{folderId}',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Health check
- */
-export const health = <ThrowOnError extends boolean = false>(options?: Options<HealthData, ThrowOnError>): RequestResult<HealthResponses, HealthErrors, ThrowOnError> => (options?.client ?? client).get<HealthResponses, HealthErrors, ThrowOnError>({ url: '/api/v1/health', ...options });
-
-/**
- * Delete current user account
- */
-export const deleteMe = <ThrowOnError extends boolean = false>(options?: Options<DeleteMeData, ThrowOnError>): RequestResult<DeleteMeResponses, DeleteMeErrors, ThrowOnError> => (options?.client ?? client).delete<DeleteMeResponses, DeleteMeErrors, ThrowOnError>({ url: '/api/v1/me', ...options });
-
-/**
- * Get current user
- */
-export const getMe = <ThrowOnError extends boolean = false>(options?: Options<GetMeData, ThrowOnError>): RequestResult<GetMeResponses, GetMeErrors, ThrowOnError> => (options?.client ?? client).get<GetMeResponses, GetMeErrors, ThrowOnError>({ url: '/api/v1/me', ...options });
-
-/**
- * Update current user profile
- */
-export const updateMe = <ThrowOnError extends boolean = false>(options: Options<UpdateMeData, ThrowOnError>): RequestResult<UpdateMeResponses, UpdateMeErrors, ThrowOnError> => (options.client ?? client).patch<UpdateMeResponses, UpdateMeErrors, ThrowOnError>({
-    url: '/api/v1/me',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
 
 /**
  * Set or update your social handle
@@ -310,28 +31,6 @@ export const updateHandle = <ThrowOnError extends boolean = false>(options: Opti
     ...options,
     headers: {
         'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Export feeds as OPML
- *
- * Returns all feed subscriptions and folders as an OPML XML document.
- */
-export const exportOpml = <ThrowOnError extends boolean = false>(options?: Options<ExportOpmlData, ThrowOnError>): RequestResult<ExportOpmlResponses, ExportOpmlErrors, ThrowOnError> => (options?.client ?? client).get<ExportOpmlResponses, ExportOpmlErrors, ThrowOnError>({ url: '/api/v1/opml/export', ...options });
-
-/**
- * Import feeds from an OPML file
- *
- * Parses an OPML XML document and subscribes the user to all feeds found. Folders are created as needed. Existing subscriptions are skipped.
- */
-export const importOpml = <ThrowOnError extends boolean = false>(options: Options<ImportOpmlData, ThrowOnError>): RequestResult<ImportOpmlResponses, ImportOpmlErrors, ThrowOnError> => (options.client ?? client).post<ImportOpmlResponses, ImportOpmlErrors, ThrowOnError>({
-    bodySerializer: null,
-    url: '/api/v1/opml/import',
-    ...options,
-    headers: {
-        'Content-Type': 'application/octet-stream',
         ...options.headers
     }
 });
@@ -369,28 +68,6 @@ export const unshareArticle = <ThrowOnError extends boolean = false>(options: Op
 export const socialTimeline = <ThrowOnError extends boolean = false>(options?: Options<SocialTimelineData, ThrowOnError>): RequestResult<SocialTimelineResponses, SocialTimelineErrors, ThrowOnError> => (options?.client ?? client).get<SocialTimelineResponses, SocialTimelineErrors, ThrowOnError>({ url: '/api/v1/social/timeline', ...options });
 
 /**
- * List API tokens
- */
-export const listTokens = <ThrowOnError extends boolean = false>(options?: Options<ListTokensData, ThrowOnError>): RequestResult<ListTokensResponses, ListTokensErrors, ThrowOnError> => (options?.client ?? client).get<ListTokensResponses, ListTokensErrors, ThrowOnError>({ url: '/api/v1/tokens', ...options });
-
-/**
- * Create an API token
- */
-export const createToken = <ThrowOnError extends boolean = false>(options: Options<CreateTokenData, ThrowOnError>): RequestResult<CreateTokenResponses, CreateTokenErrors, ThrowOnError> => (options.client ?? client).post<CreateTokenResponses, CreateTokenErrors, ThrowOnError>({
-    url: '/api/v1/tokens',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Delete an API token
- */
-export const deleteToken = <ThrowOnError extends boolean = false>(options: Options<DeleteTokenData, ThrowOnError>): RequestResult<DeleteTokenResponses, DeleteTokenErrors, ThrowOnError> => (options.client ?? client).delete<DeleteTokenResponses, DeleteTokenErrors, ThrowOnError>({ url: '/api/v1/tokens/{tokenId}', ...options });
-
-/**
  * Get a public user profile
  */
 export const getUserProfile = <ThrowOnError extends boolean = false>(options: Options<GetUserProfileData, ThrowOnError>): RequestResult<GetUserProfileResponses, GetUserProfileErrors, ThrowOnError> => (options.client ?? client).get<GetUserProfileResponses, GetUserProfileErrors, ThrowOnError>({ url: '/api/v1/users/{handle}', ...options });
@@ -414,3 +91,326 @@ export const listFollowers = <ThrowOnError extends boolean = false>(options: Opt
  * List users a user is following
  */
 export const listUserFollowing = <ThrowOnError extends boolean = false>(options: Options<ListUserFollowingData, ThrowOnError>): RequestResult<ListUserFollowingResponses, ListUserFollowingErrors, ThrowOnError> => (options.client ?? client).get<ListUserFollowingResponses, ListUserFollowingErrors, ThrowOnError>({ url: '/api/v1/users/{handle}/following', ...options });
+
+/**
+ * Begin device-flow login (issue a device code)
+ */
+export const deviceCode = <ThrowOnError extends boolean = false>(options?: Options<DeviceCodeData, ThrowOnError>): RequestResult<DeviceCodeResponses, DeviceCodeErrors, ThrowOnError> => (options?.client ?? client).post<DeviceCodeResponses, DeviceCodeErrors, ThrowOnError>({ url: '/auth/device/code', ...options });
+
+/**
+ * Approve or deny a device-flow login (authenticated user)
+ */
+export const deviceConfirm = <ThrowOnError extends boolean = false>(options: Options<DeviceConfirmData, ThrowOnError>): RequestResult<DeviceConfirmResponses, DeviceConfirmErrors, ThrowOnError> => (options.client ?? client).post<DeviceConfirmResponses, DeviceConfirmErrors, ThrowOnError>({
+    url: '/auth/device/confirm',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Check device-flow status by user code (authenticated user)
+ */
+export const deviceStatus = <ThrowOnError extends boolean = false>(options?: Options<DeviceStatusData, ThrowOnError>): RequestResult<DeviceStatusResponses, DeviceStatusErrors, ThrowOnError> => (options?.client ?? client).get<DeviceStatusResponses, DeviceStatusErrors, ThrowOnError>({ url: '/auth/device/status', ...options });
+
+/**
+ * Poll for device-flow login result
+ */
+export const deviceToken = <ThrowOnError extends boolean = false>(options: Options<DeviceTokenData, ThrowOnError>): RequestResult<DeviceTokenResponses, DeviceTokenErrors, ThrowOnError> => (options.client ?? client).post<DeviceTokenResponses, DeviceTokenErrors, ThrowOnError>({
+    url: '/auth/device/token',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List entries
+ */
+export const listEntries = <ThrowOnError extends boolean = false>(options?: Options<ListEntriesData, ThrowOnError>): RequestResult<ListEntriesResponses, ListEntriesErrors, ThrowOnError> => (options?.client ?? client).get<ListEntriesResponses, ListEntriesErrors, ThrowOnError>({ url: '/v1/entries', ...options });
+
+/**
+ * Bulk update entry status
+ */
+export const updateEntries = <ThrowOnError extends boolean = false>(options: Options<UpdateEntriesData, ThrowOnError>): RequestResult<UpdateEntriesResponses, UpdateEntriesErrors, ThrowOnError> => (options.client ?? client).put<UpdateEntriesResponses, UpdateEntriesErrors, ThrowOnError>({
+    url: '/v1/entries',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get an entry
+ */
+export const getEntry = <ThrowOnError extends boolean = false>(options: Options<GetEntryData, ThrowOnError>): RequestResult<GetEntryResponses, GetEntryErrors, ThrowOnError> => (options.client ?? client).get<GetEntryResponses, GetEntryErrors, ThrowOnError>({ url: '/v1/entries/{entryId}', ...options });
+
+/**
+ * Toggle starred on an entry
+ */
+export const toggleEntryStarred = <ThrowOnError extends boolean = false>(options: Options<ToggleEntryStarredData, ThrowOnError>): RequestResult<ToggleEntryStarredResponses, ToggleEntryStarredErrors, ThrowOnError> => (options.client ?? client).put<ToggleEntryStarredResponses, ToggleEntryStarredErrors, ThrowOnError>({
+    url: '/v1/entries/{entryId}/starred',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List my feed lists
+ */
+export const listMyFeedLists = <ThrowOnError extends boolean = false>(options?: Options<ListMyFeedListsData, ThrowOnError>): RequestResult<ListMyFeedListsResponses, ListMyFeedListsErrors, ThrowOnError> => (options?.client ?? client).get<ListMyFeedListsResponses, ListMyFeedListsErrors, ThrowOnError>({ url: '/v1/feed-lists', ...options });
+
+/**
+ * Create a feed list
+ */
+export const createFeedList = <ThrowOnError extends boolean = false>(options: Options<CreateFeedListData, ThrowOnError>): RequestResult<CreateFeedListResponses, CreateFeedListErrors, ThrowOnError> => (options.client ?? client).post<CreateFeedListResponses, CreateFeedListErrors, ThrowOnError>({
+    url: '/v1/feed-lists',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Discover public feed lists
+ */
+export const discoverFeedLists = <ThrowOnError extends boolean = false>(options?: Options<DiscoverFeedListsData, ThrowOnError>): RequestResult<DiscoverFeedListsResponses, DiscoverFeedListsErrors, ThrowOnError> => (options?.client ?? client).get<DiscoverFeedListsResponses, DiscoverFeedListsErrors, ThrowOnError>({ url: '/v1/feed-lists/discover', ...options });
+
+/**
+ * List feed lists I follow
+ */
+export const listFollowedFeedLists = <ThrowOnError extends boolean = false>(options?: Options<ListFollowedFeedListsData, ThrowOnError>): RequestResult<ListFollowedFeedListsResponses, ListFollowedFeedListsErrors, ThrowOnError> => (options?.client ?? client).get<ListFollowedFeedListsResponses, ListFollowedFeedListsErrors, ThrowOnError>({ url: '/v1/feed-lists/followed', ...options });
+
+/**
+ * Delete a feed list
+ */
+export const deleteFeedList = <ThrowOnError extends boolean = false>(options: Options<DeleteFeedListData, ThrowOnError>): RequestResult<DeleteFeedListResponses, DeleteFeedListErrors, ThrowOnError> => (options.client ?? client).delete<DeleteFeedListResponses, DeleteFeedListErrors, ThrowOnError>({ url: '/v1/feed-lists/{listId}', ...options });
+
+/**
+ * Get a feed list
+ */
+export const getFeedList = <ThrowOnError extends boolean = false>(options: Options<GetFeedListData, ThrowOnError>): RequestResult<GetFeedListResponses, GetFeedListErrors, ThrowOnError> => (options.client ?? client).get<GetFeedListResponses, GetFeedListErrors, ThrowOnError>({ url: '/v1/feed-lists/{listId}', ...options });
+
+/**
+ * Update a feed list
+ */
+export const updateFeedList = <ThrowOnError extends boolean = false>(options: Options<UpdateFeedListData, ThrowOnError>): RequestResult<UpdateFeedListResponses, UpdateFeedListErrors, ThrowOnError> => (options.client ?? client).patch<UpdateFeedListResponses, UpdateFeedListErrors, ThrowOnError>({
+    url: '/v1/feed-lists/{listId}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Add a feed to a feed list
+ */
+export const addFeedListFeed = <ThrowOnError extends boolean = false>(options: Options<AddFeedListFeedData, ThrowOnError>): RequestResult<AddFeedListFeedResponses, AddFeedListFeedErrors, ThrowOnError> => (options.client ?? client).post<AddFeedListFeedResponses, AddFeedListFeedErrors, ThrowOnError>({
+    url: '/v1/feed-lists/{listId}/feeds',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Remove a feed from a feed list
+ */
+export const removeFeedListFeed = <ThrowOnError extends boolean = false>(options: Options<RemoveFeedListFeedData, ThrowOnError>): RequestResult<RemoveFeedListFeedResponses, RemoveFeedListFeedErrors, ThrowOnError> => (options.client ?? client).delete<RemoveFeedListFeedResponses, RemoveFeedListFeedErrors, ThrowOnError>({ url: '/v1/feed-lists/{listId}/feeds/{itemId}', ...options });
+
+/**
+ * Unfollow a feed list
+ */
+export const unfollowFeedList = <ThrowOnError extends boolean = false>(options: Options<UnfollowFeedListData, ThrowOnError>): RequestResult<UnfollowFeedListResponses, UnfollowFeedListErrors, ThrowOnError> => (options.client ?? client).delete<UnfollowFeedListResponses, UnfollowFeedListErrors, ThrowOnError>({ url: '/v1/feed-lists/{listId}/follow', ...options });
+
+/**
+ * Follow a feed list
+ */
+export const followFeedList = <ThrowOnError extends boolean = false>(options: Options<FollowFeedListData, ThrowOnError>): RequestResult<FollowFeedListResponses, FollowFeedListErrors, ThrowOnError> => (options.client ?? client).post<FollowFeedListResponses, FollowFeedListErrors, ThrowOnError>({ url: '/v1/feed-lists/{listId}/follow', ...options });
+
+/**
+ * Subscribe to all feeds in a feed list
+ */
+export const importFeedList = <ThrowOnError extends boolean = false>(options: Options<ImportFeedListData, ThrowOnError>): RequestResult<ImportFeedListResponses, ImportFeedListErrors, ThrowOnError> => (options.client ?? client).post<ImportFeedListResponses, ImportFeedListErrors, ThrowOnError>({ url: '/v1/feed-lists/{listId}/import', ...options });
+
+/**
+ * List feeds
+ */
+export const listFeeds = <ThrowOnError extends boolean = false>(options?: Options<ListFeedsData, ThrowOnError>): RequestResult<ListFeedsResponses, ListFeedsErrors, ThrowOnError> => (options?.client ?? client).get<ListFeedsResponses, ListFeedsErrors, ThrowOnError>({ url: '/v1/feeds', ...options });
+
+/**
+ * Subscribe to a feed
+ */
+export const createFeed = <ThrowOnError extends boolean = false>(options: Options<CreateFeedData, ThrowOnError>): RequestResult<CreateFeedResponses, CreateFeedErrors, ThrowOnError> => (options.client ?? client).post<CreateFeedResponses, CreateFeedErrors, ThrowOnError>({
+    url: '/v1/feeds',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Preview a feed without subscribing
+ *
+ * Fetches and parses a feed URL, returning feed metadata and recent entries without persisting anything.
+ */
+export const previewFeed = <ThrowOnError extends boolean = false>(options: Options<PreviewFeedData, ThrowOnError>): RequestResult<PreviewFeedResponses, PreviewFeedErrors, ThrowOnError> => (options.client ?? client).post<PreviewFeedResponses, PreviewFeedErrors, ThrowOnError>({
+    url: '/v1/feeds/preview',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete a feed
+ */
+export const deleteFeed = <ThrowOnError extends boolean = false>(options: Options<DeleteFeedData, ThrowOnError>): RequestResult<DeleteFeedResponses, DeleteFeedErrors, ThrowOnError> => (options.client ?? client).delete<DeleteFeedResponses, DeleteFeedErrors, ThrowOnError>({ url: '/v1/feeds/{feedId}', ...options });
+
+/**
+ * Get a feed
+ */
+export const getFeed = <ThrowOnError extends boolean = false>(options: Options<GetFeedData, ThrowOnError>): RequestResult<GetFeedResponses, GetFeedErrors, ThrowOnError> => (options.client ?? client).get<GetFeedResponses, GetFeedErrors, ThrowOnError>({ url: '/v1/feeds/{feedId}', ...options });
+
+/**
+ * Update a feed
+ *
+ * Update the folder assignment and/or title of a feed.
+ */
+export const updateFeed = <ThrowOnError extends boolean = false>(options: Options<UpdateFeedData, ThrowOnError>): RequestResult<UpdateFeedResponses, UpdateFeedErrors, ThrowOnError> => (options.client ?? client).patch<UpdateFeedResponses, UpdateFeedErrors, ThrowOnError>({
+    url: '/v1/feeds/{feedId}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Mark all entries in a feed as read
+ */
+export const markFeedRead = <ThrowOnError extends boolean = false>(options: Options<MarkFeedReadData, ThrowOnError>): RequestResult<MarkFeedReadResponses, MarkFeedReadErrors, ThrowOnError> => (options.client ?? client).post<MarkFeedReadResponses, MarkFeedReadErrors, ThrowOnError>({ url: '/v1/feeds/{feedId}/mark-all-read', ...options });
+
+/**
+ * Refresh a feed
+ *
+ * Manually fetch and parse the feed, inserting any new entries. Use this to get the latest articles without waiting for the scheduler.
+ */
+export const refreshFeed = <ThrowOnError extends boolean = false>(options: Options<RefreshFeedData, ThrowOnError>): RequestResult<RefreshFeedResponses, RefreshFeedErrors, ThrowOnError> => (options.client ?? client).post<RefreshFeedResponses, RefreshFeedErrors, ThrowOnError>({ url: '/v1/feeds/{feedId}/refresh', ...options });
+
+/**
+ * List folders
+ */
+export const listFolders = <ThrowOnError extends boolean = false>(options?: Options<ListFoldersData, ThrowOnError>): RequestResult<ListFoldersResponses, ListFoldersErrors, ThrowOnError> => (options?.client ?? client).get<ListFoldersResponses, ListFoldersErrors, ThrowOnError>({ url: '/v1/folders', ...options });
+
+/**
+ * Create a folder
+ */
+export const createFolder = <ThrowOnError extends boolean = false>(options: Options<CreateFolderData, ThrowOnError>): RequestResult<CreateFolderResponses, CreateFolderErrors, ThrowOnError> => (options.client ?? client).post<CreateFolderResponses, CreateFolderErrors, ThrowOnError>({
+    url: '/v1/folders',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete a folder
+ */
+export const deleteFolder = <ThrowOnError extends boolean = false>(options: Options<DeleteFolderData, ThrowOnError>): RequestResult<DeleteFolderResponses, DeleteFolderErrors, ThrowOnError> => (options.client ?? client).delete<DeleteFolderResponses, DeleteFolderErrors, ThrowOnError>({ url: '/v1/folders/{folderId}', ...options });
+
+/**
+ * Update a folder
+ *
+ * Update the title and/or parent folder of a folder. Set parent_id to move or nest the folder.
+ */
+export const updateFolder = <ThrowOnError extends boolean = false>(options: Options<UpdateFolderData, ThrowOnError>): RequestResult<UpdateFolderResponses, UpdateFolderErrors, ThrowOnError> => (options.client ?? client).patch<UpdateFolderResponses, UpdateFolderErrors, ThrowOnError>({
+    url: '/v1/folders/{folderId}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Health check
+ */
+export const health = <ThrowOnError extends boolean = false>(options?: Options<HealthData, ThrowOnError>): RequestResult<HealthResponses, HealthErrors, ThrowOnError> => (options?.client ?? client).get<HealthResponses, HealthErrors, ThrowOnError>({ url: '/v1/health', ...options });
+
+/**
+ * Delete current user account
+ */
+export const deleteMe = <ThrowOnError extends boolean = false>(options?: Options<DeleteMeData, ThrowOnError>): RequestResult<DeleteMeResponses, DeleteMeErrors, ThrowOnError> => (options?.client ?? client).delete<DeleteMeResponses, DeleteMeErrors, ThrowOnError>({ url: '/v1/me', ...options });
+
+/**
+ * Get current user
+ */
+export const getMe = <ThrowOnError extends boolean = false>(options?: Options<GetMeData, ThrowOnError>): RequestResult<GetMeResponses, GetMeErrors, ThrowOnError> => (options?.client ?? client).get<GetMeResponses, GetMeErrors, ThrowOnError>({ url: '/v1/me', ...options });
+
+/**
+ * Update current user profile
+ */
+export const updateMe = <ThrowOnError extends boolean = false>(options: Options<UpdateMeData, ThrowOnError>): RequestResult<UpdateMeResponses, UpdateMeErrors, ThrowOnError> => (options.client ?? client).patch<UpdateMeResponses, UpdateMeErrors, ThrowOnError>({
+    url: '/v1/me',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Export feeds as OPML
+ *
+ * Returns all feed subscriptions and folders as an OPML XML document.
+ */
+export const exportOpml = <ThrowOnError extends boolean = false>(options?: Options<ExportOpmlData, ThrowOnError>): RequestResult<ExportOpmlResponses, ExportOpmlErrors, ThrowOnError> => (options?.client ?? client).get<ExportOpmlResponses, ExportOpmlErrors, ThrowOnError>({ url: '/v1/opml/export', ...options });
+
+/**
+ * Import feeds from an OPML file
+ *
+ * Parses an OPML XML document and subscribes the user to all feeds found. Folders are created as needed. Existing subscriptions are skipped.
+ */
+export const importOpml = <ThrowOnError extends boolean = false>(options: Options<ImportOpmlData, ThrowOnError>): RequestResult<ImportOpmlResponses, ImportOpmlErrors, ThrowOnError> => (options.client ?? client).post<ImportOpmlResponses, ImportOpmlErrors, ThrowOnError>({
+    bodySerializer: null,
+    url: '/v1/opml/import',
+    ...options,
+    headers: {
+        'Content-Type': 'application/octet-stream',
+        ...options.headers
+    }
+});
+
+/**
+ * List API tokens
+ */
+export const listTokens = <ThrowOnError extends boolean = false>(options?: Options<ListTokensData, ThrowOnError>): RequestResult<ListTokensResponses, ListTokensErrors, ThrowOnError> => (options?.client ?? client).get<ListTokensResponses, ListTokensErrors, ThrowOnError>({ url: '/v1/tokens', ...options });
+
+/**
+ * Create an API token
+ */
+export const createToken = <ThrowOnError extends boolean = false>(options: Options<CreateTokenData, ThrowOnError>): RequestResult<CreateTokenResponses, CreateTokenErrors, ThrowOnError> => (options.client ?? client).post<CreateTokenResponses, CreateTokenErrors, ThrowOnError>({
+    url: '/v1/tokens',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete an API token
+ */
+export const deleteToken = <ThrowOnError extends boolean = false>(options: Options<DeleteTokenData, ThrowOnError>): RequestResult<DeleteTokenResponses, DeleteTokenErrors, ThrowOnError> => (options.client ?? client).delete<DeleteTokenResponses, DeleteTokenErrors, ThrowOnError>({ url: '/v1/tokens/{tokenId}', ...options });

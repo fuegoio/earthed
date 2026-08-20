@@ -50,7 +50,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/AddFeedListFeedInputBody.json"
+                            "https://example.com/schemas/AddFeedListFeedInputBody.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -81,7 +81,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/CreateFeedInputBody.json"
+                            "https://example.com/schemas/CreateFeedInputBody.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -108,7 +108,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/CreateFeedListInputBody.json"
+                            "https://example.com/schemas/CreateFeedListInputBody.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -139,7 +139,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/CreateFolderInputBody.json"
+                            "https://example.com/schemas/CreateFolderInputBody.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -166,7 +166,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/CreateTokenInputBody.json"
+                            "https://example.com/schemas/CreateTokenInputBody.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -189,7 +189,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/DeviceCodeOutputBody.json"
+                            "https://example.com/schemas/DeviceCodeOutputBody.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -232,7 +232,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/DeviceConfirmBody.json"
+                            "https://example.com/schemas/DeviceConfirmBody.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -253,7 +253,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/DeviceConfirmInputBody.json"
+                            "https://example.com/schemas/DeviceConfirmInputBody.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -279,7 +279,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/DeviceStatusBody.json"
+                            "https://example.com/schemas/DeviceStatusBody.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -300,7 +300,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/DeviceTokenInputBody.json"
+                            "https://example.com/schemas/DeviceTokenInputBody.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -322,7 +322,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/DeviceTokenOutputBody.json"
+                            "https://example.com/schemas/DeviceTokenOutputBody.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -383,7 +383,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/Entry.json"
+                            "https://example.com/schemas/Entry.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -489,7 +489,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/ErrorModel.json"
+                            "https://example.com/schemas/ErrorModel.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -553,7 +553,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/Feed.json"
+                            "https://example.com/schemas/Feed.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -639,7 +639,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/FeedList.json"
+                            "https://example.com/schemas/FeedList.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -707,7 +707,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/FeedListFeed.json"
+                            "https://example.com/schemas/FeedListFeed.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -751,7 +751,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/FeedSubscribersResponse.json"
+                            "https://example.com/schemas/FeedSubscribersResponse.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -783,7 +783,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/Folder.json"
+                            "https://example.com/schemas/Folder.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -833,7 +833,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/HealthResponse.json"
+                            "https://example.com/schemas/HealthResponse.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -854,7 +854,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/Import-feed-listResponse.json"
+                            "https://example.com/schemas/Import-feed-listResponse.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -906,7 +906,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/OPMLImportResultBody.json"
+                            "https://example.com/schemas/OPMLImportResultBody.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -958,7 +958,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/PreviewFeedBody.json"
+                            "https://example.com/schemas/PreviewFeedBody.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -1003,7 +1003,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/PreviewFeedInputBody.json"
+                            "https://example.com/schemas/PreviewFeedInputBody.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -1066,7 +1066,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/PublicProfileResponse.json"
+                            "https://example.com/schemas/PublicProfileResponse.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -1107,7 +1107,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/ShareArticleInputBody.json"
+                            "https://example.com/schemas/ShareArticleInputBody.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -1159,7 +1159,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/SharedArticle.json"
+                            "https://example.com/schemas/SharedArticle.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -1224,7 +1224,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/Toggle-entry-starredRequest.json"
+                            "https://example.com/schemas/Toggle-entry-starredRequest.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -1245,7 +1245,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/TokenOutputBody.json"
+                            "https://example.com/schemas/TokenOutputBody.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -1280,7 +1280,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/Update-entriesRequest.json"
+                            "https://example.com/schemas/Update-entriesRequest.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -1317,7 +1317,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/UpdateFeedInputBody.json"
+                            "https://example.com/schemas/UpdateFeedInputBody.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -1340,7 +1340,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/UpdateFeedListInputBody.json"
+                            "https://example.com/schemas/UpdateFeedListInputBody.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -1371,7 +1371,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/UpdateFolderInputBody.json"
+                            "https://example.com/schemas/UpdateFolderInputBody.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -1398,7 +1398,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/UpdateHandleInputBody.json"
+                            "https://example.com/schemas/UpdateHandleInputBody.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -1425,7 +1425,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/UpdateMeInputBody.json"
+                            "https://example.com/schemas/UpdateMeInputBody.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -1454,7 +1454,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/User.json"
+                            "https://example.com/schemas/User.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -1495,7 +1495,7 @@
                     "$schema": {
                         "description": "A URL to the JSON Schema for this object.",
                         "examples": [
-                            "/api/schemas/UserProfile.json"
+                            "https://example.com/schemas/UserProfile.json"
                         ],
                         "format": "uri",
                         "readOnly": true,
@@ -1552,1213 +1552,6 @@
     },
     "openapi": "3.1.0",
     "paths": {
-        "/api/auth/device/code": {
-            "post": {
-                "operationId": "device-code",
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/DeviceCodeOutputBody"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Begin device-flow login (issue a device code)",
-                "tags": [
-                    "device"
-                ]
-            }
-        },
-        "/api/auth/device/confirm": {
-            "post": {
-                "operationId": "device-confirm",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/DeviceConfirmInputBody"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/DeviceConfirmBody"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Approve or deny a device-flow login (authenticated user)",
-                "tags": [
-                    "device"
-                ]
-            }
-        },
-        "/api/auth/device/status": {
-            "get": {
-                "operationId": "device-status",
-                "parameters": [
-                    {
-                        "explode": false,
-                        "in": "query",
-                        "name": "user_code",
-                        "schema": {
-                            "maxLength": 32,
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/DeviceStatusBody"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Check device-flow status by user code (authenticated user)",
-                "tags": [
-                    "device"
-                ]
-            }
-        },
-        "/api/auth/device/token": {
-            "post": {
-                "operationId": "device-token",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/DeviceTokenInputBody"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/DeviceTokenOutputBody"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Poll for device-flow login result",
-                "tags": [
-                    "device"
-                ]
-            }
-        },
-        "/api/v1/entries": {
-            "get": {
-                "operationId": "list-entries",
-                "parameters": [
-                    {
-                        "explode": false,
-                        "in": "query",
-                        "name": "feed_id",
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "explode": false,
-                        "in": "query",
-                        "name": "folder_id",
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "explode": false,
-                        "in": "query",
-                        "name": "status",
-                        "schema": {
-                            "enum": [
-                                "unread",
-                                "read",
-                                "removed"
-                            ],
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "explode": false,
-                        "in": "query",
-                        "name": "starred",
-                        "schema": {
-                            "type": "boolean"
-                        }
-                    },
-                    {
-                        "explode": false,
-                        "in": "query",
-                        "name": "search",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "explode": false,
-                        "in": "query",
-                        "name": "limit",
-                        "schema": {
-                            "default": 50,
-                            "format": "int64",
-                            "maximum": 200,
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "explode": false,
-                        "in": "query",
-                        "name": "offset",
-                        "schema": {
-                            "default": 0,
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "items": {
-                                        "$ref": "#/components/schemas/Entry"
-                                    },
-                                    "type": [
-                                        "array",
-                                        "null"
-                                    ]
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "List entries",
-                "tags": [
-                    "entries"
-                ]
-            },
-            "put": {
-                "operationId": "update-entries",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/Update-entriesRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Bulk update entry status",
-                "tags": [
-                    "entries"
-                ]
-            }
-        },
-        "/api/v1/entries/{entryId}": {
-            "get": {
-                "operationId": "get-entry",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "entryId",
-                        "required": true,
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Entry"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Get an entry",
-                "tags": [
-                    "entries"
-                ]
-            }
-        },
-        "/api/v1/entries/{entryId}/starred": {
-            "put": {
-                "operationId": "toggle-entry-starred",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "entryId",
-                        "required": true,
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/Toggle-entry-starredRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Toggle starred on an entry",
-                "tags": [
-                    "entries"
-                ]
-            }
-        },
-        "/api/v1/feed-lists": {
-            "get": {
-                "operationId": "list-my-feed-lists",
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "items": {
-                                        "$ref": "#/components/schemas/FeedList"
-                                    },
-                                    "type": [
-                                        "array",
-                                        "null"
-                                    ]
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "List my feed lists",
-                "tags": [
-                    "feed-lists"
-                ]
-            },
-            "post": {
-                "operationId": "create-feed-list",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateFeedListInputBody"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/FeedList"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Create a feed list",
-                "tags": [
-                    "feed-lists"
-                ]
-            }
-        },
-        "/api/v1/feed-lists/discover": {
-            "get": {
-                "operationId": "discover-feed-lists",
-                "parameters": [
-                    {
-                        "explode": false,
-                        "in": "query",
-                        "name": "limit",
-                        "schema": {
-                            "default": 24,
-                            "format": "int64",
-                            "maximum": 100,
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "explode": false,
-                        "in": "query",
-                        "name": "offset",
-                        "schema": {
-                            "default": 0,
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "items": {
-                                        "$ref": "#/components/schemas/FeedList"
-                                    },
-                                    "type": [
-                                        "array",
-                                        "null"
-                                    ]
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Discover public feed lists",
-                "tags": [
-                    "feed-lists"
-                ]
-            }
-        },
-        "/api/v1/feed-lists/followed": {
-            "get": {
-                "operationId": "list-followed-feed-lists",
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "items": {
-                                        "$ref": "#/components/schemas/FeedList"
-                                    },
-                                    "type": [
-                                        "array",
-                                        "null"
-                                    ]
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "List feed lists I follow",
-                "tags": [
-                    "feed-lists"
-                ]
-            }
-        },
-        "/api/v1/feed-lists/{listId}": {
-            "delete": {
-                "operationId": "delete-feed-list",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "listId",
-                        "required": true,
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Delete a feed list",
-                "tags": [
-                    "feed-lists"
-                ]
-            },
-            "get": {
-                "operationId": "get-feed-list",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "listId",
-                        "required": true,
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/FeedList"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Get a feed list",
-                "tags": [
-                    "feed-lists"
-                ]
-            },
-            "patch": {
-                "operationId": "update-feed-list",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "listId",
-                        "required": true,
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateFeedListInputBody"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/FeedList"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Update a feed list",
-                "tags": [
-                    "feed-lists"
-                ]
-            }
-        },
-        "/api/v1/feed-lists/{listId}/feeds": {
-            "post": {
-                "operationId": "add-feed-list-feed",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "listId",
-                        "required": true,
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/AddFeedListFeedInputBody"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/FeedListFeed"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Add a feed to a feed list",
-                "tags": [
-                    "feed-lists"
-                ]
-            }
-        },
-        "/api/v1/feed-lists/{listId}/feeds/{itemId}": {
-            "delete": {
-                "operationId": "remove-feed-list-feed",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "listId",
-                        "required": true,
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "in": "path",
-                        "name": "itemId",
-                        "required": true,
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Remove a feed from a feed list",
-                "tags": [
-                    "feed-lists"
-                ]
-            }
-        },
-        "/api/v1/feed-lists/{listId}/follow": {
-            "delete": {
-                "operationId": "unfollow-feed-list",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "listId",
-                        "required": true,
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Unfollow a feed list",
-                "tags": [
-                    "feed-lists"
-                ]
-            },
-            "post": {
-                "operationId": "follow-feed-list",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "listId",
-                        "required": true,
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Follow a feed list",
-                "tags": [
-                    "feed-lists"
-                ]
-            }
-        },
-        "/api/v1/feed-lists/{listId}/import": {
-            "post": {
-                "operationId": "import-feed-list",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "listId",
-                        "required": true,
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Import-feed-listResponse"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Subscribe to all feeds in a feed list",
-                "tags": [
-                    "feed-lists"
-                ]
-            }
-        },
-        "/api/v1/feeds": {
-            "get": {
-                "operationId": "list-feeds",
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "items": {
-                                        "$ref": "#/components/schemas/Feed"
-                                    },
-                                    "type": [
-                                        "array",
-                                        "null"
-                                    ]
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "List feeds",
-                "tags": [
-                    "feeds"
-                ]
-            },
-            "post": {
-                "operationId": "create-feed",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateFeedInputBody"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Feed"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Subscribe to a feed",
-                "tags": [
-                    "feeds"
-                ]
-            }
-        },
-        "/api/v1/feeds/preview": {
-            "post": {
-                "description": "Fetches and parses a feed URL, returning feed metadata and recent entries without persisting anything.",
-                "operationId": "preview-feed",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/PreviewFeedInputBody"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PreviewFeedBody"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Preview a feed without subscribing",
-                "tags": [
-                    "feeds"
-                ]
-            }
-        },
-        "/api/v1/feeds/{feedId}": {
-            "delete": {
-                "operationId": "delete-feed",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "feedId",
-                        "required": true,
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Delete a feed",
-                "tags": [
-                    "feeds"
-                ]
-            },
-            "get": {
-                "operationId": "get-feed",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "feedId",
-                        "required": true,
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Feed"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Get a feed",
-                "tags": [
-                    "feeds"
-                ]
-            },
-            "patch": {
-                "description": "Update the folder assignment and/or title of a feed.",
-                "operationId": "update-feed",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "feedId",
-                        "required": true,
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateFeedInputBody"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Feed"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Update a feed",
-                "tags": [
-                    "feeds"
-                ]
-            }
-        },
-        "/api/v1/feeds/{feedId}/mark-all-read": {
-            "post": {
-                "operationId": "mark-feed-read",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "feedId",
-                        "required": true,
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Mark all entries in a feed as read",
-                "tags": [
-                    "feeds"
-                ]
-            }
-        },
-        "/api/v1/feeds/{feedId}/refresh": {
-            "post": {
-                "description": "Manually fetch and parse the feed, inserting any new entries. Use this to get the latest articles without waiting for the scheduler.",
-                "operationId": "refresh-feed",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "feedId",
-                        "required": true,
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Feed"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Refresh a feed",
-                "tags": [
-                    "feeds"
-                ]
-            }
-        },
         "/api/v1/feeds/{feedId}/subscribers": {
             "get": {
                 "operationId": "feed-subscribers",
@@ -2801,291 +1594,6 @@
                 ]
             }
         },
-        "/api/v1/folders": {
-            "get": {
-                "operationId": "list-folders",
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "items": {
-                                        "$ref": "#/components/schemas/Folder"
-                                    },
-                                    "type": [
-                                        "array",
-                                        "null"
-                                    ]
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "List folders",
-                "tags": [
-                    "folders"
-                ]
-            },
-            "post": {
-                "operationId": "create-folder",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateFolderInputBody"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Folder"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Create a folder",
-                "tags": [
-                    "folders"
-                ]
-            }
-        },
-        "/api/v1/folders/{folderId}": {
-            "delete": {
-                "operationId": "delete-folder",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "folderId",
-                        "required": true,
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Delete a folder",
-                "tags": [
-                    "folders"
-                ]
-            },
-            "patch": {
-                "description": "Update the title and/or parent folder of a folder. Set parent_id to move or nest the folder.",
-                "operationId": "update-folder",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "folderId",
-                        "required": true,
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateFolderInputBody"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Folder"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Update a folder",
-                "tags": [
-                    "folders"
-                ]
-            }
-        },
-        "/api/v1/health": {
-            "get": {
-                "operationId": "health",
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HealthResponse"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Health check",
-                "tags": [
-                    "health"
-                ]
-            }
-        },
-        "/api/v1/me": {
-            "delete": {
-                "operationId": "delete-me",
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Delete current user account",
-                "tags": [
-                    "users"
-                ]
-            },
-            "get": {
-                "operationId": "get-me",
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/User"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Get current user",
-                "tags": [
-                    "users"
-                ]
-            },
-            "patch": {
-                "operationId": "update-me",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateMeInputBody"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/User"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Update current user profile",
-                "tags": [
-                    "users"
-                ]
-            }
-        },
         "/api/v1/me/handle": {
             "patch": {
                 "operationId": "update-handle",
@@ -3124,83 +1632,6 @@
                 "summary": "Set or update your social handle",
                 "tags": [
                     "social"
-                ]
-            }
-        },
-        "/api/v1/opml/export": {
-            "get": {
-                "description": "Returns all feed subscriptions and folders as an OPML XML document.",
-                "operationId": "export-opml",
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "contentEncoding": "base64",
-                                    "type": "string"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Export feeds as OPML",
-                "tags": [
-                    "opml"
-                ]
-            }
-        },
-        "/api/v1/opml/import": {
-            "post": {
-                "description": "Parses an OPML XML document and subscribes the user to all feeds found. Folders are created as needed. Existing subscriptions are skipped.",
-                "operationId": "import-opml",
-                "requestBody": {
-                    "content": {
-                        "application/octet-stream": {
-                            "schema": {
-                                "contentMediaType": "application/octet-stream",
-                                "format": "binary",
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/OPMLImportResultBody"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Import feeds from an OPML file",
-                "tags": [
-                    "opml"
                 ]
             }
         },
@@ -3414,117 +1845,6 @@
                 ]
             }
         },
-        "/api/v1/tokens": {
-            "get": {
-                "operationId": "list-tokens",
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "items": {
-                                        "$ref": "#/components/schemas/APIToken"
-                                    },
-                                    "type": [
-                                        "array",
-                                        "null"
-                                    ]
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "List API tokens",
-                "tags": [
-                    "tokens"
-                ]
-            },
-            "post": {
-                "operationId": "create-token",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateTokenInputBody"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/TokenOutputBody"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Create an API token",
-                "tags": [
-                    "tokens"
-                ]
-            }
-        },
-        "/api/v1/tokens/{tokenId}": {
-            "delete": {
-                "operationId": "delete-token",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "tokenId",
-                        "required": true,
-                        "schema": {
-                            "format": "int64",
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "default": {
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorModel"
-                                }
-                            }
-                        },
-                        "description": "Error"
-                    }
-                },
-                "summary": "Delete an API token",
-                "tags": [
-                    "tokens"
-                ]
-            }
-        },
         "/api/v1/users/{handle}": {
             "get": {
                 "operationId": "get-user-profile",
@@ -3725,11 +2045,1691 @@
                     "social"
                 ]
             }
+        },
+        "/auth/device/code": {
+            "post": {
+                "operationId": "device-code",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeviceCodeOutputBody"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Begin device-flow login (issue a device code)",
+                "tags": [
+                    "device"
+                ]
+            }
+        },
+        "/auth/device/confirm": {
+            "post": {
+                "operationId": "device-confirm",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeviceConfirmInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeviceConfirmBody"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Approve or deny a device-flow login (authenticated user)",
+                "tags": [
+                    "device"
+                ]
+            }
+        },
+        "/auth/device/status": {
+            "get": {
+                "operationId": "device-status",
+                "parameters": [
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "user_code",
+                        "schema": {
+                            "maxLength": 32,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeviceStatusBody"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Check device-flow status by user code (authenticated user)",
+                "tags": [
+                    "device"
+                ]
+            }
+        },
+        "/auth/device/token": {
+            "post": {
+                "operationId": "device-token",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeviceTokenInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeviceTokenOutputBody"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Poll for device-flow login result",
+                "tags": [
+                    "device"
+                ]
+            }
+        },
+        "/v1/entries": {
+            "get": {
+                "operationId": "list-entries",
+                "parameters": [
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "feed_id",
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "folder_id",
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "enum": [
+                                "unread",
+                                "read",
+                                "removed"
+                            ],
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "starred",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "search",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "limit",
+                        "schema": {
+                            "default": 50,
+                            "format": "int64",
+                            "maximum": 200,
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "offset",
+                        "schema": {
+                            "default": 0,
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/Entry"
+                                    },
+                                    "type": [
+                                        "array",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "List entries",
+                "tags": [
+                    "entries"
+                ]
+            },
+            "put": {
+                "operationId": "update-entries",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Update-entriesRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Bulk update entry status",
+                "tags": [
+                    "entries"
+                ]
+            }
+        },
+        "/v1/entries/{entryId}": {
+            "get": {
+                "operationId": "get-entry",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entryId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Entry"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Get an entry",
+                "tags": [
+                    "entries"
+                ]
+            }
+        },
+        "/v1/entries/{entryId}/starred": {
+            "put": {
+                "operationId": "toggle-entry-starred",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entryId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Toggle-entry-starredRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Toggle starred on an entry",
+                "tags": [
+                    "entries"
+                ]
+            }
+        },
+        "/v1/feed-lists": {
+            "get": {
+                "operationId": "list-my-feed-lists",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/FeedList"
+                                    },
+                                    "type": [
+                                        "array",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "List my feed lists",
+                "tags": [
+                    "feed-lists"
+                ]
+            },
+            "post": {
+                "operationId": "create-feed-list",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateFeedListInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FeedList"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Create a feed list",
+                "tags": [
+                    "feed-lists"
+                ]
+            }
+        },
+        "/v1/feed-lists/discover": {
+            "get": {
+                "operationId": "discover-feed-lists",
+                "parameters": [
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "limit",
+                        "schema": {
+                            "default": 24,
+                            "format": "int64",
+                            "maximum": 100,
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "offset",
+                        "schema": {
+                            "default": 0,
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/FeedList"
+                                    },
+                                    "type": [
+                                        "array",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Discover public feed lists",
+                "tags": [
+                    "feed-lists"
+                ]
+            }
+        },
+        "/v1/feed-lists/followed": {
+            "get": {
+                "operationId": "list-followed-feed-lists",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/FeedList"
+                                    },
+                                    "type": [
+                                        "array",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "List feed lists I follow",
+                "tags": [
+                    "feed-lists"
+                ]
+            }
+        },
+        "/v1/feed-lists/{listId}": {
+            "delete": {
+                "operationId": "delete-feed-list",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "listId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Delete a feed list",
+                "tags": [
+                    "feed-lists"
+                ]
+            },
+            "get": {
+                "operationId": "get-feed-list",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "listId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FeedList"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Get a feed list",
+                "tags": [
+                    "feed-lists"
+                ]
+            },
+            "patch": {
+                "operationId": "update-feed-list",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "listId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateFeedListInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FeedList"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Update a feed list",
+                "tags": [
+                    "feed-lists"
+                ]
+            }
+        },
+        "/v1/feed-lists/{listId}/feeds": {
+            "post": {
+                "operationId": "add-feed-list-feed",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "listId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AddFeedListFeedInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FeedListFeed"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Add a feed to a feed list",
+                "tags": [
+                    "feed-lists"
+                ]
+            }
+        },
+        "/v1/feed-lists/{listId}/feeds/{itemId}": {
+            "delete": {
+                "operationId": "remove-feed-list-feed",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "listId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "name": "itemId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Remove a feed from a feed list",
+                "tags": [
+                    "feed-lists"
+                ]
+            }
+        },
+        "/v1/feed-lists/{listId}/follow": {
+            "delete": {
+                "operationId": "unfollow-feed-list",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "listId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Unfollow a feed list",
+                "tags": [
+                    "feed-lists"
+                ]
+            },
+            "post": {
+                "operationId": "follow-feed-list",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "listId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Follow a feed list",
+                "tags": [
+                    "feed-lists"
+                ]
+            }
+        },
+        "/v1/feed-lists/{listId}/import": {
+            "post": {
+                "operationId": "import-feed-list",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "listId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Import-feed-listResponse"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Subscribe to all feeds in a feed list",
+                "tags": [
+                    "feed-lists"
+                ]
+            }
+        },
+        "/v1/feeds": {
+            "get": {
+                "operationId": "list-feeds",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/Feed"
+                                    },
+                                    "type": [
+                                        "array",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "List feeds",
+                "tags": [
+                    "feeds"
+                ]
+            },
+            "post": {
+                "operationId": "create-feed",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateFeedInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Feed"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Subscribe to a feed",
+                "tags": [
+                    "feeds"
+                ]
+            }
+        },
+        "/v1/feeds/preview": {
+            "post": {
+                "description": "Fetches and parses a feed URL, returning feed metadata and recent entries without persisting anything.",
+                "operationId": "preview-feed",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PreviewFeedInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PreviewFeedBody"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Preview a feed without subscribing",
+                "tags": [
+                    "feeds"
+                ]
+            }
+        },
+        "/v1/feeds/{feedId}": {
+            "delete": {
+                "operationId": "delete-feed",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "feedId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Delete a feed",
+                "tags": [
+                    "feeds"
+                ]
+            },
+            "get": {
+                "operationId": "get-feed",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "feedId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Feed"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Get a feed",
+                "tags": [
+                    "feeds"
+                ]
+            },
+            "patch": {
+                "description": "Update the folder assignment and/or title of a feed.",
+                "operationId": "update-feed",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "feedId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateFeedInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Feed"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Update a feed",
+                "tags": [
+                    "feeds"
+                ]
+            }
+        },
+        "/v1/feeds/{feedId}/mark-all-read": {
+            "post": {
+                "operationId": "mark-feed-read",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "feedId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Mark all entries in a feed as read",
+                "tags": [
+                    "feeds"
+                ]
+            }
+        },
+        "/v1/feeds/{feedId}/refresh": {
+            "post": {
+                "description": "Manually fetch and parse the feed, inserting any new entries. Use this to get the latest articles without waiting for the scheduler.",
+                "operationId": "refresh-feed",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "feedId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Feed"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Refresh a feed",
+                "tags": [
+                    "feeds"
+                ]
+            }
+        },
+        "/v1/folders": {
+            "get": {
+                "operationId": "list-folders",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/Folder"
+                                    },
+                                    "type": [
+                                        "array",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "List folders",
+                "tags": [
+                    "folders"
+                ]
+            },
+            "post": {
+                "operationId": "create-folder",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateFolderInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Folder"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Create a folder",
+                "tags": [
+                    "folders"
+                ]
+            }
+        },
+        "/v1/folders/{folderId}": {
+            "delete": {
+                "operationId": "delete-folder",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "folderId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Delete a folder",
+                "tags": [
+                    "folders"
+                ]
+            },
+            "patch": {
+                "description": "Update the title and/or parent folder of a folder. Set parent_id to move or nest the folder.",
+                "operationId": "update-folder",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "folderId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateFolderInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Folder"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Update a folder",
+                "tags": [
+                    "folders"
+                ]
+            }
+        },
+        "/v1/health": {
+            "get": {
+                "operationId": "health",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HealthResponse"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Health check",
+                "tags": [
+                    "health"
+                ]
+            }
+        },
+        "/v1/me": {
+            "delete": {
+                "operationId": "delete-me",
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Delete current user account",
+                "tags": [
+                    "users"
+                ]
+            },
+            "get": {
+                "operationId": "get-me",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Get current user",
+                "tags": [
+                    "users"
+                ]
+            },
+            "patch": {
+                "operationId": "update-me",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateMeInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Update current user profile",
+                "tags": [
+                    "users"
+                ]
+            }
+        },
+        "/v1/opml/export": {
+            "get": {
+                "description": "Returns all feed subscriptions and folders as an OPML XML document.",
+                "operationId": "export-opml",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "contentEncoding": "base64",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Export feeds as OPML",
+                "tags": [
+                    "opml"
+                ]
+            }
+        },
+        "/v1/opml/import": {
+            "post": {
+                "description": "Parses an OPML XML document and subscribes the user to all feeds found. Folders are created as needed. Existing subscriptions are skipped.",
+                "operationId": "import-opml",
+                "requestBody": {
+                    "content": {
+                        "application/octet-stream": {
+                            "schema": {
+                                "contentMediaType": "application/octet-stream",
+                                "format": "binary",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OPMLImportResultBody"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Import feeds from an OPML file",
+                "tags": [
+                    "opml"
+                ]
+            }
+        },
+        "/v1/tokens": {
+            "get": {
+                "operationId": "list-tokens",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/APIToken"
+                                    },
+                                    "type": [
+                                        "array",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "List API tokens",
+                "tags": [
+                    "tokens"
+                ]
+            },
+            "post": {
+                "operationId": "create-token",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateTokenInputBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenOutputBody"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Create an API token",
+                "tags": [
+                    "tokens"
+                ]
+            }
+        },
+        "/v1/tokens/{tokenId}": {
+            "delete": {
+                "operationId": "delete-token",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "tokenId",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Delete an API token",
+                "tags": [
+                    "tokens"
+                ]
+            }
         }
     },
     "servers": [
         {
-            "url": "/api"
+            "url": ""
         }
     ],
     "tags": [

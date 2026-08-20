@@ -769,7 +769,7 @@ export const FeedSubscribersResponseSchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/FeedSubscribersResponse.json'
+                'https://example.com/schemas/FeedSubscribersResponse.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -1092,7 +1092,7 @@ export const PublicProfileResponseSchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/PublicProfileResponse.json'
+                'https://example.com/schemas/PublicProfileResponse.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -1134,7 +1134,7 @@ export const ShareArticleInputBodySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/ShareArticleInputBody.json'
+                'https://example.com/schemas/ShareArticleInputBody.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -1187,7 +1187,7 @@ export const SharedArticleSchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/SharedArticle.json'
+                'https://example.com/schemas/SharedArticle.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -1433,7 +1433,7 @@ export const UpdateHandleInputBodySchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/UpdateHandleInputBody.json'
+                'https://example.com/schemas/UpdateHandleInputBody.json'
             ],
             format: 'uri',
             readOnly: true,
@@ -1533,7 +1533,7 @@ export const UserProfileSchema = {
         $schema: {
             description: 'A URL to the JSON Schema for this object.',
             examples: [
-                '/api/schemas/UserProfile.json'
+                'https://example.com/schemas/UserProfile.json'
             ],
             format: 'uri',
             readOnly: true,

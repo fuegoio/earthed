@@ -771,6 +771,323 @@ export type UserProfileWritable = {
     user_id: number;
 };
 
+export type FeedSubscribersData = {
+    body?: never;
+    path: {
+        feedId: number;
+    };
+    query?: never;
+    url: '/api/v1/feeds/{feedId}/subscribers';
+};
+
+export type FeedSubscribersErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type FeedSubscribersError = FeedSubscribersErrors[keyof FeedSubscribersErrors];
+
+export type FeedSubscribersResponses = {
+    /**
+     * OK
+     */
+    200: FeedSubscribersResponse;
+};
+
+export type FeedSubscribersResponse2 = FeedSubscribersResponses[keyof FeedSubscribersResponses];
+
+export type UpdateHandleData = {
+    body: UpdateHandleInputBodyWritable;
+    path?: never;
+    query?: never;
+    url: '/api/v1/me/handle';
+};
+
+export type UpdateHandleErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type UpdateHandleError = UpdateHandleErrors[keyof UpdateHandleErrors];
+
+export type UpdateHandleResponses = {
+    /**
+     * OK
+     */
+    200: UserProfile;
+};
+
+export type UpdateHandleResponse = UpdateHandleResponses[keyof UpdateHandleResponses];
+
+export type ListFollowingData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/social/following';
+};
+
+export type ListFollowingErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type ListFollowingError = ListFollowingErrors[keyof ListFollowingErrors];
+
+export type ListFollowingResponses = {
+    /**
+     * OK
+     */
+    200: Array<UserProfile> | null;
+};
+
+export type ListFollowingResponse = ListFollowingResponses[keyof ListFollowingResponses];
+
+export type MySharedArticlesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/social/shares';
+};
+
+export type MySharedArticlesErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type MySharedArticlesError = MySharedArticlesErrors[keyof MySharedArticlesErrors];
+
+export type MySharedArticlesResponses = {
+    /**
+     * OK
+     */
+    200: Array<SharedArticle> | null;
+};
+
+export type MySharedArticlesResponse = MySharedArticlesResponses[keyof MySharedArticlesResponses];
+
+export type ShareArticleData = {
+    body: ShareArticleInputBodyWritable;
+    path?: never;
+    query?: never;
+    url: '/api/v1/social/shares';
+};
+
+export type ShareArticleErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type ShareArticleError = ShareArticleErrors[keyof ShareArticleErrors];
+
+export type ShareArticleResponses = {
+    /**
+     * OK
+     */
+    200: SharedArticle;
+};
+
+export type ShareArticleResponse = ShareArticleResponses[keyof ShareArticleResponses];
+
+export type UnshareArticleData = {
+    body?: never;
+    path: {
+        shareId: number;
+    };
+    query?: never;
+    url: '/api/v1/social/shares/{shareId}';
+};
+
+export type UnshareArticleErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type UnshareArticleError = UnshareArticleErrors[keyof UnshareArticleErrors];
+
+export type UnshareArticleResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type UnshareArticleResponse = UnshareArticleResponses[keyof UnshareArticleResponses];
+
+export type SocialTimelineData = {
+    body?: never;
+    path?: never;
+    query?: {
+        limit?: number;
+        offset?: number;
+    };
+    url: '/api/v1/social/timeline';
+};
+
+export type SocialTimelineErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type SocialTimelineError = SocialTimelineErrors[keyof SocialTimelineErrors];
+
+export type SocialTimelineResponses = {
+    /**
+     * OK
+     */
+    200: Array<SharedArticle> | null;
+};
+
+export type SocialTimelineResponse = SocialTimelineResponses[keyof SocialTimelineResponses];
+
+export type GetUserProfileData = {
+    body?: never;
+    path: {
+        handle: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{handle}';
+};
+
+export type GetUserProfileErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type GetUserProfileError = GetUserProfileErrors[keyof GetUserProfileErrors];
+
+export type GetUserProfileResponses = {
+    /**
+     * OK
+     */
+    200: PublicProfileResponse;
+};
+
+export type GetUserProfileResponse = GetUserProfileResponses[keyof GetUserProfileResponses];
+
+export type UnfollowUserData = {
+    body?: never;
+    path: {
+        handle: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{handle}/follow';
+};
+
+export type UnfollowUserErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type UnfollowUserError = UnfollowUserErrors[keyof UnfollowUserErrors];
+
+export type UnfollowUserResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type UnfollowUserResponse = UnfollowUserResponses[keyof UnfollowUserResponses];
+
+export type FollowUserData = {
+    body?: never;
+    path: {
+        handle: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{handle}/follow';
+};
+
+export type FollowUserErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type FollowUserError = FollowUserErrors[keyof FollowUserErrors];
+
+export type FollowUserResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type FollowUserResponse = FollowUserResponses[keyof FollowUserResponses];
+
+export type ListFollowersData = {
+    body?: never;
+    path: {
+        handle: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{handle}/followers';
+};
+
+export type ListFollowersErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type ListFollowersError = ListFollowersErrors[keyof ListFollowersErrors];
+
+export type ListFollowersResponses = {
+    /**
+     * OK
+     */
+    200: Array<UserProfile> | null;
+};
+
+export type ListFollowersResponse = ListFollowersResponses[keyof ListFollowersResponses];
+
+export type ListUserFollowingData = {
+    body?: never;
+    path: {
+        handle: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{handle}/following';
+};
+
+export type ListUserFollowingErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type ListUserFollowingError = ListUserFollowingErrors[keyof ListUserFollowingErrors];
+
+export type ListUserFollowingResponses = {
+    /**
+     * OK
+     */
+    200: Array<UserProfile> | null;
+};
+
+export type ListUserFollowingResponse = ListUserFollowingResponses[keyof ListUserFollowingResponses];
+
 export type DeviceCodeData = {
     body?: never;
     path?: never;
@@ -1515,33 +1832,6 @@ export type RefreshFeedResponses = {
 
 export type RefreshFeedResponse = RefreshFeedResponses[keyof RefreshFeedResponses];
 
-export type FeedSubscribersData = {
-    body?: never;
-    path: {
-        feedId: number;
-    };
-    query?: never;
-    url: '/api/v1/feeds/{feedId}/subscribers';
-};
-
-export type FeedSubscribersErrors = {
-    /**
-     * Error
-     */
-    default: ErrorModel;
-};
-
-export type FeedSubscribersError = FeedSubscribersErrors[keyof FeedSubscribersErrors];
-
-export type FeedSubscribersResponses = {
-    /**
-     * OK
-     */
-    200: FeedSubscribersResponse;
-};
-
-export type FeedSubscribersResponse2 = FeedSubscribersResponses[keyof FeedSubscribersResponses];
-
 export type ListFoldersData = {
     body?: never;
     path?: never;
@@ -1746,31 +2036,6 @@ export type UpdateMeResponses = {
 
 export type UpdateMeResponse = UpdateMeResponses[keyof UpdateMeResponses];
 
-export type UpdateHandleData = {
-    body: UpdateHandleInputBodyWritable;
-    path?: never;
-    query?: never;
-    url: '/api/v1/me/handle';
-};
-
-export type UpdateHandleErrors = {
-    /**
-     * Error
-     */
-    default: ErrorModel;
-};
-
-export type UpdateHandleError = UpdateHandleErrors[keyof UpdateHandleErrors];
-
-export type UpdateHandleResponses = {
-    /**
-     * OK
-     */
-    200: UserProfile;
-};
-
-export type UpdateHandleResponse = UpdateHandleResponses[keyof UpdateHandleResponses];
-
 export type ExportOpmlData = {
     body?: never;
     path?: never;
@@ -1820,136 +2085,6 @@ export type ImportOpmlResponses = {
 };
 
 export type ImportOpmlResponse = ImportOpmlResponses[keyof ImportOpmlResponses];
-
-export type ListFollowingData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/v1/social/following';
-};
-
-export type ListFollowingErrors = {
-    /**
-     * Error
-     */
-    default: ErrorModel;
-};
-
-export type ListFollowingError = ListFollowingErrors[keyof ListFollowingErrors];
-
-export type ListFollowingResponses = {
-    /**
-     * OK
-     */
-    200: Array<UserProfile> | null;
-};
-
-export type ListFollowingResponse = ListFollowingResponses[keyof ListFollowingResponses];
-
-export type MySharedArticlesData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/v1/social/shares';
-};
-
-export type MySharedArticlesErrors = {
-    /**
-     * Error
-     */
-    default: ErrorModel;
-};
-
-export type MySharedArticlesError = MySharedArticlesErrors[keyof MySharedArticlesErrors];
-
-export type MySharedArticlesResponses = {
-    /**
-     * OK
-     */
-    200: Array<SharedArticle> | null;
-};
-
-export type MySharedArticlesResponse = MySharedArticlesResponses[keyof MySharedArticlesResponses];
-
-export type ShareArticleData = {
-    body: ShareArticleInputBodyWritable;
-    path?: never;
-    query?: never;
-    url: '/api/v1/social/shares';
-};
-
-export type ShareArticleErrors = {
-    /**
-     * Error
-     */
-    default: ErrorModel;
-};
-
-export type ShareArticleError = ShareArticleErrors[keyof ShareArticleErrors];
-
-export type ShareArticleResponses = {
-    /**
-     * OK
-     */
-    200: SharedArticle;
-};
-
-export type ShareArticleResponse = ShareArticleResponses[keyof ShareArticleResponses];
-
-export type UnshareArticleData = {
-    body?: never;
-    path: {
-        shareId: number;
-    };
-    query?: never;
-    url: '/api/v1/social/shares/{shareId}';
-};
-
-export type UnshareArticleErrors = {
-    /**
-     * Error
-     */
-    default: ErrorModel;
-};
-
-export type UnshareArticleError = UnshareArticleErrors[keyof UnshareArticleErrors];
-
-export type UnshareArticleResponses = {
-    /**
-     * No Content
-     */
-    204: void;
-};
-
-export type UnshareArticleResponse = UnshareArticleResponses[keyof UnshareArticleResponses];
-
-export type SocialTimelineData = {
-    body?: never;
-    path?: never;
-    query?: {
-        limit?: number;
-        offset?: number;
-    };
-    url: '/api/v1/social/timeline';
-};
-
-export type SocialTimelineErrors = {
-    /**
-     * Error
-     */
-    default: ErrorModel;
-};
-
-export type SocialTimelineError = SocialTimelineErrors[keyof SocialTimelineErrors];
-
-export type SocialTimelineResponses = {
-    /**
-     * OK
-     */
-    200: Array<SharedArticle> | null;
-};
-
-export type SocialTimelineResponse = SocialTimelineResponses[keyof SocialTimelineResponses];
 
 export type ListTokensData = {
     body?: never;
@@ -2027,138 +2162,3 @@ export type DeleteTokenResponses = {
 };
 
 export type DeleteTokenResponse = DeleteTokenResponses[keyof DeleteTokenResponses];
-
-export type GetUserProfileData = {
-    body?: never;
-    path: {
-        handle: string;
-    };
-    query?: never;
-    url: '/api/v1/users/{handle}';
-};
-
-export type GetUserProfileErrors = {
-    /**
-     * Error
-     */
-    default: ErrorModel;
-};
-
-export type GetUserProfileError = GetUserProfileErrors[keyof GetUserProfileErrors];
-
-export type GetUserProfileResponses = {
-    /**
-     * OK
-     */
-    200: PublicProfileResponse;
-};
-
-export type GetUserProfileResponse = GetUserProfileResponses[keyof GetUserProfileResponses];
-
-export type UnfollowUserData = {
-    body?: never;
-    path: {
-        handle: string;
-    };
-    query?: never;
-    url: '/api/v1/users/{handle}/follow';
-};
-
-export type UnfollowUserErrors = {
-    /**
-     * Error
-     */
-    default: ErrorModel;
-};
-
-export type UnfollowUserError = UnfollowUserErrors[keyof UnfollowUserErrors];
-
-export type UnfollowUserResponses = {
-    /**
-     * No Content
-     */
-    204: void;
-};
-
-export type UnfollowUserResponse = UnfollowUserResponses[keyof UnfollowUserResponses];
-
-export type FollowUserData = {
-    body?: never;
-    path: {
-        handle: string;
-    };
-    query?: never;
-    url: '/api/v1/users/{handle}/follow';
-};
-
-export type FollowUserErrors = {
-    /**
-     * Error
-     */
-    default: ErrorModel;
-};
-
-export type FollowUserError = FollowUserErrors[keyof FollowUserErrors];
-
-export type FollowUserResponses = {
-    /**
-     * No Content
-     */
-    204: void;
-};
-
-export type FollowUserResponse = FollowUserResponses[keyof FollowUserResponses];
-
-export type ListFollowersData = {
-    body?: never;
-    path: {
-        handle: string;
-    };
-    query?: never;
-    url: '/api/v1/users/{handle}/followers';
-};
-
-export type ListFollowersErrors = {
-    /**
-     * Error
-     */
-    default: ErrorModel;
-};
-
-export type ListFollowersError = ListFollowersErrors[keyof ListFollowersErrors];
-
-export type ListFollowersResponses = {
-    /**
-     * OK
-     */
-    200: Array<UserProfile> | null;
-};
-
-export type ListFollowersResponse = ListFollowersResponses[keyof ListFollowersResponses];
-
-export type ListUserFollowingData = {
-    body?: never;
-    path: {
-        handle: string;
-    };
-    query?: never;
-    url: '/api/v1/users/{handle}/following';
-};
-
-export type ListUserFollowingErrors = {
-    /**
-     * Error
-     */
-    default: ErrorModel;
-};
-
-export type ListUserFollowingError = ListUserFollowingErrors[keyof ListUserFollowingErrors];
-
-export type ListUserFollowingResponses = {
-    /**
-     * OK
-     */
-    200: Array<UserProfile> | null;
-};
-
-export type ListUserFollowingResponse = ListUserFollowingResponses[keyof ListUserFollowingResponses];
