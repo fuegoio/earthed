@@ -3,9 +3,10 @@ import { docs } from "collections/server";
 import { openapi } from "./openapi";
 
 // Three sections served from a single source so the sidebar can cross-link them:
-//   /docs          — product docs   (content/docs/product/)
+//   /              — product docs   (content/docs/product/)
 //   /self-hosting  — self-hosting   (content/docs/self-hosting/)
 //   /api-reference — OpenAPI spec   (content/docs/openapi/)
+// All URLs are relative to the basePath ("/docs") — next/link adds the prefix.
 export const source = loader(
   {
     docs: docs.toFumadocsSource(),
@@ -26,11 +27,12 @@ export const source = loader(
         const rest = slugs.slice(1);
         return rest.length ? `/self-hosting/${rest.join("/")}` : "/self-hosting";
       }
+      // Product docs live at the root of the basePath — just the slug, no prefix.
       if (slugs[0] === "product") {
         const rest = slugs.slice(1);
-        return rest.length ? `/docs/${rest.join("/")}` : "/docs";
+        return rest.length ? `/${rest.join("/")}` : "/";
       }
-      return slugs.length ? `/docs/${slugs.join("/")}` : "/docs";
+      return slugs.length ? `/${slugs.join("/")}` : "/";
     },
     plugins: [openapi.loaderPlugin()],
   },
