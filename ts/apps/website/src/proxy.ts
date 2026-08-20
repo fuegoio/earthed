@@ -1,4 +1,7 @@
 import type { APIContext } from "astro";
+import { Readable } from "node:stream";
+import http from "node:http";
+import https from "node:https";
 
 // Origin of the Next.js app the website proxies unknown paths to. Defaults
 // to the local dev server; set APP_URL (e.g. http://web:3000) in production.
@@ -16,10 +19,22 @@ const HOP_BY_HOP = new Set([
   "upgrade",
 ]);
 
+// Request headers that describe the incoming body and must not be copied
+// verbatim onto the upstream request: `host` must point at the app, and
+// `content-length` is recomputed by Node for the buffered body we send.
+const DROP_REQUEST = new Set(["host", "content-length"]);
+
 /**
  * proxyToApp forwards the incoming request to the Next.js app and returns its
  * response. It is used by the catch-all route (every path the website doesn't
  * own) and by the middleware (logged-in "/" so the app renders there).
+ *
+ * This uses Node's `http`/`https` modules rather than global `fetch` so the
+ * upstream body is streamed through **byte-for-byte without decompression**.
+ * `fetch` (undici) transparently gunzips responses but leaves the original
+ * `content-encoding` header in place, so forwarding its `Response` makes the
+ * browser try to decode an already-decoded body (ERR_CONTENT_DECODING_*).
+ * Raw passthrough keeps gzip/brotli end-to-end and lets the browser decode.
  *
  * The app's absolute redirect Location headers are rewritten to the public
  * origin so redirects (e.g. unauth /feeds -> /login) stay on the public host
@@ -28,46 +43,56 @@ const HOP_BY_HOP = new Set([
 export async function proxyToApp(context: APIContext): Promise<Response> {
   const { url, request } = context;
   const target = new URL(url.pathname + url.search, APP_URL);
+  const transport = target.protocol === "https:" ? https : http;
 
-  const reqHeaders = new Headers();
+  const reqHeaders: Record<string, string> = {};
   for (const [key, value] of request.headers) {
-    if (HOP_BY_HOP.has(key.toLowerCase())) continue;
-    reqHeaders.set(key, value);
+    const lower = key.toLowerCase();
+    if (HOP_BY_HOP.has(lower) || DROP_REQUEST.has(lower)) continue;
+    reqHeaders[key] = value;
   }
   // Let the app build public URLs (redirects, canonical links) from the
   // original request instead of the internal proxy address.
-  reqHeaders.set("x-forwarded-host", url.host);
-  reqHeaders.set("x-forwarded-proto", url.protocol.replace(":", ""));
-  reqHeaders.delete("x-forwarded-for");
-  reqHeaders.set("x-forwarded-for", request.headers.get("x-forwarded-for") ?? "");
+  reqHeaders["x-forwarded-host"] = url.host;
+  reqHeaders["x-forwarded-proto"] = url.protocol.replace(":", "");
+  reqHeaders["x-forwarded-for"] = request.headers.get("x-forwarded-for") ?? "";
 
-  const init: RequestInit = {
-    method: request.method,
-    headers: reqHeaders,
-    redirect: "manual",
-    // Forward the body for non-GET/HEAD so server actions and form posts pass
-    // through. `duplex: "half"` is required by undici when streaming a body.
-    body: request.method !== "GET" && request.method !== "HEAD" ? request.body : undefined,
-    // @ts-expect-error duplex is a non-standard but required option for streamed bodies.
-    duplex: "half",
-  };
+  // Buffer the request body for non-GET/HEAD so server actions and form posts
+  // pass through. Buffering (rather than streaming) lets Node set the correct
+  // content-length on the upstream request.
+  const hasBody = request.method !== "GET" && request.method !== "HEAD";
+  const body = hasBody ? Buffer.from(await request.arrayBuffer()) : undefined;
 
-  const upstream = await fetch(target, init);
+  return new Promise<Response>((resolve, reject) => {
+    const upstream = transport.request(
+      target,
+      { method: request.method, headers: reqHeaders },
+      (res) => {
+        const resHeaders = new Headers();
+        for (const [key, value] of Object.entries(res.headers)) {
+          if (value == null) continue;
+          const lower = key.toLowerCase();
+          if (HOP_BY_HOP.has(lower)) continue;
+          const val = Array.isArray(value) ? value.join(", ") : value;
+          if (lower === "location") {
+            resHeaders.set(key, rewriteLocation(val, url));
+          } else {
+            resHeaders.set(key, val);
+          }
+        }
 
-  const resHeaders = new Headers();
-  for (const [key, value] of upstream.headers) {
-    if (HOP_BY_HOP.has(key.toLowerCase())) continue;
-    if (key.toLowerCase() === "location") {
-      resHeaders.set(key, rewriteLocation(value, url));
-    } else {
-      resHeaders.set(key, value);
-    }
-  }
-
-  return new Response(upstream.body, {
-    status: upstream.status,
-    statusText: upstream.statusText,
-    headers: resHeaders,
+        resolve(
+          new Response(Readable.toWeb(res) as ReadableStream, {
+            status: res.statusCode ?? 200,
+            statusText: res.statusMessage ?? "",
+            headers: resHeaders,
+          }),
+        );
+      },
+    );
+    upstream.on("error", reject);
+    if (body) upstream.end(body);
+    else upstream.end();
   });
 }
 
