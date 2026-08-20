@@ -69,6 +69,29 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("EARTHED_COOKIE_SAMESITE=none requires EARTHED_COOKIE_SECURE=true (browsers reject SameSite=None without Secure)")
 	}
 
+	// When an explicit trusted-origins allowlist is set, always include the
+	// configured web frontend so its credentialed requests are accepted, and
+	// normalize entries (trim trailing slashes) so they match browser Origin
+	// headers, which never carry a trailing slash.
+	// When the allowlist is unset (nil) the CORS middleware is permissive and
+	// allows any origin, so the web URL is already covered.
+	if cfg.TrustedOrigins != nil {
+		webOrigin := strings.TrimRight(strings.TrimSpace(cfg.WebURL), "/")
+		seen := make(map[string]bool, len(cfg.TrustedOrigins)+1)
+		normalized := make([]string, 0, len(cfg.TrustedOrigins)+1)
+		add := func(o string) {
+			if !seen[o] {
+				seen[o] = true
+				normalized = append(normalized, o)
+			}
+		}
+		for _, o := range cfg.TrustedOrigins {
+			add(strings.TrimRight(strings.TrimSpace(o), "/"))
+		}
+		add(webOrigin)
+		cfg.TrustedOrigins = normalized
+	}
+
 	return cfg, nil
 }
 

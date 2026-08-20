@@ -53,7 +53,7 @@ EARTHED_COOKIE_SAMESITE=none
 EARTHED_TRUSTED_ORIGINS=https://app.earthed.app
 ```
 
-`Secure` requires the API to be served over HTTPS. `SameSite=None` without `Secure` is rejected by browsers, so the API rejects that combination at startup. Set `EARTHED_TRUSTED_ORIGINS` to the web app origin(s) so the API only returns `Access-Control-Allow-Credentials` for trusted frontends.
+`Secure` requires the API to be served over HTTPS. `SameSite=None` without `Secure` is rejected by browsers, so the API rejects that combination at startup. Set `EARTHED_TRUSTED_ORIGINS` to the web app origin(s) so the API only returns `Access-Control-Allow-Credentials` for trusted frontends. The value of `EARTHED_WEB_URL` is always added to the allowlist automatically, so you only need to list any additional origins.
 
 ## Database backup
 

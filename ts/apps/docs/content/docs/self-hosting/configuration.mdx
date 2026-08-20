@@ -23,7 +23,7 @@ description: Environment variables for the API and web containers.
 | `EARTHED_DISABLE_SCHEDULER`    | (unset)                                                                   | Set to any non-empty value to disable the scheduler        |
 | `EARTHED_COOKIE_SECURE`        | `false`                                                                   | Mark session cookies as `Secure` (required for cross-origin cookies over HTTPS) |
 | `EARTHED_COOKIE_SAMESITE`      | `lax`                                                                     | Cookie SameSite mode: `lax`, `none`, or `strict`. `none` requires `EARTHED_COOKIE_SECURE=true` |
-| `EARTHED_TRUSTED_ORIGINS`      | (unset)                                                                   | Comma-separated list of allowed browser origins (e.g. `https://app.earthed.app`). When unset, any origin is allowed (dev only) |
+| `EARTHED_TRUSTED_ORIGINS`      | (unset)                                                                   | Comma-separated list of allowed browser origins (e.g. `https://app.earthed.app`). When unset, any origin is allowed (dev only). When set, `EARTHED_WEB_URL` is always included automatically |
 
 ## Web
 
