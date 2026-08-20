@@ -43,6 +43,19 @@ server {
 }
 ```
 
+## Marketing site as the front door
+
+To host the marketing site and the app on the same domain (e.g. `earthed.app`), run the `website` container in front of the `web` container. The website is an Astro SSR server that serves its own pages and proxies every other path to the app — add a page under `src/pages/` and it's served instead of proxied. Logged-in visitors of `/` get the app (the website reads the `limen_session` cookie and proxies `/` to the app); logged-out visitors get the marketing page. Unknown paths fall through to the app, which handles its own auth (e.g. unauth `/feeds` redirects to `/login`).
+
+Point the website at the app with `APP_URL`:
+
+```
+# website container
+APP_URL=http://web:3000
+```
+
+Self-hosted deployments that don't want the marketing site skip the `website` container and expose the `web` container directly — `/` then redirects logged-out visitors to `/login` as usual.
+
 ## Cross-origin sessions
 
 When the API and the web app are served from different origins (e.g. `api.earthed.app` and `app.earthed.app`), the default session cookie is host-only on the API domain, so the web app never receives it. How you fix this depends on whether the two share a registrable domain.
