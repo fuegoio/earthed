@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -23,10 +23,19 @@ import { signinSchema, signupSchema, type SigninValues, type SignupValues } from
 
 type Mode = "signin" | "signup";
 
+// safeRedirect returns a same-origin path from a redirect query param, or "/"
+// if the value is missing/external/protocol-relative. Prevents open redirects
+// via ?redirect=https://evil.com or //evil.com.
+function safeRedirect(value: string | null): string {
+  if (!value) return "/";
+  // Must be a root-relative path: starts with "/" and not "//" (protocol-relative).
+  if (value.startsWith("/") && !value.startsWith("//")) return value;
+  return "/";
+}
+
 export function AuthForm({ mode }: { mode: Mode }) {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "/";
+  const redirect = safeRedirect(searchParams.get("redirect"));
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isSignup = mode === "signup";
@@ -64,8 +73,11 @@ export function AuthForm({ mode }: { mode: Mode }) {
         }
       }
 
-      router.push(redirect);
-      router.refresh();
+      // Hard navigation (not router.push): the API just set the session cookie
+      // via a cross-origin response, and the proxy may have cached the earlier
+      // / -> /login redirect. A full page load forces the proxy to re-run with
+      // the new cookie instead of replaying a client-side redirect cache.
+      window.location.assign(redirect);
     } finally {
       setIsSubmitting(false);
     }
