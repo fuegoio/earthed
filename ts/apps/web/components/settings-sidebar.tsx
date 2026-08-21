@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { ArrowLeft, Key, User, FileText } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { OfflineBadge } from "@/components/offline-badge";
-import { SidebarSeparator } from "@workspace/ui/components/separator";
+import { Separator } from "@workspace/ui/components/separator";
 import { cn } from "@workspace/ui/lib/utils";
 import {
   AccountButton,
@@ -43,7 +43,7 @@ function SettingsSidebarContent({ userEmail }: { userEmail: string }) {
           Back to feeds
         </Link>
 
-        <SidebarSeparator />
+        <Separator />
 
         <nav className="flex flex-col gap-0.5">
           <h3 className="px-3 pb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">

@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { SidebarSeparator } from "@workspace/ui/components/separator";
+import { Separator } from "@workspace/ui/components/separator";
 
-const meta: Meta<typeof SidebarSeparator> = {
+const meta: Meta<typeof Separator> = {
   title: "UI/Separator",
-  component: SidebarSeparator,
+  component: Separator,
   tags: ["autodocs"],
   decorators: [
     (Story) => (
@@ -26,9 +26,9 @@ export const Multiple: Story = {
   render: () => (
     <div className="flex flex-col gap-4">
       <span className="text-sm text-sidebar-foreground">Feeds</span>
-      <SidebarSeparator />
+      <Separator />
       <span className="text-sm text-sidebar-foreground">Lists</span>
-      <SidebarSeparator />
+      <Separator />
       <span className="text-sm text-sidebar-foreground">Settings</span>
     </div>
   ),
