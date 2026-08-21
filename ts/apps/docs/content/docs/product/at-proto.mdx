@@ -28,7 +28,7 @@ Sunred:
 - Articles you **share**
 - Feeds you **subscribe to**
 - Your **feed lists**
-- Your Sunred **profile** (handle, display name, email)
+- Your Sunred **profile** (display name and bio, cached from your standard `app.bsky.actor.profile` record)
 
 Sunred keeps a local **cache** of these records so the app stays fast, but
 your PDS is the source of truth. When you follow, share, or subscribe, Sunred
@@ -39,8 +39,9 @@ relay.
 
 The first time you log into an Sunred instance, it pulls your existing
 `io.sunred.*` records from your PDS into its local cache so your follows,
-shares, and feed subscriptions are all there immediately. After that it stays
-in sync via the relay.
+shares, feed subscriptions, and feed lists are all there immediately. After
+that it stays in sync via the relay. Your profile (display name and bio) is
+cached from the standard `app.bsky.actor.profile` record on your PDS.
 
 State that is not part of your AT Proto records — which entries you've read,
 your folders, your per-instance settings — stays on the instance where you

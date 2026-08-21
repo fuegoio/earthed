@@ -14,7 +14,6 @@ The sidebar is split into two parts. At the top are your views; below them, your
 - **Unread** — entries you haven't read yet, across every feed. This is the default home view.
 - **All** — every entry, read or unread.
 - **Starred** — entries you've starred.
-- **Social** — articles shared by people you follow. See [Social](/social).
 - **Feed lists** — lists you own and lists you follow. See [Feed lists](/feed-lists).
 
 Click any view to filter the timeline. A search box sits at the very top — type a query and press Enter to search across every entry.
@@ -24,6 +23,10 @@ Click any view to filter the timeline. A search box sits at the very top — typ
 Below the views, your subscriptions are listed and grouped by folder. Two small buttons next to the **Feeds** heading let you create a folder or subscribe to a new feed.
 
 Click a feed to open its page, where you can refresh it, mark all its entries as read, rename it, move it to a folder, or unsubscribe.
+
+### Follows
+
+Below your feeds, the **Follows** section lists the people you follow. Click the **+** next to the heading to open the **Find people** dialog and search for users by handle or name — on federated setups this searches across instances too. See [Social](/social).
 
 ### Account menu
 
@@ -36,7 +39,7 @@ Each entry card shows the feed, the article title, the publication date, and a s
 - **Open the article** — click the title to open the original in a new tab. Sunred marks the entry as read.
 - **Read in Sunred** — click the card body to open the in-app reader.
 - **Star** — click the star icon to bookmark an entry. It appears under **Starred**.
-- **Share** — click the share icon to post the article to your social timeline.
+- **Share** — click the share icon to share the article with people who follow you. Shared articles appear in their timeline.
 - **Mark unread again** — click the dot on a read entry to bring it back to unread.
 
 On filtered views like Unread and Starred, entries animate out as you read or unstar them, keeping the list focused on what's left.
@@ -61,14 +64,14 @@ The toolbar lets you:
 - **Refresh** — fetch new entries immediately, without waiting for the scheduler.
 - **Move to folder** — reassign the feed to a different folder.
 - **Rename** — give the feed a custom title in your sidebar.
-- **Unsubscribe** — removes the feed and all its entries permanently.
+- **Unsubscribe** — drops your subscription to the feed. The feed itself stays for other subscribers.
 - **Open website** / **Open feed** — links to the site and its raw feed URL.
 
 ## Settings
 
 Settings live at `/settings` and have three sections:
 
-- **Profile** — your display name and email, as other Sunred users see them on your profile.
+- **Profile** — your display name, cached from your `app.bsky.actor.profile` record, plus a social handle and bio other Sunred users see in search results and the Follows list.
 - **OPML** — import subscriptions from another reader, or export yours. See [OPML import & export](#opml-import-export) below.
 - **Tokens** — create and revoke API tokens for the CLI and scripts. See [Authentication](/authentication).
 

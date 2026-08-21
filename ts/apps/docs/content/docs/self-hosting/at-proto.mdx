@@ -92,7 +92,8 @@ for understanding what federates versus what stays local.
 | Data | Source of truth | Instance (API) | Relay |
 | --- | --- | --- | --- |
 | User identity (DID, handle) | PDS | cached for login | tracked |
-| `io.sunred.*` records (follows, shares, subscriptions, feed lists, profile) | PDS | mirrored cache | aggregated copy |
+| `io.sunred.*` records (follows, shares, subscriptions, feed lists) | PDS | mirrored cache | aggregated copy |
+| Profile (display name, bio) | PDS (`app.bsky.actor.profile`) | cached for display | never |
 | Article & feed content (entry bodies, enclosures) | source feeds | fetched and stored | never |
 | Per-user private state (read, starred, folders, settings) | the instance | yes | never |
 
