@@ -3,7 +3,7 @@ import { AuthForm } from "@/components/auth-form";
 import { redirectIfAuthenticated } from "@/lib/auth-guard";
 import { getOAuthConfig } from "@/lib/auth";
 
-export const metadata = { title: "Sign in" };
+export const metadata = { title: "Login" };
 
 const ERROR_MESSAGES: Record<string, string> = {
   oauth_failed: "Login was cancelled or failed. Please try again.",
@@ -26,16 +26,7 @@ export default async function LoginPage({
 
   return (
     <Suspense>
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-col gap-1.5 text-center">
-          <h1 className="font-serif text-2xl font-bold tracking-tight">
-            Welcome to Earthed
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            A calm place to read your feeds.
-          </p>
-        </div>
-
+      <div className="flex flex-col gap-4">
         {errorMessage && (
           <div
             role="alert"
@@ -44,7 +35,6 @@ export default async function LoginPage({
             {errorMessage}
           </div>
         )}
-
         <AuthForm signupAvailable={!!default_pds} />
       </div>
     </Suspense>

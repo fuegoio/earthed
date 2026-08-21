@@ -28,7 +28,7 @@ import { SearchBox } from "@/components/search-box";
 import { buttonVariants } from "@workspace/ui/components/button";
 import { FolderCreateDialog } from "@/components/folder-create-dialog";
 import { cn } from "@workspace/ui/lib/utils";
-import { SidebarSeparator } from "@workspace/ui/components/separator";
+import { Separator } from "@workspace/ui/components/separator";
 import type { Feed, Folder } from "@/lib/types";
 
 export const navLinkClass = cn(
@@ -168,7 +168,7 @@ function SidebarContent({ userEmail }: { userEmail: string }) {
 
         <SidebarNav />
 
-        <SidebarSeparator />
+        <Separator />
 
         <div className="flex flex-col gap-1">
           <div className="flex items-center justify-between pl-3 pr-2.5 pb-1">
