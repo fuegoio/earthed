@@ -43,25 +43,20 @@ A full Earthed deployment has four pieces:
 | --- | --- | --- |
 | API | Earthed REST server, session issuer, PDS/relay client | yes |
 | Web | Next.js frontend | yes |
-| PDS | Hosts user records, handles OAuth | one per user (yours or remote) |
+| PDS | Hosts user records, handles OAuth | external — users bring their own |
 | Relay | Aggregates `io.earthed.*` records across PDSes | recommended |
 
 ### The PDS
 
-Each user's data lives on a PDS. You have two options:
+Each user's data lives on a PDS — but Earthed does not run or ship a PDS. Users
+log in with their own AT Proto handle, typically a Bluesky account
+(`*.bsky.social`) or an account on a personal PDS they run themselves. Earthed
+authenticates against the user's PDS at login time via OAuth.
 
-- **Run your own PDS** and offer accounts on your domain (e.g.
-  `you.earthed.app`). This is how earthed.app itself works.
-- **Let users log in with any PDS** — including Bluesky's (`*.bsky.social`).
-  No PDS setup on your side; Earthed authenticates against the user's remote
-  PDS at login time.
-
-These are not exclusive. Running your own PDS lets people sign up directly on
-your instance, while still allowing anyone with an existing AT Proto account
-to log in.
-
-To run a PDS, use the [official PDS image](https://github.com/bluesky-social/pds).
-Earthed is compatible with any standards-compliant AT Proto PDS.
+If you want to offer accounts on your own domain, you can run a PDS separately
+using the [official PDS image](https://github.com/bluesky-social/pds). That's a
+deployment decision outside Earthed's scope — Earthed works with any
+standards-compliant AT Proto PDS, yours or anyone else's.
 
 ### The relay
 
@@ -137,10 +132,8 @@ relay read them to build the federated social graph.
 ## Configuration
 
 See [Configuration](/self-hosting/configuration) for the environment variables
-that control PDS and relay behavior. The key ones:
+that control relay and OAuth behavior. The key ones:
 
-- `EARTHED_PDS_URL` — your hosted PDS (optional; lets users sign up on your
-  domain).
 - `EARTHED_RELAY_URL` — the relay endpoint (optional; enables cross-instance
   social features).
 - `EARTHED_OAUTH_REDIRECT_URL` — the public callback URL for OAuth
