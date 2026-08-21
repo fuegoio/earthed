@@ -209,29 +209,6 @@ func (a *API) ATProtoSyncFeedList(userID, listID int, fl *store.FeedList, isCrea
 	_ = a.store.SetFeedListATProtoRkey(ctx, listID, rkey)
 }
 
-// announceToRelay notifies the configured relay of a new user DID.
-// No-ops if no relay URL is configured.
-func (a *API) announceToRelay(ctx context.Context, did, pdsURL, handle string) {
-	if a.cfg.RelayURL == "" {
-		return
-	}
-	rc := atproto.NewClient(a.cfg.RelayURL, "")
-	type announceIn struct {
-		DID         string `json:"did"`
-		PDSUrl      string `json:"pdsUrl"`
-		InstanceURL string `json:"instanceUrl"`
-		Handle      string `json:"handle"`
-	}
-	if err := rc.Procedure(ctx, "io.sunred.relay.announceUser", announceIn{
-		DID:         did,
-		PDSUrl:      pdsURL,
-		InstanceURL: a.cfg.BaseURL,
-		Handle:      handle,
-	}, nil); err != nil {
-		slog.Warn("relay: announce user", "did", did, "err", err)
-	}
-}
-
 // WellKnownATProtoDIDHandler returns an http.Handler for /.well-known/atproto-did.
 // It resolves the host's subdomain (or ?handle= query param) to a DID.
 func (a *API) WellKnownATProtoDIDHandler() http.Handler {
