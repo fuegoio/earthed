@@ -1744,6 +1744,67 @@
                 ]
             }
         },
+        "/api/v1/social/search": {
+            "get": {
+                "operationId": "search-users",
+                "parameters": [
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "maxLength": 64,
+                            "minLength": 1,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "explode": false,
+                        "in": "query",
+                        "name": "limit",
+                        "schema": {
+                            "default": 20,
+                            "format": "int64",
+                            "maximum": 50,
+                            "minimum": 1,
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/UserProfile"
+                                    },
+                                    "type": [
+                                        "array",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Search users by handle or name",
+                "tags": [
+                    "social"
+                ]
+            }
+        },
         "/api/v1/social/shares": {
             "get": {
                 "operationId": "my-shared-articles",

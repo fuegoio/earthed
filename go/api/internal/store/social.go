@@ -235,6 +235,58 @@ func (s *Store) ListFollowers(ctx context.Context, userID, viewerID int) ([]User
 	return out, rows.Err()
 }
 
+// SearchUsers returns up to limit profiles whose handle or first_name match
+// the query (case-insensitive prefix/substring match). The viewer is excluded
+// from the results, and IsFollowing is populated for each row.
+func (s *Store) SearchUsers(ctx context.Context, q string, viewerID, limit int) ([]UserProfile, error) {
+	q = strings.TrimSpace(q)
+	if q == "" || limit <= 0 {
+		return []UserProfile{}, nil
+	}
+	// Escape SQL LIKE wildcards in the query so user input is matched literally.
+	like := "%" + strings.NewReplacer(
+		"\\", "\\\\",
+		"%", "\\%",
+		"_", "\\_",
+	).Replace(q) + "%"
+
+	rows, err := s.DB.QueryContext(ctx, `
+		SELECT
+		  p.user_id, p.handle, p.bio, p.created_at, p.updated_at,
+		  COALESCE(u.first_name, ''),
+		  (SELECT COUNT(*) FROM user_follows WHERE followee_id = p.user_id),
+		  (SELECT COUNT(*) FROM user_follows WHERE follower_id = p.user_id),
+		  CASE WHEN $3 > 0 THEN
+		    EXISTS(SELECT 1 FROM user_follows WHERE follower_id = $3 AND followee_id = p.user_id)
+		  ELSE false END
+		FROM user_profiles p
+		JOIN users u ON u.id = p.user_id
+		WHERE p.user_id <> $3
+		  AND (p.handle ILIKE $1 OR u.first_name ILIKE $1)
+		ORDER BY
+		  (p.handle ILIKE $2) DESC,
+		  (SELECT COUNT(*) FROM user_follows WHERE followee_id = p.user_id) DESC
+		LIMIT $4`,
+		like, q+"%", viewerID, limit,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("search users: %w", err)
+	}
+	defer func() { _ = rows.Close() }()
+	var out []UserProfile
+	for rows.Next() {
+		var p UserProfile
+		if err := rows.Scan(
+			&p.UserID, &p.Handle, &p.Bio, &p.CreatedAt, &p.UpdatedAt,
+			&p.FirstName, &p.FollowerCount, &p.FollowingCount, &p.IsFollowing,
+		); err != nil {
+			return nil, err
+		}
+		out = append(out, p)
+	}
+	return out, rows.Err()
+}
+
 // --- Shared articles ---
 
 // ShareArticle creates or replaces a shared article for the user.

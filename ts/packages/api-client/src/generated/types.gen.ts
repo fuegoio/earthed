@@ -897,6 +897,34 @@ export type ListFollowingResponses = {
 
 export type ListFollowingResponse = ListFollowingResponses[keyof ListFollowingResponses];
 
+export type SearchUsersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        q?: string;
+        limit?: number;
+    };
+    url: '/api/v1/social/search';
+};
+
+export type SearchUsersErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type SearchUsersError = SearchUsersErrors[keyof SearchUsersErrors];
+
+export type SearchUsersResponses = {
+    /**
+     * OK
+     */
+    200: Array<UserProfile> | null;
+};
+
+export type SearchUsersResponse = SearchUsersResponses[keyof SearchUsersResponses];
+
 export type MySharedArticlesData = {
     body?: never;
     path?: never;

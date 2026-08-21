@@ -19,17 +19,18 @@ import { useTheme } from "next-themes";
 import { Menu } from "@base-ui/react/menu";
 import { Avatar } from "@base-ui/react/avatar";
 import { Skeleton } from "@workspace/ui/components/skeleton";
-import { getClient, listFeeds, listFolders, unwrap } from "@/lib/sunred";
+import { getClient, listFeeds, listFolders, listFollowing, unwrap } from "@/lib/sunred";
 import { signout } from "@/lib/auth";
 import { Logo } from "@/components/logo";
 import { OfflineBadge } from "@/components/offline-badge";
 import { FeedTree } from "@/components/feed-tree";
 import { SearchBox } from "@/components/search-box";
+import { FollowSearchDialog } from "@/components/follow-search-dialog";
 import { buttonVariants } from "@workspace/ui/components/button";
 import { FolderCreateDialog } from "@/components/folder-create-dialog";
 import { cn } from "@workspace/ui/lib/utils";
 import { Separator } from "@workspace/ui/components/separator";
-import type { Feed, Folder } from "@/lib/types";
+import type { Feed, Folder, UserProfile } from "@/lib/types";
 
 export const navLinkClass = cn(
   "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium",
@@ -140,6 +141,7 @@ export function AccountButton({ userEmail }: { userEmail: string }) {
 }
 
 function SidebarContent({ userEmail }: { userEmail: string }) {
+  const pathname = usePathname();
   const { data: feeds, isLoading: feedsLoading } = useQuery<Feed[]>({
     queryKey: ["feeds"],
     queryFn: async () => unwrap(listFeeds({ client: await getClient() })),
@@ -150,7 +152,16 @@ function SidebarContent({ userEmail }: { userEmail: string }) {
     queryFn: async () => unwrap(listFolders({ client: await getClient() })),
   });
 
+  const { data: following, isLoading: followingLoading } = useQuery<UserProfile[]>({
+    queryKey: ["following"],
+    queryFn: async () => unwrap(listFollowing({ client: await getClient() })),
+  });
+
   const isLoading = feedsLoading || foldersLoading;
+
+  function profileDisplay(p: UserProfile): string {
+    return p.first_name?.trim() || `@${p.handle}`;
+  }
 
   return (
     <div className="flex h-full flex-col">
@@ -204,6 +215,55 @@ function SidebarContent({ userEmail }: { userEmail: string }) {
             </p>
           ) : (
             <FeedTree feeds={feeds ?? []} folders={folders ?? []} />
+          )}
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center justify-between pl-3 pr-2.5 pb-1">
+            <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Follows
+            </h3>
+            <FollowSearchDialog />
+          </div>
+          {followingLoading ? (
+            <div className="flex flex-col gap-0.5">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-2.5 px-3 py-2">
+                  <Skeleton className="size-5 shrink-0 rounded-full" />
+                  <Skeleton className="h-3 flex-1" />
+                </div>
+              ))}
+            </div>
+          ) : (following ?? []).length === 0 ? (
+            <p className="px-3 py-2 text-xs text-muted-foreground">
+              Not following anyone yet. Use + to find people.
+            </p>
+          ) : (
+            <div className="flex flex-col gap-0.5">
+              {(following ?? []).map((p) => {
+                const href = `/users/${p.handle}`;
+                const active = isActive(pathname, href);
+                return (
+                  <Link
+                    key={p.user_id}
+                    href={href}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm",
+                      "text-sidebar-foreground/70 transition-colors",
+                      active
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                        : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    )}
+                  >
+                    <Avatar.Root className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground select-none">
+                      <Avatar.Fallback>{profileDisplay(p).charAt(0).toUpperCase()}</Avatar.Fallback>
+                    </Avatar.Root>
+                    <span className="truncate">@{p.handle}</span>
+                  </Link>
+                );
+              })}
+            </div>
           )}
         </div>
       </div>

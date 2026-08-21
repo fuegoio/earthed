@@ -56,7 +56,7 @@ type SharedArticleListOutput struct {
 }
 
 type PublicProfileResponse struct {
-	Profile        store.UserProfile    `json:"profile"`
+	Profile        store.UserProfile     `json:"profile"`
 	SharedArticles []store.SharedArticle `json:"shared_articles"`
 	Feeds          []store.Feed          `json:"feeds"`
 }
@@ -66,7 +66,7 @@ type PublicProfileOutput struct {
 }
 
 type FeedSubscribersResponse struct {
-	Count       int                `json:"count"`
+	Count       int                 `json:"count"`
 	Subscribers []store.UserProfile `json:"subscribers"`
 }
 
@@ -205,6 +205,28 @@ func (a *API) registerSocialRoutes() {
 	}, func(ctx context.Context, _ *struct{}) (*UserProfileListOutput, error) {
 		userID := auth.UserIDFromCtx(ctx)
 		profiles, err := a.store.ListFollowing(ctx, userID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if profiles == nil {
+			profiles = []store.UserProfile{}
+		}
+		return &UserProfileListOutput{Body: profiles}, nil
+	})
+
+	// GET /api/v1/social/search — find users by handle or name
+	huma.Register(a.huma, huma.Operation{
+		OperationID: "search-users",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/social/search",
+		Summary:     "Search users by handle or name",
+		Tags:        []string{"social"},
+	}, func(ctx context.Context, input *struct {
+		Query string `query:"q" minLength:"1" maxLength:"64"`
+		Limit int    `query:"limit" default:"20" minimum:"1" maximum:"50"`
+	}) (*UserProfileListOutput, error) {
+		userID := auth.UserIDFromCtx(ctx)
+		profiles, err := a.store.SearchUsers(ctx, input.Query, userID, input.Limit)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
