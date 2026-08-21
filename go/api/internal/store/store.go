@@ -361,7 +361,10 @@ func (s *Store) ListEntries(ctx context.Context, userID int, feedID *int, folder
 	             e.author, '' AS content, LEFT(e.description, 400) AS description,
 	             COALESCE(st.status, 'unread'), COALESCE(st.starred, false), COALESCE(st.liked, false),
 	             e.published_at, COALESCE(st.changed_at, e.created_at), e.tags,
-	             f.title, f.feed_url, f.site_url,
+	             f.id, f.feed_url, f.site_url, f.title, f.description,
+	             f.etag_header, f.last_modified_header, f.parsing_error, f.parsing_error_count,
+	             f.disabled, f.scraper_rules, f.rewrite_rules, f.crawler,
+	             f.next_check_at, f.last_fetch_at, f.created_at, f.updated_at,
 	             COALESCE(sh.handle, ''), COALESCE(u.first_name, '')
 	      FROM entries e
 	      JOIN feeds f ON f.id = e.feed_id
@@ -417,13 +420,18 @@ func (s *Store) ListEntries(ctx context.Context, userID int, feedID *int, folder
 	var entries []Entry
 	for rows.Next() {
 		var e Entry
+		var f Feed
 		if err := rows.Scan(&e.ID, &e.FeedID, &e.Hash, &e.Title, &e.URL, &e.CommentsURL,
 			&e.Author, &e.Content, &e.Description, &e.Status, &e.Starred, &e.Liked,
 			&e.PublishedAt, &e.ChangedAt, pq.Array(&e.Tags),
-			&e.FeedTitle, &e.FeedURL, &e.FeedSiteURL,
-			&e.SharedByHandle, &e.SharedByFirstName); err != nil {
+			&f.ID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
+			&f.EtagHeader, &f.LastModified, &f.ParsingError, &f.ParsingErrorCount,
+			&f.Disabled, &f.ScraperRules, &f.RewriteRules, &f.Crawler,
+			&f.NextCheckAt, &f.LastFetchAt, &f.CreatedAt, &f.UpdatedAt,
+			&e.SharedBy, &e.SharedByName); err != nil {
 			return nil, err
 		}
+		e.Feed = &f
 		entries = append(entries, e)
 	}
 	return entries, rows.Err()
@@ -433,12 +441,16 @@ func (s *Store) ListEntries(ctx context.Context, userID int, feedID *int, folder
 // or nil if not visible to the user.
 func (s *Store) GetEntryByID(ctx context.Context, id int64, userID int) (*Entry, error) {
 	var e Entry
+	var f Feed
 	err := s.DB.QueryRowContext(ctx,
 		`SELECT e.id, e.feed_id, e.hash, e.title, e.url, e.comments_url,
 		        e.author, '' AS content, LEFT(e.description, 400) AS description,
 		        COALESCE(st.status, 'unread'), COALESCE(st.starred, false), COALESCE(st.liked, false),
 		        e.published_at, COALESCE(st.changed_at, e.created_at), e.tags,
-		        f.title, f.feed_url, f.site_url,
+		        f.id, f.feed_url, f.site_url, f.title, f.description,
+		        f.etag_header, f.last_modified_header, f.parsing_error, f.parsing_error_count,
+		        f.disabled, f.scraper_rules, f.rewrite_rules, f.crawler,
+		        f.next_check_at, f.last_fetch_at, f.created_at, f.updated_at,
 		        COALESCE(sh.handle, ''), COALESCE(u.first_name, '')
 		 FROM entries e
 		 JOIN feeds f ON f.id = e.feed_id
@@ -454,14 +466,18 @@ func (s *Store) GetEntryByID(ctx context.Context, id int64, userID int) (*Entry,
 	).Scan(&e.ID, &e.FeedID, &e.Hash, &e.Title, &e.URL, &e.CommentsURL,
 		&e.Author, &e.Content, &e.Description, &e.Status, &e.Starred, &e.Liked,
 		&e.PublishedAt, &e.ChangedAt, pq.Array(&e.Tags),
-		&e.FeedTitle, &e.FeedURL, &e.FeedSiteURL,
-		&e.SharedByHandle, &e.SharedByFirstName)
+		&f.ID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
+		&f.EtagHeader, &f.LastModified, &f.ParsingError, &f.ParsingErrorCount,
+		&f.Disabled, &f.ScraperRules, &f.RewriteRules, &f.Crawler,
+		&f.NextCheckAt, &f.LastFetchAt, &f.CreatedAt, &f.UpdatedAt,
+		&e.SharedBy, &e.SharedByName)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
 	if err != nil {
 		return nil, err
 	}
+	e.Feed = &f
 	return &e, nil
 }
 

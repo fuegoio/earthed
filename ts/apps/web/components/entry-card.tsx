@@ -79,12 +79,13 @@ export function EntryCard({
   const unread = !readOptimistic;
   const snippet = htmlSnippet(entry.description, 200);
 
-  // The entry carries denormalised source-feed metadata (feed_title, feed_url,
-  // feed_site_url) so shares from feeds the user doesn't subscribe to can still
-  // render their source. Fall back to the passed `feed` prop for the subscribed
-  // case (it carries the user's title override).
-  const feedTitle = feed?.title || entry.feed_title || "Unknown feed";
-  const feedSiteUrl = feed?.site_url || entry.feed_site_url;
+  // The entry carries a nested global source feed (entry.feed) so shares from
+  // feeds the user doesn't subscribe to can still render their source. The
+  // passed `feed` prop (from the user's subscription list) carries the user's
+  // title override, so prefer it for subscribed feeds; fall back to the nested
+  // global feed for shares from unsubscribed feeds.
+  const feedTitle = feed?.title || entry.feed?.title || "Unknown feed";
+  const feedSiteUrl = feed?.site_url || entry.feed?.site_url;
   const sharerName = entry.shared_by_name?.trim()
     ? entry.shared_by_name
     : entry.shared_by
@@ -93,22 +94,23 @@ export function EntryCard({
   // The entry's feed is not subscribed when no `feed` prop was resolved by the
   // timeline (i.e. feed_id is absent from the user's subscriptions). A share
   // from a followed user surfaces such entries; offer a one-click subscribe.
-  const canSubscribe = !subscribedOverride && !feed && Boolean(entry.feed_url);
+  const canSubscribe = !subscribedOverride && !feed && Boolean(entry.feed?.feed_url);
 
   async function handleSubscribe(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    if (!entry.feed_url) return;
+    const feedURL = entry.feed?.feed_url;
+    if (!feedURL) return;
     setPending(true);
     try {
       const { error } = await createFeed({
         client: await getClient(),
-        body: { feed_url: entry.feed_url },
+        body: { feed_url: feedURL },
       });
       if (error) throw error;
       setSubscribedOverride(true);
       await queryClient.invalidateQueries({ queryKey: ["feeds"] });
-      toast.success(`Subscribed to "${entry.feed_title || "feed"}"`);
+      toast.success(`Subscribed to "${entry.feed?.title || "feed"}"`);
     } catch (err) {
       toast.error(getApiErrorMessage(err, "Could not subscribe to feed"));
     } finally {
@@ -225,7 +227,7 @@ export function EntryCard({
               type="button"
               onClick={handleSubscribe}
               disabled={pending}
-              aria-label={`Subscribe to ${entry.feed_title || "this feed"}`}
+              aria-label={`Subscribe to ${entry.feed?.title || "this feed"}`}
               className={cn(
                 buttonVariants({ variant: "outline", size: "xs" }),
                 "ml-auto h-5 shrink-0 gap-0.5 px-1.5 text-[11px]",

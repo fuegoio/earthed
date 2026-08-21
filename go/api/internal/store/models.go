@@ -44,30 +44,31 @@ type Feed struct {
 
 // Entry is a single article/item belonging to a global feed. Read/starred
 // state is per-user (entry_state) and is populated on read; absent state means
-// unread. FeedTitle/FeedURL/FeedSiteURL and SharedBy* are denormalised on read
-// so a consumer can render the source feed and sharer without extra lookups.
+// unread. Feed is the nested global source feed (joined on read) so a consumer
+// can render the source feed and offer a subscribe affordance without an extra
+// lookup, including for shares from feeds the viewer doesn't subscribe to.
+// SharedBy/SharedByName identify the followed user who shared the entry, when
+// the entry reached the viewer via a share rather than a subscription.
 type Entry struct {
-	ID                int64       `json:"id"`
-	FeedID            int         `json:"feed_id"`
-	Hash              string      `json:"hash"`
-	Title             string      `json:"title"`
-	URL               string      `json:"url"`
-	CommentsURL       string      `json:"comments_url,omitempty"`
-	Author            string      `json:"author,omitempty"`
-	Content           string      `json:"-"`
-	Description       string      `json:"description,omitempty"`
-	Status            string      `json:"status"`
-	Starred           bool        `json:"starred"`
-	Liked             bool        `json:"liked,omitempty"`
-	PublishedAt       time.Time   `json:"published_at"`
-	ChangedAt         time.Time   `json:"changed_at"`
-	Tags              []string    `json:"tags,omitempty"`
-	Enclosures        []Enclosure `json:"enclosures,omitempty"`
-	FeedTitle         string      `json:"feed_title,omitempty"`
-	FeedURL           string      `json:"feed_url,omitempty"`
-	FeedSiteURL       string      `json:"feed_site_url,omitempty"`
-	SharedByHandle    string      `json:"shared_by,omitempty"`
-	SharedByFirstName string      `json:"shared_by_name,omitempty"`
+	ID           int64       `json:"id"`
+	FeedID       int         `json:"feed_id"`
+	Hash         string      `json:"hash"`
+	Title        string      `json:"title"`
+	URL          string      `json:"url"`
+	CommentsURL  string      `json:"comments_url,omitempty"`
+	Author       string      `json:"author,omitempty"`
+	Content      string      `json:"-"`
+	Description  string      `json:"description,omitempty"`
+	Status       string      `json:"status"`
+	Starred      bool        `json:"starred"`
+	Liked        bool        `json:"liked,omitempty"`
+	PublishedAt  time.Time   `json:"published_at"`
+	ChangedAt    time.Time   `json:"changed_at"`
+	Tags         []string    `json:"tags,omitempty"`
+	Enclosures   []Enclosure `json:"enclosures,omitempty"`
+	Feed         *Feed       `json:"feed,omitempty"`
+	SharedBy     string      `json:"shared_by,omitempty"`
+	SharedByName string      `json:"shared_by_name,omitempty"`
 }
 
 // Enclosure is a media attachment (podcast, image, file) on an entry.

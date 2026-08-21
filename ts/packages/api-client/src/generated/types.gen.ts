@@ -144,10 +144,8 @@ export type Entry = {
     comments_url?: string;
     description?: string;
     enclosures?: Array<Enclosure> | null;
+    feed?: Feed;
     feed_id: number;
-    feed_site_url?: string;
-    feed_title?: string;
-    feed_url?: string;
     hash: string;
     id: number;
     liked?: boolean;
@@ -570,10 +568,8 @@ export type EntryWritable = {
     comments_url?: string;
     description?: string;
     enclosures?: Array<Enclosure> | null;
+    feed?: FeedWritable;
     feed_id: number;
-    feed_site_url?: string;
-    feed_title?: string;
-    feed_url?: string;
     hash: string;
     id: number;
     liked?: boolean;

@@ -118,6 +118,24 @@ func (s *Store) GetUserDID(ctx context.Context, userID int) (did, handle string,
 	return d.String, h.String, err
 }
 
+// GetUserDIDAndPDS returns the DID and PDS URL for a user. The DID lives on
+// users; the PDS URL lives on user_profiles (set during OAuth). Either may be
+// empty when the user has not connected AT Proto. Used to announce a followed
+// user to the relay so their shares are backfilled into the local cache.
+func (s *Store) GetUserDIDAndPDS(ctx context.Context, userID int) (did, pdsURL string, err error) {
+	var d, p sql.NullString
+	err = s.DB.QueryRowContext(ctx,
+		`SELECT u.did, COALESCE(up.pds_url, '')
+		 FROM users u
+		 LEFT JOIN user_profiles up ON up.user_id = u.id
+		 WHERE u.id = $1`, userID,
+	).Scan(&d, &p)
+	if err == sql.ErrNoRows {
+		return "", "", nil
+	}
+	return d.String, p.String, err
+}
+
 // UpsertFollowWithRkey records a local follow edge and its AT Proto rkey.
 func (s *Store) UpsertFollowWithRkey(ctx context.Context, followerID, followeeID int, rkey string) error {
 	_, err := s.DB.ExecContext(ctx,

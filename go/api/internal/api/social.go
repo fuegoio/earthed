@@ -160,13 +160,20 @@ func (a *API) registerSocialRoutes() {
 			}
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
-		// Resolve followee user ID for rkey tracking.
+		// Resolve followee user ID for rkey tracking + share ingestion.
 		followeeProfile, _ := a.store.GetProfileByHandle(ctx, input.Handle, 0)
 		followeeUserID := 0
 		if followeeProfile != nil {
 			followeeUserID = followeeProfile.UserID
 		}
 		go a.ATProtoSyncFollow(userID, followeeUserID, input.Handle, true)
+		// Ingest the followee's shares + source feeds so they appear in the
+		// follower's entry stream: announce the followee's DID to the relay,
+		// which backfills their io.sunred.share.article records into this
+		// instance. No-op without a relay or AT Proto identity.
+		if followeeUserID != 0 {
+			go a.ingestFollowee(followeeUserID)
+		}
 		return nil, nil
 	})
 

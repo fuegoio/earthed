@@ -451,18 +451,12 @@ export const EntrySchema = {
                 'null'
             ]
         },
+        feed: {
+            $ref: '#/components/schemas/Feed'
+        },
         feed_id: {
             format: 'int64',
             type: 'integer'
-        },
-        feed_site_url: {
-            type: 'string'
-        },
-        feed_title: {
-            type: 'string'
-        },
-        feed_url: {
-            type: 'string'
         },
         hash: {
             type: 'string'
@@ -1895,18 +1889,12 @@ export const EntryWritableSchema = {
                 'null'
             ]
         },
+        feed: {
+            $ref: '#/components/schemas/FeedWritable'
+        },
         feed_id: {
             format: 'int64',
             type: 'integer'
-        },
-        feed_site_url: {
-            type: 'string'
-        },
-        feed_title: {
-            type: 'string'
-        },
-        feed_url: {
-            type: 'string'
         },
         hash: {
             type: 'string'
