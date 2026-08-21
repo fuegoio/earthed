@@ -32,6 +32,10 @@ type Config struct {
 	// announces new AT Proto users to the relay and queries it for global counts.
 	// Leave empty to disable relay integration.
 	RelayURL string
+	// DefaultPDS is the PDS URL used for new account signup. When set, the web
+	// login page shows a "Create account" link that starts the OAuth flow
+	// against this PDS. When unset, only existing-handle login is offered.
+	DefaultPDS string
 	// OAuthClientID is the full URL where Earthed serves its client metadata
 	// document (the PDS fetches this during the OAuth flow). Defaults to
 	// "<BaseURL>/client-metadata.json".
@@ -62,6 +66,7 @@ func Load() (*Config, error) {
 		CookieDomain:   strings.TrimSpace(env("EARTHED_COOKIE_DOMAIN", "")),
 		TrustedOrigins: envList("EARTHED_TRUSTED_ORIGINS"),
 		RelayURL:       env("EARTHED_RELAY_URL", ""),
+		DefaultPDS:    strings.TrimRight(strings.TrimSpace(env("EARTHED_DEFAULT_PDS", "")), "/"),
 	}
 
 	// OAuth client_id and callback URL default from BaseURL. The client_id is a

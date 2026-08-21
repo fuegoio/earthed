@@ -1,12 +1,14 @@
 import { Suspense } from "react";
 import { AuthForm } from "@/components/auth-form";
 import { redirectIfAuthenticated } from "@/lib/auth-guard";
+import { getOAuthConfig } from "@/lib/auth";
 
 export const metadata = { title: "Sign in" };
 
 const ERROR_MESSAGES: Record<string, string> = {
   oauth_failed: "Login was cancelled or failed. Please try again.",
   internal: "Something went wrong on our side. Please try again.",
+  signup_failed: "Could not start signup. Please try again.",
 };
 
 export default async function LoginPage({
@@ -20,6 +22,7 @@ export default async function LoginPage({
   await redirectIfAuthenticated(redirectTo);
 
   const errorMessage = error ? ERROR_MESSAGES[error] ?? "Login failed." : null;
+  const { default_pds } = await getOAuthConfig();
 
   return (
     <Suspense>
@@ -29,7 +32,7 @@ export default async function LoginPage({
             {errorMessage}
           </div>
         )}
-        <AuthForm />
+        <AuthForm signupAvailable={!!default_pds} />
       </div>
     </Suspense>
   );

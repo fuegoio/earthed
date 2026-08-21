@@ -23,6 +23,38 @@ export function loginWithHandle(handle: string, redirectTo?: string | null): voi
 }
 
 /**
+ * signupWithDefaultPDS redirects the browser to the API to start the OAuth
+ * signup flow against the instance's default PDS (EARTHED_DEFAULT_PDS). The
+ * API returns 503 if no default PDS is configured.
+ */
+export function signupWithDefaultPDS(redirectTo?: string | null): void {
+  const params = new URLSearchParams();
+  if (redirectTo) params.set("redirect", safeRedirect(redirectTo));
+  const qs = params.toString();
+  window.location.assign(
+    `${env.NEXT_PUBLIC_EARTHED_API_URL}/auth/oauth/signup${qs ? `?${qs}` : ""}`,
+  );
+}
+
+/**
+ * getOAuthConfig fetches the public OAuth configuration from the API (whether
+ * signup via a default PDS is available). Server-safe.
+ */
+export async function getOAuthConfig(): Promise<{ default_pds: string | null }> {
+  try {
+    const res = await fetch(`${env.NEXT_PUBLIC_EARTHED_API_URL}/auth/oauth/config`, {
+      headers: { Accept: "application/json" },
+      // Forward cookies on the server so the request is consistent.
+      next: { revalidate: 60 },
+    });
+    if (!res.ok) return { default_pds: null };
+    return await res.json();
+  } catch {
+    return { default_pds: null };
+  }
+}
+
+/**
  * signout redirects to the API, which clears the session cookie and sends the
  * user back to the web app root.
  */

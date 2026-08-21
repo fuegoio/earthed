@@ -16,10 +16,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
-import { loginWithHandle, safeRedirect } from "@/lib/auth";
+import { loginWithHandle, safeRedirect, signupWithDefaultPDS } from "@/lib/auth";
 import { handleSchema, type HandleValues } from "@/lib/schemas";
 
-export function AuthForm() {
+export function AuthForm({ signupAvailable = false }: { signupAvailable?: boolean }) {
   const searchParams = useSearchParams();
   const redirect = safeRedirect(searchParams.get("redirect"));
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -83,10 +83,20 @@ export function AuthForm() {
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="justify-center text-center">
-        <p className="text-sm text-muted-foreground">
-          New here? Just enter a handle to create an account on your PDS.
-        </p>
+      <CardFooter className="flex-col gap-2 text-center">
+        {signupAvailable ? (
+          <button
+            type="button"
+            onClick={() => signupWithDefaultPDS(redirect)}
+            className="text-sm text-muted-foreground hover:text-primary hover:underline"
+          >
+            Don&apos;t have an account? Create one
+          </button>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            New here? Just enter a handle to create an account on your PDS.
+          </p>
+        )}
       </CardFooter>
     </Card>
   );

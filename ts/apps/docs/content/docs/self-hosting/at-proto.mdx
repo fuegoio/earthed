@@ -58,6 +58,17 @@ using the [official PDS image](https://github.com/bluesky-social/pds). That's a
 deployment decision outside Earthed's scope — Earthed works with any
 standards-compliant AT Proto PDS, yours or anyone else's.
 
+### Offering signup
+
+To let users without an existing AT Proto account sign up directly on your
+instance, set `EARTHED_DEFAULT_PDS` to your PDS URL. The login page then shows a
+"Create account" link that starts the OAuth flow against that PDS, so the user
+creates their account on your PDS and is logged into Earthed in one step. When
+unset, only login with an existing handle is offered.
+
+Users who already have an AT Proto account (Bluesky, another PDS) can always log
+in by entering their handle, regardless of whether a default PDS is configured.
+
 ### The relay
 
 The relay watches the repo streams of every PDS that hosts an Earthed user and
