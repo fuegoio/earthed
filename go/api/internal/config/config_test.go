@@ -29,17 +29,17 @@ func setEnv(t *testing.T, vars map[string]string) {
 func baseEnv() map[string]string {
 	return map[string]string{
 		"LIMEN_SECRET":             "0123456789abcdef0123456789abcdef", // 32 bytes
-		"EARTHED_COOKIE_SECURE":     "true",
-		"EARTHED_COOKIE_SAMESITE":   "none",
-		"EARTHED_DATABASE_URL":      "postgres://earthed:earthed@localhost:5432/earthed?sslmode=disable",
-		"EARTHED_HTTP_ADDR":         ":8080",
-		"EARTHED_BASE_URL":          "http://localhost:8080",
-		"EARTHED_WEB_URL":           "http://localhost:3000",
-		"EARTHED_TRUSTED_ORIGINS":   "",
-		"EARTHED_LOG_FORMAT":        "pretty",
-		"EARTHED_POLLING_FREQUENCY": "60s",
-		"EARTHED_BATCH_SIZE":        "100",
-		"EARTHED_WORKER_POOL_SIZE":  "5",
+		"SUNRED_COOKIE_SECURE":     "true",
+		"SUNRED_COOKIE_SAMESITE":   "none",
+		"SUNRED_DATABASE_URL":      "postgres://sunred:sunred@localhost:5432/sunred?sslmode=disable",
+		"SUNRED_HTTP_ADDR":         ":8080",
+		"SUNRED_BASE_URL":          "http://localhost:8080",
+		"SUNRED_WEB_URL":           "http://localhost:3000",
+		"SUNRED_TRUSTED_ORIGINS":   "",
+		"SUNRED_LOG_FORMAT":        "pretty",
+		"SUNRED_POLLING_FREQUENCY": "60s",
+		"SUNRED_BATCH_SIZE":        "100",
+		"SUNRED_WORKER_POOL_SIZE":  "5",
 	}
 }
 
@@ -59,8 +59,8 @@ func TestLoadTrustedOriginsUnstaysPermissive(t *testing.T) {
 // When TrustedOrigins is set without the web URL, Load must add the web URL.
 func TestLoadTrustedOriginsMergesWebURL(t *testing.T) {
 	env := baseEnv()
-	env["EARTHED_TRUSTED_ORIGINS"] = "https://app.example.com"
-	env["EARTHED_WEB_URL"] = "https://example.com"
+	env["SUNRED_TRUSTED_ORIGINS"] = "https://app.example.com"
+	env["SUNRED_WEB_URL"] = "https://example.com"
 	setEnv(t, env)
 	cfg, err := Load()
 	if err != nil {
@@ -82,8 +82,8 @@ func TestLoadTrustedOriginsMergesWebURL(t *testing.T) {
 // trailing slash must not cause a duplicate.
 func TestLoadTrustedOriginsNormalizesTrailingSlash(t *testing.T) {
 	env := baseEnv()
-	env["EARTHED_WEB_URL"] = "https://example.com/"
-	env["EARTHED_TRUSTED_ORIGINS"] = "https://example.com/"
+	env["SUNRED_WEB_URL"] = "https://example.com/"
+	env["SUNRED_TRUSTED_ORIGINS"] = "https://example.com/"
 	setEnv(t, env)
 	cfg, err := Load()
 	if err != nil {
@@ -103,21 +103,21 @@ func TestLoadTrustedOriginsNormalizesTrailingSlash(t *testing.T) {
 // CookieDomain loads as a bare host and is trimmed.
 func TestLoadCookieDomain(t *testing.T) {
 	env := baseEnv()
-	env["EARTHED_COOKIE_DOMAIN"] = "  earthed.app  "
+	env["SUNRED_COOKIE_DOMAIN"] = "  sunred.app  "
 	setEnv(t, env)
 	cfg, err := Load()
 	if err != nil {
 		t.Fatalf("Load: %v", err)
 	}
-	if cfg.CookieDomain != "earthed.app" {
-		t.Fatalf("expected CookieDomain %q, got %q", "earthed.app", cfg.CookieDomain)
+	if cfg.CookieDomain != "sunred.app" {
+		t.Fatalf("expected CookieDomain %q, got %q", "sunred.app", cfg.CookieDomain)
 	}
 }
 
 // CookieDomain rejects URLs (must be a bare host).
 func TestLoadCookieDomainRejectsURL(t *testing.T) {
 	env := baseEnv()
-	env["EARTHED_COOKIE_DOMAIN"] = "https://earthed.app"
+	env["SUNRED_COOKIE_DOMAIN"] = "https://sunred.app"
 	setEnv(t, env)
 	if _, err := Load(); err == nil {
 		t.Fatalf("expected error for URL cookie domain, got nil")

@@ -195,7 +195,7 @@ type SharedArticle struct {
 	SharerFirstName string `json:"sharer_first_name,omitempty"`
 }
 
-// Store wraps a *sql.DB with query helpers for the Earthed schema.
+// Store wraps a *sql.DB with query helpers for the Sunred schema.
 type Store struct {
 	DB *sql.DB
 }

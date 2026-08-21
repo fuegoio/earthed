@@ -1,4 +1,4 @@
-module github.com/fuegoio/earthed/go/sdk
+module github.com/fuegoio/sunred/go/sdk
 
 go 1.25.0
 

@@ -9,9 +9,9 @@ import (
 
 	"github.com/danielgtaylor/huma/v2"
 
-	"github.com/fuegoio/earthed/go/api/internal/atproto"
-	"github.com/fuegoio/earthed/go/api/internal/auth"
-	"github.com/fuegoio/earthed/go/api/internal/store"
+	"github.com/fuegoio/sunred/go/api/internal/atproto"
+	"github.com/fuegoio/sunred/go/api/internal/auth"
+	"github.com/fuegoio/sunred/go/api/internal/store"
 )
 
 // --- Input/output types ---
@@ -222,7 +222,7 @@ func (a *API) announceToRelay(ctx context.Context, did, pdsURL, handle string) {
 		InstanceURL string `json:"instanceUrl"`
 		Handle      string `json:"handle"`
 	}
-	if err := rc.Procedure(ctx, "io.earthed.relay.announceUser", announceIn{
+	if err := rc.Procedure(ctx, "io.sunred.relay.announceUser", announceIn{
 		DID:         did,
 		PDSUrl:      pdsURL,
 		InstanceURL: a.cfg.BaseURL,
@@ -236,7 +236,7 @@ func (a *API) announceToRelay(ctx context.Context, did, pdsURL, handle string) {
 // It resolves the host's subdomain (or ?handle= query param) to a DID.
 func (a *API) WellKnownATProtoDIDHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Extract handle from subdomain: "fuego.earthed.example" → "fuego"
+		// Extract handle from subdomain: "fuego.sunred.example" → "fuego"
 		host := r.Host
 		handle := r.URL.Query().Get("handle")
 		if handle == "" {

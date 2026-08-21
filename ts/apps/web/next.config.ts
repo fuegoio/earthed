@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 import { withSerwist } from "@serwist/turbopack";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@workspace/ui", "@earthed/api-client"],
+  transpilePackages: ["@workspace/ui", "@sunred/api-client"],
   output: "standalone",
 };
 

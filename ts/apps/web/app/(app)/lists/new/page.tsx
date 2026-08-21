@@ -9,7 +9,7 @@ import { Button, buttonVariants } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { Textarea } from "@workspace/ui/components/textarea";
-import { getClient, createFeedList } from "@/lib/earthed";
+import { getClient, createFeedList } from "@/lib/sunred";
 import { getApiErrorMessage } from "@/lib/errors";
 
 export default function NewFeedListPage() {

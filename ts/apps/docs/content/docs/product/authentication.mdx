@@ -1,21 +1,21 @@
 ---
 title: Authentication
-description: Log in to Earthed with your AT Proto handle, and authenticate the CLI with bearer tokens.
+description: Log in to Sunred with your AT Proto handle, and authenticate the CLI with bearer tokens.
 ---
 
-Earthed identity is your [AT Protocol](https://atproto.com) identity. You log
+Sunred identity is your [AT Protocol](https://atproto.com) identity. You log
 in with your AT Proto handle — the same account you use on Bluesky or any
-other AT Proto app. There are no Earthed-specific passwords.
+other AT Proto app. There are no Sunred-specific passwords.
 
 See [Identity & sync](/at-proto) for how identity and data sync work.
 
 ## Logging in (web)
 
-Enter your handle (for example `alice.bsky.social`) on the login page. Earthed
+Enter your handle (for example `alice.bsky.social`) on the login page. Sunred
 resolves your handle to your PDS and redirects you to your PDS to approve the
-login. After you approve, you're returned to Earthed with an active session.
+login. After you approve, you're returned to Sunred with an active session.
 
-Earthed issues a **session cookie** that the browser sends automatically on
+Sunred issues a **session cookie** that the browser sends automatically on
 every request. All data is scoped to the signed-in user — you can only read
 and write your own feeds, entries, and tokens.
 
@@ -95,7 +95,7 @@ Tokens follow the format `pla_` followed by 64 hex characters (32 random
 bytes). They are 69 characters long.
 
 Tokens created via the web UI or the `tokens create` command do not
-expire. Tokens issued via the device flow (`earthed login`) expire
+expire. Tokens issued via the device flow (`sunred login`) expire
 after 14 days.
 
 ## CORS

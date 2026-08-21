@@ -44,7 +44,7 @@ type LoginResult struct {
 
 // DefaultServerURL is the default web app (server) the CLI points users to in
 // order to approve a device-flow login.
-const DefaultServerURL = "https://earthed.app"
+const DefaultServerURL = "https://sunred.app"
 
 // Login runs the device-flow login against the given API base URL. It prints
 // the user code and verification URL, opens the browser if possible, and polls

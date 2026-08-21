@@ -10,7 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/fuegoio/earthed/go/sdk/earthed"
+	"github.com/fuegoio/sunred/go/sdk/sunred"
 )
 
 // Config holds the CLI client configuration, loaded from the config file.
@@ -25,7 +25,7 @@ func configDir() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("user config dir: %w", err)
 	}
-	return filepath.Join(dir, "earthed"), nil
+	return filepath.Join(dir, "sunred"), nil
 }
 
 // ConfigPath returns the path to the CLI config file.
@@ -90,15 +90,15 @@ func SaveConfig(cfg *Config) error {
 }
 
 // New creates a new SDK client with responses from the given config.
-func New(cfg *Config) (*earthed.ClientWithResponses, error) {
-	var opts []earthed.ClientOption
+func New(cfg *Config) (*sunred.ClientWithResponses, error) {
+	var opts []sunred.ClientOption
 
 	if cfg.Token != "" {
-		opts = append(opts, earthed.WithRequestEditorFn(func(_ context.Context, req *http.Request) error {
+		opts = append(opts, sunred.WithRequestEditorFn(func(_ context.Context, req *http.Request) error {
 			req.Header.Set("Authorization", "Bearer "+cfg.Token)
 			return nil
 		}))
 	}
 
-	return earthed.NewClientWithResponses(cfg.BaseURL, opts...)
+	return sunred.NewClientWithResponses(cfg.BaseURL, opts...)
 }

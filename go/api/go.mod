@@ -1,4 +1,4 @@
-module github.com/fuegoio/earthed/go/api
+module github.com/fuegoio/sunred/go/api
 
 go 1.26
 

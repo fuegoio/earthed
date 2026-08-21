@@ -1,5 +1,5 @@
 // Package atproto provides AT Protocol XRPC client, DID resolution,
-// TID generation, and record write helpers for the Earthed API.
+// TID generation, and record write helpers for the Sunred API.
 package atproto
 
 import (

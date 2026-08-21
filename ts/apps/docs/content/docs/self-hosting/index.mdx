@@ -1,14 +1,15 @@
 ---
 title: Docker Compose
-description: Deploy Earthed with Docker Compose.
+description: Deploy Sunred with Docker Compose.
 ---
 
-Earthed publishes images to GitHub Container Registry on every push to `main` and every release:
+Sunred publishes images to GitHub Container Registry on every push to `main` and every release:
 
 | Image | Registry                        |
 | ----- | ------------------------------- |
-| API   | `ghcr.io/fuegoio/earthed-api` |
-| Web   | `ghcr.io/fuegoio/earthed-web` |
+| API   | `ghcr.io/fuegoio/sunred-api` |
+| Web   | `ghcr.io/fuegoio/sunred-web` |
+| Relay | `ghcr.io/fuegoio/sunred-relay` |
 
 Tags: `latest` (main branch), `1.2.3` / `v1.2.3` (release), `1.2` (minor), `1` (major), `sha-<short>` (commit).
 
@@ -21,27 +22,27 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: earthed
+      POSTGRES_USER: sunred
       POSTGRES_PASSWORD: <db-password>
-      POSTGRES_DB: earthed
+      POSTGRES_DB: sunred
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U earthed"]
+      test: ["CMD-SHELL", "pg_isready -U sunred"]
       interval: 5s
       timeout: 3s
       retries: 10
 
   api:
-    image: ghcr.io/fuegoio/earthed-api:latest
+    image: ghcr.io/fuegoio/sunred-api:latest
     ports:
       - "8080:8080"
     environment:
-      EARTHED_DATABASE_URL: postgres://earthed:<db-password>@postgres:5432/earthed?sslmode=disable
-      EARTHED_BASE_URL: https://api.your-domain.com
-      EARTHED_WEB_URL: https://your-domain.com
-      EARTHED_RELAY_URL: http://relay:9090
-      EARTHED_OAUTH_REDIRECT_URL: https://api.your-domain.com/auth/oauth/callback
+      SUNRED_DATABASE_URL: postgres://sunred:<db-password>@postgres:5432/sunred?sslmode=disable
+      SUNRED_BASE_URL: https://api.your-domain.com
+      SUNRED_WEB_URL: https://your-domain.com
+      SUNRED_RELAY_URL: http://relay:9090
+      SUNRED_OAUTH_REDIRECT_URL: https://api.your-domain.com/auth/oauth/callback
     depends_on:
       postgres:
         condition: service_healthy
@@ -52,29 +53,44 @@ services:
       retries: 3
 
   web:
-    image: ghcr.io/fuegoio/earthed-web:latest
+    image: ghcr.io/fuegoio/sunred-web:latest
     ports:
       - "3000:3000"
     environment:
-      EARTHED_API_URL: http://api:8080
-      NEXT_PUBLIC_EARTHED_API_URL: https://api.your-domain.com
+      SUNRED_API_URL: http://api:8080
+      NEXT_PUBLIC_SUNRED_API_URL: https://api.your-domain.com
     depends_on:
       api:
         condition: service_healthy
 
+  relay-postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: sunred
+      POSTGRES_PASSWORD: <relay-db-password>
+      POSTGRES_DB: sunred_relay
+    volumes:
+      - relay-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sunred"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   relay:
-    image: ghcr.io/fuegoio/earthed-relay:latest
+    image: ghcr.io/fuegoio/sunred-relay:latest
     ports:
       - "9090:9090"
     environment:
-      RELAY_DATABASE_URL: postgres://earthed:<db-password>@postgres:5432/earthed_relay?sslmode=disable
+      RELAY_DATABASE_URL: postgres://sunred:<relay-db-password>@relay-postgres:5432/sunred_relay?sslmode=disable
       RELAY_HTTP_ADDR: ":9090"
     depends_on:
-      postgres:
+      relay-postgres:
         condition: service_healthy
 
 volumes:
   pgdata:
+  relay-pgdata:
 ```
 
 Start:
@@ -87,14 +103,14 @@ Run database migrations on first start. The API and relay each need their own
 database:
 
 ```bash
-docker compose exec api /app/earthed --migrate
-docker compose exec relay /app/earthed-relay --migrate
+docker compose exec api /app/sunred --migrate
+docker compose exec relay /app/sunred-relay --migrate
 ```
 
-`EARTHED_API_URL` is the server-side URL the web container uses to reach the API over the Docker network. `NEXT_PUBLIC_EARTHED_API_URL` is baked into the browser bundle and must be publicly reachable.
+`SUNRED_API_URL` is the server-side URL the web container uses to reach the API over the Docker network. `NEXT_PUBLIC_SUNRED_API_URL` is baked into the browser bundle and must be publicly reachable.
 
 The `relay` service is optional but recommended — it enables cross-instance
 social features (global counts, federated shares). See
 [AT Proto & identity](/self-hosting/at-proto) for what it does and how to
-configure it. Users log in with their own AT Proto handle — typically a
-Bluesky account or a personal PDS — so no PDS is included here.
+configure it. Users log in with their own AT Proto handle — the default PDS is
+`https://snrd.social`, or users can bring their own PDS.

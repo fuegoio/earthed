@@ -28,7 +28,7 @@ type Config struct {
 	CookieSameSite string
 	CookieDomain   string
 	TrustedOrigins []string
-	// RelayURL is the base URL of the Earthed relay. When set, the API
+	// RelayURL is the base URL of the Sunred relay. When set, the API
 	// announces new AT Proto users to the relay and queries it for global counts.
 	// Leave empty to disable relay integration.
 	RelayURL string
@@ -36,7 +36,7 @@ type Config struct {
 	// login page shows a "Create account" link that starts the OAuth flow
 	// against this PDS. When unset, only existing-handle login is offered.
 	DefaultPDS string
-	// OAuthClientID is the full URL where Earthed serves its client metadata
+	// OAuthClientID is the full URL where Sunred serves its client metadata
 	// document (the PDS fetches this during the OAuth flow). Defaults to
 	// "<BaseURL>/client-metadata.json".
 	OAuthClientID string
@@ -48,25 +48,25 @@ type Config struct {
 // Load reads configuration from environment variables and validates it.
 func Load() (*Config, error) {
 	cfg := &Config{
-		HTTPAddr:       env("EARTHED_HTTP_ADDR", ":8080"),
-		DatabaseURL:    env("EARTHED_DATABASE_URL", "postgres://earthed:earthed@localhost:5432/earthed?sslmode=disable"),
-		BaseURL:        env("EARTHED_BASE_URL", "http://localhost:8080"),
-		WebURL:         env("EARTHED_WEB_URL", "http://localhost:3000"),
-		LogFormat:      env("EARTHED_LOG_FORMAT", "pretty"),
-		PollingFreq:    envDuration("EARTHED_POLLING_FREQUENCY", 60*time.Second),
-		BatchSize:      envInt("EARTHED_BATCH_SIZE", 100),
-		WorkerPool:     envInt("EARTHED_WORKER_POOL_SIZE", 5),
-		HTTPTimeout:    envDuration("EARTHED_HTTP_CLIENT_TIMEOUT", 20*time.Second),
-		HTTPMaxBody:    int64(envInt("EARTHED_HTTP_CLIENT_MAX_BODY", 15*1024*1024)),
-		CleanupFreq:    envDuration("EARTHED_CLEANUP_FREQUENCY", 24*time.Hour),
-		EntryMaxAge:    envInt("EARTHED_ENTRY_MAX_AGE_DAYS", 60),
-		DisableSched:   env("EARTHED_DISABLE_SCHEDULER", "") != "",
-		CookieSecure:   envBool("EARTHED_COOKIE_SECURE", false),
-		CookieSameSite: env("EARTHED_COOKIE_SAMESITE", "lax"),
-		CookieDomain:   strings.TrimSpace(env("EARTHED_COOKIE_DOMAIN", "")),
-		TrustedOrigins: envList("EARTHED_TRUSTED_ORIGINS"),
-		RelayURL:       env("EARTHED_RELAY_URL", ""),
-		DefaultPDS:    strings.TrimRight(strings.TrimSpace(env("EARTHED_DEFAULT_PDS", "")), "/"),
+		HTTPAddr:       env("SUNRED_HTTP_ADDR", ":8080"),
+		DatabaseURL:    env("SUNRED_DATABASE_URL", "postgres://sunred:sunred@localhost:5432/sunred?sslmode=disable"),
+		BaseURL:        env("SUNRED_BASE_URL", "http://localhost:8080"),
+		WebURL:         env("SUNRED_WEB_URL", "http://localhost:3000"),
+		LogFormat:      env("SUNRED_LOG_FORMAT", "pretty"),
+		PollingFreq:    envDuration("SUNRED_POLLING_FREQUENCY", 60*time.Second),
+		BatchSize:      envInt("SUNRED_BATCH_SIZE", 100),
+		WorkerPool:     envInt("SUNRED_WORKER_POOL_SIZE", 5),
+		HTTPTimeout:    envDuration("SUNRED_HTTP_CLIENT_TIMEOUT", 20*time.Second),
+		HTTPMaxBody:    int64(envInt("SUNRED_HTTP_CLIENT_MAX_BODY", 15*1024*1024)),
+		CleanupFreq:    envDuration("SUNRED_CLEANUP_FREQUENCY", 24*time.Hour),
+		EntryMaxAge:    envInt("SUNRED_ENTRY_MAX_AGE_DAYS", 60),
+		DisableSched:   env("SUNRED_DISABLE_SCHEDULER", "") != "",
+		CookieSecure:   envBool("SUNRED_COOKIE_SECURE", false),
+		CookieSameSite: env("SUNRED_COOKIE_SAMESITE", "lax"),
+		CookieDomain:   strings.TrimSpace(env("SUNRED_COOKIE_DOMAIN", "")),
+		TrustedOrigins: envList("SUNRED_TRUSTED_ORIGINS"),
+		RelayURL:       env("SUNRED_RELAY_URL", ""),
+		DefaultPDS:    strings.TrimRight(strings.TrimSpace(env("SUNRED_DEFAULT_PDS", "https://snrd.social")), "/"),
 	}
 
 	// OAuth client_id and callback URL default from BaseURL. The client_id is a
@@ -75,25 +75,25 @@ func Load() (*Config, error) {
 	// client_id as query params, so the PDS never fetches it — localhost is
 	// fine and keeps the session cookie on the same origin as the web app.
 	base := strings.TrimRight(strings.TrimSpace(cfg.BaseURL), "/")
-	cfg.OAuthClientID = env("EARTHED_OAUTH_CLIENT_ID", base+"/client-metadata.json")
-	cfg.OAuthCallbackURL = env("EARTHED_OAUTH_REDIRECT_URL", base+"/auth/oauth/callback")
+	cfg.OAuthClientID = env("SUNRED_OAUTH_CLIENT_ID", base+"/client-metadata.json")
+	cfg.OAuthCallbackURL = env("SUNRED_OAUTH_REDIRECT_URL", base+"/auth/oauth/callback")
 
 	switch cfg.CookieSameSite {
 	case "lax", "none", "strict":
 	default:
-		return nil, fmt.Errorf("EARTHED_COOKIE_SAMESITE must be one of lax, none, strict; got %q", cfg.CookieSameSite)
+		return nil, fmt.Errorf("SUNRED_COOKIE_SAMESITE must be one of lax, none, strict; got %q", cfg.CookieSameSite)
 	}
 	// SameSite=None requires Secure, otherwise browsers reject the cookie.
 	if cfg.CookieSameSite == "none" && !cfg.CookieSecure {
-		return nil, fmt.Errorf("EARTHED_COOKIE_SAMESITE=none requires EARTHED_COOKIE_SECURE=true (browsers reject SameSite=None without Secure)")
+		return nil, fmt.Errorf("SUNRED_COOKIE_SAMESITE=none requires SUNRED_COOKIE_SECURE=true (browsers reject SameSite=None without Secure)")
 	}
 
-	// CookieDomain must be a bare host (e.g. "earthed.app"), not a URL.
+	// CookieDomain must be a bare host (e.g. "sunred.app"), not a URL.
 	// When set, the session cookie is shared across that registrable domain and
 	// its subdomains so the web app and API (on a subdomain) share the session.
 	if cfg.CookieDomain != "" {
 		if strings.Contains(cfg.CookieDomain, "://") || strings.ContainsAny(cfg.CookieDomain, "/:") {
-			return nil, fmt.Errorf("EARTHED_COOKIE_DOMAIN must be a bare host (e.g. \"earthed.app\"), not a URL; got %q", cfg.CookieDomain)
+			return nil, fmt.Errorf("SUNRED_COOKIE_DOMAIN must be a bare host (e.g. \"sunred.app\"), not a URL; got %q", cfg.CookieDomain)
 		}
 	}
 

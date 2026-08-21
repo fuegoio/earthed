@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "io.earthed.feed.subscription",
+  "id": "io.sunred.feed.subscription",
   "defs": {
     "main": {
       "type": "record",

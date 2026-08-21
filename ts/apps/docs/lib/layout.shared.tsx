@@ -45,7 +45,7 @@ export function baseOptions(props: BaseLayoutProps = {}): BaseLayoutProps {
       title: (
         <span className="flex items-center gap-2 font-semibold">
           <Logo className="size-5" />
-          Earthed
+          Sunred
         </span>
       ),
     },

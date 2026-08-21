@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getClient, getMe } from "@/lib/earthed";
+import { getClient, getMe } from "@/lib/sunred";
 import { apiErrorStatus, getApiErrorMessage, isClientError } from "@/lib/errors";
 import { ApiError } from "@/components/api-error";
 import { AppShell } from "@/components/app-shell";

@@ -6,7 +6,7 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/fuegoio/earthed/go/sdk/earthed"
+	"github.com/fuegoio/sunred/go/sdk/sunred"
 	"github.com/spf13/cobra"
 )
 
@@ -45,7 +45,7 @@ var feedsAddCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		_, c := mustClient()
-		resp, err := c.CreateFeedWithResponse(context.Background(), earthed.CreateFeedJSONRequestBody{
+		resp, err := c.CreateFeedWithResponse(context.Background(), sunred.CreateFeedJSONRequestBody{
 			FeedUrl: args[0],
 		})
 		if err != nil {

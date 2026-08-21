@@ -1,4 +1,4 @@
--- Earthed RSS reader tables: categories, feeds, entries, enclosures, api_tokens, feed_icons
+-- Sunred RSS reader tables: categories, feeds, entries, enclosures, api_tokens, feed_icons
 
 CREATE TABLE IF NOT EXISTS api_tokens (
   id SERIAL PRIMARY KEY,

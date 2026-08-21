@@ -7,8 +7,8 @@ import (
 	"log/slog"
 	"sync"
 
-	"github.com/fuegoio/earthed/go/api/internal/reader/processor"
-	"github.com/fuegoio/earthed/go/api/internal/store"
+	"github.com/fuegoio/sunred/go/api/internal/reader/processor"
+	"github.com/fuegoio/sunred/go/api/internal/store"
 )
 
 // Pool is a worker pool that processes feed refresh jobs.

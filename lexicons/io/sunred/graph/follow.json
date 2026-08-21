@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "io.earthed.graph.follow",
+  "id": "io.sunred.graph.follow",
   "defs": {
     "main": {
       "type": "record",

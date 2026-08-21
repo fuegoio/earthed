@@ -1,4 +1,4 @@
-// Package api registers the Earthed REST API on a huma router.
+// Package api registers the Sunred REST API on a huma router.
 package api
 
 import (
@@ -14,14 +14,14 @@ import (
 
 	"github.com/danielgtaylor/huma/v2"
 
-	"github.com/fuegoio/earthed/go/api/internal/auth"
-	"github.com/fuegoio/earthed/go/api/internal/config"
-	"github.com/fuegoio/earthed/go/api/internal/reader/discoverer"
-	"github.com/fuegoio/earthed/go/api/internal/reader/fetcher"
-	"github.com/fuegoio/earthed/go/api/internal/reader/parser"
-	"github.com/fuegoio/earthed/go/api/internal/reader/processor"
-	"github.com/fuegoio/earthed/go/api/internal/reader/sanitizer"
-	"github.com/fuegoio/earthed/go/api/internal/store"
+	"github.com/fuegoio/sunred/go/api/internal/auth"
+	"github.com/fuegoio/sunred/go/api/internal/config"
+	"github.com/fuegoio/sunred/go/api/internal/reader/discoverer"
+	"github.com/fuegoio/sunred/go/api/internal/reader/fetcher"
+	"github.com/fuegoio/sunred/go/api/internal/reader/parser"
+	"github.com/fuegoio/sunred/go/api/internal/reader/processor"
+	"github.com/fuegoio/sunred/go/api/internal/reader/sanitizer"
+	"github.com/fuegoio/sunred/go/api/internal/store"
 )
 
 // API wires the store and auth to a huma router and registers the REST routes.
@@ -61,7 +61,7 @@ func OpenAPITags() []*huma.Tag {
 	}
 }
 
-// RegisterRoutes registers all Earthed REST routes on the huma router.
+// RegisterRoutes registers all Sunred REST routes on the huma router.
 func (a *API) RegisterRoutes() {
 	a.registerHealthRoutes()
 	a.registerMeRoutes()
@@ -1236,7 +1236,7 @@ func (a *API) registerOPMLRoutes() {
 
 		doc := opmlXML{
 			Version: "2.0",
-			Head:    opmlHead{Title: "Earthed Subscriptions"},
+			Head:    opmlHead{Title: "Sunred Subscriptions"},
 			Body:    opmlBody{Outlines: outlines},
 		}
 

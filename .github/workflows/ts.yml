@@ -49,7 +49,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/earthed-docs
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/sunred-docs
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}
@@ -92,7 +92,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/earthed-web
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/sunred-web
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}
@@ -135,7 +135,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/earthed-website
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/sunred-website
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}

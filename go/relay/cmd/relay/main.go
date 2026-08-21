@@ -1,9 +1,9 @@
-// Package main is the Earthed relay server entrypoint.
+// Package main is the Sunred relay server entrypoint.
 //
 // The relay:
-//   1. Accepts announcements from Earthed instances when users connect AT Proto identities.
+//   1. Accepts announcements from Sunred instances when users connect AT Proto identities.
 //   2. Maintains persistent WebSocket subscriptions to each announced DID's PDS repo stream.
-//   3. Aggregates io.earthed.* record events into global counts (followers, shares, feed subs).
+//   3. Aggregates io.sunred.* record events into global counts (followers, shares, feed subs).
 //   4. Streams events back to subscribed instances via the subscribeEvents WebSocket endpoint.
 //
 // Run: relay [--migrate]
@@ -31,11 +31,11 @@ import (
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 
-	"github.com/fuegoio/earthed/go/relay/internal/config"
-	"github.com/fuegoio/earthed/go/relay/internal/fanout"
-	"github.com/fuegoio/earthed/go/relay/internal/migrations"
-	"github.com/fuegoio/earthed/go/relay/internal/server"
-	"github.com/fuegoio/earthed/go/relay/internal/store"
+	"github.com/fuegoio/sunred/go/relay/internal/config"
+	"github.com/fuegoio/sunred/go/relay/internal/fanout"
+	"github.com/fuegoio/sunred/go/relay/internal/migrations"
+	"github.com/fuegoio/sunred/go/relay/internal/server"
+	"github.com/fuegoio/sunred/go/relay/internal/store"
 )
 
 func main() {

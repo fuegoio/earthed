@@ -1,11 +1,11 @@
-# Earthed
+# Sunred
 
 A self-hosted RSS reader.
 
 ## Repository structure
 
 ```
-earthed/
+sunred/
 ├── go/                      # Go (API server, SDK, CLI/TUI)
 │   ├── go.work              # Go workspace — links all modules
 │   ├── api/                 # API server (huma, PostgreSQL)
@@ -46,10 +46,10 @@ make run            # start the API server on :8080
 ```bash
 cd go/cli
 make build
-./earthed config set base_url http://localhost:8080
-./earthed config set token <your-api-token>
-./earthed feeds list
-./earthed-tui      # interactive TUI
+./sunred config set base_url http://localhost:8080
+./sunred config set token <your-api-token>
+./sunred feeds list
+./sunred-tui      # interactive TUI
 ```
 
 ### Web frontend

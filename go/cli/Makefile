@@ -3,16 +3,16 @@
 build: cli tui
 
 cli:
-	go build -o earthed ./cmd/earthed/
+	go build -o sunred ./cmd/sunred/
 
 tui:
-	go build -o earthed-tui ./cmd/earthed-tui/
+	go build -o sunred-tui ./cmd/sunred-tui/
 
 test:
 	go test ./...
 
 test-tui: tui
-	bash tui_test.sh ./earthed-tui
+	bash tui_test.sh ./sunred-tui
 
 tidy:
 	go mod tidy

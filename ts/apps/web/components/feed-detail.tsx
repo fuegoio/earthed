@@ -30,7 +30,7 @@ import {
   listFolders,
   feedSubscribers,
   unwrap,
-} from "@/lib/earthed";
+} from "@/lib/sunred";
 import { getApiErrorMessage } from "@/lib/errors";
 import { cn } from "@workspace/ui/lib/utils";
 import type { Feed, Folder, FeedSubscribersResponse, UserProfile } from "@/lib/types";

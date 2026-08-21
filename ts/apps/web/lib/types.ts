@@ -1,4 +1,4 @@
-import type { ApiToken, TokenOutputBody } from "@earthed/api-client";
+import type { ApiToken, TokenOutputBody } from "@sunred/api-client";
 
 export type {
   ApiToken,
@@ -21,7 +21,7 @@ export type {
   SharedArticle,
   User,
   UserProfile,
-} from "@earthed/api-client";
+} from "@sunred/api-client";
 
 // Web-friendly aliases for generated types whose generated names are awkward
 // to use in components.

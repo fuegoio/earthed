@@ -7,7 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ChevronRight, FolderOpen, Folder as FolderIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { getClient, updateFeed, updateFolder } from "@/lib/earthed";
+import { getClient, updateFeed, updateFolder } from "@/lib/sunred";
 import { getApiErrorMessage } from "@/lib/errors";
 import { FeedIcon } from "@/components/feed-icon";
 import { cn } from "@workspace/ui/lib/utils";

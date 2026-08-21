@@ -28,13 +28,13 @@ func TestViewSidebarText(t *testing.T) {
 		t.Logf("line[%d] len=%d visible=%d: %q", i, len(l), ansiStripWidth(l), l)
 	}
 
-	// Row 0 should contain "Earthed" from the sidebar header.
+	// Row 0 should contain "Sunred" from the sidebar header.
 	if len(lines) == 0 {
 		t.Fatal("no lines in view")
 	}
 	visible0 := stripAnsiChars(lines[0])
-	if !strings.Contains(visible0, "Earthed") {
-		t.Errorf("row 0 does not contain 'Earthed'; got: %q", visible0)
+	if !strings.Contains(visible0, "Sunred") {
+		t.Errorf("row 0 does not contain 'Sunred'; got: %q", visible0)
 	}
 
 	// Sidebar lines should contain nav items.
@@ -66,7 +66,7 @@ func TestAnsiStripWidth(t *testing.T) {
 		{"hello", 5},
 		{"\x1b[1mhello\x1b[m", 5},
 		{"\x1b[38;5;99mhello\x1b[m", 5},
-		{"\x1b[1m\x1b[38;5;99m  Earthed\x1b[m", 9},
+		{"\x1b[1m\x1b[38;5;99m  Sunred\x1b[m", 8},
 		{"─", 1},                     // 3-byte UTF-8 rune, 1 visible column
 		{strings.Repeat("─", 27), 27}, // 81 bytes, 27 visible columns
 		{"\x1b[38;5;245m" + strings.Repeat("─", 27) + "\x1b[m", 27},

@@ -1,14 +1,14 @@
 import { env } from "./env";
 
 /**
- * Earthed authentication is AT Proto OAuth. Users enter their handle; the web
+ * Sunred authentication is AT Proto OAuth. Users enter their handle; the web
  * app redirects to the API's OAuth login endpoint, which resolves the handle,
  * sends a PAR request to the user's PDS, and redirects the browser to the PDS
  * to approve. After approval the PDS redirects back to the API callback, which
  * issues a session cookie and redirects back here.
  *
  * All of that happens as full-page browser navigations (not fetch), because the
- * user leaves the Earthed origin to approve on their PDS.
+ * user leaves the Sunred origin to approve on their PDS.
  */
 
 /**
@@ -19,12 +19,12 @@ import { env } from "./env";
 export function loginWithHandle(handle: string, redirectTo?: string | null): void {
   const params = new URLSearchParams({ handle });
   if (redirectTo) params.set("redirect", safeRedirect(redirectTo));
-  window.location.assign(`${env.NEXT_PUBLIC_EARTHED_API_URL}/auth/oauth/login?${params}`);
+  window.location.assign(`${env.NEXT_PUBLIC_SUNRED_API_URL}/auth/oauth/login?${params}`);
 }
 
 /**
  * signupWithDefaultPDS redirects the browser to the API to start the OAuth
- * signup flow against the instance's default PDS (EARTHED_DEFAULT_PDS). The
+ * signup flow against the instance's default PDS (SUNRED_DEFAULT_PDS). The
  * API returns 503 if no default PDS is configured.
  */
 export function signupWithDefaultPDS(redirectTo?: string | null): void {
@@ -32,7 +32,7 @@ export function signupWithDefaultPDS(redirectTo?: string | null): void {
   if (redirectTo) params.set("redirect", safeRedirect(redirectTo));
   const qs = params.toString();
   window.location.assign(
-    `${env.NEXT_PUBLIC_EARTHED_API_URL}/auth/oauth/signup${qs ? `?${qs}` : ""}`,
+    `${env.NEXT_PUBLIC_SUNRED_API_URL}/auth/oauth/signup${qs ? `?${qs}` : ""}`,
   );
 }
 
@@ -42,7 +42,7 @@ export function signupWithDefaultPDS(redirectTo?: string | null): void {
  */
 export async function getOAuthConfig(): Promise<{ default_pds: string | null }> {
   try {
-    const res = await fetch(`${env.NEXT_PUBLIC_EARTHED_API_URL}/auth/oauth/config`, {
+    const res = await fetch(`${env.NEXT_PUBLIC_SUNRED_API_URL}/auth/oauth/config`, {
       headers: { Accept: "application/json" },
       // Forward cookies on the server so the request is consistent.
       next: { revalidate: 60 },
@@ -59,7 +59,7 @@ export async function getOAuthConfig(): Promise<{ default_pds: string | null }> 
  * user back to the web app root.
  */
 export function signout(): void {
-  window.location.assign(`${env.NEXT_PUBLIC_EARTHED_API_URL}/auth/signout`);
+  window.location.assign(`${env.NEXT_PUBLIC_SUNRED_API_URL}/auth/signout`);
 }
 
 /**

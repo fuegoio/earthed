@@ -3,11 +3,11 @@ import Base from "../layouts/Base.astro"
 import Logo from "../components/Logo.astro"
 
 // CTA targets. The marketing site is served at the same origin as the app
-// (earthed.app) for logged-out visitors, so "Login" is a same-origin link to
+// (sunred.app) for logged-out visitors, so "Login" is a same-origin link to
 // the app's /login route (the web proxy routes it to the Next app). After
 // signing in, the proxy serves the app at "/".
 const loginUrl = "/login"
-const selfHostUrl = "https://github.com/fuegoio/earthed"
+const selfHostUrl = "https://github.com/fuegoio/sunred"
 ---
 
 <Base>
@@ -19,14 +19,14 @@ const selfHostUrl = "https://github.com/fuegoio/earthed"
   <nav class="site-nav" aria-label="Primary">
     <a class="nav-brand" href="/">
       <Logo class="nav-mark" static />
-      <span>Earthed</span>
+      <span>Sunred</span>
     </a>
     <div class="nav-links">
       <a href="#features">Features</a>
       <a href="#interfaces">Interfaces</a>
       <a href="#feed-lists">Feed Lists</a>
       <a href="#faq">FAQ</a>
-      <a href="https://earthed.dev/docs">Docs</a>
+      <a href="https://sunred.dev/docs">Docs</a>
     </div>
     <div class="nav-cta">
       <a class="nav-link-login" href={loginUrl}>Login</a>
@@ -37,7 +37,7 @@ const selfHostUrl = "https://github.com/fuegoio/earthed"
   <!-- ════════════════════════════════════════════════════════════════
        HERO — the dawn
        A deep warm sky. The sun (logo) rises from the left.
-       "Earthed" appears as the light blooms. Then the tagline and CTAs.
+       "Sunred" appears as the light blooms. Then the tagline and CTAs.
   ═════════════════════════════════════════════════════════════════ -->
   <section class="hero" aria-label="Hero">
     <!-- Sky layers: base deep sky, warming layer (fades in as sun rises) -->
@@ -57,7 +57,7 @@ const selfHostUrl = "https://github.com/fuegoio/earthed"
 
     <!-- Wordmark + tagline + CTAs -->
     <div class="hero-content">
-      <h1 class="wordmark">Earthed</h1>
+      <h1 class="wordmark">Sunred</h1>
       <p class="tagline">
         A modern, self-hostable RSS reader. Clean API, multiple
         interfaces, one timeline.
@@ -119,7 +119,7 @@ const selfHostUrl = "https://github.com/fuegoio/earthed"
 
       <div class="positioning-body">
         <p>
-          Earthed fetches RSS 2.0, Atom, and JSON Feed into a single
+          Sunred fetches RSS 2.0, Atom, and JSON Feed into a single
           timeline you actually want to read. No ads, no tracking, no
           algorithm deciding what reaches you. Just the sources you chose,
           in a calm space built for reading.
@@ -134,21 +134,21 @@ const selfHostUrl = "https://github.com/fuegoio/earthed"
       </div>
 
       <!-- A CLI sample shows the product, not a restatement of the prose -->
-      <div class="code-sample" role="region" aria-label="Earthed CLI sample">
+      <div class="code-sample" role="region" aria-label="Sunred CLI sample">
         <div class="code-tabbar" aria-hidden="true">
           <span class="code-dot"></span>
           <span class="code-dot"></span>
           <span class="code-dot"></span>
           <span class="code-label">terminal</span>
         </div>
-        <pre class="code-body"><code><span class="code-prompt">$</span> earthed feeds add https://example.com/feed.xml
-<span class="code-prompt">$</span> earthed list --unread
+        <pre class="code-body"><code><span class="code-prompt">$</span> sunred feeds add https://example.com/feed.xml
+<span class="code-prompt">$</span> sunred list --unread
 <span class="code-comment"># 3 unread in Technology</span>
   planet4.local  Rust 2026 roadmap
   planet4.local  The end of Moore's law (again)
   planet4.local  Why RSS still matters
 
-<span class="code-prompt">$</span> earthed read 1 --open</code></pre>
+<span class="code-prompt">$</span> sunred read 1 --open</code></pre>
       </div>
     </div>
   </section>
@@ -263,22 +263,22 @@ const selfHostUrl = "https://github.com/fuegoio/earthed"
         </div>
       </div>
 
-      <div class="code-sample code-sample-wide" role="region" aria-label="Earthed CLI sample">
+      <div class="code-sample code-sample-wide" role="region" aria-label="Sunred CLI sample">
         <div class="code-tabbar" aria-hidden="true">
           <span class="code-dot"></span>
           <span class="code-dot"></span>
           <span class="code-dot"></span>
           <span class="code-label">terminal</span>
         </div>
-        <pre class="code-body"><code><span class="code-prompt">$</span> earthed feeds add https://example.com/feed.xml
+        <pre class="code-body"><code><span class="code-prompt">$</span> sunred feeds add https://example.com/feed.xml
 <span class="code-comment"># Added "Example Blog" to Technology</span>
 
-<span class="code-prompt">$</span> earthed list --unread
+<span class="code-prompt">$</span> sunred list --unread
   planet4.local  Rust 2026 roadmap
   planet4.local  The end of Moore's law (again)
   planet4.local  Why RSS still matters
 
-<span class="code-prompt">$</span> earthed read 1 --open</code></pre>
+<span class="code-prompt">$</span> sunred read 1 --open</code></pre>
       </div>
     </div>
   </section>
@@ -343,12 +343,12 @@ const selfHostUrl = "https://github.com/fuegoio/earthed"
 
       <div class="faq-list">
         <details class="faq-item">
-          <summary>What feed formats does Earthed support?</summary>
+          <summary>What feed formats does Sunred support?</summary>
           <p>RSS 2.0, Atom 1.0, and JSON Feed. If a site publishes a feed in any of these formats, you can subscribe to it.</p>
         </details>
         <details class="faq-item">
           <summary>Do I need to host it myself?</summary>
-          <p>No. You can use the hosted version and skip the setup. But if you want full control over your data, Earthed is open source and runs anywhere with Docker — a single command gets you a server, database, and web frontend.</p>
+          <p>No. You can use the hosted version and skip the setup. But if you want full control over your data, Sunred is open source and runs anywhere with Docker — a single command gets you a server, database, and web frontend.</p>
         </details>
         <details class="faq-item">
           <summary>Is there a mobile app?</summary>
@@ -360,15 +360,15 @@ const selfHostUrl = "https://github.com/fuegoio/earthed"
         </details>
         <details class="faq-item">
           <summary>Can I import my feeds from another reader?</summary>
-          <p>Yes. Earthed supports OPML import. Export your feeds from any RSS reader (Feedly, Inoreader, NetNewsWire, etc.) as an OPML file and import them directly. You can also import OPML into feed lists.</p>
+          <p>Yes. Sunred supports OPML import. Export your feeds from any RSS reader (Feedly, Inoreader, NetNewsWire, etc.) as an OPML file and import them directly. You can also import OPML into feed lists.</p>
         </details>
         <details class="faq-item">
           <summary>What is a feed list?</summary>
-          <p>A feed list is a named collection of feeds you curate around a topic. You can keep lists private or make them public. Public lists can be discovered and followed by other Earthed users — following a list subscribes you to all its feeds in one click.</p>
+          <p>A feed list is a named collection of feeds you curate around a topic. You can keep lists private or make them public. Public lists can be discovered and followed by other Sunred users — following a list subscribes you to all its feeds in one click.</p>
         </details>
         <details class="faq-item">
           <summary>Is there tracking or advertising?</summary>
-          <p>No. Earthed has no ads, no tracking, no analytics, no algorithmic feed. You see the entries from the feeds you subscribed to, in the order they were published.</p>
+          <p>No. Sunred has no ads, no tracking, no analytics, no algorithmic feed. You see the entries from the feeds you subscribed to, in the order they were published.</p>
         </details>
         <details class="faq-item">
           <summary>What's the API like?</summary>
@@ -408,12 +408,12 @@ const selfHostUrl = "https://github.com/fuegoio/earthed"
     <div class="footer-inner">
       <div class="footer-brand">
         <Logo class="footer-mark" static />
-        <span>Earthed</span>
+        <span>Sunred</span>
       </div>
       <nav class="footer-nav" aria-label="Footer">
         <a href={loginUrl}>Login</a>
         <a href={selfHostUrl}>Self-host</a>
-        <a href="https://earthed.dev/docs">Docs</a>
+        <a href="https://sunred.dev/docs">Docs</a>
         <a href="#features">Features</a>
         <a href="#faq">FAQ</a>
       </nav>

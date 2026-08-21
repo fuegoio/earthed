@@ -1,4 +1,4 @@
-// Package cors provides a CORS middleware for the Earthed HTTP API.
+// Package cors provides a CORS middleware for the Sunred HTTP API.
 package cors
 
 import (

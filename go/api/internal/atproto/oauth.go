@@ -8,7 +8,7 @@ import (
 	"github.com/bluesky-social/indigo/atproto/auth/oauth"
 )
 
-// NewOAuthApp builds the indigo OAuth ClientApp for Earthed.
+// NewOAuthApp builds the indigo OAuth ClientApp for Sunred.
 //
 // For local development (BaseURL on 127.0.0.1 or localhost), it uses
 // NewLocalhostConfig, which encodes the client metadata directly in the
@@ -19,7 +19,7 @@ import (
 // client_id URL pointing at the client-metadata.json document this server
 // serves.
 //
-// Earthed is a public (non-confidential) client: it has no shared secret with
+// Sunred is a public (non-confidential) client: it has no shared secret with
 // the PDS, relying on PKCE + DPoP instead. The PGStore persists auth-request
 // state and sessions in PostgreSQL so logins survive restarts.
 func NewOAuthApp(db *sql.DB, clientID, callbackURL string) (*oauth.ClientApp, error) {

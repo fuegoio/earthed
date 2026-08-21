@@ -7,8 +7,8 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/fuegoio/earthed/go/api/internal/store"
-	"github.com/fuegoio/earthed/go/api/internal/worker"
+	"github.com/fuegoio/sunred/go/api/internal/store"
+	"github.com/fuegoio/sunred/go/api/internal/worker"
 )
 
 // Scheduler ticks at a fixed interval and dispatches due feeds to the worker pool.

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { getClient, getMe } from "@/lib/earthed";
+import { getClient, getMe } from "@/lib/sunred";
 import { apiErrorStatus, getApiErrorMessage, isClientError } from "@/lib/errors";
 import { ApiError } from "@/components/api-error";
 

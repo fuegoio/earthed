@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sunred-relay-postgres
+    environment:
+      POSTGRES_USER: sunred
+      POSTGRES_PASSWORD: sunred
+      POSTGRES_DB: sunred_relay
+    ports:
+      - "5433:5432"
+    volumes:
+      - sunred-relay-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sunred -d sunred_relay"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  sunred-relay-pgdata:

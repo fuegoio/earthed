@@ -2,16 +2,16 @@ package atproto
 
 import "time"
 
-// Lexicon collection IDs for io.earthed.* record types.
+// Lexicon collection IDs for io.sunred.* record types.
 const (
-	CollectionProfile      = "io.earthed.actor.profile"
-	CollectionFollow       = "io.earthed.graph.follow"
-	CollectionShare        = "io.earthed.share.article"
-	CollectionSubscription = "io.earthed.feed.subscription"
-	CollectionFeedList     = "io.earthed.feed.list"
+	CollectionProfile      = "io.sunred.actor.profile"
+	CollectionFollow       = "io.sunred.graph.follow"
+	CollectionShare        = "io.sunred.share.article"
+	CollectionSubscription = "io.sunred.feed.subscription"
+	CollectionFeedList     = "io.sunred.feed.list"
 )
 
-// ProfileRecord is the io.earthed.actor.profile record.
+// ProfileRecord is the io.sunred.actor.profile record.
 // Stored at rkey "self" — one per user repo.
 type ProfileRecord struct {
 	Type        string `json:"$type"`
@@ -22,14 +22,14 @@ type ProfileRecord struct {
 	CreatedAt   string `json:"createdAt"`
 }
 
-// FollowRecord is the io.earthed.graph.follow record.
+// FollowRecord is the io.sunred.graph.follow record.
 type FollowRecord struct {
 	Type      string `json:"$type"`
 	Subject   string `json:"subject"` // followee DID
 	CreatedAt string `json:"createdAt"`
 }
 
-// ShareRecord is the io.earthed.share.article record.
+// ShareRecord is the io.sunred.share.article record.
 type ShareRecord struct {
 	Type        string `json:"$type"`
 	ArticleURL  string `json:"articleUrl"`
@@ -43,7 +43,7 @@ type ShareRecord struct {
 	SharedAt    string `json:"sharedAt"`
 }
 
-// SubscriptionRecord is the io.earthed.feed.subscription record.
+// SubscriptionRecord is the io.sunred.feed.subscription record.
 type SubscriptionRecord struct {
 	Type      string `json:"$type"`
 	FeedURL   string `json:"feedUrl"`
@@ -52,7 +52,7 @@ type SubscriptionRecord struct {
 	CreatedAt string `json:"createdAt"`
 }
 
-// FeedListRecord is the io.earthed.feed.list record.
+// FeedListRecord is the io.sunred.feed.list record.
 type FeedListRecord struct {
 	Type        string          `json:"$type"`
 	Title       string          `json:"title"`

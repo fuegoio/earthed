@@ -1,4 +1,4 @@
-// Package tui implements the earthed TUI — an interactive feed browser.
+// Package tui implements the sunred TUI — an interactive feed browser.
 package tui
 
 import (
@@ -11,7 +11,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/fuegoio/earthed/go/sdk/earthed"
+	"github.com/fuegoio/sunred/go/sdk/sunred"
 )
 
 // focus tracks which panel has keyboard focus.
@@ -44,7 +44,7 @@ type sidebarItem struct {
 
 // Model holds the TUI state.
 type Model struct {
-	client  *earthed.ClientWithResponses
+	client  *sunred.ClientWithResponses
 	focus   focus
 	width   int
 	height  int
@@ -52,9 +52,9 @@ type Model struct {
 	err     string
 
 	// sidebar data
-	feeds         []earthed.Feed
-	folders       []earthed.Folder
-	feedsByID     map[int64]earthed.Feed
+	feeds         []sunred.Feed
+	folders       []sunred.Folder
+	feedsByID     map[int64]sunred.Feed
 	items         []sidebarItem
 	sidebarCursor int
 
@@ -63,7 +63,7 @@ type Model struct {
 	searchQuery string
 
 	// entries panel
-	entries       []earthed.Entry
+	entries       []sunred.Entry
 	entriesCursor int
 	entriesOffset int // index of first visible entry (scroll offset)
 }
@@ -127,7 +127,7 @@ var (
 )
 
 // NewModel creates a new TUI model with the given client.
-func NewModel(client *earthed.ClientWithResponses) Model {
+func NewModel(client *sunred.ClientWithResponses) Model {
 	return Model{
 		client:        client,
 		focus:         focusEntries,
@@ -143,23 +143,23 @@ func (m Model) Init() tea.Cmd {
 // ---- messages --------------------------------------------------------------
 
 type loadFeedsMsg struct {
-	feeds []earthed.Feed
+	feeds []sunred.Feed
 	err   error
 }
 
 type loadFoldersMsg struct {
-	folders []earthed.Folder
+	folders []sunred.Folder
 	err     error
 }
 
 type loadEntriesMsg struct {
-	entries []earthed.Entry
+	entries []sunred.Entry
 	err     error
 }
 
 type markReadMsg struct {
 	entryID int64
-	status  earthed.UpdateEntriesRequestStatus
+	status  sunred.UpdateEntriesRequestStatus
 	err     error
 }
 
@@ -171,7 +171,7 @@ type toggleStarMsg struct {
 
 // ---- commands --------------------------------------------------------------
 
-func loadFeeds(client *earthed.ClientWithResponses) tea.Cmd {
+func loadFeeds(client *sunred.ClientWithResponses) tea.Cmd {
 	return func() tea.Msg {
 		resp, err := client.ListFeedsWithResponse(context.Background())
 		if err != nil {
@@ -184,7 +184,7 @@ func loadFeeds(client *earthed.ClientWithResponses) tea.Cmd {
 	}
 }
 
-func loadFolders(client *earthed.ClientWithResponses) tea.Cmd {
+func loadFolders(client *sunred.ClientWithResponses) tea.Cmd {
 	return func() tea.Msg {
 		resp, err := client.ListFoldersWithResponse(context.Background())
 		if err != nil {
@@ -197,7 +197,7 @@ func loadFolders(client *earthed.ClientWithResponses) tea.Cmd {
 	}
 }
 
-func loadEntriesByParams(client *earthed.ClientWithResponses, params *earthed.ListEntriesParams) tea.Cmd {
+func loadEntriesByParams(client *sunred.ClientWithResponses, params *sunred.ListEntriesParams) tea.Cmd {
 	return func() tea.Msg {
 		if params.Limit == nil {
 			params.Limit = ptr(int64(200))
@@ -213,16 +213,16 @@ func loadEntriesByParams(client *earthed.ClientWithResponses, params *earthed.Li
 	}
 }
 
-func searchEntries(client *earthed.ClientWithResponses, query string) tea.Cmd {
-	return loadEntriesByParams(client, &earthed.ListEntriesParams{
+func searchEntries(client *sunred.ClientWithResponses, query string) tea.Cmd {
+	return loadEntriesByParams(client, &sunred.ListEntriesParams{
 		Search: ptr(query),
 	})
 }
 
-func setEntryStatus(client *earthed.ClientWithResponses, entryID int64, status earthed.UpdateEntriesRequestStatus) tea.Cmd {
+func setEntryStatus(client *sunred.ClientWithResponses, entryID int64, status sunred.UpdateEntriesRequestStatus) tea.Cmd {
 	return func() tea.Msg {
 		ids := []int64{entryID}
-		_, err := client.UpdateEntriesWithResponse(context.Background(), earthed.UpdateEntriesRequest{
+		_, err := client.UpdateEntriesWithResponse(context.Background(), sunred.UpdateEntriesRequest{
 			EntryIds: &ids,
 			Status:   status,
 		})
@@ -230,9 +230,9 @@ func setEntryStatus(client *earthed.ClientWithResponses, entryID int64, status e
 	}
 }
 
-func toggleStar(client *earthed.ClientWithResponses, entryID int64, starred bool) tea.Cmd {
+func toggleStar(client *sunred.ClientWithResponses, entryID int64, starred bool) tea.Cmd {
 	return func() tea.Msg {
-		_, err := client.ToggleEntryStarredWithResponse(context.Background(), entryID, earthed.ToggleEntryStarredRequest{
+		_, err := client.ToggleEntryStarredWithResponse(context.Background(), entryID, sunred.ToggleEntryStarredRequest{
 			Starred: starred,
 		})
 		return toggleStarMsg{entryID: entryID, starred: starred, err: err}
@@ -285,28 +285,28 @@ func (m *Model) rebuildSidebar() {
 	m.items = items
 
 	// rebuild lookup map
-	m.feedsByID = make(map[int64]earthed.Feed, len(m.feeds))
+	m.feedsByID = make(map[int64]sunred.Feed, len(m.feeds))
 	for _, f := range m.feeds {
 		m.feedsByID[f.Id] = f
 	}
 }
 
 // entriesParamsForItem returns API params matching the selected sidebar item.
-func entriesParamsForItem(item sidebarItem) *earthed.ListEntriesParams {
+func entriesParamsForItem(item sidebarItem) *sunred.ListEntriesParams {
 	switch item.kind {
 	case sidebarAll:
-		return &earthed.ListEntriesParams{}
+		return &sunred.ListEntriesParams{}
 	case sidebarUnread:
-		s := earthed.ListEntriesParamsStatusUnread
-		return &earthed.ListEntriesParams{Status: &s}
+		s := sunred.ListEntriesParamsStatusUnread
+		return &sunred.ListEntriesParams{Status: &s}
 	case sidebarStarred:
-		return &earthed.ListEntriesParams{Starred: ptr(true)}
+		return &sunred.ListEntriesParams{Starred: ptr(true)}
 	case sidebarFeed:
-		return &earthed.ListEntriesParams{FeedId: &item.feedID}
+		return &sunred.ListEntriesParams{FeedId: &item.feedID}
 	case sidebarFolder:
-		return &earthed.ListEntriesParams{FolderId: &item.folderID}
+		return &sunred.ListEntriesParams{FolderId: &item.folderID}
 	}
-	return &earthed.ListEntriesParams{}
+	return &sunred.ListEntriesParams{}
 }
 
 // ---- utility ---------------------------------------------------------------

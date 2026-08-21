@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Trash2, Loader2 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { ConfirmDialog } from "@/components/confirm-dialog";
-import { getClient, deleteFolder } from "@/lib/earthed";
+import { getClient, deleteFolder } from "@/lib/sunred";
 import { getApiErrorMessage } from "@/lib/errors";
 import type { Folder } from "@/lib/types";
 

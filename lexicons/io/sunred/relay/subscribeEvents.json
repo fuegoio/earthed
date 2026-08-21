@@ -1,10 +1,10 @@
 {
   "lexicon": 1,
-  "id": "io.earthed.relay.subscribeEvents",
+  "id": "io.sunred.relay.subscribeEvents",
   "defs": {
     "main": {
       "type": "subscription",
-      "description": "WebSocket subscription for a Earthed instance to receive real-time events from the relay. The relay pushes events whenever a tracked DID emits a follow, share, or feed subscription record. Instances use this to keep their local counts and timelines up to date.",
+      "description": "WebSocket subscription for a Sunred instance to receive real-time events from the relay. The relay pushes events whenever a tracked DID emits a follow, share, or feed subscription record. Instances use this to keep their local counts and timelines up to date.",
       "parameters": {
         "type": "params",
         "required": ["instanceUrl"],

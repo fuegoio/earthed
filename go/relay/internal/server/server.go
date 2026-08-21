@@ -1,9 +1,9 @@
-// Package server implements the Earthed relay HTTP server.
+// Package server implements the Sunred relay HTTP server.
 //
 // Endpoints:
-//   POST  /xrpc/io.earthed.relay.announceUser   — instance registers a new DID
-//   GET   /xrpc/io.earthed.relay.getCounts      — global counts for a DID
-//   GET   /xrpc/io.earthed.relay.subscribeEvents — WebSocket event stream for instances
+//   POST  /xrpc/io.sunred.relay.announceUser   — instance registers a new DID
+//   GET   /xrpc/io.sunred.relay.getCounts      — global counts for a DID
+//   GET   /xrpc/io.sunred.relay.subscribeEvents — WebSocket event stream for instances
 //   GET   /health
 package server
 
@@ -17,8 +17,8 @@ import (
 
 	"golang.org/x/net/websocket"
 
-	"github.com/fuegoio/earthed/go/relay/internal/fanout"
-	"github.com/fuegoio/earthed/go/relay/internal/store"
+	"github.com/fuegoio/sunred/go/relay/internal/fanout"
+	"github.com/fuegoio/sunred/go/relay/internal/store"
 )
 
 // Server is the relay HTTP server.
@@ -36,9 +36,9 @@ func New(st *store.Store, f *fanout.Fanout) *Server {
 func (s *Server) Handler() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", s.handleHealth)
-	mux.HandleFunc("/xrpc/io.earthed.relay.announceUser", s.handleAnnounceUser)
-	mux.HandleFunc("/xrpc/io.earthed.relay.getCounts", s.handleGetCounts)
-	mux.Handle("/xrpc/io.earthed.relay.subscribeEvents", websocket.Handler(s.handleSubscribeEvents))
+	mux.HandleFunc("/xrpc/io.sunred.relay.announceUser", s.handleAnnounceUser)
+	mux.HandleFunc("/xrpc/io.sunred.relay.getCounts", s.handleGetCounts)
+	mux.Handle("/xrpc/io.sunred.relay.subscribeEvents", websocket.Handler(s.handleSubscribeEvents))
 	return mux
 }
 

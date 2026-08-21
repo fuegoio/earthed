@@ -3,11 +3,11 @@ title: Managing Feeds
 description: Subscribe to feeds, organize them with folders, and trigger manual refreshes.
 ---
 
-Feeds are RSS 2.0, Atom 1.0, or JSON Feed subscriptions. Earthed fetches and parses them in the background and stores new entries automatically. See [Architecture](/architecture) for how the refresh pipeline and adaptive polling work.
+Feeds are RSS 2.0, Atom 1.0, or JSON Feed subscriptions. Sunred fetches and parses them in the background and stores new entries automatically. See [Architecture](/architecture) for how the refresh pipeline and adaptive polling work.
 
 ## Subscribe to a feed
 
-Pass a feed URL or a website URL. When given a website, Earthed discovers the feed from `<link rel="alternate">` tags in the page's `<head>`:
+Pass a feed URL or a website URL. When given a website, Sunred discovers the feed from `<link rel="alternate">` tags in the page's `<head>`:
 
 ```bash
 curl -X POST http://localhost:8080/v1/feeds \

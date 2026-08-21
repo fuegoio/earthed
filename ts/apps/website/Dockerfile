@@ -23,7 +23,7 @@ WORKDIR /app/apps/website
 RUN pnpm run build
 
 # ---- runtime stage ----
-# The website is the front door for earthed.app: an Astro SSR server that
+# The website is the front door for sunred.app: an Astro SSR server that
 # serves its own pages and proxies every other path to the Next.js app
 # (APP_URL, e.g. http://web:3000). See src/middleware.ts and
 # src/pages/[...path].ts.

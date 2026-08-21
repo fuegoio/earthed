@@ -1,13 +1,13 @@
 .PHONY: build run migrate test fmt fmt-check vet lint clean db-up db-down db-reset
 
 build:
-	go build -o earthed-relay ./cmd/relay/
+	go build -o sunred-relay ./cmd/relay/
 
 run: build
-	./earthed-relay
+	./sunred-relay
 
 migrate: build
-	./earthed-relay --migrate
+	./sunred-relay --migrate
 
 test:
 	go test ./... -count=1
@@ -25,15 +25,14 @@ lint:
 	go tool golangci-lint run ./...
 
 clean:
-	rm -f earthed-relay
+	rm -f sunred-relay
 
 db-up:
-	cd ../api && docker compose up -d
-	@docker exec earthed-postgres psql -U earthed -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'earthed_relay'" | grep -q 1 || \
-		docker exec earthed-postgres psql -U earthed -d postgres -c "CREATE DATABASE earthed_relay;"
+	docker compose up -d
 
 db-down:
-	cd ../api && docker compose down
+	docker compose down
 
 db-reset:
-	docker exec earthed-postgres psql -U earthed -d postgres -c "DROP DATABASE IF EXISTS earthed_relay;" -c "CREATE DATABASE earthed_relay;"
+	docker compose down -v
+	docker compose up -d

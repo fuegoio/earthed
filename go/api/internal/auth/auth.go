@@ -1,4 +1,4 @@
-// Package auth handles Earthed authentication: web session cookies and bearer
+// Package auth handles Sunred authentication: web session cookies and bearer
 // API tokens. Identity is provided by AT Proto OAuth (see the atproto package);
 // this package only resolves the authenticated user ID for a request.
 package auth
@@ -14,16 +14,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fuegoio/earthed/go/api/internal/config"
-	"github.com/fuegoio/earthed/go/api/internal/store"
+	"github.com/fuegoio/sunred/go/api/internal/config"
+	"github.com/fuegoio/sunred/go/api/internal/store"
 )
 
 type contextKey int
 
 const userKey contextKey = iota
 
-// SessionCookie is the name of the Earthed web session cookie.
-const SessionCookie = "earthed_session"
+// SessionCookie is the name of the Sunred web session cookie.
+const SessionCookie = "sunred_session"
 
 // SessionTTL is how long a web session cookie remains valid.
 const SessionTTL = 30 * 24 * time.Hour

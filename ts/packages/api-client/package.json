@@ -1,8 +1,8 @@
 {
-  "name": "@earthed/api-client",
+  "name": "@sunred/api-client",
   "version": "0.0.0",
   "private": true,
-  "description": "Typed TypeScript client for the Earthed API, generated from the OpenAPI spec using @hey-api/openapi-ts.",
+  "description": "Typed TypeScript client for the Sunred API, generated from the OpenAPI spec using @hey-api/openapi-ts.",
   "license": "MIT",
   "type": "module",
   "exports": {

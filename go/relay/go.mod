@@ -1,4 +1,4 @@
-module github.com/fuegoio/earthed/go/relay
+module github.com/fuegoio/sunred/go/relay
 
 go 1.25.0
 

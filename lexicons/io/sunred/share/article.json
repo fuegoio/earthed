@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "io.earthed.share.article",
+  "id": "io.sunred.share.article",
   "defs": {
     "main": {
       "type": "record",

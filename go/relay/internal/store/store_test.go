@@ -18,7 +18,7 @@ func relayTestDB(t *testing.T) *Store {
 	dsn := os.Getenv("RELAY_DATABASE_URL")
 	if dsn == "" {
 		// Fall back to a relay-specific test DB. If not set, skip.
-		dsn = "postgres://earthed:earthed@localhost:5432/earthed_relay_test?sslmode=disable"
+		dsn = "postgres://sunred:sunred@localhost:5432/sunred_relay_test?sslmode=disable"
 	}
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {

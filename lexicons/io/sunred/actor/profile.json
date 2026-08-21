@@ -1,10 +1,10 @@
 {
   "lexicon": 1,
-  "id": "io.earthed.actor.profile",
+  "id": "io.sunred.actor.profile",
   "defs": {
     "main": {
       "type": "record",
-      "description": "A Earthed user profile. Stored in the user's PDS repo under io.earthed.actor.profile/self.",
+      "description": "A Sunred user profile. Stored in the user's PDS repo under io.sunred.actor.profile/self.",
       "key": "literal:self",
       "record": {
         "type": "object",
@@ -13,7 +13,7 @@
           "handle": {
             "type": "string",
             "maxLength": 64,
-            "description": "The user's Earthed handle (e.g. 'fuego'). Unique within the instance."
+            "description": "The user's Sunred handle (e.g. 'fuego'). Unique within the instance."
           },
           "bio": {
             "type": "string",
@@ -28,7 +28,7 @@
           "instanceUrl": {
             "type": "string",
             "format": "uri",
-            "description": "Base URL of the Earthed instance this user belongs to."
+            "description": "Base URL of the Sunred instance this user belongs to."
           },
           "createdAt": {
             "type": "string",

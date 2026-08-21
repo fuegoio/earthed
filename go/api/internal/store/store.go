@@ -1,5 +1,5 @@
 // Package store wraps *sql.DB with domain-specific query helpers for the
-// Earthed RSS reader schema.
+// Sunred RSS reader schema.
 package store
 
 import (

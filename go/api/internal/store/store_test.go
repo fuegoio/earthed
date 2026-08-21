@@ -16,9 +16,9 @@ import (
 // have migrations applied.
 func testDB(t *testing.T) *Store {
 	t.Helper()
-	dsn := os.Getenv("EARTHED_DATABASE_URL")
+	dsn := os.Getenv("SUNRED_DATABASE_URL")
 	if dsn == "" {
-		dsn = "postgres://earthed:earthed@localhost:5432/earthed?sslmode=disable"
+		dsn = "postgres://sunred:sunred@localhost:5432/sunred?sslmode=disable"
 	}
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {

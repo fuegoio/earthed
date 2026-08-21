@@ -9,7 +9,7 @@ import { StarToggle } from "@/components/star-toggle";
 import { ShareToggle } from "@/components/share-toggle";
 import { FeedIcon } from "@/components/feed-icon";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { getClient, updateEntries } from "@/lib/earthed";
+import { getClient, updateEntries } from "@/lib/sunred";
 import { getApiErrorMessage } from "@/lib/errors";
 import { formatRelative, htmlSnippet } from "@/lib/format";
 import { cn } from "@workspace/ui/lib/utils";

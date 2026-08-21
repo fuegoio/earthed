@@ -8,7 +8,7 @@ import { Button, buttonVariants } from "@workspace/ui/components/button";
 import { StarToggle } from "@/components/star-toggle";
 import { FeedIcon } from "@/components/feed-icon";
 import { PageHeader } from "@/components/page-header";
-import { getClient, updateEntries } from "@/lib/earthed";
+import { getClient, updateEntries } from "@/lib/sunred";
 import { getApiErrorMessage } from "@/lib/errors";
 import { formatDateTime } from "@/lib/format";
 import { cn } from "@workspace/ui/lib/utils";

@@ -1,5 +1,5 @@
 /**
- * Earthed API Client
+ * Sunred API Client
  * Generated using @hey-api/openapi-ts
  */
 
@@ -8,23 +8,23 @@ import type { Config } from "./generated/client/types.gen";
 
 const DEFAULT_BASE_URL = "http://localhost:8080";
 
-export interface EarthedClientOptions extends Config {
+export interface SunredClientOptions extends Config {
   /**
-   * Base URL of the Earthed API (no trailing slash). Paths in the spec already
+   * Base URL of the Sunred API (no trailing slash). Paths in the spec already
    * include the `/v1` (or `/auth`) prefix, so this should be the host only
-   * (e.g. `http://localhost:8080` or `https://api.earthed.app`).
+   * (e.g. `http://localhost:8080` or `https://api.sunred.app`).
    */
   baseUrl?: string;
 }
 
 /**
- * Create a typed client for the Earthed API.
+ * Create a typed client for the Sunred API.
  *
  * The returned client exposes typed methods for all API operations and a
  * `config`/`interceptors` surface compatible with the hey-api client-fetch
  * plugins (used by `lib/logger.ts` for request logging).
  */
-export function createEarthedClient(options: EarthedClientOptions = {}) {
+export function createSunredClient(options: SunredClientOptions = {}) {
   const client = createClient({
     baseUrl: options.baseUrl ?? DEFAULT_BASE_URL,
     ...options,
@@ -32,7 +32,7 @@ export function createEarthedClient(options: EarthedClientOptions = {}) {
   return client;
 }
 
-export type EarthedClient = ReturnType<typeof createEarthedClient>;
+export type SunredClient = ReturnType<typeof createSunredClient>;
 
 // Re-export all generated types and functions
 export * from "./generated/sdk.gen";

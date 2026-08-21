@@ -7,7 +7,7 @@
 -- Three new tables back the OAuth client:
 --   oauth_auth_requests — in-flight auth flows (state → AuthRequestData JSON)
 --   oauth_sessions      — persisted OAuth sessions (did, session_id → JSON)
---   web_sessions        — Earthed's own session cookie → user_id mapping
+--   web_sessions        — Sunred's own session cookie → user_id mapping
 
 -- The DID is now the identity. Existing email/password users are not migrated;
 -- the columns are dropped. New users are created with a DID at OAuth callback.
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS oauth_sessions (
   PRIMARY KEY (account_did, session_id)
 );
 
--- Earthed web session cookie: opaque token → user_id. Issued after a successful
+-- Sunred web session cookie: opaque token → user_id. Issued after a successful
 -- OAuth callback so the browser authenticates to the API without round-tripping
 -- the OAuth session on every request.
 CREATE TABLE IF NOT EXISTS web_sessions (

@@ -139,7 +139,7 @@ export const Wide: Story = {
         </DialogHeader>
         <div className="mt-4 flex flex-col gap-2">
           <Label htmlFor="story-token-label">Label</Label>
-          <Input id="story-token-label" placeholder="e.g. earthed-cli" autoFocus />
+          <Input id="story-token-label" placeholder="e.g. sunred-cli" autoFocus />
         </div>
         <DialogFooter className="mt-3">
           <DialogClose render={<Button variant="ghost">Cancel</Button>} />

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getClient, getMe } from "@/lib/earthed";
+import { getClient, getMe } from "@/lib/sunred";
 import { isClientError } from "@/lib/errors";
 import { safeRedirect } from "@/lib/auth";
 

@@ -4,8 +4,8 @@ import tailwindcss from "@tailwindcss/vite";
 import node from "@astrojs/node";
 
 export default defineConfig({
-  site: "https://earthed.app",
-  // The website is the front door for earthed.app: it serves its own pages
+  site: "https://sunred.app",
+  // The website is the front door for sunred.app: it serves its own pages
   // (marketing) and proxies every other path to the Next.js app (see
   // src/middleware.ts and src/pages/[...path].ts). Self-hosted deployments
   // that don't want the marketing site just run the Next.js app directly.

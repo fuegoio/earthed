@@ -13,7 +13,7 @@ import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { ConfirmDialog } from "@/components/confirm-dialog";
-import { getClient, getMe, updateMe, deleteMe, updateHandle, unwrap } from "@/lib/earthed";
+import { getClient, getMe, updateMe, deleteMe, updateHandle, unwrap } from "@/lib/sunred";
 import { signout } from "@/lib/auth";
 import { getApiErrorMessage } from "@/lib/errors";
 import { cn } from "@workspace/ui/lib/utils";

@@ -17,7 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
-import { getClient, updateFeed } from "@/lib/earthed";
+import { getClient, updateFeed } from "@/lib/sunred";
 import { getApiErrorMessage } from "@/lib/errors";
 import type { Feed } from "@/lib/types";
 

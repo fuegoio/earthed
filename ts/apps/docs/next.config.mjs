@@ -9,7 +9,7 @@ const config = {
   output: "standalone",
   outputFileTracingRoot: path.join(__dirname, "../../"),
   reactStrictMode: true,
-  // Mounted under /docs on earthed.app via the website proxy. All routes,
+  // Mounted under /docs on sunred.app via the website proxy. All routes,
   // _next assets, and next/link redirects are prefixed accordingly.
   basePath: "/docs",
   turbopack: {

@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # TUI smoke tests using tui-test (https://github.com/microsoft/tui-test).
 # Requires: tui-test binary on PATH or at /tmp/tui-test.
-# Requires: earthed-tui binary at ./earthed-tui (run `make tui` first).
-# Usage: bash tui_test.sh [path-to-earthed-tui]
+# Requires: sunred-tui binary at ./sunred-tui (run `make tui` first).
+# Usage: bash tui_test.sh [path-to-sunred-tui]
 set -euo pipefail
 
-TUI_BIN="${1:-./earthed-tui}"
+TUI_BIN="${1:-./sunred-tui}"
 TUI_TEST="${TUI_TEST_BIN:-tui-test}"
 
 # Try /tmp/tui-test as fallback
@@ -23,7 +23,7 @@ if [ ! -x "$TUI_BIN" ]; then
   exit 1
 fi
 
-SESSION="earthed-tui-test-$$"
+SESSION="sunred-tui-test-$$"
 PASS=0
 FAIL=0
 
@@ -44,7 +44,7 @@ run_test() {
   fi
 }
 
-echo "=== Earthed TUI tests ==="
+echo "=== Sunred TUI tests ==="
 echo
 
 # Start the TUI
@@ -52,8 +52,8 @@ echo
 "$TUI_TEST" --session "$SESSION" wait idle --timeout 10000 >/dev/null 2>&1
 
 echo "Layout:"
-run_test "sidebar header 'Earthed' is visible" \
-  "$TUI_TEST" --session "$SESSION" expect text "Earthed" --timeout 5000
+run_test "sidebar header 'Sunred' is visible" \
+  "$TUI_TEST" --session "$SESSION" expect text "Sunred" --timeout 5000
 
 run_test "sidebar shows 'Unread'" \
   "$TUI_TEST" --session "$SESSION" expect text "Unread" --timeout 5000
@@ -77,9 +77,9 @@ echo "Navigation — vim bindings:"
 "$TUI_TEST" --session "$SESSION" press k >/dev/null 2>&1
 "$TUI_TEST" --session "$SESSION" wait idle --timeout 2000 >/dev/null 2>&1
 
-# 'Earthed' should still be visible (sidebar still showing)
+# 'Sunred' should still be visible (sidebar still showing)
 run_test "sidebar still visible after j/k navigation" \
-  "$TUI_TEST" --session "$SESSION" expect text "Earthed" --timeout 3000
+  "$TUI_TEST" --session "$SESSION" expect text "Sunred" --timeout 3000
 
 # Move to 'Unread' (second item) and open it
 "$TUI_TEST" --session "$SESSION" press j >/dev/null 2>&1
@@ -94,7 +94,7 @@ run_test "opening Unread shows 'Unread' header in main panel" \
 "$TUI_TEST" --session "$SESSION" wait idle --timeout 2000 >/dev/null 2>&1
 
 run_test "pressing 'h' returns focus to sidebar" \
-  "$TUI_TEST" --session "$SESSION" expect text "Earthed" --timeout 3000
+  "$TUI_TEST" --session "$SESSION" expect text "Sunred" --timeout 3000
 
 echo
 echo "Keyboard shortcuts:"
@@ -103,7 +103,7 @@ echo "Keyboard shortcuts:"
 "$TUI_TEST" --session "$SESSION" wait idle --timeout 5000 >/dev/null 2>&1
 
 run_test "'r' refresh: sidebar still visible after reload" \
-  "$TUI_TEST" --session "$SESSION" expect text "Earthed" --timeout 8000
+  "$TUI_TEST" --session "$SESSION" expect text "Sunred" --timeout 8000
 
 echo
 echo "=== Results: $PASS passed, $FAIL failed ==="

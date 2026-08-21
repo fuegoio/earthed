@@ -9,8 +9,8 @@ import (
 
 	"github.com/danielgtaylor/huma/v2"
 
-	"github.com/fuegoio/earthed/go/api/internal/auth"
-	"github.com/fuegoio/earthed/go/api/internal/store"
+	"github.com/fuegoio/sunred/go/api/internal/auth"
+	"github.com/fuegoio/sunred/go/api/internal/store"
 )
 
 // --- Input / output types ---

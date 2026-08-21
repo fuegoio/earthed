@@ -10,16 +10,16 @@ web
 
 ## Users
 
-Developers evaluating or using Earthed. They arrive at the docs to get
+Developers evaluating or using Sunred. They arrive at the docs to get
 started quickly, understand the API, self-host, or learn a specific feature.
 They are technical, skim for answers, and expect code samples they can copy.
 
 ## Product Purpose
 
-The documentation site is the reference surface for Earthed. It serves
+The documentation site is the reference surface for Sunred. It serves
 getting-started guides, API reference (generated from the OpenAPI spec),
 and self-hosting instructions. Success looks like a developer going from
-zero to a running Earthed instance and a subscribed feed without needing
+zero to a running Sunred instance and a subscribed feed without needing
 to ask for help.
 
 ## Positioning
@@ -49,7 +49,7 @@ would do. Enterprise docs that feel like they were written by a committee.
 - **Complete, not cluttered.** The sidebar should be navigable without
   overwhelming. Search should work. Structure should be obvious.
 - **Modern craft.** The docs site shares the product's visual vocabulary.
-  No generic docs template look — it should feel like part of Earthed.
+  No generic docs template look — it should feel like part of Sunred.
 - **Accessibility is baseline.** WCAG 2.2 AA, keyboard navigation, good
   contrast, and reduced-motion support.
 

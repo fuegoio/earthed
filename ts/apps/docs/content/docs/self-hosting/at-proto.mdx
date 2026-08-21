@@ -1,83 +1,85 @@
 ---
 title: AT Proto & identity
-description: How Earthed uses AT Proto for identity, OAuth login with a PDS, and the relay.
+description: How Sunred uses AT Proto for identity, OAuth login with a PDS, and the relay.
 ---
 
-Earthed uses the [AT Protocol](https://atproto.com) for identity. Users log in
+Sunred uses the [AT Protocol](https://atproto.com) for identity. Users log in
 with an AT Proto handle — the same account they use on Bluesky or any other
-AT Proto client. There are no Earthed-specific passwords.
+AT Proto client. There are no Sunred-specific passwords.
 
 This page covers what an operator needs to know: the components involved, how
-login works, and how to run the PDS and relay alongside Earthed.
+login works, and how to run the PDS and relay alongside Sunred.
 
 ## How identity works
 
-Every Earthed user is identified by a **DID** — a persistent identifier stored
+Every Sunred user is identified by a **DID** — a persistent identifier stored
 on their **PDS** (Personal Data Server). A handle (`alice.bsky.social`,
-`bob.earthed.app`) is a human-readable alias that resolves to a DID.
+`bob.sunred.app`) is a human-readable alias that resolves to a DID.
 
 ```
 handle  ──resolve──▶  DID  ──points to──▶  PDS  ──holds──▶  user records
 ```
 
-Earthed does not store passwords or issue its own identities. It authenticates
+Sunred does not store passwords or issue its own identities. It authenticates
 users against their PDS using **AT Proto OAuth** (OAuth 2.0 with PKCE, DPoP,
-and PAR). After a successful login, Earthed issues its own session cookie so
+and PAR). After a successful login, Sunred issues its own session cookie so
 the web app can make authenticated requests.
 
 ### Any server, any DID
 
-Every Earthed server can authenticate **any** DID, regardless of which PDS
+Every Sunred server can authenticate **any** DID, regardless of which PDS
 hosts it. A user with a Bluesky account (`alice.bsky.social`) and a user with
 an account on your own PDS (`bob.your-domain.com`) can both log into the same
-Earthed instance. You are not limited to users on your PDS.
+Sunred instance. You are not limited to users on your PDS.
 
-This means Earthed is a **cache and view** of each user's AT Proto data, not
+This means Sunred is a **cache and view** of each user's AT Proto data, not
 the source of truth. The PDS is the source of truth.
 
 ## Components
 
-A full Earthed deployment has four pieces:
+A full Sunred deployment has four pieces:
 
 | Component | Role | Required? |
 | --- | --- | --- |
-| API | Earthed REST server, session issuer, PDS/relay client | yes |
+| API | Sunred REST server, session issuer, PDS/relay client | yes |
 | Web | Next.js frontend | yes |
 | PDS | Hosts user records, handles OAuth | external — users bring their own |
-| Relay | Aggregates `io.earthed.*` records across PDSes | recommended |
+| Relay | Aggregates `io.sunred.*` records across PDSes | recommended |
 
 ### The PDS
 
-Each user's data lives on a PDS — but Earthed does not run or ship a PDS. Users
+Each user's data lives on a PDS — but Sunred does not run or ship a PDS. Users
 log in with their own AT Proto handle, typically a Bluesky account
-(`*.bsky.social`) or an account on a personal PDS they run themselves. Earthed
+(`*.bsky.social`) or an account on a personal PDS they run themselves. Sunred
 authenticates against the user's PDS at login time via OAuth.
 
 If you want to offer accounts on your own domain, you can run a PDS separately
 using the [official PDS image](https://github.com/bluesky-social/pds). That's a
-deployment decision outside Earthed's scope — Earthed works with any
+deployment decision outside Sunred's scope — Sunred works with any
 standards-compliant AT Proto PDS, yours or anyone else's.
 
 ### Offering signup
 
 To let users without an existing AT Proto account sign up directly on your
-instance, set `EARTHED_DEFAULT_PDS` to your PDS URL. The login page then shows a
+instance, set `SUNRED_DEFAULT_PDS` to your PDS URL. The login page then shows a
 "Create account" link that starts the OAuth flow against that PDS, so the user
-creates their account on your PDS and is logged into Earthed in one step. When
-unset, only login with an existing handle is offered.
+creates their account on your PDS and is logged into Sunred in one step.
+
+The default is `https://snrd.social`. To use a different PDS, override
+`SUNRED_DEFAULT_PDS`. To disable signup entirely, set it to an empty string.
 
 Users who already have an AT Proto account (Bluesky, another PDS) can always log
 in by entering their handle, regardless of whether a default PDS is configured.
 
 ### The relay
 
-The relay watches the repo streams of every PDS that hosts an Earthed user and
-aggregates `io.earthed.*` records (follows, article shares, feed subscriptions)
-into global counts. It then streams those events back to Earthed instances so
+The relay watches the repo streams of every PDS that hosts an Sunred user and
+aggregates `io.sunred.*` records (follows, article shares, feed subscriptions)
+into global counts. It then streams those events back to Sunred instances so
 they stay in sync across the federated network.
 
 The relay is a separate Go service with its own database. Point the API at it
-with `EARTHED_RELAY_URL`. If unset, cross-instance social features (global
+with `SUNRED_RELAY_URL`. If unset, cross-instance social features (global
 follower counts, federated shares) are disabled — the instance still works
 standalone.
 
@@ -85,28 +87,28 @@ standalone.
 
 ```
 1. User enters their handle in the web UI
-2. Earthed resolves handle → DID → PDS endpoint
-3. Earthed registers as an OAuth client with that PDS (dynamic registration)
-4. Earthed sends a Pushed Authorization Request (PAR) and redirects the
+2. Sunred resolves handle → DID → PDS endpoint
+3. Sunred registers as an OAuth client with that PDS (dynamic registration)
+4. Sunred sends a Pushed Authorization Request (PAR) and redirects the
    user to the PDS's authorize endpoint with a PKCE challenge
 5. User approves on the PDS
-6. PDS redirects back to Earthed's callback with an authorization code
-7. Earthed exchanges the code for DPoP-bound access + refresh tokens,
+6. PDS redirects back to Sunred's callback with an authorization code
+7. Sunred exchanges the code for DPoP-bound access + refresh tokens,
    stored keyed by the user's DID
-8. Earthed creates or looks up the local user row by DID, issues a
+8. Sunred creates or looks up the local user row by DID, issues a
    session cookie, and redirects to the app
 ```
 
-Earthed holds a DPoP keypair per account so it can sign PDS requests with the
-bound access token. You do not need to manage these keys manually — Earthed
+Sunred holds a DPoP keypair per account so it can sign PDS requests with the
+bound access token. You do not need to manage these keys manually — Sunred
 generates and stores them.
 
 ## Sync on first login
 
-Because Earthed is a cache of the user's PDS, the first time a DID logs into a
-given instance Earthed backfills the local database from the PDS:
+Because Sunred is a cache of the user's PDS, the first time a DID logs into a
+given instance Sunred backfills the local database from the PDS:
 
-1. List the user's `io.earthed.*` records (`com.atproto.repo.listRecords` for
+1. List the user's `io.sunred.*` records (`com.atproto.repo.listRecords` for
    each collection).
 2. Populate the local cache: follows, shared articles, feed subscriptions,
    feed lists, and the actor profile.
@@ -122,22 +124,22 @@ and does not transfer with the DID.
 ## Writing back to the PDS
 
 When a user follows someone, shares an article, or subscribes to a feed,
-Earthed writes an `io.earthed.*` record to their PDS repo (signed with the
+Sunred writes an `io.sunred.*` record to their PDS repo (signed with the
 DPoP-bound access token). The relay picks up the record from the PDS repo
 stream and federates it. The local cache and the PDS stay in sync — the PDS is
 the canonical copy, the cache is derived.
 
-## Records Earthed uses
+## Records Sunred uses
 
 | Collection | Purpose |
 | --- | --- |
-| `io.earthed.actor.profile` | The user's Earthed profile (handle, bio, instance URL) |
-| `io.earthed.graph.follow` | A follow relationship between two DIDs |
-| `io.earthed.share.article` | A shared article with metadata (URL, title, feed) |
-| `io.earthed.feed.subscription` | A feed the user subscribes to |
-| `io.earthed.feed.list` | A named, optionally public list of feeds |
+| `io.sunred.actor.profile` | The user's Sunred profile (handle, bio, instance URL) |
+| `io.sunred.graph.follow` | A follow relationship between two DIDs |
+| `io.sunred.share.article` | A shared article with metadata (URL, title, feed) |
+| `io.sunred.feed.subscription` | A feed the user subscribes to |
+| `io.sunred.feed.list` | A named, optionally public list of feeds |
 
-These are public records on the user's PDS. Other Earthed instances and the
+These are public records on the user's PDS. Other Sunred instances and the
 relay read them to build the federated social graph.
 
 ## Configuration
@@ -145,7 +147,7 @@ relay read them to build the federated social graph.
 See [Configuration](/self-hosting/configuration) for the environment variables
 that control relay and OAuth behavior. The key ones:
 
-- `EARTHED_RELAY_URL` — the relay endpoint (optional; enables cross-instance
+- `SUNRED_RELAY_URL` — the relay endpoint (optional; enables cross-instance
   social features).
-- `EARTHED_OAUTH_REDIRECT_URL` — the public callback URL for OAuth
+- `SUNRED_OAUTH_REDIRECT_URL` — the public callback URL for OAuth
   (`https://api.your-domain.com/auth/oauth/callback`).

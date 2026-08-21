@@ -28,7 +28,7 @@ function SettingsSidebarContent({ userEmail }: { userEmail: string }) {
       <div className="flex h-14 shrink-0 items-center gap-2 px-4 w-full">
         <Link href="/" className="flex items-center gap-2 font-serif text-lg font-bold px-1">
           <Logo className="size-5" />
-          Earthed
+          Sunred
         </Link>
         <div className="flex-1" />
         <OfflineBadge />

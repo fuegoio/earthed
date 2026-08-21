@@ -105,17 +105,17 @@ func TestClient_PutRecord(t *testing.T) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		if body.Repo != "did:plc:test" || body.Collection != "io.earthed.graph.follow" || body.Rkey != "rkey123" {
+		if body.Repo != "did:plc:test" || body.Collection != "io.sunred.graph.follow" || body.Rkey != "rkey123" {
 			http.Error(w, "bad input", http.StatusBadRequest)
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(`{"uri":"at://did:plc:test/io.earthed.graph.follow/rkey123","cid":"bafy123"}`))
+		_, _ = w.Write([]byte(`{"uri":"at://did:plc:test/io.sunred.graph.follow/rkey123","cid":"bafy123"}`))
 	})
 	srv := mockPDS(t, mux)
 
 	client := NewClient(srv.URL, "tok")
-	out, err := client.PutRecord(context.Background(), "did:plc:test", "io.earthed.graph.follow", "rkey123", map[string]string{"subject": "did:plc:other"})
+	out, err := client.PutRecord(context.Background(), "did:plc:test", "io.sunred.graph.follow", "rkey123", map[string]string{"subject": "did:plc:other"})
 	if err != nil {
 		t.Fatalf("PutRecord: %v", err)
 	}
@@ -137,7 +137,7 @@ func TestClient_DeleteRecord(t *testing.T) {
 	srv := mockPDS(t, mux)
 
 	client := NewClient(srv.URL, "tok")
-	err := client.DeleteRecord(context.Background(), "did:plc:test", "io.earthed.graph.follow", "rkey123")
+	err := client.DeleteRecord(context.Background(), "did:plc:test", "io.sunred.graph.follow", "rkey123")
 	if err != nil {
 		t.Fatalf("DeleteRecord: %v", err)
 	}
@@ -210,7 +210,7 @@ func TestClient_ListRecords(t *testing.T) {
 	srv := mockPDS(t, mux)
 
 	client := NewClient(srv.URL, "tok")
-	out, err := client.ListRecords(context.Background(), "did:plc:test", "io.earthed.graph.follow", 50, "")
+	out, err := client.ListRecords(context.Background(), "did:plc:test", "io.sunred.graph.follow", 50, "")
 	if err != nil {
 		t.Fatalf("ListRecords: %v", err)
 	}

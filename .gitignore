@@ -49,6 +49,6 @@ yarn-error.log*
 next-env.d.ts
 
 # go
-go/api/earthed
-go/cli/earthed
-go/cli/earthed-tui
+go/api/sunred
+go/cli/sunred
+go/cli/sunred-tui

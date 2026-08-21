@@ -9,8 +9,8 @@ import (
 	"github.com/bluesky-social/indigo/atproto/atclient"
 	"github.com/bluesky-social/indigo/atproto/syntax"
 
-	"github.com/fuegoio/earthed/go/api/internal/atproto"
-	"github.com/fuegoio/earthed/go/api/internal/store"
+	"github.com/fuegoio/sunred/go/api/internal/atproto"
+	"github.com/fuegoio/sunred/go/api/internal/store"
 )
 
 // listRecordsOut matches com.atproto.repo.listRecords response.
@@ -23,9 +23,9 @@ type listRecordsOut struct {
 	Cursor string `json:"cursor"`
 }
 
-// syncFollows backfills io.earthed.graph.follow records from the PDS into the
+// syncFollows backfills io.sunred.graph.follow records from the PDS into the
 // local follow cache. Each follow record's `subject` is a DID; we record a
-// local follow edge if the followee is also a known Earthed user on this
+// local follow edge if the followee is also a known Sunred user on this
 // instance, and store the rkey for later delete-on-unfollow.
 func syncFollows(ctx context.Context, c *atclient.APIClient, st *store.Store, userID int) error {
 	cursor := ""
@@ -64,7 +64,7 @@ func syncFollows(ctx context.Context, c *atclient.APIClient, st *store.Store, us
 	return nil
 }
 
-// syncFeedSubscriptions backfills io.earthed.feed.subscription records into the
+// syncFeedSubscriptions backfills io.sunred.feed.subscription records into the
 // local feeds table, storing the rkey so later unsubscribe deletes the record.
 func syncFeedSubscriptions(ctx context.Context, c *atclient.APIClient, st *store.Store, userID int) error {
 	cursor := ""

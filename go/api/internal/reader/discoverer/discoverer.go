@@ -12,8 +12,8 @@ import (
 
 	"golang.org/x/net/html"
 
-	"github.com/fuegoio/earthed/go/api/internal/reader/fetcher"
-	"github.com/fuegoio/earthed/go/api/internal/reader/parser"
+	"github.com/fuegoio/sunred/go/api/internal/reader/fetcher"
+	"github.com/fuegoio/sunred/go/api/internal/reader/parser"
 )
 
 // Result holds the outcome of feed discovery.

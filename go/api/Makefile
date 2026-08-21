@@ -1,16 +1,16 @@
 .PHONY: build run migrate gen-openapi test fmt fmt-check vet lint clean db-up db-down db-reset
 
 build:
-	go build -o earthed ./cmd/earthed/
+	go build -o sunred ./cmd/sunred/
 
 run: build
-	./earthed
+	./sunred
 
 migrate: build
-	./earthed --migrate
+	./sunred --migrate
 
 gen-openapi: build
-	./earthed --openapi 2>/dev/null | python3 -m json.tool > openapi.json
+	./sunred --openapi 2>/dev/null | python3 -m json.tool > openapi.json
 	cp openapi.json ../../ts/apps/docs/openapi/openapi.json
 	cd ../../ts/packages/api-client && pnpm gen
 
@@ -30,7 +30,7 @@ lint:
 	go tool golangci-lint run ./...
 
 clean:
-	rm -f earthed
+	rm -f sunred
 
 db-up:
 	docker compose up -d
@@ -39,4 +39,4 @@ db-down:
 	docker compose down
 
 db-reset:
-	docker exec earthed-postgres psql -U earthed -d postgres -c "DROP DATABASE IF EXISTS earthed;" -c "CREATE DATABASE earthed;"
+	docker exec sunred-postgres psql -U sunred -d postgres -c "DROP DATABASE IF EXISTS sunred;" -c "CREATE DATABASE sunred;"

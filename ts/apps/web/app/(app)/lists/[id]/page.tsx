@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getClient, getFeedList, getMe } from "@/lib/earthed";
+import { getClient, getFeedList, getMe } from "@/lib/sunred";
 import { getApiErrorMessage, apiErrorStatus } from "@/lib/errors";
 import { ApiError } from "@/components/api-error";
 import { FeedListDetail } from "@/components/feed-list-detail";

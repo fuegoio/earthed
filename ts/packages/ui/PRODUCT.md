@@ -10,7 +10,7 @@ web
 
 ## Users
 
-Developers building Earthed's web app and docs site. They consume the
+Developers building Sunred's web app and docs site. They consume the
 design system's components, tokens, and prose styles to assemble product
 surfaces. They value consistency, type safety, and components that work
 without configuration.
@@ -18,9 +18,9 @@ without configuration.
 ## Product Purpose
 
 The shared UI package (`@workspace/ui`) provides the visual vocabulary for
-Earthed's frontend surfaces: color tokens, typography, spacing, component
+Sunred's frontend surfaces: color tokens, typography, spacing, component
 primitives (shadcn/ui on `@base-ui/react`), and the typeset prose system.
-Success looks like every Earthed surface sharing the same component
+Success looks like every Sunred surface sharing the same component
 vocabulary, the same color logic, and the same reading-first defaults.
 
 ## Positioning

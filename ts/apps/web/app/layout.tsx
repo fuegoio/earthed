@@ -10,16 +10,16 @@ import { PublicEnv } from "@/lib/public-env";
 import { cn } from "@workspace/ui/lib/utils";
 
 export const metadata: Metadata = {
-  applicationName: "Earthed",
+  applicationName: "Sunred",
   title: {
-    default: "Earthed",
-    template: "%s — Earthed",
+    default: "Sunred",
+    template: "%s — Sunred",
   },
   description: "A modern, self-hostable RSS reader with a clean REST API.",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Earthed",
+    title: "Sunred",
   },
   formatDetection: {
     telephone: false,

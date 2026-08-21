@@ -15,7 +15,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@workspace/ui/components/empty";
-import { getClient, listEntries, listFeeds, mySharedArticles, unwrap } from "@/lib/earthed";
+import { getClient, listEntries, listFeeds, mySharedArticles, unwrap } from "@/lib/sunred";
 import type { Entry, Feed, SharedArticle } from "@/lib/types";
 import { buttonVariants } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";

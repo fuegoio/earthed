@@ -1,4 +1,4 @@
-// Package main is the earthed-tui entry point.
+// Package main is the sunred-tui entry point.
 package main
 
 import (
@@ -8,8 +8,8 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/fuegoio/earthed/go/cli/internal/client"
-	"github.com/fuegoio/earthed/go/cli/internal/tui"
+	"github.com/fuegoio/sunred/go/cli/internal/client"
+	"github.com/fuegoio/sunred/go/cli/internal/tui"
 )
 
 func main() {
@@ -24,7 +24,7 @@ func main() {
 	// Pass --login to force a re-login even when a token is present.
 	forceLogin := false
 	serverURL := client.DefaultServerURL
-	fs := flag.NewFlagSet("earthed-tui", flag.ContinueOnError)
+	fs := flag.NewFlagSet("sunred-tui", flag.ContinueOnError)
 	fs.BoolVar(&forceLogin, "login", false, "force a re-login even when a token is present")
 	fs.StringVar(&serverURL, "server", client.DefaultServerURL, "web app (server) URL to open for approval")
 	if err := fs.Parse(os.Args[1:]); err != nil {

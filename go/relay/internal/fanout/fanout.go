@@ -1,4 +1,4 @@
-// Package fanout manages PDS WebSocket subscriptions and aggregates io.earthed.* events.
+// Package fanout manages PDS WebSocket subscriptions and aggregates io.sunred.* events.
 package fanout
 
 import (
@@ -15,7 +15,7 @@ import (
 
 	"golang.org/x/net/websocket"
 
-	"github.com/fuegoio/earthed/go/relay/internal/store"
+	"github.com/fuegoio/sunred/go/relay/internal/store"
 )
 
 // fanoutStore is the subset of store.Store that the Fanout uses.
@@ -193,11 +193,11 @@ func (f *Fanout) processOp(ctx context.Context, did, pdsURL string, op repoOp) {
 		effectivePDS = f.testPDSURL
 	}
 	switch col {
-	case "io.earthed.graph.follow":
+	case "io.sunred.graph.follow":
 		f.handleFollow(ctx, did, effectivePDS, rkey, op.Action)
-	case "io.earthed.share.article":
+	case "io.sunred.share.article":
 		f.handleShare(ctx, did, effectivePDS, rkey, op.Action)
-	case "io.earthed.feed.subscription":
+	case "io.sunred.feed.subscription":
 		f.handleFeedSub(ctx, did, effectivePDS, rkey, op.Action)
 	}
 }
@@ -214,7 +214,7 @@ func (f *Fanout) handleFollow(ctx context.Context, did, pdsURL, rkey, action str
 		}
 		return
 	}
-	rec, err := f.fetchRecord(ctx, pdsURL, did, "io.earthed.graph.follow", rkey)
+	rec, err := f.fetchRecord(ctx, pdsURL, did, "io.sunred.graph.follow", rkey)
 	if err != nil {
 		slog.Warn("fanout: fetch follow", "err", err)
 		return
@@ -248,7 +248,7 @@ func (f *Fanout) handleShare(ctx context.Context, did, pdsURL, rkey, action stri
 		}
 		return
 	}
-	rec, err := f.fetchRecord(ctx, pdsURL, did, "io.earthed.share.article", rkey)
+	rec, err := f.fetchRecord(ctx, pdsURL, did, "io.sunred.share.article", rkey)
 	if err != nil {
 		slog.Warn("fanout: fetch share", "err", err)
 		return
@@ -282,7 +282,7 @@ func (f *Fanout) handleFeedSub(ctx context.Context, did, pdsURL, rkey, action st
 		}
 		return
 	}
-	rec, err := f.fetchRecord(ctx, pdsURL, did, "io.earthed.feed.subscription", rkey)
+	rec, err := f.fetchRecord(ctx, pdsURL, did, "io.sunred.feed.subscription", rkey)
 	if err != nil {
 		slog.Warn("fanout: fetch feed sub", "err", err)
 		return

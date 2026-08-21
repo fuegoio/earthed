@@ -10,10 +10,10 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/fuegoio/earthed/go/api/internal/reader/fetcher"
-	"github.com/fuegoio/earthed/go/api/internal/reader/parser"
-	"github.com/fuegoio/earthed/go/api/internal/reader/sanitizer"
-	"github.com/fuegoio/earthed/go/api/internal/store"
+	"github.com/fuegoio/sunred/go/api/internal/reader/fetcher"
+	"github.com/fuegoio/sunred/go/api/internal/reader/parser"
+	"github.com/fuegoio/sunred/go/api/internal/reader/sanitizer"
+	"github.com/fuegoio/sunred/go/api/internal/store"
 )
 
 // Processor coordinates the fetch-parse-store pipeline for a single feed.

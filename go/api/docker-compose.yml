@@ -1,21 +1,20 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: earthed-postgres
+    container_name: sunred-postgres
     environment:
-      POSTGRES_USER: earthed
-      POSTGRES_PASSWORD: earthed
-      POSTGRES_DB: earthed
+      POSTGRES_USER: sunred
+      POSTGRES_PASSWORD: sunred
+      POSTGRES_DB: sunred
     ports:
       - "5432:5432"
     volumes:
-      - earthed-pgdata:/var/lib/postgresql/data
-      - ./init-relay-db.sh:/docker-entrypoint-initdb.d/init-relay-db.sh:ro
+      - sunred-pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U earthed -d earthed"]
+      test: ["CMD-SHELL", "pg_isready -U sunred -d sunred"]
       interval: 3s
       timeout: 3s
       retries: 10
 
 volumes:
-  earthed-pgdata:
+  sunred-pgdata:

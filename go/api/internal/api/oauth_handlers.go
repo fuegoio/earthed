@@ -11,10 +11,10 @@ import (
 	"github.com/bluesky-social/indigo/atproto/auth/oauth"
 	"github.com/bluesky-social/indigo/atproto/syntax"
 
-	"github.com/fuegoio/earthed/go/api/internal/atproto"
-	"github.com/fuegoio/earthed/go/api/internal/auth"
-	"github.com/fuegoio/earthed/go/api/internal/config"
-	"github.com/fuegoio/earthed/go/api/internal/store"
+	"github.com/fuegoio/sunred/go/api/internal/atproto"
+	"github.com/fuegoio/sunred/go/api/internal/auth"
+	"github.com/fuegoio/sunred/go/api/internal/config"
+	"github.com/fuegoio/sunred/go/api/internal/store"
 )
 
 // OAuthHandlers serves the AT Proto OAuth flow: login start, callback,
@@ -85,7 +85,7 @@ func (h *OAuthHandlers) handleLogin(w http.ResponseWriter, r *http.Request) {
 	// Stash the post-login redirect in a short-lived cookie so the callback
 	// can pick it up. The auth request state itself lives in the PGStore.
 	http.SetCookie(w, &http.Cookie{
-		Name:     "earthed_oauth_redirect",
+		Name:     "sunred_oauth_redirect",
 		Value:    redirectTo,
 		Path:     "/",
 		MaxAge:   600,
@@ -97,7 +97,7 @@ func (h *OAuthHandlers) handleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 // handleSignup starts the OAuth flow against the configured default PDS
-// (EARTHED_DEFAULT_PDS). This lets users without an existing AT Proto account
+// (SUNRED_DEFAULT_PDS). This lets users without an existing AT Proto account
 // sign up on the instance's own PDS. Returns 503 if no default PDS is configured.
 func (h *OAuthHandlers) handleSignup(w http.ResponseWriter, r *http.Request) {
 	if h.oauthApp == nil {
@@ -121,7 +121,7 @@ func (h *OAuthHandlers) handleSignup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:     "earthed_oauth_redirect",
+		Name:     "sunred_oauth_redirect",
 		Value:    redirectTo,
 		Path:     "/",
 		MaxAge:   600,
@@ -143,7 +143,7 @@ func (h *OAuthHandlers) handleOAuthConfig(w http.ResponseWriter, r *http.Request
 
 // handleCallback completes the OAuth flow: exchanges the authorization code for
 // DPoP-bound tokens, creates or looks up the local user by DID, syncs the
-// user's io.earthed.* records from their PDS into the local cache, announces
+// user's io.sunred.* records from their PDS into the local cache, announces
 // the user to the relay, issues a web session cookie, and redirects to the app.
 func (h *OAuthHandlers) handleCallback(w http.ResponseWriter, r *http.Request) {
 	if h.oauthApp == nil {
@@ -195,7 +195,7 @@ func (h *OAuthHandlers) handleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Sync the PDS data into the local cache. On first login this backfills the
-	// user's existing io.earthed.* records; on subsequent logins it reconciles.
+	// user's existing io.sunred.* records; on subsequent logins it reconciles.
 	// Run synchronously so the user lands in an app that already has their data,
 	// but never block the login on a sync failure.
 	go func() {
@@ -215,8 +215,8 @@ func (h *OAuthHandlers) handleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	redirectTo := h.cfg.WebURL + "/"
-	if c, err := r.Cookie("earthed_oauth_redirect"); err == nil && c.Value != "" {
-		http.SetCookie(w, &http.Cookie{Name: "earthed_oauth_redirect", Path: "/", MaxAge: -1})
+	if c, err := r.Cookie("sunred_oauth_redirect"); err == nil && c.Value != "" {
+		http.SetCookie(w, &http.Cookie{Name: "sunred_oauth_redirect", Path: "/", MaxAge: -1})
 		redirectTo = c.Value
 	}
 	http.Redirect(w, r, redirectTo, http.StatusFound)
@@ -254,7 +254,7 @@ func safeOAuthRedirect(value, webURL string) string {
 
 // --- Sync on login ---
 
-// syncFromPDS backfills the user's io.earthed.* records from their PDS into the
+// syncFromPDS backfills the user's io.sunred.* records from their PDS into the
 // local cache using the persisted OAuth session. It is best-effort: failures
 // are logged but never fail the login.
 func (h *OAuthHandlers) syncFromPDS(ctx context.Context, did string, userID int, sessionID string) error {
@@ -264,7 +264,7 @@ func (h *OAuthHandlers) syncFromPDS(ctx context.Context, did string, userID int,
 	}
 	client := sess.APIClient()
 
-	// Backfill each io.earthed.* collection by listing records newest-first.
+	// Backfill each io.sunred.* collection by listing records newest-first.
 	if err := syncFollows(ctx, client, h.store, userID); err != nil {
 		slog.Warn("sync: follows", "err", err)
 	}
@@ -286,7 +286,7 @@ func (h *OAuthHandlers) announceToRelay(ctx context.Context, did, pdsURL, handle
 		InstanceURL string `json:"instanceUrl"`
 		Handle      string `json:"handle"`
 	}
-	if err := rc.Procedure(ctx, "io.earthed.relay.announceUser", announceIn{
+	if err := rc.Procedure(ctx, "io.sunred.relay.announceUser", announceIn{
 		DID:         did,
 		PDSUrl:      pdsURL,
 		InstanceURL: h.cfg.BaseURL,

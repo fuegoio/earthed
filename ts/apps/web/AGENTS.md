@@ -7,15 +7,15 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # Frontend conventions
 
-## Data fetching: TanStack Query + the Earthed SDK
+## Data fetching: TanStack Query + the Sunred SDK
 
-All data fetching and mutations go through the **`@earthed/api-client`** typed SDK, re-exported from `lib/earthed.ts`. **Client-side reads use TanStack Query (`useQuery` / `useInfiniteQuery`)** — never hand-rolled `useEffect` + `useState` fetch loops.
+All data fetching and mutations go through the **`@sunred/api-client`** typed SDK, re-exported from `lib/sunred.ts`. **Client-side reads use TanStack Query (`useQuery` / `useInfiniteQuery`)** — never hand-rolled `useEffect` + `useState` fetch loops.
 
-- **Client components** call `useQuery` with a `queryKey` (a stable array identifying the query) and a `queryFn` that goes through the SDK. Use the `unwrap()` helper from `lib/earthed.ts` to adapt the SDK's `{ data, error }` discriminated union to react-query's throw-on-error contract:
+- **Client components** call `useQuery` with a `queryKey` (a stable array identifying the query) and a `queryFn` that goes through the SDK. Use the `unwrap()` helper from `lib/sunred.ts` to adapt the SDK's `{ data, error }` discriminated union to react-query's throw-on-error contract:
 
   ```ts
   import { useQuery } from "@tanstack/react-query";
-  import { getClient, listFolders, unwrap } from "@/lib/earthed";
+  import { getClient, listFolders, unwrap } from "@/lib/sunred";
 
   const {
     data: folders,
@@ -32,10 +32,10 @@ All data fetching and mutations go through the **`@earthed/api-client`** typed S
 
 - **Server components** still call `getClient()` directly and `await` the SDK call (`const { data, error } = await listFolders({ client, ... })`), since `useQuery` is client-only. Render `<ApiError />` on failure as below.
 - **Client-side mutations** (forms, delete actions, etc.) stay as event handlers calling the SDK directly (`const { error } = await createFolder({ client, ... })`) — not `useMutation` unless you need its cache/optimistic machinery. After a successful mutation, call `queryClient.invalidateQueries({ queryKey: [...] })` (or `router.refresh()`) to refetch affected reads.
-- `getClient()` is isomorphic: on the server it forwards cookies via `next/headers` (dynamically imported to keep it out of the client bundle) and uses `env.EARTHED_API_URL`; on the client it relies on the browser sending cookies automatically (`credentials: "include"`) and uses `env.NEXT_PUBLIC_EARTHED_API_URL`.
+- `getClient()` is isomorphic: on the server it forwards cookies via `next/headers` (dynamically imported to keep it out of the client bundle) and uses `env.SUNRED_API_URL`; on the client it relies on the browser sending cookies automatically (`credentials: "include"`) and uses `env.NEXT_PUBLIC_SUNRED_API_URL`.
 - The `QueryClient` is provided once at the root via `components/query-provider.tsx` (mounted in `app/layout.tsx`). Do not instantiate `QueryClient` per-component; use `useQueryClient()` if you need imperative access from a child.
-- Never use `fetch`, `axios`, or raw API calls in components, hooks, or pages. Go through `lib/earthed.ts`. The only layer allowed to import `@earthed/api-client` is `lib/earthed.ts`.
-- Environment variables are validated via `@t3-oss/env-nextjs` in `lib/env.ts`. Access `env.EARTHED_API_URL` (server) or `env.NEXT_PUBLIC_EARTHED_API_URL` (client) instead of `process.env.*`.
+- Never use `fetch`, `axios`, or raw API calls in components, hooks, or pages. Go through `lib/sunred.ts`. The only layer allowed to import `@sunred/api-client` is `lib/sunred.ts`.
+- Environment variables are validated via `@t3-oss/env-nextjs` in `lib/env.ts`. Access `env.SUNRED_API_URL` (server) or `env.NEXT_PUBLIC_SUNRED_API_URL` (client) instead of `process.env.*`.
 
 ## Avoid `useEffect`
 
@@ -62,7 +62,7 @@ All forms use **react-hook-form** with **@hookform/resolvers/zod** for schema va
 
 Destructive delete actions use the **shadcn `AlertDialog`** (from `components/ui/alert-dialog.tsx`) composed directly inside the business component that owns the resource — never a shared half-DS `DeleteButton` wrapper.
 
-- Each component that can delete a resource renders its own `AlertDialog` with the trigger `Button` (`variant="destructive"`) and the confirm/cancel actions inline. The mutation call (`deleteFolder`, `deleteFeed`, `deleteToken`, … from `lib/earthed.ts`) lives in the same component.
+- Each component that can delete a resource renders its own `AlertDialog` with the trigger `Button` (`variant="destructive"`) and the confirm/cancel actions inline. The mutation call (`deleteFolder`, `deleteFeed`, `deleteToken`, … from `lib/sunred.ts`) lives in the same component.
 - Do **not** add a generic `components/delete-button.tsx` that takes a `kind` discriminator and switches on resource type. This does not scale beyond a couple of resources, hides the mutation behind a prop API, and forces every new resource to extend a union. Composing the `AlertDialog` inline keeps each delete flow local to its resource.
 - Error handling follows the client-mutation rule above: `const { error } = await sdk(...)` then `toast.error(getApiErrorMessage(error))`. Use `router.refresh()` (or an optimistic update) after success.
 
@@ -87,11 +87,11 @@ All API error handling lives in **`lib/errors.ts`**. On error the SDK resolves `
 
 - Next.js 16 (App Router), React 19, TypeScript, Tailwind v4, shadcn/ui. UI components and primitives live in `packages/ui` (`@workspace/ui`); app-specific components live in `components/`.
 - Data fetching (client): TanStack Query v5, provided via `components/query-provider.tsx`. `useQuery` for reads, optional `useMutation` for mutations with cache invalidation.
-- API client: `@earthed/api-client` (in `packages/api-client/`), generated from the OpenAPI spec via `@hey-api/openapi-ts`. Types come from `go/api/openapi.json`. Regenerate with `pnpm --filter @earthed/api-client gen`.
-- API access: `lib/earthed.ts` — exports `getClient()` (an isomorphic factory that creates a `EarthedClient` with cookie forwarding on server, `credentials: "include"` on client, `no-store` fetch), `unwrap()` (adapts `{ data, error }` to react-query's throw-on-error contract), and re-exports all SDK functions and types from `@earthed/api-client`.
-- Model types: `lib/types.ts` — re-exports named types from `@earthed/api-client` with web-friendly aliases (`APIToken`, `CreatedToken`).
+- API client: `@sunred/api-client` (in `packages/api-client/`), generated from the OpenAPI spec via `@hey-api/openapi-ts`. Types come from `go/api/openapi.json`. Regenerate with `pnpm --filter @sunred/api-client gen`.
+- API access: `lib/sunred.ts` — exports `getClient()` (an isomorphic factory that creates a `SunredClient` with cookie forwarding on server, `credentials: "include"` on client, `no-store` fetch), `unwrap()` (adapts `{ data, error }` to react-query's throw-on-error contract), and re-exports all SDK functions and types from `@sunred/api-client`.
+- Model types: `lib/types.ts` — re-exports named types from `@sunred/api-client` with web-friendly aliases (`APIToken`, `CreatedToken`).
 - API error handling: `lib/errors.ts` — `getApiErrorMessage(e)` (huma `ErrorModel`), `apiErrorStatus(e)`, `isClientError(e)`.
 - Logging: `lib/logger.ts` — shared pino `logger` and `attachApiLogger(client)` (pino-backed server log of every API call). `components/api-error.tsx` renders the server-side fetch error banner.
 - Shared Zod schemas for forms: `lib/schemas.ts`.
-- Environment: `lib/env.ts` — t3-env validated. Server-only vars like `EARTHED_API_URL`.
+- Environment: `lib/env.ts` — t3-env validated. Server-only vars like `SUNRED_API_URL`.
 - Zod for all runtime validation, both client and server.

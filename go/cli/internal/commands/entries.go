@@ -6,7 +6,7 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/fuegoio/earthed/go/sdk/earthed"
+	"github.com/fuegoio/sunred/go/sdk/sunred"
 	"github.com/spf13/cobra"
 )
 
@@ -21,8 +21,8 @@ var entriesListCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, _ []string) {
 		_, c := mustClient()
 		limit := int64(50)
-		status := earthed.ListEntriesParamsStatusUnread
-		resp, err := c.ListEntriesWithResponse(context.Background(), &earthed.ListEntriesParams{
+		status := sunred.ListEntriesParamsStatusUnread
+		resp, err := c.ListEntriesWithResponse(context.Background(), &sunred.ListEntriesParams{
 			Limit:  &limit,
 			Status: &status,
 		})

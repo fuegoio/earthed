@@ -1,6 +1,6 @@
 ---
 title: Getting Started
-description: Run Earthed locally, create an account, subscribe to a feed, and read entries.
+description: Run Sunred locally, create an account, subscribe to a feed, and read entries.
 ---
 
 ## Prerequisites
@@ -16,19 +16,19 @@ cd go/api
 make db-up
 ```
 
-This starts a PostgreSQL 16 container on port 5432 with database `earthed`, user `earthed`, password `earthed`.
+This starts a PostgreSQL 16 container on port 5432 with database `sunred`, user `sunred`, password `sunred`.
 
 ## 2. Configure environment
 
 Create a `.env` file in `go/api/`:
 
 ```bash
-EARTHED_DATABASE_URL=postgres://earthed:earthed@localhost:5432/earthed?sslmode=disable
-EARTHED_BASE_URL=http://localhost:8080
-EARTHED_WEB_URL=http://localhost:3000
+SUNRED_DATABASE_URL=postgres://sunred:sunred@localhost:5432/sunred?sslmode=disable
+SUNRED_BASE_URL=http://localhost:8080
+SUNRED_WEB_URL=http://localhost:3000
 ```
 
-The OAuth client_id and callback URL default from `EARTHED_BASE_URL`, so no
+The OAuth client_id and callback URL default from `SUNRED_BASE_URL`, so no
 extra OAuth configuration is needed for local development.
 
 Users log in with their own AT Proto handle — typically a Bluesky account or an
@@ -58,7 +58,7 @@ curl http://localhost:8080/v1/health
 
 ## 5. Create an account
 
-Earthed uses AT Proto identity — there is no email/password signup. Start the
+Sunred uses AT Proto identity — there is no email/password signup. Start the
 web frontend (step 9) and sign in by entering an AT Proto handle, such as your
 Bluesky account.
 
@@ -86,7 +86,7 @@ curl -X POST http://localhost:8080/v1/feeds \
   -d '{"feed_url":"https://blog.golang.org/feeds/posts/default"}'
 ```
 
-You can also pass a website URL — Earthed discovers the feed automatically from `<link rel="alternate">` tags.
+You can also pass a website URL — Sunred discovers the feed automatically from `<link rel="alternate">` tags.
 
 ## 8. Read entries
 
@@ -110,12 +110,12 @@ The web app is at `http://localhost:3000`. Sign in with the account you created 
 ```bash
 cd go/cli
 make build
-./earthed config set base_url http://localhost:8080
-./earthed config set token pla_your-token-here
+./sunred config set base_url http://localhost:8080
+./sunred config set token pla_your-token-here
 
-./earthed feeds list
-./earthed entries list
-./earthed-tui   # interactive TUI
+./sunred feeds list
+./sunred entries list
+./sunred-tui   # interactive TUI
 ```
 
 See [CLI](/cli) for the full command reference.

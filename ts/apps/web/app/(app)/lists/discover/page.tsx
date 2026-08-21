@@ -14,7 +14,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@workspace/ui/components/empty";
-import { getClient, discoverFeedLists, followFeedList, unwrap } from "@/lib/earthed";
+import { getClient, discoverFeedLists, followFeedList, unwrap } from "@/lib/sunred";
 import { getApiErrorMessage } from "@/lib/errors";
 import { cn } from "@workspace/ui/lib/utils";
 import type { FeedList } from "@/lib/types";

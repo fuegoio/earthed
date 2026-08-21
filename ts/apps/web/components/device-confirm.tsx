@@ -35,7 +35,7 @@ export function DeviceConfirm() {
     setState("submitting")
     try {
       const res = await fetch(
-        `${env.NEXT_PUBLIC_EARTHED_API_URL}/auth/device/confirm`,
+        `${env.NEXT_PUBLIC_SUNRED_API_URL}/auth/device/confirm`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -101,7 +101,7 @@ export function DeviceConfirm() {
         className="mb-8 flex items-center justify-center gap-2 font-serif text-2xl font-bold"
       >
         <Logo className="size-8" />
-        Earthed
+        Sunred
       </Link>
       <Card>
         <CardHeader className="items-center text-center">
@@ -180,7 +180,7 @@ function ResultCard({
         className="mb-8 flex items-center justify-center gap-2 font-serif text-2xl font-bold"
       >
         <Logo className="size-8" />
-        Earthed
+        Sunred
       </Link>
       <Card>
         <CardHeader className="items-center text-center">

@@ -2,7 +2,7 @@ import pino, { type Logger } from "pino";
 
 /**
  * Server-side structured logger. Imported only from server code paths; the
- * API logger wired in `lib/earthed.ts` guards on `typeof window` before
+ * API logger wired in `lib/sunred.ts` guards on `typeof window` before
  * calling into it so the pino dependency is kept out of the browser bundle.
  */
 export const logger: Logger = pino({
@@ -20,7 +20,7 @@ export type ApiLogger = Pick<Logger, "info" | "warn" | "error">;
 interface InterceptableClient {
   interceptors: {
     // Method syntax (bivariant) so the real typed `Client` is assignable
-    // without `lib/logger.ts` having to import from `@earthed/api-client`.
+    // without `lib/logger.ts` having to import from `@sunred/api-client`.
     request: {
       use(fn: (request: unknown, options: unknown) => unknown): void;
     };
@@ -59,7 +59,7 @@ const requestStart = new WeakMap<object, number>();
  * huma `ErrorModel` body. On the client it's a no-op (pino is server-only).
  *
  * `client` is typed as `unknown` and cast internally so `lib/logger.ts` doesn't
- * have to import from `@earthed/api-client` (only `lib/earthed.ts` may).
+ * have to import from `@sunred/api-client` (only `lib/sunred.ts` may).
  * `log` is injectable so tests can capture it; production passes the shared
  * pino logger above.
  */

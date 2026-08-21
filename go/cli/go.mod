@@ -1,11 +1,11 @@
-module github.com/fuegoio/earthed/go/cli
+module github.com/fuegoio/sunred/go/cli
 
 go 1.25.0
 
 require (
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/lipgloss v1.1.0
-	github.com/fuegoio/earthed/go/sdk v0.0.0
+	github.com/fuegoio/sunred/go/sdk v0.0.0
 	github.com/spf13/cobra v1.10.2
 )
 
@@ -36,4 +36,4 @@ require (
 	golang.org/x/text v0.32.0 // indirect
 )
 
-replace github.com/fuegoio/earthed/go/sdk => ../sdk
+replace github.com/fuegoio/sunred/go/sdk => ../sdk

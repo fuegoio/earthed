@@ -25,7 +25,7 @@ type Config struct {
 func Load() (*Config, error) {
 	cfg := &Config{
 		HTTPAddr:       env("RELAY_HTTP_ADDR", ":9090"),
-		DatabaseURL:    env("RELAY_DATABASE_URL", "postgres://earthed:earthed@localhost:5432/earthed_relay?sslmode=disable"),
+		DatabaseURL:    env("RELAY_DATABASE_URL", "postgres://sunred:sunred@localhost:5433/sunred_relay?sslmode=disable"),
 		LogFormat:      env("RELAY_LOG_FORMAT", "pretty"),
 		FanoutWorkers:  envInt("RELAY_FANOUT_WORKERS", 50),
 		ReconnectDelay: envDuration("RELAY_RECONNECT_DELAY", 5*time.Second),

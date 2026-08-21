@@ -7,7 +7,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/fuegoio/earthed/go/sdk/earthed"
+	"github.com/fuegoio/sunred/go/sdk/sunred"
 )
 
 // Update handles messages and keyboard input.
@@ -233,7 +233,7 @@ func (m Model) handleEntriesKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		entry := m.entries[m.entriesCursor]
 		var cmds []tea.Cmd
 		if entry.Status != "read" {
-			cmds = append(cmds, setEntryStatus(m.client, entry.Id, earthed.UpdateEntriesRequestStatusRead))
+			cmds = append(cmds, setEntryStatus(m.client, entry.Id, sunred.UpdateEntriesRequestStatusRead))
 		}
 		cmds = append(cmds, openURL(entry.Url))
 		m.clampEntriesOffset()
@@ -244,9 +244,9 @@ func (m Model) handleEntriesKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 		entry := m.entries[m.entriesCursor]
-		newStatus := earthed.UpdateEntriesRequestStatusRead
+		newStatus := sunred.UpdateEntriesRequestStatusRead
 		if entry.Status == "read" {
-			newStatus = earthed.UpdateEntriesRequestStatusUnread
+			newStatus = sunred.UpdateEntriesRequestStatusUnread
 		}
 		return m, setEntryStatus(m.client, entry.Id, newStatus)
 	case "s":
@@ -328,7 +328,7 @@ func (m Model) renderSidebarLines() []string {
 	}
 
 	// Header
-	addLine(headerStyle.Render(truncate("☀ Earthed", innerWidth-2)))
+	addLine(headerStyle.Render(truncate("☀ Sunred", innerWidth-2)))
 	addLine(strings.Repeat("─", innerWidth))
 
 	// Search input box replaces the nav items when searching.
