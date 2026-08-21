@@ -13,9 +13,11 @@ export const env = createEnv({
   },
   client: {
     NEXT_PUBLIC_SUNRED_API_URL: z.string().url().default("http://localhost:8080"),
+    NEXT_PUBLIC_SUNRED_DEFAULT_PDS: z.string().url().default("https://snrd.social"),
   },
   runtimeEnv: {
     SUNRED_API_URL: process.env.SUNRED_API_URL,
     NEXT_PUBLIC_SUNRED_API_URL: getPublicEnv().NEXT_PUBLIC_SUNRED_API_URL,
+    NEXT_PUBLIC_SUNRED_DEFAULT_PDS: getPublicEnv().NEXT_PUBLIC_SUNRED_DEFAULT_PDS,
   },
 });

@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { AuthForm } from "@/components/auth-form";
 import { redirectIfAuthenticated } from "@/lib/auth-guard";
-import { getOAuthConfig } from "@/lib/auth";
+import { env } from "@/lib/env";
 
 export const metadata = { title: "Login" };
 
@@ -22,7 +22,6 @@ export default async function LoginPage({
   await redirectIfAuthenticated(redirectTo);
 
   const errorMessage = error ? ERROR_MESSAGES[error] ?? "Login failed. Please try again." : null;
-  const { default_pds } = await getOAuthConfig();
 
   return (
     <Suspense>
@@ -35,7 +34,7 @@ export default async function LoginPage({
             {errorMessage}
           </div>
         )}
-        <AuthForm signupAvailable={!!default_pds} />
+        <AuthForm defaultPds={env.NEXT_PUBLIC_SUNRED_DEFAULT_PDS} />
       </div>
     </Suspense>
   );

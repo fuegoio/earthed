@@ -8,10 +8,12 @@ const PUBLIC_API_URL_KEY = "NEXT_PUBLIC_SUNRED_API_URL";
 export const { getPublicEnv, PublicEnv } = createPublicEnv(
   {
     NEXT_PUBLIC_SUNRED_API_URL: process.env[PUBLIC_API_URL_KEY],
+    NEXT_PUBLIC_SUNRED_DEFAULT_PDS: process.env.NEXT_PUBLIC_SUNRED_DEFAULT_PDS,
   },
   {
     schema: (z) => ({
       NEXT_PUBLIC_SUNRED_API_URL: z.string().url().default("http://localhost:8080"),
+      NEXT_PUBLIC_SUNRED_DEFAULT_PDS: z.string().url().default("https://snrd.social"),
     }),
   },
 );
