@@ -73,14 +73,28 @@ SUNRED_TRUSTED_ORIGINS=https://myapp.com
 
 ## Database backup
 
-All feeds, entries, folders, and feed lists are in PostgreSQL. Back it up regularly.
+Sunred uses two separate PostgreSQL databases — one for the instance (API) and
+one for the relay. See [Data responsibilities](/self-hosting/at-proto#data-responsibilities)
+for what each holds.
+
+The instance database is the one that matters: it holds feed content, the
+mirrored PDS cache, and instance-local state (read state, folders, settings).
+Back it up regularly.
 
 ```bash
-# Create a backup
+# Create a backup of the instance database
 docker compose exec postgres pg_dump -U sunred sunred > backup.sql
 
 # Restore from a backup
 cat backup.sql | docker compose exec -T postgres psql -U sunred sunred
+```
+
+The relay database holds only aggregated social-graph metadata and can be
+rebuilt by re-subscribing to PDS repo streams, so it does not need the same
+backup regime. Back it up if you want to avoid the re-aggregation delay:
+
+```bash
+docker compose exec relay-postgres pg_dump -U sunred sunred_relay > relay-backup.sql
 ```
 
 Schedule `pg_dump` with a cron job and store backups off-site for automated backups.
