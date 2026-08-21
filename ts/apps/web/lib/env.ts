@@ -9,7 +9,7 @@ import { getPublicEnv } from "./public-env";
 // The server-only `SUNRED_API_URL` is unaffected (read from `process.env`).
 export const env = createEnv({
   server: {
-    SUNRED_API_URL: z.string().url().default("http://localhost:8080"),
+    SUNRED_API_URL: z.string().url().default("http://127.0.0.1:8080"),
   },
   client: {
     NEXT_PUBLIC_SUNRED_API_URL: z.string().url().default("http://localhost:8080"),

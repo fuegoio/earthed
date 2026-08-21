@@ -5,7 +5,7 @@ const PUBLIC_ROUTES = ["/login", "/signup", "/~offline"];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const session = request.cookies.get("limen_session");
+  const session = request.cookies.get("sunred_session");
 
   const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
 

@@ -50,7 +50,7 @@ func Load() (*Config, error) {
 	cfg := &Config{
 		HTTPAddr:       env("SUNRED_HTTP_ADDR", ":8080"),
 		DatabaseURL:    env("SUNRED_DATABASE_URL", "postgres://sunred:sunred@localhost:5432/sunred?sslmode=disable"),
-		BaseURL:        env("SUNRED_BASE_URL", "http://localhost:8080"),
+		BaseURL:        env("SUNRED_BASE_URL", "http://127.0.0.1:8080"),
 		WebURL:         env("SUNRED_WEB_URL", "http://localhost:3000"),
 		LogFormat:      env("SUNRED_LOG_FORMAT", "pretty"),
 		PollingFreq:    envDuration("SUNRED_POLLING_FREQUENCY", 60*time.Second),
@@ -72,8 +72,9 @@ func Load() (*Config, error) {
 	// OAuth client_id and callback URL default from BaseURL. The client_id is a
 	// URL pointing at the client-metadata.json document this server serves.
 	// For loopback dev, NewLocalhostConfig encodes the callback URL in the
-	// client_id as query params, so the PDS never fetches it — localhost is
-	// fine and keeps the session cookie on the same origin as the web app.
+	// client_id as query params, so the PDS never fetches it — 127.0.0.1 is
+	// used (RFC 8252 rejects "localhost") and keeps the session cookie on the
+	// same origin as the web app via the /api proxy.
 	base := strings.TrimRight(strings.TrimSpace(cfg.BaseURL), "/")
 	cfg.OAuthClientID = env("SUNRED_OAUTH_CLIENT_ID", base+"/client-metadata.json")
 	cfg.OAuthCallbackURL = env("SUNRED_OAUTH_REDIRECT_URL", base+"/auth/oauth/callback")

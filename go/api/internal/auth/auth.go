@@ -136,7 +136,9 @@ func bearerToken(r *http.Request) string {
 	return strings.TrimPrefix(auth, "Bearer ")
 }
 
-func parseSameSite(s string) http.SameSite {
+// ParseSameSite converts a SameSite config string ("lax", "none", "strict")
+// to the corresponding http.SameSite value.
+func ParseSameSite(s string) http.SameSite {
 	switch strings.ToLower(s) {
 	case "none":
 		return http.SameSiteNoneMode
@@ -145,6 +147,10 @@ func parseSameSite(s string) http.SameSite {
 	default:
 		return http.SameSiteLaxMode
 	}
+}
+
+func parseSameSite(s string) http.SameSite {
+	return ParseSameSite(s)
 }
 
 // randomToken returns a hex-encoded random string of n bytes.

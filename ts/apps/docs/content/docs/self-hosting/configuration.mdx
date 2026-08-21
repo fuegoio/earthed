@@ -9,7 +9,7 @@ description: Environment variables for the API and web containers.
 | -------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------- |
 | `SUNRED_DATABASE_URL`         | `postgres://sunred:sunred@localhost:5432/sunred?sslmode=disable` | PostgreSQL connection string                               |
 | `SUNRED_HTTP_ADDR`            | `:8080`                                                                   | HTTP listen address                                        |
-| `SUNRED_BASE_URL`             | `http://localhost:8080`                                                   | Public URL of the API (used for auth redirects)            |
+| `SUNRED_BASE_URL`             | `http://127.0.0.1:8080`                                                   | Public URL of the API (used for auth redirects)            |
 | `SUNRED_WEB_URL`              | `http://localhost:3000`                                                   | Public URL of the web frontend                             |
 | `SUNRED_LOG_FORMAT`           | `pretty`                                                                  | Log format: `pretty` or `json`                             |
 | `SUNRED_POLLING_FREQUENCY`    | `60s`                                                                     | How often the scheduler checks for due feeds               |
@@ -25,12 +25,12 @@ description: Environment variables for the API and web containers.
 | `SUNRED_COOKIE_DOMAIN`        | (unset)                                                                   | Bare host to set as the cookie `Domain` (e.g. `sunred.app`), so the session is shared across subdomains. Set to the registrable domain shared by the API and web app |
 | `SUNRED_TRUSTED_ORIGINS`      | (unset)                                                                   | Comma-separated list of allowed browser origins (e.g. `https://app.sunred.app`). When unset, any origin is allowed (dev only). When set, `SUNRED_WEB_URL` is always included automatically |
 | `SUNRED_RELAY_URL`            | (unset)                                                                   | URL of the Sunred relay. Optional; enables cross-instance social features (global counts, federated shares). See [AT Proto & identity](/self-hosting/at-proto) |
-| `SUNRED_OAUTH_REDIRECT_URL`   | (unset)                                                                   | Public OAuth callback URL, e.g. `https://api.your-domain.com/auth/oauth/callback` |
+| `SUNRED_OAUTH_REDIRECT_URL`   | (unset)                                                                   | Public OAuth callback URL. In dev, set to `http://127.0.0.1:8080/auth/oauth/callback` (RFC 8252 requires `127.0.0.1`, not `localhost`; the API redirects `127.0.0.1` callbacks to `localhost` so the session cookie is scoped to `localhost`). In production, e.g. `https://api.your-domain.com/auth/oauth/callback` |
 | `SUNRED_DEFAULT_PDS`         | `https://snrd.social`                                                                   | PDS URL for new account signup. When set, the login page shows a "Create account" link that starts the OAuth signup flow against this PDS. When unset, only existing-handle login is offered. See [AT Proto & identity](/self-hosting/at-proto) |
 
 ## Web
 
 | Variable                        | Default                 | Description                                          |
 | ------------------------------- | ----------------------- | ---------------------------------------------------- |
-| `SUNRED_API_URL`             | `http://localhost:8080` | Server-side API URL (reachable from the container)   |
+| `SUNRED_API_URL`             | `http://127.0.0.1:8080` | Server-side API URL (reachable from the container)   |
 | `NEXT_PUBLIC_SUNRED_API_URL` | `http://localhost:8080` | Client-side API URL (reachable from the browser)     |

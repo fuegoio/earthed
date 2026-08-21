@@ -6,7 +6,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // session cookie is only a presence signal here; the app layout validates
   // it and redirects to /login if it's expired — no loop, since /login is a
   // public route that the catch-all proxies straight back to the app.
-  if (context.url.pathname === "/" && context.cookies.get("limen_session")?.value) {
+  if (context.url.pathname === "/" && context.cookies.get("sunred_session")?.value) {
     return proxyToApp(context);
   }
   return next();
