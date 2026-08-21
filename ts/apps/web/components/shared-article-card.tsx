@@ -25,8 +25,8 @@ export function SharedArticleCard({
 }) {
   const snippet = htmlSnippet(article.description ?? "", 200);
 
-  const sharerLabel = article.sharer_first_name?.trim()
-    ? article.sharer_first_name
+  const sharerLabel = article.sharer_display_name?.trim()
+    ? article.sharer_display_name
     : article.sharer_handle
       ? `@${article.sharer_handle}`
       : null;

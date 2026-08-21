@@ -45,20 +45,27 @@ func (s *Store) DeleteWebSession(ctx context.Context, token string) error {
 
 // --- DID-based users ---
 
-// UpdateUserEmail sets the email on a user row. Called after OAuth callback
-// when the PDS returns the account email via com.atproto.server.getSession
-// (requires the transition:email scope).
-func (s *Store) UpdateUserEmail(ctx context.Context, userID int, email string) error {
-	_, err := s.DB.ExecContext(ctx,
-		`UPDATE users SET email = $2 WHERE id = $1`,
-		userID, email,
-	)
-	return err
+// CreateRemoteUser creates a stub user for a remote DID that has never
+// logged into this instance. The user has is_remote=true, no PDS credentials,
+// and will be populated on-demand from their PDS profile.
+func (s *Store) CreateRemoteUser(ctx context.Context, did, handle, pdsURL string) (int, error) {
+	var userID int
+	err := s.DB.QueryRowContext(ctx,
+		`INSERT INTO users (did, handle, is_remote, pds_url)
+		 VALUES ($1, $2, true, $3)
+		 ON CONFLICT (did) WHERE did IS NOT NULL DO UPDATE
+		   SET handle = EXCLUDED.handle, pds_url = COALESCE(users.pds_url, EXCLUDED.pds_url)
+		 RETURNING id`,
+		did, handle, pdsURL,
+	).Scan(&userID)
+	if err != nil {
+		return 0, fmt.Errorf("create remote user: %w", err)
+	}
+	return userID, nil
 }
 
-// GetOrCreateUserByDID returns the user ID for a DID, creating the user (and a
-// blank profile row) if it does not yet exist. handle is stored on the users
-// row; a user_profiles row is created so social queries join correctly.
+// GetOrCreateUserByDID returns the user ID for a DID, creating the user if it
+// does not yet exist. handle is stored on the users row.
 func (s *Store) GetOrCreateUserByDID(ctx context.Context, did, handle string) (int, bool, error) {
 	var userID int
 	err := s.DB.QueryRowContext(ctx,
@@ -85,12 +92,6 @@ func (s *Store) GetOrCreateUserByDID(ctx context.Context, did, handle string) (i
 	if err != nil {
 		return 0, false, fmt.Errorf("create user by did: %w", err)
 	}
-	// Ensure a user_profiles row exists for social joins.
-	_, _ = s.DB.ExecContext(ctx,
-		`INSERT INTO user_profiles (user_id, handle, bio) VALUES ($1, $2, '')
-		 ON CONFLICT (user_id) DO NOTHING`,
-		userID, handle,
-	)
 	return userID, created, nil
 }
 
@@ -118,17 +119,13 @@ func (s *Store) GetUserDID(ctx context.Context, userID int) (did, handle string,
 	return d.String, h.String, err
 }
 
-// GetUserDIDAndPDS returns the DID and PDS URL for a user. The DID lives on
-// users; the PDS URL lives on user_profiles (set during OAuth). Either may be
-// empty when the user has not connected AT Proto. Used to announce a followed
-// user to the relay so their shares are backfilled into the local cache.
+// GetUserDIDAndPDS returns the DID and PDS URL for a user. Either may be empty
+// when the user has not connected AT Proto. Used to announce a followed user
+// to the relay so their shares are backfilled into the local cache.
 func (s *Store) GetUserDIDAndPDS(ctx context.Context, userID int) (did, pdsURL string, err error) {
 	var d, p sql.NullString
 	err = s.DB.QueryRowContext(ctx,
-		`SELECT u.did, COALESCE(up.pds_url, '')
-		 FROM users u
-		 LEFT JOIN user_profiles up ON up.user_id = u.id
-		 WHERE u.id = $1`, userID,
+		`SELECT did, COALESCE(pds_url, '') FROM users WHERE id = $1`, userID,
 	).Scan(&d, &p)
 	if err == sql.ErrNoRows {
 		return "", "", nil

@@ -76,12 +76,13 @@ the default PDS.
 The relay watches the repo streams of every PDS that hosts an Sunred user and
 aggregates `io.sunred.*` records (follows, article shares, feed subscriptions)
 into global counts. It then streams those events back to Sunred instances so
-they stay in sync across the federated network.
+they stay in sync across the federated network. The relay also indexes every
+known DID and handle, enabling cross-instance user search and follow.
 
 The relay is a separate Go service with its own database. Point the API at it
 with `SUNRED_RELAY_URL`. If unset, cross-instance social features (global
-follower counts, federated shares) are disabled — the instance still works
-standalone.
+follower counts, federated shares, cross-instance user search) are disabled —
+the instance still works standalone.
 
 ## Login flow
 

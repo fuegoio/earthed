@@ -24,12 +24,7 @@ import type { User as UserType } from "@/lib/types";
 // ---------------------------------------------------------------------------
 
 const profileSchema = z.object({
-  first_name: z.string().max(255, "Name must be 255 characters or fewer"),
-  email: z
-    .string()
-    .min(1, "Email is required")
-    .email("Enter a valid email address")
-    .max(255, "Email must be 255 characters or fewer"),
+  display_name: z.string().max(255, "Name must be 255 characters or fewer"),
 });
 
 type ProfileValues = z.infer<typeof profileSchema>;
@@ -38,8 +33,8 @@ type ProfileValues = z.infer<typeof profileSchema>;
 // Avatar
 // ---------------------------------------------------------------------------
 
-function AvatarDisplay({ email, firstName }: { email: string; firstName?: string }) {
-  const initial = (firstName?.trim() || email).charAt(0).toUpperCase();
+function AvatarDisplay({ displayName, handle }: { displayName?: string; handle?: string }) {
+  const initial = (displayName?.trim() || handle || "?").charAt(0).toUpperCase();
   return (
     <div
       className={cn(
@@ -69,20 +64,19 @@ function ProfileForm({ user }: { user: UserType }) {
   } = useForm<ProfileValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      first_name: user.first_name ?? "",
-      email: user.email,
+      display_name: user.display_name ?? "",
     },
   });
 
   // Sync form when user data changes (e.g. after a successful save)
   useEffect(() => {
-    reset({ first_name: user.first_name ?? "", email: user.email });
+    reset({ display_name: user.display_name ?? "" });
   }, [user, reset]);
 
   async function onSubmit(values: ProfileValues) {
     const { error } = await updateMe({
       client: await getClient(),
-      body: { first_name: values.first_name, email: values.email },
+      body: { display_name: values.display_name },
     });
     if (error) {
       toast.error(getApiErrorMessage(error, "Could not update profile"));
@@ -96,12 +90,12 @@ function ProfileForm({ user }: { user: UserType }) {
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
       {/* Avatar + identity */}
       <div className="flex items-center gap-4">
-        <AvatarDisplay email={user.email} firstName={user.first_name} />
+        <AvatarDisplay displayName={user.display_name} handle={user.handle} />
         <div className="min-w-0">
           <p className="truncate font-medium">
-            {user.first_name?.trim() || user.email}
+            {user.display_name?.trim() || `@${user.handle}`}
           </p>
-          <p className="text-sm text-muted-foreground">{user.email}</p>
+          <p className="text-sm text-muted-foreground">@{user.handle}</p>
         </div>
       </div>
 
@@ -115,26 +109,11 @@ function ProfileForm({ user }: { user: UserType }) {
             id="profile-name"
             placeholder="Your name"
             autoComplete="given-name"
-            aria-invalid={!!errors.first_name}
-            {...register("first_name")}
+            aria-invalid={!!errors.display_name}
+            {...register("display_name")}
           />
-          {errors.first_name && (
-            <p className="text-xs text-destructive">{errors.first_name.message}</p>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="profile-email">Email address</Label>
-          <Input
-            id="profile-email"
-            type="email"
-            placeholder="you@example.com"
-            autoComplete="email"
-            aria-invalid={!!errors.email}
-            {...register("email")}
-          />
-          {errors.email && (
-            <p className="text-xs text-destructive">{errors.email.message}</p>
+          {errors.display_name && (
+            <p className="text-xs text-destructive">{errors.display_name.message}</p>
           )}
         </div>
       </div>
@@ -153,7 +132,7 @@ function ProfileForm({ user }: { user: UserType }) {
 // Danger zone
 // ---------------------------------------------------------------------------
 
-function DangerZone({ userEmail }: { userEmail: string }) {
+function DangerZone({ userHandle }: { userHandle: string }) {
   const router = useRouter();
 
   async function handleDelete() {
@@ -191,7 +170,7 @@ function DangerZone({ userEmail }: { userEmail: string }) {
             </Button>
           }
           title="Delete your account?"
-          description={`All data for ${userEmail} will be permanently deleted. This cannot be undone.`}
+          description={`All data for @${userHandle} will be permanently deleted. This cannot be undone.`}
           confirmLabel="Yes, delete my account"
           onConfirm={handleDelete}
         />
@@ -349,7 +328,7 @@ export function ProfileManager() {
           Profile
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Manage your display name, email address, and account.
+          Manage your display name and account.
         </p>
       </header>
 
@@ -381,7 +360,7 @@ export function ProfileManager() {
         {user && (
           <>
             <div className="h-px bg-border" />
-            <DangerZone userEmail={user.email} />
+            <DangerZone userHandle={user.handle ?? ""} />
           </>
         )}
       </div>

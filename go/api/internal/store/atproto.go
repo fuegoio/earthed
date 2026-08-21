@@ -13,14 +13,13 @@ import (
 // This is called after the user authenticates with their PDS.
 func (s *Store) ConnectATProto(ctx context.Context, userID int, did, pdsURL, accessToken, refreshToken string, expiresAt *time.Time) error {
 	_, err := s.DB.ExecContext(ctx, `
-		UPDATE user_profiles
-		SET did                       = $2,
-		    pds_url                   = $3,
-		    atproto_access_token      = $4,
-		    atproto_refresh_token     = $5,
-		    atproto_token_expires_at  = $6,
-		    updated_at                = NOW()
-		WHERE user_id = $1`,
+		UPDATE users
+		SET did                      = $2,
+		    pds_url                  = $3,
+		    atproto_access_token     = $4,
+		    atproto_refresh_token    = $5,
+		    atproto_token_expires_at = $6
+		WHERE id = $1`,
 		userID, did, pdsURL, accessToken, refreshToken, expiresAt,
 	)
 	if err != nil {
@@ -32,14 +31,13 @@ func (s *Store) ConnectATProto(ctx context.Context, userID int, did, pdsURL, acc
 // DisconnectATProto clears the AT Proto identity for a user.
 func (s *Store) DisconnectATProto(ctx context.Context, userID int) error {
 	_, err := s.DB.ExecContext(ctx, `
-		UPDATE user_profiles
-		SET did                       = NULL,
-		    pds_url                   = NULL,
-		    atproto_access_token      = NULL,
-		    atproto_refresh_token     = NULL,
-		    atproto_token_expires_at  = NULL,
-		    updated_at                = NOW()
-		WHERE user_id = $1`, userID,
+		UPDATE users
+		SET did                      = NULL,
+		    pds_url                  = NULL,
+		    atproto_access_token     = NULL,
+		    atproto_refresh_token    = NULL,
+		    atproto_token_expires_at = NULL
+		WHERE id = $1`, userID,
 	)
 	return err
 }
@@ -50,11 +48,11 @@ func (s *Store) GetATProtoCredentials(ctx context.Context, userID int) (*ATProto
 	var did, pdsURL, access, refresh sql.NullString
 	var expiresAt sql.NullTime
 	err := s.DB.QueryRowContext(ctx, `
-		SELECT user_id, COALESCE(did,''), COALESCE(pds_url,''),
+		SELECT id, COALESCE(did,''), COALESCE(pds_url,''),
 		       COALESCE(atproto_access_token,''),
 		       COALESCE(atproto_refresh_token,''),
 		       atproto_token_expires_at
-		FROM user_profiles WHERE user_id = $1`, userID,
+		FROM users WHERE id = $1`, userID,
 	).Scan(&c.UserID, &did, &pdsURL, &access, &refresh, &expiresAt)
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -79,12 +77,11 @@ func (s *Store) GetATProtoCredentials(ctx context.Context, userID int) (*ATProto
 // UpdateATProtoTokens updates the access/refresh tokens for a user after a refresh.
 func (s *Store) UpdateATProtoTokens(ctx context.Context, userID int, accessToken, refreshToken string, expiresAt *time.Time) error {
 	_, err := s.DB.ExecContext(ctx, `
-		UPDATE user_profiles
+		UPDATE users
 		SET atproto_access_token     = $2,
 		    atproto_refresh_token    = $3,
-		    atproto_token_expires_at = $4,
-		    updated_at               = NOW()
-		WHERE user_id = $1`,
+		    atproto_token_expires_at  = $4
+		WHERE id = $1`,
 		userID, accessToken, refreshToken, expiresAt,
 	)
 	return err
@@ -94,12 +91,12 @@ func (s *Store) UpdateATProtoTokens(ctx context.Context, userID int, accessToken
 // Used by the poller to know which users to sync.
 func (s *Store) ListUsersWithATProto(ctx context.Context) ([]ATProtoCredentials, error) {
 	rows, err := s.DB.QueryContext(ctx, `
-		SELECT user_id,
+		SELECT id,
 		       COALESCE(did,''), COALESCE(pds_url,''),
 		       COALESCE(atproto_access_token,''),
 		       COALESCE(atproto_refresh_token,''),
 		       atproto_token_expires_at
-		FROM user_profiles
+		FROM users
 		WHERE did IS NOT NULL AND pds_url IS NOT NULL`,
 	)
 	if err != nil {

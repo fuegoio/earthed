@@ -721,7 +721,7 @@ export const FeedListSchema = {
         is_public: {
             type: 'boolean'
         },
-        owner_email: {
+        owner_handle: {
             type: 'string'
         },
         title: {
@@ -1257,7 +1257,7 @@ export const SharedArticleSchema = {
             format: 'date-time',
             type: 'string'
         },
-        sharer_first_name: {
+        sharer_display_name: {
             type: 'string'
         },
         sharer_handle: {
@@ -1501,20 +1501,13 @@ export const UpdateMeInputBodySchema = {
             readOnly: true,
             type: 'string'
         },
-        email: {
-            format: 'email',
-            maxLength: 255,
-            minLength: 1,
-            type: 'string'
-        },
-        first_name: {
+        display_name: {
             maxLength: 255,
             type: 'string'
         }
     },
     required: [
-        'first_name',
-        'email'
+        'display_name'
     ],
     type: 'object'
 } as const;
@@ -1531,14 +1524,17 @@ export const UserSchema = {
             readOnly: true,
             type: 'string'
         },
+        bio: {
+            type: 'string'
+        },
         created_at: {
             format: 'date-time',
             type: 'string'
         },
-        email: {
+        did: {
             type: 'string'
         },
-        first_name: {
+        display_name: {
             type: 'string'
         },
         handle: {
@@ -1551,6 +1547,9 @@ export const UserSchema = {
         is_admin: {
             type: 'boolean'
         },
+        is_remote: {
+            type: 'boolean'
+        },
         pds_sync_status: {
             type: 'string'
         },
@@ -1561,7 +1560,7 @@ export const UserSchema = {
     },
     required: [
         'id',
-        'email',
+        'handle',
         'is_admin',
         'created_at',
         'pds_sync_status'
@@ -1591,7 +1590,7 @@ export const UserProfileSchema = {
         did: {
             type: 'string'
         },
-        first_name: {
+        display_name: {
             type: 'string'
         },
         follower_count: {
@@ -1608,11 +1607,10 @@ export const UserProfileSchema = {
         is_following: {
             type: 'boolean'
         },
-        pds_url: {
-            type: 'string'
+        is_remote: {
+            type: 'boolean'
         },
-        updated_at: {
-            format: 'date-time',
+        pds_url: {
             type: 'string'
         },
         user_id: {
@@ -1624,7 +1622,6 @@ export const UserProfileSchema = {
         'user_id',
         'handle',
         'created_at',
-        'updated_at',
         'follower_count',
         'following_count'
     ],
@@ -2114,7 +2111,7 @@ export const FeedListWritableSchema = {
         is_public: {
             type: 'boolean'
         },
-        owner_email: {
+        owner_handle: {
             type: 'string'
         },
         title: {
@@ -2510,7 +2507,7 @@ export const SharedArticleWritableSchema = {
             format: 'date-time',
             type: 'string'
         },
-        sharer_first_name: {
+        sharer_display_name: {
             type: 'string'
         },
         sharer_handle: {
@@ -2682,20 +2679,13 @@ export const UpdateHandleInputBodyWritableSchema = {
 export const UpdateMeInputBodyWritableSchema = {
     additionalProperties: false,
     properties: {
-        email: {
-            format: 'email',
-            maxLength: 255,
-            minLength: 1,
-            type: 'string'
-        },
-        first_name: {
+        display_name: {
             maxLength: 255,
             type: 'string'
         }
     },
     required: [
-        'first_name',
-        'email'
+        'display_name'
     ],
     type: 'object'
 } as const;
@@ -2703,14 +2693,17 @@ export const UpdateMeInputBodyWritableSchema = {
 export const UserWritableSchema = {
     additionalProperties: false,
     properties: {
+        bio: {
+            type: 'string'
+        },
         created_at: {
             format: 'date-time',
             type: 'string'
         },
-        email: {
+        did: {
             type: 'string'
         },
-        first_name: {
+        display_name: {
             type: 'string'
         },
         handle: {
@@ -2723,6 +2716,9 @@ export const UserWritableSchema = {
         is_admin: {
             type: 'boolean'
         },
+        is_remote: {
+            type: 'boolean'
+        },
         pds_sync_status: {
             type: 'string'
         },
@@ -2733,7 +2729,7 @@ export const UserWritableSchema = {
     },
     required: [
         'id',
-        'email',
+        'handle',
         'is_admin',
         'created_at',
         'pds_sync_status'
@@ -2754,7 +2750,7 @@ export const UserProfileWritableSchema = {
         did: {
             type: 'string'
         },
-        first_name: {
+        display_name: {
             type: 'string'
         },
         follower_count: {
@@ -2771,11 +2767,10 @@ export const UserProfileWritableSchema = {
         is_following: {
             type: 'boolean'
         },
-        pds_url: {
-            type: 'string'
+        is_remote: {
+            type: 'boolean'
         },
-        updated_at: {
-            format: 'date-time',
+        pds_url: {
             type: 'string'
         },
         user_id: {
@@ -2787,7 +2782,6 @@ export const UserProfileWritableSchema = {
         'user_id',
         'handle',
         'created_at',
-        'updated_at',
         'follower_count',
         'following_count'
     ],

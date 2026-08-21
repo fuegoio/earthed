@@ -39,6 +39,8 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/health", s.handleHealth)
 	mux.HandleFunc("/xrpc/io.sunred.relay.announceUser", s.handleAnnounceUser)
 	mux.HandleFunc("/xrpc/io.sunred.relay.getCounts", s.handleGetCounts)
+	mux.HandleFunc("/xrpc/io.sunred.relay.searchDIDs", s.handleSearchDIDs)
+	mux.HandleFunc("/xrpc/io.sunred.relay.resolveHandle", s.handleResolveHandle)
 	mux.Handle("/xrpc/io.sunred.relay.subscribeEvents", websocket.Handler(s.handleSubscribeEvents))
 	return mux
 }
@@ -140,9 +142,72 @@ func (s *Server) handleGetCounts(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// --- subscribeEvents ---
+// --- searchDIDs ---
 
-// handleSubscribeEvents upgrades to a WebSocket and streams relay events
+type searchDIDsOutput struct {
+	Results []store.SearchResult `json:"results"`
+}
+
+func (s *Server) handleSearchDIDs(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	q := r.URL.Query().Get("q")
+	if q == "" {
+		http.Error(w, "q is required", http.StatusBadRequest)
+		return
+	}
+	limitStr := r.URL.Query().Get("limit")
+	limit := 20
+	if limitStr != "" {
+		limit, _ = strconv.Atoi(limitStr)
+	}
+	results, err := s.store.SearchDIDs(r.Context(), q, limit)
+	if err != nil {
+		slog.Error("relay: search dids", "q", q, "err", err)
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+	if results == nil {
+		results = []store.SearchResult{}
+	}
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(searchDIDsOutput{Results: results})
+}
+
+// --- resolveHandle ---
+
+type resolveHandleOutput struct {
+	DID    string `json:"did"`
+	PDSUrl string `json:"pdsUrl"`
+}
+
+func (s *Server) handleResolveHandle(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	handle := r.URL.Query().Get("handle")
+	if handle == "" {
+		http.Error(w, "handle is required", http.StatusBadRequest)
+		return
+	}
+	did, pdsURL, err := s.store.ResolveHandle(r.Context(), handle)
+	if err != nil {
+		slog.Error("relay: resolve handle", "handle", handle, "err", err)
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+	if did == "" {
+		http.Error(w, "handle not found", http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(resolveHandleOutput{DID: did, PDSUrl: pdsURL})
+}
+
+// --- subscribeEvents ---
 // to the subscribing instance. Supports cursor-based replay.
 //
 // To avoid the replay/subscribe race, the instance is registered for live

@@ -161,7 +161,7 @@ export default function UserProfilePage({
   }
 
   const { profile: user, shared_articles, feeds } = profile;
-  const displayName = user.first_name?.trim() || `@${user.handle}`;
+  const displayName = user.display_name?.trim() || `@${user.handle}`;
 
   return (
     <div className="flex flex-col">

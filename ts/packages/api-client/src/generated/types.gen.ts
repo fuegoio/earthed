@@ -240,7 +240,7 @@ export type FeedList = {
     id: number;
     is_following?: boolean;
     is_public: boolean;
-    owner_email?: string;
+    owner_handle?: string;
     title: string;
     updated_at: string;
     user_id: number;
@@ -385,7 +385,7 @@ export type SharedArticle = {
     id: number;
     published_at?: string;
     shared_at: string;
-    sharer_first_name?: string;
+    sharer_display_name?: string;
     sharer_handle?: string;
     title: string;
     user_id: number;
@@ -461,8 +461,7 @@ export type UpdateMeInputBody = {
      * A URL to the JSON Schema for this object.
      */
     readonly $schema?: string;
-    email: string;
-    first_name: string;
+    display_name: string;
 };
 
 export type User = {
@@ -470,12 +469,14 @@ export type User = {
      * A URL to the JSON Schema for this object.
      */
     readonly $schema?: string;
+    bio?: string;
     created_at: string;
-    email: string;
-    first_name?: string;
-    handle?: string;
+    did?: string;
+    display_name?: string;
+    handle: string;
     id: number;
     is_admin: boolean;
+    is_remote?: boolean;
     pds_sync_status: string;
     pds_synced_at?: string;
 };
@@ -488,13 +489,13 @@ export type UserProfile = {
     bio?: string;
     created_at: string;
     did?: string;
-    first_name?: string;
+    display_name?: string;
     follower_count: number;
     following_count: number;
     handle: string;
     is_following?: boolean;
+    is_remote?: boolean;
     pds_url?: string;
-    updated_at: string;
     user_id: number;
 };
 
@@ -637,7 +638,7 @@ export type FeedListWritable = {
     id: number;
     is_following?: boolean;
     is_public: boolean;
-    owner_email?: string;
+    owner_handle?: string;
     title: string;
     updated_at: string;
     user_id: number;
@@ -728,7 +729,7 @@ export type SharedArticleWritable = {
     id: number;
     published_at?: string;
     shared_at: string;
-    sharer_first_name?: string;
+    sharer_display_name?: string;
     sharer_handle?: string;
     title: string;
     user_id: number;
@@ -772,17 +773,18 @@ export type UpdateHandleInputBodyWritable = {
 };
 
 export type UpdateMeInputBodyWritable = {
-    email: string;
-    first_name: string;
+    display_name: string;
 };
 
 export type UserWritable = {
+    bio?: string;
     created_at: string;
-    email: string;
-    first_name?: string;
-    handle?: string;
+    did?: string;
+    display_name?: string;
+    handle: string;
     id: number;
     is_admin: boolean;
+    is_remote?: boolean;
     pds_sync_status: string;
     pds_synced_at?: string;
 };
@@ -791,13 +793,13 @@ export type UserProfileWritable = {
     bio?: string;
     created_at: string;
     did?: string;
-    first_name?: string;
+    display_name?: string;
     follower_count: number;
     following_count: number;
     handle: string;
     is_following?: boolean;
+    is_remote?: boolean;
     pds_url?: string;
-    updated_at: string;
     user_id: number;
 };
 

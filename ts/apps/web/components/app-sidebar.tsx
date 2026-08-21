@@ -73,7 +73,7 @@ function SidebarNav() {
   );
 }
 
-export function AccountButton({ userEmail }: { userEmail: string }) {
+export function AccountButton({ userHandle }: { userHandle: string }) {
   const router = useRouter();
   const { resolvedTheme, setTheme } = useTheme();
 
@@ -100,9 +100,9 @@ export function AccountButton({ userEmail }: { userEmail: string }) {
         aria-label="Account menu"
       >
         <Avatar.Root className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
-          <Avatar.Fallback>{userEmail.charAt(0).toUpperCase()}</Avatar.Fallback>
+          <Avatar.Fallback>{userHandle.charAt(0).toUpperCase()}</Avatar.Fallback>
         </Avatar.Root>
-        <span className="truncate text-sm font-medium">{userEmail}</span>
+        <span className="truncate text-sm font-medium">@{userHandle}</span>
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner
@@ -138,7 +138,7 @@ export function AccountButton({ userEmail }: { userEmail: string }) {
   );
 }
 
-function SidebarContent({ userEmail }: { userEmail: string }) {
+function SidebarContent({ userHandle }: { userHandle: string }) {
   const pathname = usePathname();
   const { data: feeds, isLoading: feedsLoading } = useQuery<Feed[]>({
     queryKey: ["feeds"],
@@ -158,7 +158,7 @@ function SidebarContent({ userEmail }: { userEmail: string }) {
   const isLoading = feedsLoading || foldersLoading;
 
   function profileDisplay(p: UserProfile): string {
-    return p.first_name?.trim() || `@${p.handle}`;
+    return p.display_name?.trim() || `@${p.handle}`;
   }
 
   return (
@@ -267,7 +267,7 @@ function SidebarContent({ userEmail }: { userEmail: string }) {
       </div>
 
       <div className="shrink-0 p-3">
-        <AccountButton userEmail={userEmail} />
+        <AccountButton userHandle={userHandle} />
       </div>
     </div>
   );
@@ -276,16 +276,16 @@ function SidebarContent({ userEmail }: { userEmail: string }) {
 export function AppSidebar({
   open,
   onClose,
-  userEmail,
+  userHandle,
 }: {
   open: boolean;
   onClose: () => void;
-  userEmail: string;
+  userHandle: string;
 }) {
   return (
     <>
       <aside className="hidden w-64 shrink-0 border-r border-sidebar-border bg-sidebar lg:flex lg:flex-col">
-        <SidebarContent userEmail={userEmail} />
+        <SidebarContent userHandle={userHandle} />
       </aside>
 
       {open && (
@@ -301,7 +301,7 @@ export function AppSidebar({
               if ((e.target as HTMLElement).closest("a")) onClose();
             }}
           >
-            <SidebarContent userEmail={userEmail} />
+            <SidebarContent userHandle={userHandle} />
           </aside>
         </div>
       )}

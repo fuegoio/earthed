@@ -28,14 +28,12 @@ func TestUpsertHandle_Valid(t *testing.T) {
 	if p.UserID != userID {
 		t.Errorf("user_id=%d, want %d", p.UserID, userID)
 	}
-	t.Cleanup(func() { _, _ = s.DB.Exec(`DELETE FROM user_profiles WHERE user_id=$1`, userID) })
 }
 
 func TestUpsertHandle_UpdatesBioAndHandle(t *testing.T) {
 	s := testDB(t)
 	ctx := context.Background()
 	userID := seedUser(t, s, fmt.Sprintf("handle-update-%d@example.com", time.Now().UnixNano()))
-	t.Cleanup(func() { _, _ = s.DB.Exec(`DELETE FROM user_profiles WHERE user_id=$1`, userID) })
 
 	_, err := s.UpsertHandle(ctx, userID, "oldalias", "old bio")
 	if err != nil {
@@ -57,7 +55,6 @@ func TestUpsertHandle_Invalid(t *testing.T) {
 	s := testDB(t)
 	ctx := context.Background()
 	userID := seedUser(t, s, fmt.Sprintf("handle-invalid-%d@example.com", time.Now().UnixNano()))
-	t.Cleanup(func() { _, _ = s.DB.Exec(`DELETE FROM user_profiles WHERE user_id=$1`, userID) })
 
 	cases := []string{"ab", "", "has spaces", "has@at"}
 	for _, h := range cases {
@@ -75,7 +72,6 @@ func TestUpsertHandle_UniqueConstraint(t *testing.T) {
 	u1 := seedUser(t, s, fmt.Sprintf("unique1-%d@example.com", time.Now().UnixNano()))
 	u2 := seedUser(t, s, fmt.Sprintf("unique2-%d@example.com", time.Now().UnixNano()))
 	t.Cleanup(func() {
-		_, _ = s.DB.Exec(`DELETE FROM user_profiles WHERE user_id IN ($1,$2)`, u1, u2)
 	})
 
 	_, err := s.UpsertHandle(ctx, u1, handle, "")
@@ -96,7 +92,6 @@ func TestGetProfileByHandle(t *testing.T) {
 	ctx := context.Background()
 	handle := fmt.Sprintf("profiletest%d", time.Now().UnixNano()%99999)
 	userID := seedUser(t, s, fmt.Sprintf("profile-%d@example.com", time.Now().UnixNano()))
-	t.Cleanup(func() { _, _ = s.DB.Exec(`DELETE FROM user_profiles WHERE user_id=$1`, userID) })
 
 	_, err := s.UpsertHandle(ctx, userID, handle, "bio text")
 	if err != nil {
@@ -139,7 +134,6 @@ func TestFollowUser_And_Unfollow(t *testing.T) {
 	u2 := seedUser(t, s, fmt.Sprintf("follow-u2-%d@example.com", time.Now().UnixNano()))
 	t.Cleanup(func() {
 		_, _ = s.DB.Exec(`DELETE FROM user_follows WHERE follower_id=$1 OR followee_id=$1 OR follower_id=$2 OR followee_id=$2`, u1, u2)
-		_, _ = s.DB.Exec(`DELETE FROM user_profiles WHERE user_id IN ($1,$2)`, u1, u2)
 	})
 
 	_, err := s.UpsertHandle(ctx, u1, handle1, "")
@@ -193,7 +187,6 @@ func TestFollowUser_CannotFollowSelf(t *testing.T) {
 	ctx := context.Background()
 	handle := fmt.Sprintf("selffollow%d", time.Now().UnixNano()%99999)
 	u := seedUser(t, s, fmt.Sprintf("self-%d@example.com", time.Now().UnixNano()))
-	t.Cleanup(func() { _, _ = s.DB.Exec(`DELETE FROM user_profiles WHERE user_id=$1`, u) })
 
 	_, err := s.UpsertHandle(ctx, u, handle, "")
 	if err != nil {
@@ -225,7 +218,6 @@ func TestListFollowing(t *testing.T) {
 	h3 := fmt.Sprintf("listf3h%d", base)
 	t.Cleanup(func() {
 		_, _ = s.DB.Exec(`DELETE FROM user_follows WHERE follower_id=$1`, u1)
-		_, _ = s.DB.Exec(`DELETE FROM user_profiles WHERE user_id IN ($1,$2,$3)`, u1, u2, u3)
 	})
 	_, _ = s.UpsertHandle(ctx, u1, fmt.Sprintf("listf1h%d", base), "")
 	_, _ = s.UpsertHandle(ctx, u2, h2, "")
@@ -261,7 +253,6 @@ func TestShareArticle_And_Timeline(t *testing.T) {
 	t.Cleanup(func() {
 		_, _ = s.DB.Exec(`DELETE FROM shared_articles WHERE user_id IN ($1,$2)`, u1, u2)
 		_, _ = s.DB.Exec(`DELETE FROM user_follows WHERE follower_id=$1`, u1)
-		_, _ = s.DB.Exec(`DELETE FROM user_profiles WHERE user_id IN ($1,$2)`, u1, u2)
 	})
 
 	_, _ = s.UpsertHandle(ctx, u1, h1, "")
@@ -416,7 +407,6 @@ func TestListFeedSubscribers_OnlyWithHandles(t *testing.T) {
 	t.Cleanup(func() {
 		_, _ = s.DB.Exec(`DELETE FROM subscriptions WHERE feed_id = $1`, feed.ID)
 		_, _ = s.DB.Exec(`DELETE FROM feeds WHERE id = $1`, feed.ID)
-		_, _ = s.DB.Exec(`DELETE FROM user_profiles WHERE user_id=$1`, u1)
 	})
 
 	subs, err := s.ListFeedSubscribers(ctx, feed.ID)
@@ -498,7 +488,6 @@ func TestUpsertHandle_AllowedChars(t *testing.T) {
 	s := testDB(t)
 	ctx := context.Background()
 	u := seedUser(t, s, fmt.Sprintf("handlechar-%d@example.com", time.Now().UnixNano()))
-	t.Cleanup(func() { _, _ = s.DB.Exec(`DELETE FROM user_profiles WHERE user_id=$1`, u) })
 
 	valid := []string{"abc", "ABC123", "my-handle", "my_handle", "aaa"}
 	for _, h := range valid {
@@ -512,7 +501,6 @@ func TestUpsertHandle_AllowedChars(t *testing.T) {
 
 	invalid := []string{"a b", "a@b", "a.b", strings.Repeat("x", 65)}
 	u2 := seedUser(t, s, fmt.Sprintf("handlechar2-%d@example.com", time.Now().UnixNano()))
-	t.Cleanup(func() { _, _ = s.DB.Exec(`DELETE FROM user_profiles WHERE user_id=$1`, u2) })
 	for _, h := range invalid {
 		_, err := s.UpsertHandle(ctx, u2, h, "")
 		if err == nil {

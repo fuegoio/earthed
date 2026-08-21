@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/oapi-codegen/runtime"
-	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 // Defines values for UpdateEntriesRequestStatus.
@@ -69,6 +68,17 @@ type APIToken struct {
 	LastUsedAt *time.Time `json:"last_used_at"`
 	Origin     string     `json:"origin"`
 	UserId     int64      `json:"user_id"`
+}
+
+// ATProtoStatusOutputBody defines model for ATProtoStatusOutputBody.
+type ATProtoStatusOutputBody struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: https://example.com/schemas/ATProtoStatusOutputBody.json
+	Schema    *string `json:"$schema,omitempty"`
+	Connected bool    `json:"connected"`
+	Did       *string `json:"did,omitempty"`
+	Handle    *string `json:"handle,omitempty"`
 }
 
 // AddFeedListFeedInputBody defines model for AddFeedListFeedInputBody.
@@ -198,22 +208,25 @@ type Entry struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
 	// Examples: https://example.com/schemas/Entry.json
-	Schema      *string      `json:"$schema,omitempty"`
-	Author      *string      `json:"author,omitempty"`
-	ChangedAt   time.Time    `json:"changed_at"`
-	CommentsUrl *string      `json:"comments_url,omitempty"`
-	Description *string      `json:"description,omitempty"`
-	Enclosures  *[]Enclosure `json:"enclosures,omitempty"`
-	FeedId      int64        `json:"feed_id"`
-	Hash        string       `json:"hash"`
-	Id          int64        `json:"id"`
-	PublishedAt time.Time    `json:"published_at"`
-	Starred     bool         `json:"starred"`
-	Status      string       `json:"status"`
-	Tags        *[]string    `json:"tags,omitempty"`
-	Title       string       `json:"title"`
-	Url         string       `json:"url"`
-	UserId      int64        `json:"user_id"`
+	Schema       *string      `json:"$schema,omitempty"`
+	Author       *string      `json:"author,omitempty"`
+	ChangedAt    time.Time    `json:"changed_at"`
+	CommentsUrl  *string      `json:"comments_url,omitempty"`
+	Description  *string      `json:"description,omitempty"`
+	Enclosures   *[]Enclosure `json:"enclosures,omitempty"`
+	Feed         *Feed        `json:"feed,omitempty"`
+	FeedId       int64        `json:"feed_id"`
+	Hash         string       `json:"hash"`
+	Id           int64        `json:"id"`
+	Liked        *bool        `json:"liked,omitempty"`
+	PublishedAt  time.Time    `json:"published_at"`
+	SharedBy     *string      `json:"shared_by,omitempty"`
+	SharedByName *string      `json:"shared_by_name,omitempty"`
+	Starred      bool         `json:"starred"`
+	Status       string       `json:"status"`
+	Tags         *[]string    `json:"tags,omitempty"`
+	Title        string       `json:"title"`
+	Url          string       `json:"url"`
 }
 
 // ErrorDetail defines model for ErrorDetail.
@@ -286,7 +299,6 @@ type Feed struct {
 	SiteUrl           string     `json:"site_url"`
 	Title             string     `json:"title"`
 	UpdatedAt         time.Time  `json:"updated_at"`
-	UserId            int64      `json:"user_id"`
 }
 
 // FeedList defines model for FeedList.
@@ -302,7 +314,7 @@ type FeedList struct {
 	Id          int64           `json:"id"`
 	IsFollowing *bool           `json:"is_following,omitempty"`
 	IsPublic    bool            `json:"is_public"`
-	OwnerEmail  *string         `json:"owner_email,omitempty"`
+	OwnerHandle *string         `json:"owner_handle,omitempty"`
 	Title       string          `json:"title"`
 	UpdatedAt   time.Time       `json:"updated_at"`
 	UserId      int64           `json:"user_id"`
@@ -320,6 +332,16 @@ type FeedListFeed struct {
 	Position   int64   `json:"position"`
 	SiteUrl    string  `json:"site_url"`
 	Title      string  `json:"title"`
+}
+
+// FeedSubscribersResponse defines model for FeedSubscribersResponse.
+type FeedSubscribersResponse struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: https://example.com/schemas/FeedSubscribersResponse.json
+	Schema      *string        `json:"$schema,omitempty"`
+	Count       int64          `json:"count"`
+	Subscribers *[]UserProfile `json:"subscribers"`
 }
 
 // Folder defines model for Folder.
@@ -406,6 +428,55 @@ type PreviewFeedItem struct {
 	Url         string    `json:"url"`
 }
 
+// PublicProfileResponse defines model for PublicProfileResponse.
+type PublicProfileResponse struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: https://example.com/schemas/PublicProfileResponse.json
+	Schema         *string          `json:"$schema,omitempty"`
+	Feeds          *[]Feed          `json:"feeds"`
+	Profile        UserProfile      `json:"profile"`
+	SharedArticles *[]SharedArticle `json:"shared_articles"`
+}
+
+// ShareArticleInputBody defines model for ShareArticleInputBody.
+type ShareArticleInputBody struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: https://example.com/schemas/ShareArticleInputBody.json
+	Schema      *string    `json:"$schema,omitempty"`
+	ArticleUrl  string     `json:"article_url"`
+	Author      *string    `json:"author,omitempty"`
+	Description *string    `json:"description,omitempty"`
+	FeedSiteUrl *string    `json:"feed_site_url,omitempty"`
+	FeedTitle   *string    `json:"feed_title,omitempty"`
+	FeedUrl     *string    `json:"feed_url,omitempty"`
+	PublishedAt *time.Time `json:"published_at,omitempty"`
+	Title       string     `json:"title"`
+}
+
+// SharedArticle defines model for SharedArticle.
+type SharedArticle struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: https://example.com/schemas/SharedArticle.json
+	Schema            *string    `json:"$schema,omitempty"`
+	ArticleUrl        string     `json:"article_url"`
+	Author            *string    `json:"author,omitempty"`
+	Description       *string    `json:"description,omitempty"`
+	EntryId           *int64     `json:"entry_id,omitempty"`
+	FeedSiteUrl       *string    `json:"feed_site_url,omitempty"`
+	FeedTitle         *string    `json:"feed_title,omitempty"`
+	FeedUrl           *string    `json:"feed_url,omitempty"`
+	Id                int64      `json:"id"`
+	PublishedAt       *time.Time `json:"published_at,omitempty"`
+	SharedAt          time.Time  `json:"shared_at"`
+	SharerDisplayName *string    `json:"sharer_display_name,omitempty"`
+	SharerHandle      *string    `json:"sharer_handle,omitempty"`
+	Title             string     `json:"title"`
+	UserId            int64      `json:"user_id"`
+}
+
 // ToggleEntryStarredRequest defines model for Toggle-entry-starredRequest.
 type ToggleEntryStarredRequest struct {
 	// Schema A URL to the JSON Schema for this object.
@@ -471,14 +542,23 @@ type UpdateFolderInputBody struct {
 	Title    string  `json:"title"`
 }
 
+// UpdateHandleInputBody defines model for UpdateHandleInputBody.
+type UpdateHandleInputBody struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: https://example.com/schemas/UpdateHandleInputBody.json
+	Schema *string `json:"$schema,omitempty"`
+	Bio    *string `json:"bio,omitempty"`
+	Handle string  `json:"handle"`
+}
+
 // UpdateMeInputBody defines model for UpdateMeInputBody.
 type UpdateMeInputBody struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
 	// Examples: https://example.com/schemas/UpdateMeInputBody.json
-	Schema    *string             `json:"$schema,omitempty"`
-	Email     openapi_types.Email `json:"email"`
-	FirstName string              `json:"first_name"`
+	Schema      *string `json:"$schema,omitempty"`
+	DisplayName string  `json:"display_name"`
 }
 
 // User defines model for User.
@@ -486,12 +566,48 @@ type User struct {
 	// Schema A URL to the JSON Schema for this object.
 	//
 	// Examples: https://example.com/schemas/User.json
-	Schema    *string   `json:"$schema,omitempty"`
-	CreatedAt time.Time `json:"created_at"`
-	Email     string    `json:"email"`
-	FirstName *string   `json:"first_name,omitempty"`
-	Id        int64     `json:"id"`
-	IsAdmin   bool      `json:"is_admin"`
+	Schema        *string    `json:"$schema,omitempty"`
+	Bio           *string    `json:"bio,omitempty"`
+	CreatedAt     time.Time  `json:"created_at"`
+	Did           *string    `json:"did,omitempty"`
+	DisplayName   *string    `json:"display_name,omitempty"`
+	Handle        string     `json:"handle"`
+	Id            int64      `json:"id"`
+	IsAdmin       bool       `json:"is_admin"`
+	IsRemote      *bool      `json:"is_remote,omitempty"`
+	PdsSyncStatus string     `json:"pds_sync_status"`
+	PdsSyncedAt   *time.Time `json:"pds_synced_at,omitempty"`
+}
+
+// UserProfile defines model for UserProfile.
+type UserProfile struct {
+	// Schema A URL to the JSON Schema for this object.
+	//
+	// Examples: https://example.com/schemas/UserProfile.json
+	Schema         *string   `json:"$schema,omitempty"`
+	Bio            *string   `json:"bio,omitempty"`
+	CreatedAt      time.Time `json:"created_at"`
+	Did            *string   `json:"did,omitempty"`
+	DisplayName    *string   `json:"display_name,omitempty"`
+	FollowerCount  int64     `json:"follower_count"`
+	FollowingCount int64     `json:"following_count"`
+	Handle         string    `json:"handle"`
+	IsFollowing    *bool     `json:"is_following,omitempty"`
+	IsRemote       *bool     `json:"is_remote,omitempty"`
+	PdsUrl         *string   `json:"pds_url,omitempty"`
+	UserId         int64     `json:"user_id"`
+}
+
+// SearchUsersParams defines parameters for SearchUsers.
+type SearchUsersParams struct {
+	Q     *string `form:"q,omitempty" json:"q,omitempty"`
+	Limit *int64  `form:"limit,omitempty" json:"limit,omitempty"`
+}
+
+// SocialTimelineParams defines parameters for SocialTimeline.
+type SocialTimelineParams struct {
+	Limit  *int64 `form:"limit,omitempty" json:"limit,omitempty"`
+	Offset *int64 `form:"offset,omitempty" json:"offset,omitempty"`
 }
 
 // DeviceStatusParams defines parameters for DeviceStatus.
@@ -518,6 +634,12 @@ type DiscoverFeedListsParams struct {
 	Limit  *int64 `form:"limit,omitempty" json:"limit,omitempty"`
 	Offset *int64 `form:"offset,omitempty" json:"offset,omitempty"`
 }
+
+// UpdateHandleJSONRequestBody defines body for UpdateHandle for application/json ContentType.
+type UpdateHandleJSONRequestBody = UpdateHandleInputBody
+
+// ShareArticleJSONRequestBody defines body for ShareArticle for application/json ContentType.
+type ShareArticleJSONRequestBody = ShareArticleInputBody
 
 // DeviceConfirmJSONRequestBody defines body for DeviceConfirm for application/json ContentType.
 type DeviceConfirmJSONRequestBody = DeviceConfirmInputBody
@@ -634,6 +756,94 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
+
+	// FeedSubscribers Get subscriber count and public profiles for a feed
+	//
+	// Corresponds with GET /api/v1/feeds/{feedId}/subscribers (the `FeedSubscribers` operationId).
+	FeedSubscribers(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AtprotoStatus Get AT Proto identity for the current user
+	//
+	// Corresponds with GET /api/v1/me/atproto (the `AtprotoStatus` operationId).
+	AtprotoStatus(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateHandleWithBody Set or update your social handle
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with PATCH /api/v1/me/handle (the `UpdateHandle` operationId).
+	UpdateHandleWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateHandle Set or update your social handle
+	//
+	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with PATCH /api/v1/me/handle (the `UpdateHandle` operationId).
+	UpdateHandle(ctx context.Context, body UpdateHandleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListFollowing List users you are following
+	//
+	// Corresponds with GET /api/v1/social/following (the `ListFollowing` operationId).
+	ListFollowing(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// SearchUsers Search users by handle or name
+	//
+	// Corresponds with GET /api/v1/social/search (the `SearchUsers` operationId).
+	SearchUsers(ctx context.Context, params *SearchUsersParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// MySharedArticles List your shared articles
+	//
+	// Corresponds with GET /api/v1/social/shares (the `MySharedArticles` operationId).
+	MySharedArticles(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ShareArticleWithBody Share an article to your social timeline
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with POST /api/v1/social/shares (the `ShareArticle` operationId).
+	ShareArticleWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ShareArticle Share an article to your social timeline
+	//
+	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with POST /api/v1/social/shares (the `ShareArticle` operationId).
+	ShareArticle(ctx context.Context, body ShareArticleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UnshareArticle Remove a shared article
+	//
+	// Corresponds with DELETE /api/v1/social/shares/{shareId} (the `UnshareArticle` operationId).
+	UnshareArticle(ctx context.Context, shareId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// SocialTimeline Social timeline: shared articles from followed users
+	//
+	// Corresponds with GET /api/v1/social/timeline (the `SocialTimeline` operationId).
+	SocialTimeline(ctx context.Context, params *SocialTimelineParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetUserProfile Get a public user profile
+	//
+	// Corresponds with GET /api/v1/users/{handle} (the `GetUserProfile` operationId).
+	GetUserProfile(ctx context.Context, handle string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UnfollowUser Unfollow a user
+	//
+	// Corresponds with DELETE /api/v1/users/{handle}/follow (the `UnfollowUser` operationId).
+	UnfollowUser(ctx context.Context, handle string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// FollowUser Follow a user
+	//
+	// Corresponds with POST /api/v1/users/{handle}/follow (the `FollowUser` operationId).
+	FollowUser(ctx context.Context, handle string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListFollowers List followers of a user
+	//
+	// Corresponds with GET /api/v1/users/{handle}/followers (the `ListFollowers` operationId).
+	ListFollowers(ctx context.Context, handle string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListUserFollowing List users a user is following
+	//
+	// Corresponds with GET /api/v1/users/{handle}/following (the `ListUserFollowing` operationId).
+	ListUserFollowing(ctx context.Context, handle string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeviceCode Begin device-flow login (issue a device code)
 	//
@@ -847,7 +1057,7 @@ type ClientInterface interface {
 
 	// UpdateFeedWithBody Update a feed
 	//
-	// Update the folder assignment and/or title of a feed.
+	// Update the folder assignment and/or title override of a subscription.
 	//
 	// Takes any type of body and a specified content type.
 	//
@@ -856,7 +1066,7 @@ type ClientInterface interface {
 
 	// UpdateFeed Update a feed
 	//
-	// Update the folder assignment and/or title of a feed.
+	// Update the folder assignment and/or title override of a subscription.
 	//
 	// Takes a body of the `application/json` content type.
 	//
@@ -985,6 +1195,254 @@ type ClientInterface interface {
 	//
 	// Corresponds with DELETE /v1/tokens/{tokenId} (the `DeleteToken` operationId).
 	DeleteToken(ctx context.Context, tokenId int64, reqEditors ...RequestEditorFn) (*http.Response, error)
+}
+
+// FeedSubscribers Get subscriber count and public profiles for a feed
+//
+// Corresponds with GET /api/v1/feeds/{feedId}/subscribers (the `FeedSubscribers` operationId).
+func (c *Client) FeedSubscribers(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewFeedSubscribersRequest(c.Server, feedId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// AtprotoStatus Get AT Proto identity for the current user
+//
+// Corresponds with GET /api/v1/me/atproto (the `AtprotoStatus` operationId).
+func (c *Client) AtprotoStatus(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAtprotoStatusRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// UpdateHandleWithBody Set or update your social handle
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with PATCH /api/v1/me/handle (the `UpdateHandle` operationId).
+func (c *Client) UpdateHandleWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateHandleRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// UpdateHandle Set or update your social handle
+//
+// Takes a body of the `application/json` content type.
+//
+// Corresponds with PATCH /api/v1/me/handle (the `UpdateHandle` operationId).
+func (c *Client) UpdateHandle(ctx context.Context, body UpdateHandleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateHandleRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// ListFollowing List users you are following
+//
+// Corresponds with GET /api/v1/social/following (the `ListFollowing` operationId).
+func (c *Client) ListFollowing(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListFollowingRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// SearchUsers Search users by handle or name
+//
+// Corresponds with GET /api/v1/social/search (the `SearchUsers` operationId).
+func (c *Client) SearchUsers(ctx context.Context, params *SearchUsersParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSearchUsersRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// MySharedArticles List your shared articles
+//
+// Corresponds with GET /api/v1/social/shares (the `MySharedArticles` operationId).
+func (c *Client) MySharedArticles(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewMySharedArticlesRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// ShareArticleWithBody Share an article to your social timeline
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with POST /api/v1/social/shares (the `ShareArticle` operationId).
+func (c *Client) ShareArticleWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewShareArticleRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// ShareArticle Share an article to your social timeline
+//
+// Takes a body of the `application/json` content type.
+//
+// Corresponds with POST /api/v1/social/shares (the `ShareArticle` operationId).
+func (c *Client) ShareArticle(ctx context.Context, body ShareArticleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewShareArticleRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// UnshareArticle Remove a shared article
+//
+// Corresponds with DELETE /api/v1/social/shares/{shareId} (the `UnshareArticle` operationId).
+func (c *Client) UnshareArticle(ctx context.Context, shareId int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnshareArticleRequest(c.Server, shareId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// SocialTimeline Social timeline: shared articles from followed users
+//
+// Corresponds with GET /api/v1/social/timeline (the `SocialTimeline` operationId).
+func (c *Client) SocialTimeline(ctx context.Context, params *SocialTimelineParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSocialTimelineRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// GetUserProfile Get a public user profile
+//
+// Corresponds with GET /api/v1/users/{handle} (the `GetUserProfile` operationId).
+func (c *Client) GetUserProfile(ctx context.Context, handle string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetUserProfileRequest(c.Server, handle)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// UnfollowUser Unfollow a user
+//
+// Corresponds with DELETE /api/v1/users/{handle}/follow (the `UnfollowUser` operationId).
+func (c *Client) UnfollowUser(ctx context.Context, handle string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnfollowUserRequest(c.Server, handle)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// FollowUser Follow a user
+//
+// Corresponds with POST /api/v1/users/{handle}/follow (the `FollowUser` operationId).
+func (c *Client) FollowUser(ctx context.Context, handle string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewFollowUserRequest(c.Server, handle)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// ListFollowers List followers of a user
+//
+// Corresponds with GET /api/v1/users/{handle}/followers (the `ListFollowers` operationId).
+func (c *Client) ListFollowers(ctx context.Context, handle string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListFollowersRequest(c.Server, handle)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// ListUserFollowing List users a user is following
+//
+// Corresponds with GET /api/v1/users/{handle}/following (the `ListUserFollowing` operationId).
+func (c *Client) ListUserFollowing(ctx context.Context, handle string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListUserFollowingRequest(c.Server, handle)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
 }
 
 // DeviceCode Begin device-flow login (issue a device code)
@@ -1539,7 +1997,7 @@ func (c *Client) GetFeed(ctx context.Context, feedId int64, reqEditors ...Reques
 
 // UpdateFeedWithBody Update a feed
 //
-// Update the folder assignment and/or title of a feed.
+// Update the folder assignment and/or title override of a subscription.
 //
 // Takes any type of body and a specified content type.
 //
@@ -1558,7 +2016,7 @@ func (c *Client) UpdateFeedWithBody(ctx context.Context, feedId int64, contentTy
 
 // UpdateFeed Update a feed
 //
-// Update the folder assignment and/or title of a feed.
+// Update the folder assignment and/or title override of a subscription.
 //
 // Takes a body of the `application/json` content type.
 //
@@ -1886,6 +2344,537 @@ func (c *Client) DeleteToken(ctx context.Context, tokenId int64, reqEditors ...R
 		return nil, err
 	}
 	return c.Client.Do(req)
+}
+
+// NewFeedSubscribersRequest constructs an http.Request for the FeedSubscribers method
+func NewFeedSubscribersRequest(server string, feedId int64) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "feedId", feedId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "integer", Format: "int64"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/feeds/%s/subscribers", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAtprotoStatusRequest constructs an http.Request for the AtprotoStatus method
+func NewAtprotoStatusRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/me/atproto")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdateHandleRequest calls the generic UpdateHandle builder with application/json body
+func NewUpdateHandleRequest(server string, body UpdateHandleJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateHandleRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewUpdateHandleRequestWithBody constructs an http.Request for the UpdateHandle method, with any body, and a specified content type
+func NewUpdateHandleRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/me/handle")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPatch, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewListFollowingRequest constructs an http.Request for the ListFollowing method
+func NewListFollowingRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/social/following")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewSearchUsersRequest constructs an http.Request for the SearchUsers method
+func NewSearchUsersRequest(server string, params *SearchUsersParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/social/search")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		// queryValues collects non-styled parameters (passthrough, JSON)
+		// that are safe to round-trip through url.Values.Encode().
+		queryValues := queryURL.Query()
+		// rawQueryFragments collects pre-encoded query fragments from
+		// styled parameters, preserving literal commas as delimiters
+		// per the OpenAPI spec (e.g. "color=blue,black,brown").
+		var rawQueryFragments []string
+
+		if params.Q != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", false, "q", *params.Q, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", false, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: "int64"}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if encoded := queryValues.Encode(); encoded != "" {
+			rawQueryFragments = append(rawQueryFragments, encoded)
+		}
+		queryURL.RawQuery = strings.Join(rawQueryFragments, "&")
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewMySharedArticlesRequest constructs an http.Request for the MySharedArticles method
+func NewMySharedArticlesRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/social/shares")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewShareArticleRequest calls the generic ShareArticle builder with application/json body
+func NewShareArticleRequest(server string, body ShareArticleJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewShareArticleRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewShareArticleRequestWithBody constructs an http.Request for the ShareArticle method, with any body, and a specified content type
+func NewShareArticleRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/social/shares")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewUnshareArticleRequest constructs an http.Request for the UnshareArticle method
+func NewUnshareArticleRequest(server string, shareId int64) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "shareId", shareId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "integer", Format: "int64"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/social/shares/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodDelete, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewSocialTimelineRequest constructs an http.Request for the SocialTimeline method
+func NewSocialTimelineRequest(server string, params *SocialTimelineParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/social/timeline")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		// queryValues collects non-styled parameters (passthrough, JSON)
+		// that are safe to round-trip through url.Values.Encode().
+		queryValues := queryURL.Query()
+		// rawQueryFragments collects pre-encoded query fragments from
+		// styled parameters, preserving literal commas as delimiters
+		// per the OpenAPI spec (e.g. "color=blue,black,brown").
+		var rawQueryFragments []string
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", false, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: "int64"}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.Offset != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", false, "offset", *params.Offset, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: "int64"}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if encoded := queryValues.Encode(); encoded != "" {
+			rawQueryFragments = append(rawQueryFragments, encoded)
+		}
+		queryURL.RawQuery = strings.Join(rawQueryFragments, "&")
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetUserProfileRequest constructs an http.Request for the GetUserProfile method
+func NewGetUserProfileRequest(server string, handle string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "handle", handle, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/users/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUnfollowUserRequest constructs an http.Request for the UnfollowUser method
+func NewUnfollowUserRequest(server string, handle string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "handle", handle, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/users/%s/follow", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodDelete, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewFollowUserRequest constructs an http.Request for the FollowUser method
+func NewFollowUserRequest(server string, handle string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "handle", handle, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/users/%s/follow", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewListFollowersRequest constructs an http.Request for the ListFollowers method
+func NewListFollowersRequest(server string, handle string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "handle", handle, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/users/%s/followers", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewListUserFollowingRequest constructs an http.Request for the ListUserFollowing method
+func NewListUserFollowingRequest(server string, handle string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "handle", handle, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/users/%s/following", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
 }
 
 // NewDeviceCodeRequest constructs an http.Request for the DeviceCode method
@@ -3521,6 +4510,118 @@ func WithBaseURL(baseURL string) ClientOption {
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
 
+	// FeedSubscribersWithResponse Get subscriber count and public profiles for a feed
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /api/v1/feeds/{feedId}/subscribers (the `FeedSubscribers` operationId).
+	FeedSubscribersWithResponse(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*FeedSubscribersResp, error)
+
+	// AtprotoStatusWithResponse Get AT Proto identity for the current user
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /api/v1/me/atproto (the `AtprotoStatus` operationId).
+	AtprotoStatusWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AtprotoStatusResp, error)
+
+	// UpdateHandleWithBodyWithResponse Set or update your social handle
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with PATCH /api/v1/me/handle (the `UpdateHandle` operationId).
+	UpdateHandleWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateHandleResp, error)
+
+	// UpdateHandleWithResponse Set or update your social handle
+	//
+	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with PATCH /api/v1/me/handle (the `UpdateHandle` operationId).
+	UpdateHandleWithResponse(ctx context.Context, body UpdateHandleJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateHandleResp, error)
+
+	// ListFollowingWithResponse List users you are following
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /api/v1/social/following (the `ListFollowing` operationId).
+	ListFollowingWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListFollowingResp, error)
+
+	// SearchUsersWithResponse Search users by handle or name
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /api/v1/social/search (the `SearchUsers` operationId).
+	SearchUsersWithResponse(ctx context.Context, params *SearchUsersParams, reqEditors ...RequestEditorFn) (*SearchUsersResp, error)
+
+	// MySharedArticlesWithResponse List your shared articles
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /api/v1/social/shares (the `MySharedArticles` operationId).
+	MySharedArticlesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*MySharedArticlesResp, error)
+
+	// ShareArticleWithBodyWithResponse Share an article to your social timeline
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v1/social/shares (the `ShareArticle` operationId).
+	ShareArticleWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ShareArticleResp, error)
+
+	// ShareArticleWithResponse Share an article to your social timeline
+	//
+	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v1/social/shares (the `ShareArticle` operationId).
+	ShareArticleWithResponse(ctx context.Context, body ShareArticleJSONRequestBody, reqEditors ...RequestEditorFn) (*ShareArticleResp, error)
+
+	// UnshareArticleWithResponse Remove a shared article
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with DELETE /api/v1/social/shares/{shareId} (the `UnshareArticle` operationId).
+	UnshareArticleWithResponse(ctx context.Context, shareId int64, reqEditors ...RequestEditorFn) (*UnshareArticleResp, error)
+
+	// SocialTimelineWithResponse Social timeline: shared articles from followed users
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /api/v1/social/timeline (the `SocialTimeline` operationId).
+	SocialTimelineWithResponse(ctx context.Context, params *SocialTimelineParams, reqEditors ...RequestEditorFn) (*SocialTimelineResp, error)
+
+	// GetUserProfileWithResponse Get a public user profile
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /api/v1/users/{handle} (the `GetUserProfile` operationId).
+	GetUserProfileWithResponse(ctx context.Context, handle string, reqEditors ...RequestEditorFn) (*GetUserProfileResp, error)
+
+	// UnfollowUserWithResponse Unfollow a user
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with DELETE /api/v1/users/{handle}/follow (the `UnfollowUser` operationId).
+	UnfollowUserWithResponse(ctx context.Context, handle string, reqEditors ...RequestEditorFn) (*UnfollowUserResp, error)
+
+	// FollowUserWithResponse Follow a user
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /api/v1/users/{handle}/follow (the `FollowUser` operationId).
+	FollowUserWithResponse(ctx context.Context, handle string, reqEditors ...RequestEditorFn) (*FollowUserResp, error)
+
+	// ListFollowersWithResponse List followers of a user
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /api/v1/users/{handle}/followers (the `ListFollowers` operationId).
+	ListFollowersWithResponse(ctx context.Context, handle string, reqEditors ...RequestEditorFn) (*ListFollowersResp, error)
+
+	// ListUserFollowingWithResponse List users a user is following
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /api/v1/users/{handle}/following (the `ListUserFollowing` operationId).
+	ListUserFollowingWithResponse(ctx context.Context, handle string, reqEditors ...RequestEditorFn) (*ListUserFollowingResp, error)
+
 	// DeviceCodeWithResponse Begin device-flow login (issue a device code)
 	//
 	// Returns a wrapper object for the known response body format(s).
@@ -3765,7 +4866,7 @@ type ClientWithResponsesInterface interface {
 
 	// UpdateFeedWithBodyWithResponse Update a feed
 	//
-	// Update the folder assignment and/or title of a feed.
+	// Update the folder assignment and/or title override of a subscription.
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
@@ -3774,7 +4875,7 @@ type ClientWithResponsesInterface interface {
 
 	// UpdateFeedWithResponse Update a feed
 	//
-	// Update the folder assignment and/or title of a feed.
+	// Update the folder assignment and/or title override of a subscription.
 	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
@@ -3923,6 +5024,657 @@ type ClientWithResponsesInterface interface {
 	//
 	// Corresponds with DELETE /v1/tokens/{tokenId} (the `DeleteToken` operationId).
 	DeleteTokenWithResponse(ctx context.Context, tokenId int64, reqEditors ...RequestEditorFn) (*DeleteTokenResp, error)
+}
+
+type FeedSubscribersResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *FeedSubscribersResponse
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r FeedSubscribersResp) GetJSON200() *FeedSubscribersResponse {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r FeedSubscribersResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r FeedSubscribersResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r FeedSubscribersResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r FeedSubscribersResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r FeedSubscribersResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type AtprotoStatusResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *ATProtoStatusOutputBody
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r AtprotoStatusResp) GetJSON200() *ATProtoStatusOutputBody {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r AtprotoStatusResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r AtprotoStatusResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r AtprotoStatusResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AtprotoStatusResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r AtprotoStatusResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type UpdateHandleResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *UserProfile
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r UpdateHandleResp) GetJSON200() *UserProfile {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r UpdateHandleResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r UpdateHandleResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateHandleResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateHandleResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r UpdateHandleResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type ListFollowingResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *[]UserProfile
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r ListFollowingResp) GetJSON200() *[]UserProfile {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r ListFollowingResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r ListFollowingResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r ListFollowingResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListFollowingResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r ListFollowingResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type SearchUsersResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *[]UserProfile
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r SearchUsersResp) GetJSON200() *[]UserProfile {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r SearchUsersResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r SearchUsersResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r SearchUsersResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r SearchUsersResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r SearchUsersResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type MySharedArticlesResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *[]SharedArticle
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r MySharedArticlesResp) GetJSON200() *[]SharedArticle {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r MySharedArticlesResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r MySharedArticlesResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r MySharedArticlesResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r MySharedArticlesResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r MySharedArticlesResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type ShareArticleResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *SharedArticle
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r ShareArticleResp) GetJSON200() *SharedArticle {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r ShareArticleResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r ShareArticleResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r ShareArticleResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ShareArticleResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r ShareArticleResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type UnshareArticleResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r UnshareArticleResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r UnshareArticleResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r UnshareArticleResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UnshareArticleResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r UnshareArticleResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type SocialTimelineResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *[]SharedArticle
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r SocialTimelineResp) GetJSON200() *[]SharedArticle {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r SocialTimelineResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r SocialTimelineResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r SocialTimelineResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r SocialTimelineResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r SocialTimelineResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type GetUserProfileResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *PublicProfileResponse
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r GetUserProfileResp) GetJSON200() *PublicProfileResponse {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r GetUserProfileResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r GetUserProfileResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r GetUserProfileResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetUserProfileResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r GetUserProfileResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type UnfollowUserResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r UnfollowUserResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r UnfollowUserResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r UnfollowUserResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UnfollowUserResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r UnfollowUserResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type FollowUserResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r FollowUserResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r FollowUserResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r FollowUserResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r FollowUserResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r FollowUserResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type ListFollowersResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *[]UserProfile
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r ListFollowersResp) GetJSON200() *[]UserProfile {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r ListFollowersResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r ListFollowersResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r ListFollowersResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListFollowersResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r ListFollowersResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type ListUserFollowingResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *[]UserProfile
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *ErrorModel
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r ListUserFollowingResp) GetJSON200() *[]UserProfile {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r ListUserFollowingResp) GetApplicationproblemJSONDefault() *ErrorModel {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r ListUserFollowingResp) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r ListUserFollowingResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListUserFollowingResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r ListUserFollowingResp) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
 }
 
 type DeviceCodeResp struct {
@@ -5816,6 +7568,214 @@ func (r DeleteTokenResp) ContentType() string {
 	return ""
 }
 
+// FeedSubscribersWithResponse Get subscriber count and public profiles for a feed
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /api/v1/feeds/{feedId}/subscribers (the `FeedSubscribers` operationId).
+func (c *ClientWithResponses) FeedSubscribersWithResponse(ctx context.Context, feedId int64, reqEditors ...RequestEditorFn) (*FeedSubscribersResp, error) {
+	rsp, err := c.FeedSubscribers(ctx, feedId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseFeedSubscribersResp(rsp)
+}
+
+// AtprotoStatusWithResponse Get AT Proto identity for the current user
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /api/v1/me/atproto (the `AtprotoStatus` operationId).
+func (c *ClientWithResponses) AtprotoStatusWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AtprotoStatusResp, error) {
+	rsp, err := c.AtprotoStatus(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAtprotoStatusResp(rsp)
+}
+
+// UpdateHandleWithBodyWithResponse Set or update your social handle
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with PATCH /api/v1/me/handle (the `UpdateHandle` operationId).
+func (c *ClientWithResponses) UpdateHandleWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateHandleResp, error) {
+	rsp, err := c.UpdateHandleWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateHandleResp(rsp)
+}
+
+// UpdateHandleWithResponse Set or update your social handle
+//
+// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with PATCH /api/v1/me/handle (the `UpdateHandle` operationId).
+func (c *ClientWithResponses) UpdateHandleWithResponse(ctx context.Context, body UpdateHandleJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateHandleResp, error) {
+	rsp, err := c.UpdateHandle(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateHandleResp(rsp)
+}
+
+// ListFollowingWithResponse List users you are following
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /api/v1/social/following (the `ListFollowing` operationId).
+func (c *ClientWithResponses) ListFollowingWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListFollowingResp, error) {
+	rsp, err := c.ListFollowing(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListFollowingResp(rsp)
+}
+
+// SearchUsersWithResponse Search users by handle or name
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /api/v1/social/search (the `SearchUsers` operationId).
+func (c *ClientWithResponses) SearchUsersWithResponse(ctx context.Context, params *SearchUsersParams, reqEditors ...RequestEditorFn) (*SearchUsersResp, error) {
+	rsp, err := c.SearchUsers(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseSearchUsersResp(rsp)
+}
+
+// MySharedArticlesWithResponse List your shared articles
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /api/v1/social/shares (the `MySharedArticles` operationId).
+func (c *ClientWithResponses) MySharedArticlesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*MySharedArticlesResp, error) {
+	rsp, err := c.MySharedArticles(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseMySharedArticlesResp(rsp)
+}
+
+// ShareArticleWithBodyWithResponse Share an article to your social timeline
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v1/social/shares (the `ShareArticle` operationId).
+func (c *ClientWithResponses) ShareArticleWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ShareArticleResp, error) {
+	rsp, err := c.ShareArticleWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseShareArticleResp(rsp)
+}
+
+// ShareArticleWithResponse Share an article to your social timeline
+//
+// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v1/social/shares (the `ShareArticle` operationId).
+func (c *ClientWithResponses) ShareArticleWithResponse(ctx context.Context, body ShareArticleJSONRequestBody, reqEditors ...RequestEditorFn) (*ShareArticleResp, error) {
+	rsp, err := c.ShareArticle(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseShareArticleResp(rsp)
+}
+
+// UnshareArticleWithResponse Remove a shared article
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with DELETE /api/v1/social/shares/{shareId} (the `UnshareArticle` operationId).
+func (c *ClientWithResponses) UnshareArticleWithResponse(ctx context.Context, shareId int64, reqEditors ...RequestEditorFn) (*UnshareArticleResp, error) {
+	rsp, err := c.UnshareArticle(ctx, shareId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUnshareArticleResp(rsp)
+}
+
+// SocialTimelineWithResponse Social timeline: shared articles from followed users
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /api/v1/social/timeline (the `SocialTimeline` operationId).
+func (c *ClientWithResponses) SocialTimelineWithResponse(ctx context.Context, params *SocialTimelineParams, reqEditors ...RequestEditorFn) (*SocialTimelineResp, error) {
+	rsp, err := c.SocialTimeline(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseSocialTimelineResp(rsp)
+}
+
+// GetUserProfileWithResponse Get a public user profile
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /api/v1/users/{handle} (the `GetUserProfile` operationId).
+func (c *ClientWithResponses) GetUserProfileWithResponse(ctx context.Context, handle string, reqEditors ...RequestEditorFn) (*GetUserProfileResp, error) {
+	rsp, err := c.GetUserProfile(ctx, handle, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetUserProfileResp(rsp)
+}
+
+// UnfollowUserWithResponse Unfollow a user
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with DELETE /api/v1/users/{handle}/follow (the `UnfollowUser` operationId).
+func (c *ClientWithResponses) UnfollowUserWithResponse(ctx context.Context, handle string, reqEditors ...RequestEditorFn) (*UnfollowUserResp, error) {
+	rsp, err := c.UnfollowUser(ctx, handle, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUnfollowUserResp(rsp)
+}
+
+// FollowUserWithResponse Follow a user
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /api/v1/users/{handle}/follow (the `FollowUser` operationId).
+func (c *ClientWithResponses) FollowUserWithResponse(ctx context.Context, handle string, reqEditors ...RequestEditorFn) (*FollowUserResp, error) {
+	rsp, err := c.FollowUser(ctx, handle, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseFollowUserResp(rsp)
+}
+
+// ListFollowersWithResponse List followers of a user
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /api/v1/users/{handle}/followers (the `ListFollowers` operationId).
+func (c *ClientWithResponses) ListFollowersWithResponse(ctx context.Context, handle string, reqEditors ...RequestEditorFn) (*ListFollowersResp, error) {
+	rsp, err := c.ListFollowers(ctx, handle, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListFollowersResp(rsp)
+}
+
+// ListUserFollowingWithResponse List users a user is following
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /api/v1/users/{handle}/following (the `ListUserFollowing` operationId).
+func (c *ClientWithResponses) ListUserFollowingWithResponse(ctx context.Context, handle string, reqEditors ...RequestEditorFn) (*ListUserFollowingResp, error) {
+	rsp, err := c.ListUserFollowing(ctx, handle, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListUserFollowingResp(rsp)
+}
+
 // DeviceCodeWithResponse Begin device-flow login (issue a device code)
 //
 // Returns a wrapper object for the known response body format(s).
@@ -6264,7 +8224,7 @@ func (c *ClientWithResponses) GetFeedWithResponse(ctx context.Context, feedId in
 
 // UpdateFeedWithBodyWithResponse Update a feed
 //
-// Update the folder assignment and/or title of a feed.
+// Update the folder assignment and/or title override of a subscription.
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
@@ -6279,7 +8239,7 @@ func (c *ClientWithResponses) UpdateFeedWithBodyWithResponse(ctx context.Context
 
 // UpdateFeedWithResponse Update a feed
 //
-// Update the folder assignment and/or title of a feed.
+// Update the folder assignment and/or title override of a subscription.
 //
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
@@ -6547,6 +8507,456 @@ func (c *ClientWithResponses) DeleteTokenWithResponse(ctx context.Context, token
 		return nil, err
 	}
 	return ParseDeleteTokenResp(rsp)
+}
+
+// ParseFeedSubscribersResp parses an HTTP response from a FeedSubscribersWithResponse call
+func ParseFeedSubscribersResp(rsp *http.Response) (*FeedSubscribersResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &FeedSubscribersResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest FeedSubscribersResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAtprotoStatusResp parses an HTTP response from a AtprotoStatusWithResponse call
+func ParseAtprotoStatusResp(rsp *http.Response) (*AtprotoStatusResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AtprotoStatusResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ATProtoStatusOutputBody
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateHandleResp parses an HTTP response from a UpdateHandleWithResponse call
+func ParseUpdateHandleResp(rsp *http.Response) (*UpdateHandleResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateHandleResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest UserProfile
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListFollowingResp parses an HTTP response from a ListFollowingWithResponse call
+func ParseListFollowingResp(rsp *http.Response) (*ListFollowingResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListFollowingResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []UserProfile
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseSearchUsersResp parses an HTTP response from a SearchUsersWithResponse call
+func ParseSearchUsersResp(rsp *http.Response) (*SearchUsersResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &SearchUsersResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []UserProfile
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseMySharedArticlesResp parses an HTTP response from a MySharedArticlesWithResponse call
+func ParseMySharedArticlesResp(rsp *http.Response) (*MySharedArticlesResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &MySharedArticlesResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []SharedArticle
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseShareArticleResp parses an HTTP response from a ShareArticleWithResponse call
+func ParseShareArticleResp(rsp *http.Response) (*ShareArticleResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ShareArticleResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest SharedArticle
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUnshareArticleResp parses an HTTP response from a UnshareArticleWithResponse call
+func ParseUnshareArticleResp(rsp *http.Response) (*UnshareArticleResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UnshareArticleResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case rsp.StatusCode == 204:
+		break // No content-type
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseSocialTimelineResp parses an HTTP response from a SocialTimelineWithResponse call
+func ParseSocialTimelineResp(rsp *http.Response) (*SocialTimelineResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &SocialTimelineResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []SharedArticle
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetUserProfileResp parses an HTTP response from a GetUserProfileWithResponse call
+func ParseGetUserProfileResp(rsp *http.Response) (*GetUserProfileResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetUserProfileResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PublicProfileResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUnfollowUserResp parses an HTTP response from a UnfollowUserWithResponse call
+func ParseUnfollowUserResp(rsp *http.Response) (*UnfollowUserResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UnfollowUserResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case rsp.StatusCode == 204:
+		break // No content-type
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseFollowUserResp parses an HTTP response from a FollowUserWithResponse call
+func ParseFollowUserResp(rsp *http.Response) (*FollowUserResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &FollowUserResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case rsp.StatusCode == 204:
+		break // No content-type
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListFollowersResp parses an HTTP response from a ListFollowersWithResponse call
+func ParseListFollowersResp(rsp *http.Response) (*ListFollowersResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListFollowersResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []UserProfile
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListUserFollowingResp parses an HTTP response from a ListUserFollowingWithResponse call
+func ParseListUserFollowingResp(rsp *http.Response) (*ListUserFollowingResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListUserFollowingResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []UserProfile
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
 }
 
 // ParseDeviceCodeResp parses an HTTP response from a DeviceCodeWithResponse call

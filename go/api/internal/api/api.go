@@ -108,8 +108,7 @@ type MeOutput struct {
 
 type UpdateMeInput struct {
 	Body struct {
-		FirstName string `json:"first_name" maxLength:"255"`
-		Email     string `json:"email" format:"email" minLength:"1" maxLength:"255"`
+		DisplayName string `json:"display_name" maxLength:"255"`
 	}
 }
 
@@ -140,7 +139,7 @@ func (a *API) registerMeRoutes() {
 		Tags:        []string{"users"},
 	}, func(ctx context.Context, input *UpdateMeInput) (*MeOutput, error) {
 		userID := auth.UserIDFromCtx(ctx)
-		user, err := a.store.UpdateUser(ctx, userID, input.Body.FirstName, input.Body.Email)
+		user, err := a.store.UpdateUser(ctx, userID, input.Body.DisplayName)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(fmt.Errorf("update user: %w", err).Error())
 		}

@@ -20,7 +20,7 @@ const settingsNavItems = [
   { href: "/settings/opml", label: "OPML", icon: FileText },
 ];
 
-function SettingsSidebarContent({ userEmail }: { userEmail: string }) {
+function SettingsSidebarContent({ userHandle }: { userHandle: string }) {
   const pathname = usePathname();
 
   return (
@@ -67,7 +67,7 @@ function SettingsSidebarContent({ userEmail }: { userEmail: string }) {
       </div>
 
       <div className="shrink-0 p-3">
-        <AccountButton userEmail={userEmail} />
+        <AccountButton userHandle={userHandle} />
       </div>
     </div>
   );
@@ -76,16 +76,16 @@ function SettingsSidebarContent({ userEmail }: { userEmail: string }) {
 export function SettingsSidebar({
   open,
   onClose,
-  userEmail,
+  userHandle,
 }: {
   open: boolean;
   onClose: () => void;
-  userEmail: string;
+  userHandle: string;
 }) {
   return (
     <>
       <aside className="hidden w-64 shrink-0 border-r border-sidebar-border bg-sidebar lg:flex lg:flex-col">
-        <SettingsSidebarContent userEmail={userEmail} />
+        <SettingsSidebarContent userHandle={userHandle} />
       </aside>
 
       {open && (
@@ -101,7 +101,7 @@ export function SettingsSidebar({
               if ((e.target as HTMLElement).closest("a")) onClose();
             }}
           >
-            <SettingsSidebarContent userEmail={userEmail} />
+            <SettingsSidebarContent userHandle={userHandle} />
           </aside>
         </div>
       )}

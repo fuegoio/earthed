@@ -45,5 +45,5 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     );
   }
 
-  return <AppShell userEmail={user.email} pdsSyncStatus={user.pds_sync_status}>{children}</AppShell>;
+  return <AppShell userHandle={user.handle ?? ""} pdsSyncStatus={user.pds_sync_status}>{children}</AppShell>;
 }
