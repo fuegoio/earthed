@@ -378,8 +378,21 @@ func (a *API) registerFeedRoutes() {
 		FeedID int `path:"feedId"`
 	}) (*struct{}, error) {
 		userID := auth.UserIDFromCtx(ctx)
+		// Fetch feed + rkey before deleting so we can replicate the
+		// unsubscribe to the user's PDS.
+		feed, err := a.store.GetFeedByID(ctx, input.FeedID, userID)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if feed == nil {
+			return nil, huma.Error404NotFound("feed not found")
+		}
+		rkey, _ := a.store.GetFeedATProtoRkey(ctx, input.FeedID)
 		if err := a.store.DeleteFeed(ctx, input.FeedID, userID); err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
+		}
+		if rkey != "" {
+			go a.ATProtoSyncFeedSubscription(userID, input.FeedID, feed.FeedURL, feed.SiteURL, feed.Title, false, time.Now())
 		}
 		return nil, nil
 	})
@@ -812,6 +825,10 @@ func (a *API) subscribeToFeed(ctx context.Context, userID int, feedURL string, f
 	// Mark all entries as read so the user doesn't see a backlog of unread
 	// items from before they subscribed.
 	_ = a.store.MarkFeedEntriesRead(ctx, feed.ID, userID)
+
+	// Replicate the subscription to the user's PDS so it survives across
+	// instances and can be backfilled by the relay on future logins.
+	go a.ATProtoSyncFeedSubscription(userID, feed.ID, feed.FeedURL, feed.SiteURL, feed.Title, true, feed.CreatedAt)
 
 	return feed, nil
 }

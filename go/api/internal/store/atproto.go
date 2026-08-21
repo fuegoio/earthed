@@ -179,6 +179,18 @@ func (s *Store) SetFeedATProtoRkey(ctx context.Context, feedID int, rkey string)
 	return err
 }
 
+// GetFeedATProtoRkey retrieves the AT Proto rkey for a feed subscription.
+func (s *Store) GetFeedATProtoRkey(ctx context.Context, feedID int) (string, error) {
+	var rkey sql.NullString
+	err := s.DB.QueryRowContext(ctx, `
+		SELECT atproto_rkey FROM feeds WHERE id = $1`, feedID,
+	).Scan(&rkey)
+	if err == sql.ErrNoRows {
+		return "", nil
+	}
+	return rkey.String, err
+}
+
 // SetFeedListATProtoRkey records the AT Proto rkey for a feed list row.
 func (s *Store) SetFeedListATProtoRkey(ctx context.Context, listID int, rkey string) error {
 	_, err := s.DB.ExecContext(ctx, `

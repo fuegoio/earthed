@@ -144,3 +144,23 @@ func (s *Store) UpsertFeedSubscriptionWithRkey(ctx context.Context, userID int, 
 	)
 	return err
 }
+
+// DeleteFeedByRkey removes a feed subscription by its AT Proto rkey.
+// Used by the relay consumer to process feedUnsubscription events.
+func (s *Store) DeleteFeedByRkey(ctx context.Context, userID int, rkey string) error {
+	_, err := s.DB.ExecContext(ctx,
+		`DELETE FROM feeds WHERE user_id = $1 AND atproto_rkey = $2`,
+		userID, rkey,
+	)
+	return err
+}
+
+// DeleteFollowByRkey removes a follow edge by its AT Proto rkey.
+// Used by the relay consumer to process unfollow events.
+func (s *Store) DeleteFollowByRkey(ctx context.Context, followerID int, rkey string) error {
+	_, err := s.DB.ExecContext(ctx,
+		`DELETE FROM user_follows WHERE follower_id = $1 AND atproto_rkey = $2`,
+		followerID, rkey,
+	)
+	return err
+}

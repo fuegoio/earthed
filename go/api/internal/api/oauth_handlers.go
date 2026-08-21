@@ -212,27 +212,36 @@ func (h *OAuthHandlers) handleCallback(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Sync the PDS data into the local cache. On first login this backfills the
-	// user's existing io.sunred.* records; on subsequent logins it reconciles.
-	// The sync runs in the background so login is never blocked; the web UI
-	// polls the user's pds_sync_status to show a waiting state until it settles.
+	// Sync the PDS data into the local cache. When a relay is configured, the
+	// relay does the backfill (tap-style: historical records first, then live)
+	// and pushes events to the API's relay consumer; the sync status is set
+	// to "idle" when the relay emits a backfillComplete event for this DID.
+	// When no relay is configured, fall back to pulling records per-collection
+	// via listRecords.
 	if err := h.store.SetUserSyncStatus(r.Context(), userID, "syncing"); err != nil {
 		slog.Warn("oauth: set sync status syncing", "did", did, "err", err)
 	}
 	go func() {
 		bgCtx := context.Background()
-		if err := h.syncFromPDS(bgCtx, did, userID, sessData.SessionID); err != nil {
-			slog.Warn("oauth: sync from pds", "did", did, "err", err)
-			if serr := h.store.SetUserSyncStatus(bgCtx, userID, "failed"); serr != nil {
-				slog.Warn("oauth: set sync status failed", "did", did, "err", serr)
-			}
-		} else {
-			if serr := h.store.SetUserSyncStatus(bgCtx, userID, "idle"); serr != nil {
-				slog.Warn("oauth: set sync status idle", "did", did, "err", serr)
+		// Announce to the relay first. If a relay is configured, it will
+		// backfill the PDS and push events to the consumer.
+		h.announceToRelay(bgCtx, did, sessData.HostURL, handle)
+
+		if h.cfg.RelayURL == "" {
+			// No relay: fall back to direct listRecords backfill.
+			if err := h.syncFromPDS(bgCtx, did, userID, sessData.SessionID); err != nil {
+				slog.Warn("oauth: sync from pds", "did", did, "err", err)
+				if serr := h.store.SetUserSyncStatus(bgCtx, userID, "failed"); serr != nil {
+					slog.Warn("oauth: set sync status failed", "did", did, "err", serr)
+				}
+			} else {
+				if serr := h.store.SetUserSyncStatus(bgCtx, userID, "idle"); serr != nil {
+					slog.Warn("oauth: set sync status idle", "did", did, "err", serr)
+				}
 			}
 		}
-		// Announce to the relay so it subscribes to this PDS repo stream.
-		h.announceToRelay(bgCtx, did, sessData.HostURL, handle)
+		// When a relay is configured, the relay consumer will set the
+		// status to "idle" when it receives the backfillComplete event.
 	}()
 	_ = created
 

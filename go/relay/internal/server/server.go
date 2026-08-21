@@ -1,10 +1,11 @@
 // Package server implements the Sunred relay HTTP server.
 //
 // Endpoints:
-//   POST  /xrpc/io.sunred.relay.announceUser   — instance registers a new DID
-//   GET   /xrpc/io.sunred.relay.getCounts      — global counts for a DID
-//   GET   /xrpc/io.sunred.relay.subscribeEvents — WebSocket event stream for instances
-//   GET   /health
+//
+//	POST  /xrpc/io.sunred.relay.announceUser   — instance registers a new DID
+//	GET   /xrpc/io.sunred.relay.getCounts      — global counts for a DID
+//	GET   /xrpc/io.sunred.relay.subscribeEvents — WebSocket event stream for instances
+//	GET   /health
 package server
 
 import (
@@ -94,8 +95,9 @@ func (s *Server) handleAnnounceUser(w http.ResponseWriter, r *http.Request) {
 
 	if isNew {
 		slog.Info("relay: tracking new DID", "did", in.DID, "pds", in.PDSUrl)
-		// Start subscribing to this DID's PDS immediately.
-		go s.fanout.EnsureSubscribed(context.Background(), in.DID, in.PDSUrl, 0)
+		// Backfill existing records from the PDS, then start the live
+		// firehose subscription (tap-style backfill-then-cutover).
+		go s.fanout.BackfillAndSubscribe(context.Background(), in.DID, in.PDSUrl)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -105,10 +107,10 @@ func (s *Server) handleAnnounceUser(w http.ResponseWriter, r *http.Request) {
 // --- getCounts ---
 
 type getCountsOutput struct {
-	DID                  string `json:"did"`
-	FollowerCount        int64  `json:"followerCount"`
-	ShareCount           int64  `json:"shareCount"`
-	FeedSubscriptionCount int64 `json:"feedSubscriptionCount"`
+	DID                   string `json:"did"`
+	FollowerCount         int64  `json:"followerCount"`
+	ShareCount            int64  `json:"shareCount"`
+	FeedSubscriptionCount int64  `json:"feedSubscriptionCount"`
 }
 
 func (s *Server) handleGetCounts(w http.ResponseWriter, r *http.Request) {
@@ -142,6 +144,12 @@ func (s *Server) handleGetCounts(w http.ResponseWriter, r *http.Request) {
 
 // handleSubscribeEvents upgrades to a WebSocket and streams relay events
 // to the subscribing instance. Supports cursor-based replay.
+//
+// To avoid the replay/subscribe race, the instance is registered for live
+// events BEFORE replaying. Events that arrive during replay are held in the
+// subscriber channel's buffer (capacity 256). After replay completes, the
+// main read loop drains the buffer and continues with live events. Any
+// events already replayed are skipped by seq comparison.
 func (s *Server) handleSubscribeEvents(ws *websocket.Conn) {
 	r := ws.Request()
 	instanceURL := r.URL.Query().Get("instanceUrl")
@@ -152,8 +160,13 @@ func (s *Server) handleSubscribeEvents(ws *websocket.Conn) {
 		cursor, _ = strconv.ParseInt(cursorStr, 10, 64)
 	}
 
-	slog.Info("relay: instance subscribed", "instance", instanceURL)
+	slog.Info("relay: instance subscribed", "instance", instanceURL, "cursor", cursor)
 	defer slog.Info("relay: instance disconnected", "instance", instanceURL)
+
+	// Register for live events first so nothing is missed during replay.
+	// The channel buffer (capacity 256) holds events emitted while we replay.
+	ch := s.fanout.Subscribe(instanceURL)
+	defer s.fanout.Unsubscribe(instanceURL)
 
 	// Replay missed events from cursor.
 	if cursor > 0 {
@@ -163,20 +176,22 @@ func (s *Server) handleSubscribeEvents(ws *websocket.Conn) {
 		}
 	}
 
-	// Register for live events.
-	ch := s.fanout.Subscribe(instanceURL)
-	defer s.fanout.Unsubscribe(instanceURL)
-
-	// Stream live events until the connection closes.
+	// Stream live events until the connection closes. Any events that were
+	// emitted during replay are still in the channel buffer and will be
+	// delivered here; skip ones already replayed by seq.
 	for {
 		select {
 		case evt, ok := <-ch:
 			if !ok {
 				return
 			}
+			if evt.Seq <= cursor {
+				continue // already replayed
+			}
 			if err := websocket.JSON.Send(ws, evt); err != nil {
 				return
 			}
+			cursor = evt.Seq
 		case <-time.After(30 * time.Second):
 			// Send a keepalive ping frame.
 			if err := websocket.JSON.Send(ws, map[string]string{"$type": "#ping"}); err != nil {

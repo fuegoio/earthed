@@ -219,6 +219,13 @@ func (f *Fanout) handleFollow(ctx context.Context, did, pdsURL, rkey, action str
 		slog.Warn("fanout: fetch follow", "err", err)
 		return
 	}
+	f.processFollowRecord(ctx, did, pdsURL, rkey, rec)
+}
+
+// processFollowRecord records a follow and emits an event. Shared by the live
+// firehose path (after fetchRecord) and the backfill path (with the record
+// value from listRecords).
+func (f *Fanout) processFollowRecord(ctx context.Context, did, pdsURL, rkey string, rec map[string]any) {
 	subject, _ := rec["subject"].(string)
 	if subject == "" {
 		return
@@ -253,6 +260,12 @@ func (f *Fanout) handleShare(ctx context.Context, did, pdsURL, rkey, action stri
 		slog.Warn("fanout: fetch share", "err", err)
 		return
 	}
+	f.processShareRecord(ctx, did, pdsURL, rkey, rec)
+}
+
+// processShareRecord records a share and emits an event. Shared by the live
+// firehose path and the backfill path.
+func (f *Fanout) processShareRecord(ctx context.Context, did, pdsURL, rkey string, rec map[string]any) {
 	articleURL, _ := rec["articleUrl"].(string)
 	feedURL, _ := rec["feedUrl"].(string)
 	title, _ := rec["title"].(string)
@@ -287,7 +300,19 @@ func (f *Fanout) handleFeedSub(ctx context.Context, did, pdsURL, rkey, action st
 		slog.Warn("fanout: fetch feed sub", "err", err)
 		return
 	}
+	f.processFeedSubRecord(ctx, did, pdsURL, rkey, rec)
+}
+
+// processFeedSubRecord records a feed subscription and emits an event with the
+// full record metadata (feedUrl, siteUrl, title). Shared by the live firehose
+// path and the backfill path.
+func (f *Fanout) processFeedSubRecord(ctx context.Context, did, pdsURL, rkey string, rec map[string]any) {
 	feedURL, _ := rec["feedUrl"].(string)
+	if feedURL == "" {
+		return
+	}
+	siteURL, _ := rec["siteUrl"].(string)
+	title, _ := rec["title"].(string)
 	createdAt := parseTime(rec["createdAt"])
 	isNew, err := f.store.RecordFeedSubscription(ctx, did, rkey, feedURL, pdsURL, &createdAt)
 	if err != nil {
@@ -296,7 +321,8 @@ func (f *Fanout) handleFeedSub(ctx context.Context, did, pdsURL, rkey, action st
 	}
 	if isNew {
 		f.emit(ctx, "feedSubscription", did, map[string]any{
-			"did": did, "rkey": rkey, "feedUrl": feedURL, "createdAt": createdAt,
+			"did": did, "rkey": rkey, "feedUrl": feedURL,
+			"siteUrl": siteURL, "title": title, "createdAt": createdAt,
 		})
 	}
 }

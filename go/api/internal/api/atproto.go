@@ -91,29 +91,36 @@ func (a *API) ATProtoSyncFollow(userID, followeeUserID int, followeeHandle strin
 	ctx := context.Background()
 	w, creds, err := a.atprotoWriterForUser(ctx, userID)
 	if err != nil || w == nil {
+		slog.Debug("atproto: skip follow sync, no credentials", "user_id", userID, "is_follow", isFollow)
 		return
 	}
 
 	// Resolve followee DID — they may or may not have connected AT Proto.
 	followeeProfile, err := a.store.GetProfileByHandle(ctx, followeeHandle, 0)
 	if err != nil || followeeProfile == nil || followeeProfile.DID == "" {
-		return // followee has no DID — nothing to write
+		slog.Debug("atproto: skip follow sync, followee has no DID", "user_id", userID, "handle", followeeHandle)
+		return
 	}
 
 	if isFollow {
+		slog.Info("atproto: writing follow to PDS", "user_id", userID, "subject_did", followeeProfile.DID)
 		rkey, err := w.PutFollow(ctx, followeeProfile.DID)
 		if err != nil {
-			slog.Warn("atproto: put follow", "user_id", userID, "err", err)
+			slog.Warn("atproto: put follow failed", "user_id", userID, "err", err)
 			return
 		}
+		slog.Info("atproto: follow written", "user_id", userID, "rkey", rkey)
 		_ = a.store.SetFollowATProtoRkey(ctx, userID, followeeUserID, rkey)
 	} else {
 		rkey, err := a.store.GetFollowATProtoRkey(ctx, userID, followeeUserID)
 		if err != nil || rkey == "" {
 			return
 		}
+		slog.Info("atproto: deleting follow from PDS", "user_id", userID, "rkey", rkey)
 		if err := w.DeleteFollow(ctx, rkey); err != nil {
-			slog.Warn("atproto: delete follow", "user_id", userID, "err", err)
+			slog.Warn("atproto: delete follow failed", "user_id", userID, "rkey", rkey, "err", err)
+		} else {
+			slog.Info("atproto: follow deleted", "user_id", userID, "rkey", rkey)
 		}
 		_ = a.store.SetFollowATProtoRkey(ctx, userID, followeeUserID, "")
 	}
@@ -125,50 +132,70 @@ func (a *API) ATProtoSyncShare(userID int, sa *store.SharedArticle, isShare bool
 	ctx := context.Background()
 	w, _, err := a.atprotoWriterForUser(ctx, userID)
 	if err != nil || w == nil {
+		slog.Debug("atproto: skip share sync, no credentials", "user_id", userID, "is_share", isShare)
 		return
 	}
 
 	if isShare {
+		slog.Info("atproto: writing share to PDS", "user_id", userID, "article_url", sa.ArticleURL)
 		rkey, err := w.PutShare(ctx,
 			sa.ArticleURL, sa.Title, sa.Description,
 			sa.FeedURL, sa.FeedTitle, sa.FeedSiteURL,
 			sa.Author, sa.PublishedAt, sa.SharedAt,
 		)
 		if err != nil {
-			slog.Warn("atproto: put share", "user_id", userID, "err", err)
+			slog.Warn("atproto: put share failed", "user_id", userID, "err", err)
 			return
 		}
+		slog.Info("atproto: share written", "user_id", userID, "rkey", rkey)
 		_ = a.store.SetShareATProtoRkey(ctx, sa.ID, rkey)
 	} else {
 		rkey, err := a.store.GetShareATProtoRkey(ctx, sa.ID)
 		if err != nil || rkey == "" {
 			return
 		}
+		slog.Info("atproto: deleting share from PDS", "user_id", userID, "rkey", rkey)
 		if err := w.DeleteShare(ctx, rkey); err != nil {
-			slog.Warn("atproto: delete share", "user_id", userID, "err", err)
+			slog.Warn("atproto: delete share failed", "user_id", userID, "rkey", rkey, "err", err)
+		} else {
+			slog.Info("atproto: share deleted", "user_id", userID, "rkey", rkey)
 		}
 	}
 }
 
-// ATProtoSyncFeedSubscription writes or deletes a feed subscription record.
+// ATProtoSyncFeedSubscription writes or deletes a feed subscription record on
+// the PDS. On subscribe it creates an io.sunred.feed.subscription record and
+// stores the rkey locally; on unsubscribe it deletes the record using the
+// stored rkey.
 func (a *API) ATProtoSyncFeedSubscription(userID, feedID int, feedURL, siteURL, title string, isSubscribe bool, createdAt time.Time) {
 	ctx := context.Background()
 	w, _, err := a.atprotoWriterForUser(ctx, userID)
 	if err != nil || w == nil {
+		slog.Debug("atproto: skip feed subscription sync, no credentials", "user_id", userID, "is_subscribe", isSubscribe)
 		return
 	}
 
-	if !isSubscribe {
-		// On unsubscribe we don't have the rkey easily; skip for now.
-		// A full implementation would store rkey on the feeds row and delete.
-		return
+	if isSubscribe {
+		slog.Info("atproto: writing feed subscription to PDS", "user_id", userID, "feed_url", feedURL)
+		rkey, err := w.PutFeedSubscription(ctx, feedURL, siteURL, title, createdAt)
+		if err != nil {
+			slog.Warn("atproto: put feed subscription failed", "user_id", userID, "feed_url", feedURL, "err", err)
+			return
+		}
+		slog.Info("atproto: feed subscription written", "user_id", userID, "feed_url", feedURL, "rkey", rkey)
+		_ = a.store.SetFeedATProtoRkey(ctx, feedID, rkey)
+	} else {
+		rkey, err := a.store.GetFeedATProtoRkey(ctx, feedID)
+		if err != nil || rkey == "" {
+			return
+		}
+		slog.Info("atproto: deleting feed subscription from PDS", "user_id", userID, "feed_url", feedURL, "rkey", rkey)
+		if err := w.DeleteFeedSubscription(ctx, rkey); err != nil {
+			slog.Warn("atproto: delete feed subscription failed", "user_id", userID, "rkey", rkey, "err", err)
+		} else {
+			slog.Info("atproto: feed subscription deleted", "user_id", userID, "rkey", rkey)
+		}
 	}
-	rkey, err := w.PutFeedSubscription(ctx, feedURL, siteURL, title, createdAt)
-	if err != nil {
-		slog.Warn("atproto: put feed subscription", "user_id", userID, "err", err)
-		return
-	}
-	_ = a.store.SetFeedATProtoRkey(ctx, feedID, rkey)
 }
 
 // ATProtoSyncFeedList writes or deletes a feed list record on the PDS.
@@ -176,6 +203,7 @@ func (a *API) ATProtoSyncFeedList(userID, listID int, fl *store.FeedList, isCrea
 	ctx := context.Background()
 	w, _, err := a.atprotoWriterForUser(ctx, userID)
 	if err != nil || w == nil {
+		slog.Debug("atproto: skip feed list sync, no credentials", "user_id", userID, "is_create", isCreate)
 		return
 	}
 
@@ -184,8 +212,11 @@ func (a *API) ATProtoSyncFeedList(userID, listID int, fl *store.FeedList, isCrea
 		if err != nil || rkey == "" {
 			return
 		}
+		slog.Info("atproto: deleting feed list from PDS", "user_id", userID, "rkey", rkey)
 		if err := w.DeleteFeedList(ctx, rkey); err != nil {
-			slog.Warn("atproto: delete feed list", "user_id", userID, "err", err)
+			slog.Warn("atproto: delete feed list failed", "user_id", userID, "rkey", rkey, "err", err)
+		} else {
+			slog.Info("atproto: feed list deleted", "user_id", userID, "rkey", rkey)
 		}
 		return
 	}
@@ -201,11 +232,13 @@ func (a *API) ATProtoSyncFeedList(userID, listID int, fl *store.FeedList, isCrea
 	}
 
 	existingRkey, _ := a.store.GetFeedListATProtoRkey(ctx, listID)
+	slog.Info("atproto: writing feed list to PDS", "user_id", userID, "list_id", listID, "rkey", existingRkey)
 	rkey, err := w.PutFeedList(ctx, existingRkey, fl.Title, fl.Description, fl.IsPublic, entries, fl.CreatedAt)
 	if err != nil {
-		slog.Warn("atproto: put feed list", "user_id", userID, "err", err)
+		slog.Warn("atproto: put feed list failed", "user_id", userID, "err", err)
 		return
 	}
+	slog.Info("atproto: feed list written", "user_id", userID, "rkey", rkey)
 	_ = a.store.SetFeedListATProtoRkey(ctx, listID, rkey)
 }
 
@@ -244,5 +277,3 @@ func (a *API) WellKnownATProtoDIDHandler() http.Handler {
 		_, _ = w.Write([]byte(profile.DID))
 	})
 }
-
-

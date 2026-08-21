@@ -159,6 +159,13 @@ func run() (int, error) {
 		go sched.Start(ctx)
 	}
 
+	// Start the relay consumer so the API receives push events (backfill +
+	// live) from the relay instead of pulling per-collection on each login.
+	if cfg.RelayURL != "" {
+		consumer := api.NewRelayConsumer(st, cfg.RelayURL, cfg.BaseURL)
+		go consumer.Start(ctx)
+	}
+
 	log.Printf("HTTP server listening on %s", cfg.HTTPAddr)
 	srv := &http.Server{
 		Addr:              cfg.HTTPAddr,
