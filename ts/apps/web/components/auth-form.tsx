@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
@@ -18,148 +16,76 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
-import { signin, signup, safeRedirect } from "@/lib/auth";
-import { signinSchema, signupSchema, type SigninValues, type SignupValues } from "@/lib/schemas";
+import { loginWithHandle, safeRedirect } from "@/lib/auth";
+import { handleSchema, type HandleValues } from "@/lib/schemas";
 
-type Mode = "signin" | "signup";
-
-export function AuthForm({ mode }: { mode: Mode }) {
+export function AuthForm() {
   const searchParams = useSearchParams();
   const redirect = safeRedirect(searchParams.get("redirect"));
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const isSignup = mode === "signup";
-  const schema = isSignup ? signupSchema : signinSchema;
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<SigninValues & SignupValues>({
-    resolver: zodResolver(schema as never),
+  } = useForm<HandleValues>({
+    resolver: zodResolver(handleSchema),
   });
 
-  async function onSubmit(values: SigninValues & SignupValues) {
+  function onSubmit(values: HandleValues) {
     setIsSubmitting(true);
-    try {
-      if (isSignup) {
-        const { error: signupError } = await signup({
-          email: values.email,
-          password: values.password,
-        });
-        if (signupError) {
-          toast.error(signupError);
-          return;
-        }
-        // Signup auto-signs-in (Limen sets the session cookie)
-      } else {
-        const { error: signinError } = await signin({
-          email: values.email,
-          password: values.password,
-        });
-        if (signinError) {
-          toast.error(signinError);
-          return;
-        }
-      }
-
-      // Hard navigation (not router.push): the API just set the session cookie
-      // via a cross-origin response, and the proxy may have cached the earlier
-      // / -> /login redirect. A full page load forces the proxy to re-run with
-      // the new cookie instead of replaying a client-side redirect cache.
-      window.location.assign(redirect);
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Full-page navigation to the API's OAuth login endpoint. The API
+    // redirects to the user's PDS to approve, then back here with a session.
+    loginWithHandle(values.handle.trim(), redirect);
   }
 
   return (
     <Card>
       <CardHeader className="items-center text-center">
-        <CardTitle className="text-xl">{isSignup ? "Create your account" : "Sign in"}</CardTitle>
+        <CardTitle className="text-xl">Sign in</CardTitle>
         <CardDescription>
-          {isSignup ? "Start reading your feeds with Earthed" : "Welcome back to Earthed"}
+          Use your{" "}
+          <a
+            href="https://atproto.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-primary hover:underline"
+          >
+            AT Protocol
+          </a>{" "}
+          handle to log in. This is likely your Bluesky (
+          <code className="text-xs">.bsky.social</code>) or Earthed account.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="handle">Handle</Label>
             <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              autoComplete="email"
-              aria-invalid={!!errors.email}
-              aria-describedby={errors.email ? "email-error" : undefined}
-              {...register("email")}
+              id="handle"
+              type="text"
+              placeholder="alice.bsky.social"
+              autoComplete="username"
+              aria-invalid={!!errors.handle}
+              aria-describedby={errors.handle ? "handle-error" : undefined}
+              {...register("handle")}
             />
-            {errors.email && (
-              <p id="email-error" className="text-sm text-destructive">
-                {errors.email.message}
+            {errors.handle && (
+              <p id="handle-error" className="text-sm text-destructive">
+                {errors.handle.message}
               </p>
             )}
           </div>
-
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              autoComplete={isSignup ? "new-password" : "current-password"}
-              aria-invalid={!!errors.password}
-              aria-describedby={errors.password ? "password-error" : undefined}
-              {...register("password")}
-            />
-            {errors.password && (
-              <p id="password-error" className="text-sm text-destructive">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
-
-          {isSignup && (
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="confirmPassword">Confirm password</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                aria-invalid={!!errors.confirmPassword}
-                aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}
-                {...register("confirmPassword")}
-              />
-              {errors.confirmPassword && (
-                <p id="confirmPassword-error" className="text-sm text-destructive">
-                  {errors.confirmPassword.message}
-                </p>
-              )}
-            </div>
-          )}
 
           <Button type="submit" disabled={isSubmitting} className="w-full">
             {isSubmitting && <Loader2 className="size-4 animate-spin" />}
-            {isSignup ? "Create account" : "Sign in"}
+            Login
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="justify-center">
+      <CardFooter className="justify-center text-center">
         <p className="text-sm text-muted-foreground">
-          {isSignup ? (
-            <>
-              Already have an account?{" "}
-              <Link href="/login" className="font-medium text-primary hover:underline">
-                Sign in
-              </Link>
-            </>
-          ) : (
-            <>
-              Don&apos;t have an account?{" "}
-              <Link href="/signup" className="font-medium text-primary hover:underline">
-                Sign up
-              </Link>
-            </>
-          )}
+          New here? Just enter a handle to create an account on your PDS.
         </p>
       </CardFooter>
     </Card>

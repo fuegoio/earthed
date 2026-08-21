@@ -1,64 +1,34 @@
 import { env } from "./env";
-import { getApiErrorMessage } from "./errors";
 
-const SESSION_COOKIE = "limen_session";
+/**
+ * Earthed authentication is AT Proto OAuth. Users enter their handle; the web
+ * app redirects to the API's OAuth login endpoint, which resolves the handle,
+ * sends a PAR request to the user's PDS, and redirects the browser to the PDS
+ * to approve. After approval the PDS redirects back to the API callback, which
+ * issues a session cookie and redirects back here.
+ *
+ * All of that happens as full-page browser navigations (not fetch), because the
+ * user leaves the Earthed origin to approve on their PDS.
+ */
 
-export type AuthResult = { data: { ok: true }; error: null } | { data: null; error: string };
-
-async function authFetch(path: string, body: Record<string, unknown>): Promise<AuthResult> {
-  try {
-    const res = await fetch(`${env.NEXT_PUBLIC_EARTHED_API_URL}${path}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-      credentials: "include",
-    });
-
-    if (!res.ok) {
-      let errorBody: unknown = null;
-      try {
-        errorBody = await res.json();
-      } catch {
-        // non-JSON error response
-      }
-      return {
-        data: null,
-        error: getApiErrorMessage(errorBody, res.statusText || "Request failed"),
-      };
-    }
-
-    return { data: { ok: true }, error: null };
-  } catch (err) {
-    return {
-      data: null,
-      error: err instanceof Error ? err.message : "Network error",
-    };
-  }
+/**
+ * loginWithHandle redirects the browser to the API to start the OAuth flow for
+ * the given AT Proto handle (e.g. "alice.bsky.social"). After a successful
+ * login the API redirects back to `redirectTo` (sanitized) or the app root.
+ */
+export function loginWithHandle(handle: string, redirectTo?: string | null): void {
+  const params = new URLSearchParams({ handle });
+  if (redirectTo) params.set("redirect", safeRedirect(redirectTo));
+  window.location.assign(`${env.NEXT_PUBLIC_EARTHED_API_URL}/auth/oauth/login?${params}`);
 }
 
-export async function signin(values: { email: string; password: string }): Promise<AuthResult> {
-  return authFetch("/auth/signin/credential", {
-    credential: values.email,
-    password: values.password,
-  });
+/**
+ * signout redirects to the API, which clears the session cookie and sends the
+ * user back to the web app root.
+ */
+export function signout(): void {
+  window.location.assign(`${env.NEXT_PUBLIC_EARTHED_API_URL}/auth/signout`);
 }
-
-export async function signup(values: { email: string; password: string }): Promise<AuthResult> {
-  return authFetch("/auth/signup/credential", values);
-}
-
-export async function signout(): Promise<void> {
-  try {
-    await fetch(`${env.NEXT_PUBLIC_EARTHED_API_URL}/auth/signout`, {
-      method: "POST",
-      credentials: "include",
-    });
-  } catch {
-    // best-effort; cookie will be cleared by the server or we redirect anyway
-  }
-}
-
-export { SESSION_COOKIE };
 
 /**
  * safeRedirect returns a same-origin path from a redirect query param, or "/"

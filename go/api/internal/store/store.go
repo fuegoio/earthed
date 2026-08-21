@@ -674,19 +674,20 @@ func (s *Store) DeleteUser(ctx context.Context, id int) error {
 // The Handle field is populated when the user has a social profile.
 func (s *Store) GetUserByID(ctx context.Context, id int) (*User, error) {
 	var u User
+	var handle sql.NullString
 	err := s.DB.QueryRowContext(ctx,
-		`SELECT u.id, u.email, COALESCE(u.first_name, ''), false, u.created_at,
-		        COALESCE(p.handle, '')
+		`SELECT u.id, COALESCE(u.email,''), COALESCE(u.first_name, ''), false, u.created_at,
+		        u.handle
 		 FROM users u
-		 LEFT JOIN user_profiles p ON p.user_id = u.id
 		 WHERE u.id = $1`, id,
-	).Scan(&u.ID, &u.Email, &u.FirstName, &u.IsAdmin, &u.CreatedAt, &u.Handle)
+	).Scan(&u.ID, &u.Email, &u.FirstName, &u.IsAdmin, &u.CreatedAt, &handle)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
 	if err != nil {
 		return nil, err
 	}
+	u.Handle = handle.String
 	return &u, nil
 }
 

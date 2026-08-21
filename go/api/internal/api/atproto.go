@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -17,128 +16,42 @@ import (
 
 // --- Input/output types ---
 
-type ConnectATProtoInput struct {
-	Body struct {
-		// PDS base URL (e.g. "https://pds.example.com").
-		PDSUrl string `json:"pds_url" minLength:"1" maxLength:"2048"`
-		// Identifier: handle or DID for PDS authentication.
-		Identifier string `json:"identifier" minLength:"1" maxLength:"255"`
-		// App password or account password for the PDS.
-		Password string `json:"password" minLength:"1" maxLength:"255"`
-	}
-}
-
 type ATProtoStatusOutput struct {
 	Body struct {
 		Connected bool   `json:"connected"`
 		DID       string `json:"did,omitempty"`
-		PDSUrl    string `json:"pds_url,omitempty"`
 		Handle    string `json:"handle,omitempty"`
 	}
 }
 
 // registerATProtoRoutes registers AT Protocol integration endpoints.
+//
+// Identity is now established via OAuth at login (see oauth_handlers.go), so
+// there is no app-password "connect" endpoint. The status endpoint reports the
+// DID linked to the current user.
 func (a *API) registerATProtoRoutes() {
 	// GET /.well-known/atproto-did — lets users point an AT Proto handle at
-	// this instance. Returns the DID for the handle in the subdomain or query.
-	// e.g. "fuego.earthed.example" → look up handle "fuego" → return DID.
-	//
-	// This is registered on the bare mux in main.go at /.well-known/atproto-did;
-	// here we register the XRPC-namespaced version for discoverability.
+	// this instance. Registered on the bare mux in main.go; here we register
+	// the XRPC-namespaced version for discoverability.
 	huma.Register(a.huma, huma.Operation{
 		OperationID: "atproto-status",
 		Method:      http.MethodGet,
 		Path:        "/api/v1/me/atproto",
-		Summary:     "Get AT Proto connection status for the current user",
+		Summary:     "Get AT Proto identity for the current user",
 		Tags:        []string{"social"},
 	}, func(ctx context.Context, _ *struct{}) (*ATProtoStatusOutput, error) {
 		userID := auth.UserIDFromCtx(ctx)
-		creds, err := a.store.GetATProtoCredentials(ctx, userID)
+		did, handle, err := a.store.GetUserDID(ctx, userID)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
 		out := &ATProtoStatusOutput{}
-		if creds != nil {
+		if did != "" {
 			out.Body.Connected = true
-			out.Body.DID = creds.DID
-			out.Body.PDSUrl = creds.PDSUrl
+			out.Body.DID = did
+			out.Body.Handle = handle
 		}
 		return out, nil
-	})
-
-	// POST /api/v1/me/atproto — connect a PDS account.
-	huma.Register(a.huma, huma.Operation{
-		OperationID: "connect-atproto",
-		Method:      http.MethodPost,
-		Path:        "/api/v1/me/atproto",
-		Summary:     "Connect an AT Protocol PDS account",
-		Tags:        []string{"social"},
-	}, func(ctx context.Context, input *ConnectATProtoInput) (*ATProtoStatusOutput, error) {
-		userID := auth.UserIDFromCtx(ctx)
-
-		// Get the user's Earthed profile to include in the PDS profile record.
-		profile, err := a.store.GetProfileByUserID(ctx, userID)
-		if err != nil {
-			return nil, huma.Error500InternalServerError(err.Error())
-		}
-		if profile == nil {
-			return nil, huma.Error422UnprocessableEntity("set a handle before connecting AT Proto", nil)
-		}
-
-		pdsURL := strings.TrimRight(input.Body.PDSUrl, "/")
-		client := atproto.NewClient(pdsURL, "")
-		session, err := client.CreateSession(ctx, input.Body.Identifier, input.Body.Password)
-		if err != nil {
-			return nil, huma.Error422UnprocessableEntity(fmt.Sprintf("PDS authentication failed: %s", err.Error()), nil)
-		}
-
-		// Persist DID + tokens.
-		expiresAt := time.Now().Add(2 * time.Hour) // standard AT Proto access token TTL
-		if err := a.store.ConnectATProto(ctx, userID,
-			session.DID, pdsURL,
-			session.AccessJwt, session.RefreshJwt, &expiresAt,
-		); err != nil {
-			return nil, huma.Error500InternalServerError(err.Error())
-		}
-
-		// Write the profile record to the PDS asynchronously — we don't want
-		// a slow PDS to block the HTTP response.
-		go func() {
-			bgCtx := context.Background()
-			user, _ := a.store.GetUserByID(bgCtx, userID)
-			w := atproto.NewWriter(pdsURL, session.DID, session.AccessJwt)
-			displayName := ""
-			if user != nil {
-				displayName = user.FirstName
-			}
-			if err := w.PutProfile(bgCtx, profile.Handle, profile.Bio, displayName, a.cfg.BaseURL, profile.CreatedAt); err != nil {
-				slog.Warn("atproto: put profile", "did", session.DID, "err", err)
-			}
-			// Announce to the relay if configured.
-			a.announceToRelay(bgCtx, session.DID, pdsURL, profile.Handle)
-		}()
-
-		out := &ATProtoStatusOutput{}
-		out.Body.Connected = true
-		out.Body.DID = session.DID
-		out.Body.PDSUrl = pdsURL
-		out.Body.Handle = session.Handle
-		return out, nil
-	})
-
-	// DELETE /api/v1/me/atproto — disconnect PDS account.
-	huma.Register(a.huma, huma.Operation{
-		OperationID: "disconnect-atproto",
-		Method:      http.MethodDelete,
-		Path:        "/api/v1/me/atproto",
-		Summary:     "Disconnect the AT Protocol PDS account",
-		Tags:        []string{"social"},
-	}, func(ctx context.Context, _ *struct{}) (*struct{}, error) {
-		userID := auth.UserIDFromCtx(ctx)
-		if err := a.store.DisconnectATProto(ctx, userID); err != nil {
-			return nil, huma.Error500InternalServerError(err.Error())
-		}
-		return nil, nil
 	})
 }
 

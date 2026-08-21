@@ -16,6 +16,7 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/fuegoio/earthed/go/api/internal/api"
+	"github.com/fuegoio/earthed/go/api/internal/atproto"
 	"github.com/fuegoio/earthed/go/api/internal/auth"
 	"github.com/fuegoio/earthed/go/api/internal/config"
 	"github.com/fuegoio/earthed/go/api/internal/cors"
@@ -112,6 +113,13 @@ func run() (int, error) {
 		return 0, fmt.Errorf("auth: %w", err)
 	}
 
+	// AT Proto OAuth client (indigo). Backed by the same Postgres for
+	// auth-request and session persistence.
+	oauthApp, err := atproto.NewOAuthApp(db, cfg.OAuthClientID, cfg.OAuthCallbackURL)
+	if err != nil {
+		return 0, fmt.Errorf("oauth: %w", err)
+	}
+
 	humaMux := http.NewServeMux()
 	humaConfig := huma.DefaultConfig("Earthed API", "1.0.0")
 	humaConfig.Servers = []*huma.Server{{URL: ""}}
@@ -122,9 +130,14 @@ func run() (int, error) {
 	apiHandler := api.New(humaRouter, st, authInst, cfg, f)
 	apiHandler.RegisterRoutes()
 
+	oauthHandlers := api.NewOAuthHandlers(oauthApp, st, authInst, cfg)
+
 	mux := http.NewServeMux()
 
-	mux.Handle("/auth/", authInst.Handler())
+	// OAuth flow (public): login start, callback, client metadata, signout.
+	for path, handler := range oauthHandlers.Routes() {
+		mux.Handle(path, handler)
+	}
 	// Public device-flow endpoints (issue + poll) must be reachable without
 	// a session; the confirm + status endpoints sit behind the middleware
 	// because they require an authenticated user to approve the grant.
