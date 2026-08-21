@@ -1,128 +1,49 @@
 ---
 title: Getting Started
-description: Run Sunred locally, create an account, subscribe to a feed, and read entries.
+description: Sign in, subscribe to your first feed, and read an article.
 ---
 
-## Prerequisites
+This guide walks you through your first few minutes in Sunred: signing in, subscribing to a feed, and reading an article. You don't need to install anything — Sunred runs in the browser.
 
-- [Go](https://go.dev/dl/) 1.25 or later
-- [Node.js](https://nodejs.org/) 20+ with [pnpm](https://pnpm.io/) 10+
-- [Docker](https://docs.docker.com/get-docker/) (for PostgreSQL)
+## 1. Sign in
 
-## 1. Start PostgreSQL
+Open your Sunred instance and sign in with your AT Proto handle — the same account you use on Bluesky or any other AT Proto app. There is no separate Sunred password.
 
-```bash
-cd go/api
-make db-up
-```
+If your instance has a default PDS configured, you'll see a **Continue with snrd.social** button (or similar) that takes you straight through. Prefer to use an existing account? Click **Login with a different handle** and enter it — for example `alice.bsky.social`.
 
-This starts a PostgreSQL 16 container on port 5432 with database `sunred`, user `sunred`, password `sunred`.
+Sunred redirects you to your PDS to approve the login, then brings you back signed in. See [Identity & sync](/at-proto) for how it works behind the scenes.
 
-## 2. Configure environment
+## 2. Subscribe to a feed
 
-Create a `.env` file in `go/api/`:
+Click the **+** next to **Feeds** in the sidebar and paste a website or feed URL — for example `https://blog.golang.org`. You can paste a regular website URL; Sunred discovers the feed automatically.
 
-```bash
-SUNRED_DATABASE_URL=postgres://sunred:sunred@localhost:5432/sunred?sslmode=disable
-SUNRED_BASE_URL=http://127.0.0.1:8080
-SUNRED_WEB_URL=http://localhost:3000
-```
+Before you commit, Sunred shows a preview: the feed's title, description, and its most recent articles. If it looks right, click **Subscribe to this feed**.
 
-`SUNRED_BASE_URL` must use `127.0.0.1` (not `localhost`) because RFC 8252
-rejects `localhost` in OAuth redirect URIs. The API derives the callback URL
-from `SUNRED_BASE_URL` and redirects `127.0.0.1` callbacks to `localhost` so
-the session cookie (host-only on `localhost`) is shared across ports 3000
-and 8080.
+The feed's title and site link fill in after the first refresh. New articles will start appearing in your timeline as soon as Sunred fetches them.
 
-Users log in with their own AT Proto handle — typically a Bluesky account or an
-account on a personal PDS. No PDS setup is required. See
-[Identity & sync](/at-proto) for how login and data sync work.
+## 3. Read an entry
 
-## 3. Run migrations
+Your timeline shows entries from every feed, newest first. Unread entries have a dot beside them.
 
-```bash
-cd go/api
-make migrate
-```
+Click an entry's title to open the original article in a new tab — Sunred marks it as read as you open it. Prefer to read in Sunred? Click anywhere else on the card to open the in-app reader.
 
-## 4. Start the API server
+A few things to try:
 
-```bash
-cd go/api
-make run
-```
+- Click the **star** icon on a card to bookmark an article. Starred articles live in **Starred** in the sidebar.
+- Click the **share** icon to post an article to your social timeline. People you follow will see it.
+- Use the **search** box at the top of the sidebar to search across every entry by title and content.
 
-Verify it is running:
+## 4. Organize with folders
 
-```bash
-curl http://localhost:8080/v1/health
-# {"status":"ok"}
-```
+As your subscriptions grow, group them into folders. Click the **folder** icon next to **Feeds** to create one — say "Technology" or "News" — then move feeds into it from a feed's page using the folder picker.
 
-## 5. Create an account
+Folders only affect how feeds are grouped in the sidebar; they don't change the timeline.
 
-Sunred uses AT Proto identity — there is no email/password signup. Start the
-web frontend (step 8), click **Continue with snrd.social** to log in or sign up
-through the default PDS, or use **Login with a different handle** to sign in
-with an existing AT Proto handle (e.g. your Bluesky account).
+## Where to go next
 
-See [Identity & sync](/at-proto) for how login and data sync work.
-
-## 6. Create an API token
-
-API tokens are used for the CLI, curl, and scripts. Create one with the session cookie from the previous step:
-
-```bash
-curl -X POST http://localhost:8080/v1/tokens \
-  -H "Content-Type: application/json" \
-  -b cookies.txt \
-  -d '{"label":"my-token"}'
-```
-
-Save the `token` value from the response — it starts with `pla_` and is shown only once.
-
-## 7. Subscribe to a feed
-
-```bash
-curl -X POST http://localhost:8080/v1/feeds \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer pla_your-token-here" \
-  -d '{"feed_url":"https://blog.golang.org/feeds/posts/default"}'
-```
-
-You can also pass a website URL — Sunred discovers the feed automatically from `<link rel="alternate">` tags.
-
-## 8. Read entries
-
-```bash
-curl "http://localhost:8080/v1/entries?limit=10" \
-  -H "Authorization: Bearer pla_your-token-here"
-```
-
-## 8. Start the web frontend
-
-```bash
-cd ts
-pnpm install
-pnpm dev
-```
-
-The web app is at `http://localhost:3000`. The login page shows a
-**Continue with snrd.social** button (the default PDS, configurable via
-`NEXT_PUBLIC_SUNRED_DEFAULT_PDS`) and a **Login with a different handle**
-option for existing AT Proto accounts.
-
-## 9. Try the CLI
-
-```bash
-cd go/cli
-make build
-./sunred config set base_url http://localhost:8080
-./sunred config set token pla_your-token-here
-
-./sunred feeds list
-./sunred entries list
-./sunred-tui   # interactive TUI
-```
-
-See [CLI](/cli) for the full command reference.
+- **[Web UI guide](/web-ui)** — every part of the interface, in detail.
+- **[Feeds](/feeds)** — subscribing, refreshing, and organizing.
+- **[Entries](/entries)** — read statuses, starring, and search.
+- **[Feed lists](/feed-lists)** — curate and share collections of feeds.
+- **[Social](/social)** — follow people and share what you read.
+- **[CLI](/cli)** — manage Sunred from the terminal.

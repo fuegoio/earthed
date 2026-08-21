@@ -10,6 +10,7 @@
     "feeds",
     "entries",
     "feed-lists",
+    "social",
     "---Interfaces---",
     "cli",
     "---Reference---",

@@ -1,111 +1,47 @@
 ---
-title: Managing Feeds
-description: Subscribe to feeds, organize them with folders, and trigger manual refreshes.
+title: Feeds
+description: Subscribe to websites, organize them with folders, and keep them fresh.
 ---
 
-Feeds are RSS 2.0, Atom 1.0, or JSON Feed subscriptions. Sunred fetches and parses them in the background and stores new entries automatically. See [Architecture](/architecture) for how the refresh pipeline and adaptive polling work.
+A **feed** is a subscription to a website that publishes an RSS, Atom, or JSON Feed. Sunred fetches each feed in the background and adds new articles to your timeline as they appear. You don't have to refresh anything yourself.
 
 ## Subscribe to a feed
 
-Pass a feed URL or a website URL. When given a website, Sunred discovers the feed from `<link rel="alternate">` tags in the page's `<head>`:
+Click the **+** next to **Feeds** in the sidebar and paste a URL. It can be a feed URL or an ordinary website URL — Sunred discovers the feed automatically by looking for `<link rel="alternate">` tags in the page.
 
-```bash
-curl -X POST http://localhost:8080/v1/feeds \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer pla_your-token" \
-  -d '{"feed_url":"https://blog.golang.org"}'
-```
+Before you subscribe, Sunred shows a preview: the feed's title, description, favicon, and its most recent articles. If it's the right feed, click **Subscribe to this feed**.
 
-Assign to a folder at creation time with `folder_id`:
+The feed's title and site link fill in after the first refresh. Subscribing to the same URL twice is a no-op.
 
-```bash
-curl -X POST http://localhost:8080/v1/feeds \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer pla_your-token" \
-  -d '{"feed_url":"https://blog.golang.org","folder_id":2}'
-```
+## Organize with folders
 
-The `site_url` and `title` fields are temporarily set to the feed URL and updated to real values after the first refresh. Duplicate subscriptions (same URL per user) return a 400 error.
+Folders group feeds in the sidebar — they don't affect the timeline. Create one with the **folder** icon next to **Feeds**, then move a feed into it from the feed's page using the folder picker.
 
-## Preview a feed
+Deleting a folder leaves its feeds behind, now ungrouped — it never deletes feeds.
 
-Check what a feed contains before subscribing:
+## The feed page
 
-```bash
-curl -X POST http://localhost:8080/v1/feeds/preview \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer pla_your-token" \
-  -d '{"feed_url":"https://blog.golang.org"}'
-```
+Click a feed in the sidebar to open its page. The header shows the feed's title, description, and how many people subscribe to it (across the instance). Below the header is that feed's entry timeline.
 
-Returns the discovered feed URL, metadata, and the 20 most recent entries. Auto-discovery works here too.
+The toolbar has everything you need to manage the feed:
 
-## List feeds
+- **Refresh** — fetch new entries right away, without waiting for the scheduler. Useful right after subscribing, or when you know a site just published.
+- **Mark all as read** — clears every unread entry in this feed in one click.
+- **Move to folder** — reassign the feed to a different folder.
+- **Rename** — give the feed a custom title for your sidebar.
+- **Unsubscribe** — removes the feed and all its entries permanently.
+- **Open website** / **Open feed** — jump to the site or its raw feed URL in a new tab.
 
-```bash
-curl http://localhost:8080/v1/feeds \
-  -H "Authorization: Bearer pla_your-token"
-```
+## How and when feeds refresh
 
-Feeds are ordered by title. Each feed includes `next_check_at` and `last_fetch_at` so you can see when it was last refreshed and when the next refresh is due.
+Sunred refreshes feeds automatically on a schedule that adapts to each feed. A site that publishes daily is checked roughly once a day; a site that publishes hourly is checked more often. The interval is based on how frequently the feed actually publishes new items.
 
-## Get a single feed
+If a feed fails to fetch or parse, Sunred retries on a shorter interval and shows the last error on the feed page until it succeeds again. You don't need to manage any of this — but the **Refresh** button is there when you want new entries now.
 
-```bash
-curl http://localhost:8080/v1/feeds/1 \
-  -H "Authorization: Bearer pla_your-token"
-```
+## Move from another reader
 
-## Manually refresh a feed
+Coming from another RSS reader? Export your subscriptions as an OPML file and import it under **Settings → OPML**. Sunred subscribes you to every feed in the file at once.
 
-Fetch new entries immediately without waiting for the scheduler:
+## Programmatic access
 
-```bash
-curl -X POST http://localhost:8080/v1/feeds/1/refresh \
-  -H "Authorization: Bearer pla_your-token"
-```
-
-Returns the updated feed object.
-
-## Mark all entries as read
-
-```bash
-curl -X POST http://localhost:8080/v1/feeds/1/mark-all-read \
-  -H "Authorization: Bearer pla_your-token"
-```
-
-## Delete a feed
-
-Unsubscribes and permanently deletes all entries belonging to the feed.
-
-```bash
-curl -X DELETE http://localhost:8080/v1/feeds/1 \
-  -H "Authorization: Bearer pla_your-token"
-```
-
-## Folders
-
-Folders group feeds in the sidebar. They have no effect on entries themselves.
-
-Create a folder:
-
-```bash
-curl -X POST http://localhost:8080/v1/folders \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer pla_your-token" \
-  -d '{"title":"Technology"}'
-```
-
-List folders:
-
-```bash
-curl http://localhost:8080/v1/folders \
-  -H "Authorization: Bearer pla_your-token"
-```
-
-Delete a folder — feeds inside it become ungrouped, not deleted:
-
-```bash
-curl -X DELETE http://localhost:8080/v1/folders/2 \
-  -H "Authorization: Bearer pla_your-token"
-```
+Everything above is also available through the [Feeds API](/api-reference?tag=Feeds) and the [Folders API](/api-reference?tag=Folders) — subscribe, list, refresh, move, and unsubscribe from scripts or the CLI.

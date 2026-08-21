@@ -1,117 +1,64 @@
 ---
 title: Authentication
-description: Log in to Sunred with your AT Proto handle, and authenticate the CLI with bearer tokens.
+description: How sign-in works, and how to create API tokens for the CLI and scripts.
 ---
 
-Sunred identity is your [AT Protocol](https://atproto.com) identity. You log
-in with your AT Proto handle — the same account you use on Bluesky or any
-other AT Proto app. There are no Sunred-specific passwords.
+Sunred identity is your [AT Protocol](https://atproto.com) identity. You sign in with your AT Proto handle — the same account you use on Bluesky or any other AT Proto app. There are no Sunred-specific passwords. See [Identity & sync](/at-proto) for the full picture.
 
-See [Identity & sync](/at-proto) for how identity and data sync work.
+## Signing in (web)
 
-## Logging in (web)
+On the login page, enter your handle (for example `alice.bsky.social`) or click the default-PDS button if your instance shows one. Sunred redirects you to your PDS to approve the login, then brings you back with an active session.
 
-Enter your handle (for example `alice.bsky.social`) on the login page. Sunred
-resolves your handle to your PDS and redirects you to your PDS to approve the
-login. After you approve, you're returned to Sunred with an active session.
-
-Sunred issues a **session cookie** that the browser sends automatically on
-every request. All data is scoped to the signed-in user — you can only read
-and write your own feeds, entries, and tokens.
-
-## Bearer tokens (CLI, scripts, integrations)
-
-For the CLI, scripts, and custom integrations, use a **bearer token** in the
-`Authorization` header. When both a session cookie and a bearer token are
-present, the bearer token takes precedence.
-
-## Device flow (CLI login)
-
-The CLI logs in via [RFC 8628 device authorization grant](https://datatracker.ietf.org/doc/html/rfc8628).
-The CLI requests a device code from the API, opens a browser to a
-confirmation page on the web frontend, and polls the API until the user
-approves or denies the request.
-
-```
-POST /auth/device/code     → issue a device code (public)
-POST /auth/device/token    → poll for the result (public)
-POST /auth/device/confirm  → approve or deny (requires session)
-GET  /auth/device/status   → check status by user code (requires session)
-```
-
-Tokens issued via the device flow expire after 14 days and are labeled
-`CLI (device flow)` in the token list so they can be identified and
-revoked. The plaintext token is never exposed to the web UI — it is
-returned only to the CLI that initiated the flow.
+The session is a cookie your browser sends automatically on every request. All your data — feeds, entries, tokens — is scoped to the signed-in user, so you only ever see your own.
 
 ## API tokens
 
-API tokens are prefixed with `pla_` and stored as SHA-256 hashes. The raw token value is shown only once at creation — save it immediately.
+API tokens let the CLI, scripts, and custom integrations call the [API](/api-reference) on your behalf. They're an alternative to the session cookie, sent in the `Authorization` header as a bearer token.
 
-Create a token (requires an active session or an existing token):
+### Create a token
 
-```bash
-curl -X POST http://localhost:8080/v1/tokens \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer pla_existing-token" \
-  -d '{"label":"my-script"}'
-```
+Go to **Settings → Tokens** and create one. Give it a label so you remember what it's for — say "laptop CLI" or "nightly script".
 
-```json
-{
-  "id": 1,
-  "label": "my-script",
-  "token": "pla_a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef12345678",
-  "created_at": "2025-08-14T12:00:00Z"
-}
-```
+The token value is shown **only once**, right after you create it. Copy it and save it somewhere safe — you won't see it again. Tokens start with `pla_`.
 
-Use the token:
+### Use a token
+
+Pass the token in the `Authorization` header:
 
 ```bash
-curl http://localhost:8080/v1/feeds \
-  -H "Authorization: Bearer pla_a1b2c3d4e5f6..."
-```
-
-List tokens (raw values are never returned, only labels and metadata):
-
-```bash
-curl http://localhost:8080/v1/tokens \
+curl https://api.your-instance.com/v1/feeds \
   -H "Authorization: Bearer pla_your-token"
 ```
 
-Revoke a token by ID:
+The CLI stores it for you with `sunred config set token pla_...` (or via `sunred login`, below).
+
+### Revoke a token
+
+Delete a token from **Settings → Tokens** to revoke it immediately — any request using it fails with `401` from that point on. Use this if a token leaks or you no longer need it.
+
+## CLI login (device flow)
+
+The CLI logs in without you pasting a token. Run:
 
 ```bash
-curl -X DELETE http://localhost:8080/v1/tokens/1 \
-  -H "Authorization: Bearer pla_your-token"
+sunred login
 ```
 
-Requests using a deleted token fail immediately with 401.
+It opens a browser to a confirmation page where you approve the request, using your existing web session. If a browser can't open automatically, the CLI prints a URL to open on any device where you're signed in. Once approved, the CLI stores the token and you're ready to go.
 
-## Token format
+Use `--no-browser` to skip auto-opening a browser, or `--url` to point at a different API for this login only:
 
-Tokens follow the format `pla_` followed by 64 hex characters (32 random
-bytes). They are 69 characters long.
+```bash
+sunred login --no-browser --url https://api.your-instance.com
+```
 
-Tokens created via the web UI or the `tokens create` command do not
-expire. Tokens issued via the device flow (`sunred login`) expire
-after 14 days.
+Tokens issued through the device flow expire after 14 days and show up in your token list labeled `CLI (device flow)` so you can spot and revoke them. Run `sunred login` again to refresh.
 
-## CORS
+## Token lifetime
 
-By default (local development), the API reflects any request `Origin` back with
-`Access-Control-Allow-Credentials: true`. Requests with no `Origin` header get
-`Access-Control-Allow-Origin: *`.
+- Tokens you create in the web UI or with `sunred tokens create` **do not expire**.
+- Tokens issued via `sunred login` (device flow) **expire after 14 days**.
 
-In production, configure a list of trusted origins. The API then only sends
-`Access-Control-Allow-Credentials: true` for origins on that list; untrusted
-origins receive no `Access-Control-Allow-Origin` header. This bounds
-credentialed cross-site requests (cookie-bearing) to frontends you control.
+## Programmatic access
 
-See [Configuration](/self-hosting/configuration) and
-[Cross-origin sessions](/self-hosting/production#cross-origin-sessions) for
-setting trusted origins and the related cookie flags (`Secure`, `SameSite`).
-
-Allowed methods: GET, POST, PUT, PATCH, DELETE, OPTIONS.
-Allowed headers: Accept, Authorization, Content-Type, X-Requested-With.
+Create, list, and revoke tokens through the [Tokens API](/api-reference?tag=Tokens).

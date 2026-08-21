@@ -1,97 +1,47 @@
 ---
-title: Reading Entries
-description: Browse, filter, search, and manage entry status with the Sunred API.
+title: Entries
+description: Read, star, search, and manage articles from your feeds.
 ---
 
-Entries are individual articles fetched from your feed subscriptions. Each entry has a status (`unread`, `read`, or `removed`), a starred flag, and sanitized HTML content.
+An **entry** is a single article fetched from one of your feeds. Each entry has a read status, a starred flag, and sanitized HTML content. Entries appear in your timeline newest-first.
 
-## List entries
+## Read statuses
 
-Results are ordered by `published_at` descending (newest first).
+Every entry is in one of three states:
 
-```bash
-curl "http://localhost:8080/v1/entries?limit=10" \
-  -H "Authorization: Bearer pla_your-token"
-```
+| Status    | What it means                                              |
+| --------- | --------------------------------------------------------- |
+| `unread`  | New — you haven't opened it yet. Shows a dot in the timeline. |
+| `read`    | You've opened it. Hidden from the **Unread** view.        |
+| `removed` | Hidden from the normal views without being marked read.   |
 
-### Filters
+New entries start as `unread`. Opening an article marks it `read` automatically. You can mark a read entry unread again by clicking its dot — useful when you want to come back to something.
 
-| Parameter   | Type   | Default | Description                           |
-| ----------- | ------ | ------- | ------------------------------------- |
-| `feed_id`   | int    | —       | Filter by feed                        |
-| `folder_id` | int    | —       | Filter by folder (joins through feed) |
-| `status`    | string | —       | `unread`, `read`, or `removed`        |
-| `starred`   | bool   | —       | Filter starred entries                |
-| `search`    | string | —       | Full-text search (English dictionary) |
-| `limit`     | int    | 50      | Max 200                               |
-| `offset`    | int    | 0       | Pagination offset                     |
+## Read an entry
 
-Filters can be combined freely. When both `feed_id` and `folder_id` are provided, `folder_id` takes precedence.
+There are two ways to read:
 
-```bash
-# Unread entries in a specific feed
-curl "http://localhost:8080/v1/entries?feed_id=1&status=unread" \
-  -H "Authorization: Bearer pla_your-token"
+- **Open the original** — click the entry's title to open the article on its source site in a new tab. Sunred marks it read.
+- **Read in Sunred** — click the card body to open the in-app reader, which shows the title, author, date, tags, and a summary. From there, open the full article in a new tab with one click.
 
-# Starred entries across all feeds
-curl "http://localhost:8080/v1/entries?starred=true" \
-  -H "Authorization: Bearer pla_your-token"
-
-# Full-text search combined with a status filter
-curl "http://localhost:8080/v1/entries?search=docker&status=unread" \
-  -H "Authorization: Bearer pla_your-token"
-
-# Second page of results
-curl "http://localhost:8080/v1/entries?limit=50&offset=50" \
-  -H "Authorization: Bearer pla_your-token"
-```
-
-## Get a single entry
-
-```bash
-curl http://localhost:8080/v1/entries/42 \
-  -H "Authorization: Bearer pla_your-token"
-```
-
-The `content` field contains the full sanitized HTML. The `description` field is a short summary, when available from the feed. Entries may also include `tags` (feed category tags) and `enclosures` (podcast audio, images, and other media attachments).
-
-## Entry statuses
-
-| Status    | Meaning                              |
-| --------- | ------------------------------------ |
-| `unread`  | New entry, not yet read              |
-| `read`    | Entry has been opened                |
-| `removed` | Hidden from the normal view          |
-
-New entries start as `unread`. `changed_at` tracks when the status last changed.
-
-## Bulk update status
-
-Update the status of multiple entries in one request. Any valid status works: `read`, `unread`, or `removed`.
-
-```bash
-curl -X PUT http://localhost:8080/v1/entries \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer pla_your-token" \
-  -d '{"entry_ids":[42,43,44],"status":"read"}'
-```
-
-To mark all entries in a feed as read at once:
-
-```bash
-curl -X POST http://localhost:8080/v1/feeds/1/mark-all-read \
-  -H "Authorization: Bearer pla_your-token"
-```
+The in-app reader doesn't render the full article body, because most feeds only carry a summary. The original is always one click away.
 
 ## Star entries
 
-Star an entry to bookmark it. The `starred` flag is independent of status — a `removed` entry that is starred still appears when filtering with `starred=true`.
+Star an entry to bookmark it — click the star icon on the card or in the reader header. Starred entries live under **Starred** in the sidebar, whatever their read status. Click the star again to unstar.
 
-```bash
-curl -X PUT http://localhost:8080/v1/entries/42/starred \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer pla_your-token" \
-  -d '{"starred":true}'
-```
+## Share entries
 
-Pass `false` to unstar.
+Click the share icon on a card to post the article to your social timeline. People you follow will see it in their **Social** view. See [Social](/social) for the full picture.
+
+## Search
+
+The search box at the top of the sidebar runs a full-text query across every entry's title and content. Type a query and press Enter; results appear in the timeline like any other view. Combine it with read status and starred filters through the [Entries API](/api-reference?tag=Entries) for more targeted queries.
+
+## Mark all as read
+
+To clear a whole feed at once, open the feed's page and click **Mark all as read**. The unread count drops to zero and those entries leave the **Unread** view.
+
+## Programmatic access
+
+List, filter, update, and star entries through the [Entries API](/api-reference?tag=Entries) — filter by feed, folder, status, starred, or a search query, and paginate with `limit` and `offset`.
