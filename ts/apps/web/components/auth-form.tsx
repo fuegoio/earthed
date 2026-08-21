@@ -38,7 +38,7 @@ export function AuthForm({ signupAvailable = false }: { signupAvailable?: boolea
 
   return (
     <div className="flex flex-col gap-6">
-      <p className="text-sm text-muted-foreground">
+      <FieldDescription>
         Use your{" "}
         <a
           href="https://atproto.com"
@@ -50,7 +50,7 @@ export function AuthForm({ signupAvailable = false }: { signupAvailable?: boolea
         </a>{" "}
         handle to log in. If you&apos;re unsure, this is likely your Bluesky (
         <code className="text-xs">.bsky.social</code>) account.
-      </p>
+      </FieldDescription>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
         <Field data-invalid={!!errors.handle}>
