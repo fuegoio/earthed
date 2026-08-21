@@ -1,18 +1,29 @@
 ---
 title: Authentication
-description: Authenticate with the Earthed API using session cookies or bearer tokens.
+description: Log in to Earthed with your AT Proto handle, and authenticate the CLI with bearer tokens.
 ---
 
-All endpoints under `/v1/` require authentication. The only exception is `GET /v1/health`.
+Earthed identity is your [AT Protocol](https://atproto.com) identity. You log
+in with your AT Proto handle — the same account you use on Bluesky or any
+other AT Proto app. There are no Earthed-specific passwords.
 
-Earthed supports two credential types:
+See [Identity & sync](/at-proto) for how identity and data sync work.
 
-- **Session cookie** — used by the web frontend. The browser sends it automatically after sign-in.
-- **Bearer token** — used by the CLI, scripts, and custom integrations. Send it in the `Authorization` header.
+## Logging in (web)
 
-When both are present, the bearer token takes precedence.
+Enter your handle (for example `alice.bsky.social`) on the login page. Earthed
+resolves your handle to your PDS and redirects you to your PDS to approve the
+login. After you approve, you're returned to Earthed with an active session.
 
-All data is scoped per user — you can only read and write your own feeds, entries, folders, and tokens.
+Earthed issues a **session cookie** that the browser sends automatically on
+every request. All data is scoped to the signed-in user — you can only read
+and write your own feeds, entries, and tokens.
+
+## Bearer tokens (CLI, scripts, integrations)
+
+For the CLI, scripts, and custom integrations, use a **bearer token** in the
+`Authorization` header. When both a session cookie and a bearer token are
+present, the bearer token takes precedence.
 
 ## Device flow (CLI login)
 
@@ -32,36 +43,6 @@ Tokens issued via the device flow expire after 14 days and are labeled
 `CLI (device flow)` in the token list so they can be identified and
 revoked. The plaintext token is never exposed to the web UI — it is
 returned only to the CLI that initiated the flow.
-
-## Session authentication
-
-Session endpoints live at `/auth/` and do not require authentication.
-
-Sign up:
-
-```bash
-curl -X POST http://localhost:8080/auth/signup \
-  -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"your-password"}'
-```
-
-Sign in to get a session cookie:
-
-```bash
-curl -X POST http://localhost:8080/auth/signin \
-  -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"your-password"}' \
-  -c cookies.txt
-```
-
-Pass the cookie in subsequent requests:
-
-```bash
-curl http://localhost:8080/v1/me \
-  -b cookies.txt
-```
-
-> **Email and password reset:** Verification and reset tokens are printed to the server's terminal output instead of being emailed. Check your terminal and open the URL from the logs. Wire a real mailer before deploying to production.
 
 ## API tokens
 

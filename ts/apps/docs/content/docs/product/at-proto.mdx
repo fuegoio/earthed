@@ -1,0 +1,53 @@
+---
+title: Identity & sync
+description: How Earthed identity works with AT Proto, and how your data stays in sync.
+---
+
+Earthed uses the [AT Protocol](https://atproto.com) for identity. Your Earthed
+account is your AT Proto account — the same one you use on Bluesky or any
+other AT Proto app. There is no separate Earthed password.
+
+## Logging in
+
+Sign in by entering your AT Proto handle (for example `alice.bsky.social` or
+`bob.earthed.app`). Earthed resolves your handle to your identity and
+authenticates you with your PDS via OAuth. You approve the login on your PDS,
+then you're returned to Earthed signed in.
+
+You can log into any Earthed instance with your handle — you are not tied to a
+single server. If your friend runs an Earthed instance and you have a Bluesky
+account, you can log into their instance directly.
+
+## Where your data lives
+
+Your social data lives on your PDS as public records, not locked inside
+Earthed:
+
+- Who you **follow**
+- Articles you **share**
+- Feeds you **subscribe to**
+- Your **feed lists**
+- Your Earthed **profile** (handle, bio)
+
+Earthed keeps a local **cache** of these records so the app stays fast, but
+your PDS is the source of truth. When you follow, share, or subscribe, Earthed
+writes the record to your PDS, and other Earthed users see it through the
+relay.
+
+## Syncing to a new instance
+
+The first time you log into an Earthed instance, it pulls your existing
+`io.earthed.*` records from your PDS into its local cache so your follows,
+shares, and feed subscriptions are all there immediately. After that it stays
+in sync via the relay.
+
+State that is not part of your AT Proto records — which entries you've read,
+your folders, your per-instance settings — stays on the instance where you
+created it. Switching instances means your social graph comes with you (it's
+on your PDS), but your local reading state does not.
+
+## Portability
+
+Because your identity and social graph live on your PDS, you're not locked
+into Earthed. Another AT Proto-compatible RSS reader can read the same
+records, and you can move your PDS without losing your Earthed social data.

@@ -25,6 +25,9 @@ description: Environment variables for the API and web containers.
 | `EARTHED_COOKIE_SAMESITE`      | `lax`                                                                     | Cookie SameSite mode: `lax`, `none`, or `strict`. `none` requires `EARTHED_COOKIE_SECURE=true` |
 | `EARTHED_COOKIE_DOMAIN`        | (unset)                                                                   | Bare host to set as the cookie `Domain` (e.g. `earthed.app`), so the session is shared across subdomains. Set to the registrable domain shared by the API and web app |
 | `EARTHED_TRUSTED_ORIGINS`      | (unset)                                                                   | Comma-separated list of allowed browser origins (e.g. `https://app.earthed.app`). When unset, any origin is allowed (dev only). When set, `EARTHED_WEB_URL` is always included automatically |
+| `EARTHED_PDS_URL`              | (unset)                                                                   | URL of your hosted PDS (e.g. `https://pds.your-domain.com`). Optional; lets users sign up on your domain. When unset, users still log in with any existing AT Proto handle. See [AT Proto & identity](/self-hosting/at-proto) |
+| `EARTHED_RELAY_URL`            | (unset)                                                                   | URL of the Earthed relay. Optional; enables cross-instance social features (global counts, federated shares). See [AT Proto & identity](/self-hosting/at-proto) |
+| `EARTHED_OAUTH_REDIRECT_URL`   | (unset)                                                                   | Public OAuth callback URL, e.g. `https://api.your-domain.com/auth/oauth/callback` |
 
 ## Web
 

@@ -41,6 +41,9 @@ services:
       EARTHED_DATABASE_URL: postgres://earthed:<db-password>@postgres:5432/earthed?sslmode=disable
       EARTHED_BASE_URL: https://api.your-domain.com
       EARTHED_WEB_URL: https://your-domain.com
+      EARTHED_PDS_URL: http://pds:2583
+      EARTHED_RELAY_URL: http://relay:9090
+      EARTHED_OAUTH_REDIRECT_URL: https://api.your-domain.com/auth/oauth/callback
     depends_on:
       postgres:
         condition: service_healthy
@@ -61,8 +64,32 @@ services:
       api:
         condition: service_healthy
 
+  pds:
+    image: ghcr.io/bluesky-social/pds:latest
+    ports:
+      - "2583:2583"
+    environment:
+      PDS_HOSTNAME: pds.your-domain.com
+      PDS_JWT_SECRET: <jwt-secret>
+      PDS_ADMIN_PASSWORD: <admin-password>
+      PDS_DATA_DIR: /pds
+    volumes:
+      - pdsdata:/pds
+
+  relay:
+    image: ghcr.io/fuegoio/earthed-relay:latest
+    ports:
+      - "9090:9090"
+    environment:
+      RELAY_DATABASE_URL: postgres://earthed:<db-password>@postgres:5432/earthed_relay?sslmode=disable
+      RELAY_HTTP_ADDR: ":9090"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   pgdata:
+  pdsdata:
 ```
 
 Start:
@@ -71,10 +98,18 @@ Start:
 docker compose up -d
 ```
 
-Run database migrations on first start:
+Run database migrations on first start. The API and relay each need their own
+database:
 
 ```bash
 docker compose exec api /app/earthed --migrate
+docker compose exec relay /app/earthed-relay --migrate
 ```
 
 `EARTHED_API_URL` is the server-side URL the web container uses to reach the API over the Docker network. `NEXT_PUBLIC_EARTHED_API_URL` is baked into the browser bundle and must be publicly reachable.
+
+The `pds` and `relay` services are optional but recommended — `pds` lets users
+sign up on your domain, and `relay` enables cross-instance social features.
+See [AT Proto & identity](/self-hosting/at-proto) for what each does and how to
+configure them. Users can still log in with any existing AT Proto handle
+(e.g. a Bluesky account) without running your own PDS.
