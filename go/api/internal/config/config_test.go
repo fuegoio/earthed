@@ -33,7 +33,7 @@ func baseEnv() map[string]string {
 		"SUNRED_COOKIE_SAMESITE":   "none",
 		"SUNRED_DATABASE_URL":      "postgres://sunred:sunred@localhost:5432/sunred?sslmode=disable",
 		"SUNRED_HTTP_ADDR":         ":8080",
-		"SUNRED_BASE_URL":          "http://localhost:8080",
+		"SUNRED_BASE_URL":          "http://127.0.0.1:8080",
 		"SUNRED_WEB_URL":           "http://localhost:3000",
 		"SUNRED_TRUSTED_ORIGINS":   "",
 		"SUNRED_LOG_FORMAT":        "pretty",

@@ -84,15 +84,7 @@ func (h *OAuthHandlers) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	// Stash the post-login redirect in a short-lived cookie so the callback
 	// can pick it up. The auth request state itself lives in the PGStore.
-	http.SetCookie(w, &http.Cookie{
-		Name:     "sunred_oauth_redirect",
-		Value:    redirectTo,
-		Path:     "/",
-		MaxAge:   600,
-		HttpOnly: true,
-		Secure:   h.cfg.CookieSecure,
-		SameSite: http.SameSiteLaxMode,
-	})
+	http.SetCookie(w, h.redirectCookie(redirectTo, 600))
 	http.Redirect(w, r, authURL, http.StatusFound)
 }
 
@@ -120,16 +112,28 @@ func (h *OAuthHandlers) handleSignup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
+	http.SetCookie(w, h.redirectCookie(redirectTo, 600))
+	http.Redirect(w, r, authURL, http.StatusFound)
+}
+
+// redirectCookie builds the short-lived sunred_oauth_redirect cookie used to
+// pass the post-login redirect target from the login/start handler to the
+// callback. It obeys the same cookie config (Secure, SameSite, Domain) as the
+// session cookie.
+func (h *OAuthHandlers) redirectCookie(value string, maxAge int) *http.Cookie {
+	ck := &http.Cookie{
 		Name:     "sunred_oauth_redirect",
-		Value:    redirectTo,
+		Value:    value,
 		Path:     "/",
-		MaxAge:   600,
+		MaxAge:   maxAge,
 		HttpOnly: true,
 		Secure:   h.cfg.CookieSecure,
-		SameSite: http.SameSiteLaxMode,
-	})
-	http.Redirect(w, r, authURL, http.StatusFound)
+		SameSite: auth.ParseSameSite(h.cfg.CookieSameSite),
+	}
+	if h.cfg.CookieDomain != "" {
+		ck.Domain = h.cfg.CookieDomain
+	}
+	return ck
 }
 
 // handleOAuthConfig returns public OAuth configuration so the web frontend
@@ -148,6 +152,19 @@ func (h *OAuthHandlers) handleOAuthConfig(w http.ResponseWriter, r *http.Request
 func (h *OAuthHandlers) handleCallback(w http.ResponseWriter, r *http.Request) {
 	if h.oauthApp == nil {
 		http.Error(w, "oauth not configured", http.StatusServiceUnavailable)
+		return
+	}
+
+	// The OAuth redirect_uri uses 127.0.0.1 (RFC 8252 rejects "localhost").
+	// When the PDS redirects the browser back to 127.0.0.1, bounce it to
+	// localhost so the session cookie (host-only, no Domain in dev) is scoped
+	// to the same host the user browses. This redirect happens before
+	// processing the callback, so no cookie is set on 127.0.0.1.
+	if strings.HasPrefix(r.Host, "127.0.0.1:") {
+		u := *r.URL
+		u.Host = "localhost:" + strings.TrimPrefix(r.Host, "127.0.0.1:")
+		u.Scheme = "http"
+		http.Redirect(w, r, u.String(), http.StatusFound)
 		return
 	}
 
@@ -216,7 +233,7 @@ func (h *OAuthHandlers) handleCallback(w http.ResponseWriter, r *http.Request) {
 
 	redirectTo := h.cfg.WebURL + "/"
 	if c, err := r.Cookie("sunred_oauth_redirect"); err == nil && c.Value != "" {
-		http.SetCookie(w, &http.Cookie{Name: "sunred_oauth_redirect", Path: "/", MaxAge: -1})
+		http.SetCookie(w, h.redirectCookie("", -1))
 		redirectTo = c.Value
 	}
 	http.Redirect(w, r, redirectTo, http.StatusFound)

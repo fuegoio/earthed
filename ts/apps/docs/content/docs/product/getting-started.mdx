@@ -24,12 +24,15 @@ Create a `.env` file in `go/api/`:
 
 ```bash
 SUNRED_DATABASE_URL=postgres://sunred:sunred@localhost:5432/sunred?sslmode=disable
-SUNRED_BASE_URL=http://localhost:8080
+SUNRED_BASE_URL=http://127.0.0.1:8080
 SUNRED_WEB_URL=http://localhost:3000
+SUNRED_OAUTH_REDIRECT_URL=http://127.0.0.1:8080/auth/oauth/callback
 ```
 
-The OAuth client_id and callback URL default from `SUNRED_BASE_URL`, so no
-extra OAuth configuration is needed for local development.
+The OAuth callback URL uses `127.0.0.1` because RFC 8252 rejects `localhost`
+in redirect URIs. The API redirects `127.0.0.1` callbacks to `localhost` so
+the session cookie (host-only on `localhost`) is shared across ports 3000
+and 8080.
 
 Users log in with their own AT Proto handle — typically a Bluesky account or an
 account on a personal PDS. No PDS setup is required. See
