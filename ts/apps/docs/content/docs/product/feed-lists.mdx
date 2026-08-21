@@ -1,89 +1,49 @@
 ---
-title: Feed Lists
-description: Curate, share, and follow collections of feeds.
+title: Feed lists
+description: Curate collections of feeds, share them, and follow lists from others.
 ---
 
-Feed lists are curated, shareable collections of feeds. A list stores feed URLs with optional title and site URL metadata — it is independent of any user's subscriptions, so it can be shared with anyone.
+A **feed list** is a curated, shareable collection of feeds — a reading list for a topic. A list stores feed URLs and titles, and it's independent of your subscriptions: you can share a list without subscribing to its feeds, and following someone else's list doesn't subscribe you to anything until you import it.
 
-## Create a feed list
+Lists live under **Feed lists** in the sidebar.
 
-```bash
-curl -X POST http://localhost:8080/v1/feed-lists \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer pla_your-token" \
-  -d '{"title":"Best engineering blogs","description":"A curated set.","is_public":true}'
-```
+## Create a list
 
-Set `is_public` to `true` so others can discover and follow the list. Change it later with `PATCH /v1/feed-lists/{listId}`.
+Go to **Feed lists → New list**. Give it a title, an optional description, and choose whether it's **public** (discoverable and followable by others) or **private** (only you can see it). You can change all of this later from the list's page.
 
 ## Add feeds to a list
 
-Only the list owner can add feeds. A `title` is optional but recommended so the list reads well before import.
+On a list you own, add feeds in two ways:
 
-```bash
-curl -X POST http://localhost:8080/v1/feed-lists/1/feeds \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer pla_your-token" \
-  -d '{"feed_url":"https://blog.golang.org/feeds/posts/default","title":"The Go Blog"}'
-```
+- **From your subscriptions** — search your feeds and click to add them.
+- **By URL** — paste any feed or website URL below, with an optional title.
 
-Adding the same URL twice is a no-op. Remove a feed with `DELETE /v1/feed-lists/{listId}/feeds/{itemId}`.
+Adding the same URL twice is a no-op. Remove a feed from a list with the trash icon next to it — this never affects your subscriptions.
 
-## Discover and follow
+## Follow a list
 
-Browse public lists:
+Open any public list and click **Follow** to bookmark it. Followed lists appear under **Lists you follow** on the Feed lists page, and you can unfollow from the same place.
 
-```bash
-curl http://localhost:8080/v1/feed-lists/discover \
-  -H "Authorization: Bearer pla_your-token"
-```
+You can't follow your own list or a private list.
 
-Follow a list to bookmark it:
+## Discover lists
 
-```bash
-curl -X POST http://localhost:8080/v1/feed-lists/1/follow \
-  -H "Authorization: Bearer pla_your-token"
-```
-
-You cannot follow your own list or a private list. Your followed lists are at `GET /v1/feed-lists/followed`. Unfollow with `DELETE /v1/feed-lists/{listId}/follow`.
+Click **Discover** on the Feed lists page to browse public lists others have shared. Follow any that look interesting.
 
 ## Import a list's feeds
 
-Following a list does not subscribe you to its feeds. To subscribe to every feed in a list at once:
+Following a list keeps it bookmarked but doesn't subscribe you to its feeds. To subscribe to every feed in a list at once, open it and click **Import all feeds**.
 
-```bash
-curl -X POST http://localhost:8080/v1/feed-lists/1/import \
-  -H "Authorization: Bearer pla_your-token"
-```
+Import is idempotent — feeds you already subscribe to are skipped, so it's safe to run more than once. You'll see how many were imported, how many skipped, and how many failed.
 
-```json
-{
-  "imported": 8,
-  "skipped": 2,
-  "failed": 0
-}
-```
+## Share a list
 
-Import is idempotent — feeds you already subscribe to are skipped.
+On a public list you own, click **Share** to copy a link to the list. Anyone who opens it can follow it or import its feeds (as long as they're on the same instance).
 
-## Update a feed list
+## Edit or delete a list
 
-```bash
-curl -X PATCH http://localhost:8080/v1/feed-lists/1 \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer pla_your-token" \
-  -d '{"title":"Updated title","is_public":false}'
-```
+Only the owner can edit or delete a list. From the list's page, **Edit** changes the title, description, and visibility; **Delete** removes the list and its feeds. Deleting a list never affects anyone's subscriptions — including yours.
 
-Only the owner can update or delete a list.
+## Programmatic access
 
-## Delete a feed list
-
-```bash
-curl -X DELETE http://localhost:8080/v1/feed-lists/1 \
-  -H "Authorization: Bearer pla_your-token"
-```
-
-## Visibility
-
-A list is visible to its owner, anyone following it, and — if public — everyone. `GET /v1/feed-lists/{listId}` returns the list with its feeds, follow status, and owner email to any user who can see it.
+Create, update, follow, and import lists through the [Feed lists API](/api-reference?tag=Feed%20lists).
