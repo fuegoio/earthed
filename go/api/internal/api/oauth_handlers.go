@@ -253,6 +253,7 @@ func (h *OAuthHandlers) handleClientMetadata(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	doc := h.oauthApp.Config.ClientMetadata()
+	doc.ClientName = ptr("Sunred")
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(doc)
 }
@@ -312,3 +313,6 @@ func (h *OAuthHandlers) announceToRelay(ctx context.Context, did, pdsURL, handle
 		slog.Warn("relay: announce user", "did", did, "err", err)
 	}
 }
+
+// ptr returns a pointer to s. Convenience for optional string fields.
+func ptr(s string) *string { return &s }
