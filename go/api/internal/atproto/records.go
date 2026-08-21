@@ -4,23 +4,11 @@ import "time"
 
 // Lexicon collection IDs for io.sunred.* record types.
 const (
-	CollectionProfile      = "io.sunred.actor.profile"
 	CollectionFollow       = "io.sunred.graph.follow"
 	CollectionShare        = "io.sunred.share.article"
 	CollectionSubscription = "io.sunred.feed.subscription"
 	CollectionFeedList     = "io.sunred.feed.list"
 )
-
-// ProfileRecord is the io.sunred.actor.profile record.
-// Stored at rkey "self" — one per user repo.
-type ProfileRecord struct {
-	Type        string `json:"$type"`
-	Handle      string `json:"handle"`
-	Bio         string `json:"bio,omitempty"`
-	DisplayName string `json:"displayName,omitempty"`
-	InstanceURL string `json:"instanceUrl,omitempty"`
-	CreatedAt   string `json:"createdAt"`
-}
 
 // FollowRecord is the io.sunred.graph.follow record.
 type FollowRecord struct {

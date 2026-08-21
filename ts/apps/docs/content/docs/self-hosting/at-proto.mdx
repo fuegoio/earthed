@@ -117,7 +117,7 @@ given instance Sunred backfills the local database from the PDS:
 1. List the user's `io.sunred.*` records (`com.atproto.repo.listRecords` for
    each collection).
 2. Populate the local cache: follows, shared articles, feed subscriptions,
-   feed lists, and the actor profile.
+   feed lists.
 3. Announce the user to the relay so it starts subscribing to that PDS repo
    stream.
 4. Subscribe to the relay's event stream for that DID to receive live updates.
@@ -139,7 +139,6 @@ the canonical copy, the cache is derived.
 
 | Collection | Purpose |
 | --- | --- |
-| `io.sunred.actor.profile` | The user's Sunred profile (handle, bio, instance URL) |
 | `io.sunred.graph.follow` | A follow relationship between two DIDs |
 | `io.sunred.share.article` | A shared article with metadata (URL, title, feed) |
 | `io.sunred.feed.subscription` | A feed the user subscribes to |

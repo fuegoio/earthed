@@ -21,19 +21,6 @@ func NewWriter(pdsURL, did, accessToken string) *Writer {
 	}
 }
 
-// PutProfile writes (or replaces) the io.sunred.actor.profile record.
-func (w *Writer) PutProfile(ctx context.Context, handle, bio, displayName, instanceURL string, createdAt time.Time) error {
-	_, err := w.client.PutRecord(ctx, w.did, CollectionProfile, "self", ProfileRecord{
-		Type:        CollectionProfile,
-		Handle:      handle,
-		Bio:         bio,
-		DisplayName: displayName,
-		InstanceURL: instanceURL,
-		CreatedAt:   FormatTime(createdAt),
-	})
-	return err
-}
-
 // PutFollow writes an io.sunred.graph.follow record and returns the rkey.
 func (w *Writer) PutFollow(ctx context.Context, subjectDID string) (string, error) {
 	rkey := NewTID()

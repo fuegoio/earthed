@@ -48,27 +48,6 @@ func writerMock(t *testing.T) (pdsURL string, cap *captured) {
 	return srv.URL, cap
 }
 
-func TestWriter_PutProfile(t *testing.T) {
-	pdsURL, cap := writerMock(t)
-	w := NewWriter(pdsURL, "did:plc:alice", "tok")
-	err := w.PutProfile(context.Background(), "alice", "My bio", "Alice", "https://sunred.example.com", time.Now())
-	if err != nil {
-		t.Fatalf("PutProfile: %v", err)
-	}
-	if cap.Collection != CollectionProfile {
-		t.Errorf("collection=%q, want %q", cap.Collection, CollectionProfile)
-	}
-	if cap.Rkey != "self" {
-		t.Errorf("rkey=%q, want 'self'", cap.Rkey)
-	}
-	if cap.Value["handle"] != "alice" {
-		t.Errorf("handle=%v, want 'alice'", cap.Value["handle"])
-	}
-	if cap.Value["bio"] != "My bio" {
-		t.Errorf("bio=%v, want 'My bio'", cap.Value["bio"])
-	}
-}
-
 func TestWriter_PutFollow(t *testing.T) {
 	pdsURL, cap := writerMock(t)
 	w := NewWriter(pdsURL, "did:plc:alice", "tok")
