@@ -45,6 +45,17 @@ func (s *Store) DeleteWebSession(ctx context.Context, token string) error {
 
 // --- DID-based users ---
 
+// UpdateUserEmail sets the email on a user row. Called after OAuth callback
+// when the PDS returns the account email via com.atproto.server.getSession
+// (requires the transition:email scope).
+func (s *Store) UpdateUserEmail(ctx context.Context, userID int, email string) error {
+	_, err := s.DB.ExecContext(ctx,
+		`UPDATE users SET email = $2 WHERE id = $1`,
+		userID, email,
+	)
+	return err
+}
+
 // GetOrCreateUserByDID returns the user ID for a DID, creating the user (and a
 // blank profile row) if it does not yet exist. handle is stored on the users
 // row; a user_profiles row is created so social queries join correctly.

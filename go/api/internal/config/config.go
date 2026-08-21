@@ -71,13 +71,12 @@ func Load() (*Config, error) {
 
 	// OAuth client_id and callback URL default from BaseURL. The client_id is a
 	// URL pointing at the client-metadata.json document this server serves.
-	// RFC 8252 requires loopback redirect URIs and client IDs to use an IP
-	// (127.0.0.1), not the "localhost" hostname. Normalize so local dev works
-	// out of the box.
+	// For loopback dev, NewLocalhostConfig encodes the callback URL in the
+	// client_id as query params, so the PDS never fetches it — localhost is
+	// fine and keeps the session cookie on the same origin as the web app.
 	base := strings.TrimRight(strings.TrimSpace(cfg.BaseURL), "/")
-	loopbackBase := strings.Replace(base, "://localhost", "://127.0.0.1", 1)
-	cfg.OAuthClientID = env("EARTHED_OAUTH_CLIENT_ID", loopbackBase+"/client-metadata.json")
-	cfg.OAuthCallbackURL = env("EARTHED_OAUTH_REDIRECT_URL", loopbackBase+"/auth/oauth/callback")
+	cfg.OAuthClientID = env("EARTHED_OAUTH_CLIENT_ID", base+"/client-metadata.json")
+	cfg.OAuthCallbackURL = env("EARTHED_OAUTH_REDIRECT_URL", base+"/auth/oauth/callback")
 
 	switch cfg.CookieSameSite {
 	case "lax", "none", "strict":

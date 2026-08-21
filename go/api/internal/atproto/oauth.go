@@ -27,11 +27,15 @@ func NewOAuthApp(db *sql.DB, clientID, callbackURL string) (*oauth.ClientApp, er
 		return nil, fmt.Errorf("oauth client_id and callback URL are required")
 	}
 
+	// "atproto" is the base scope; "transition:email" lets us read the
+	// account email via com.atproto.server.getSession on callback.
+	scopes := []string{"atproto", "transition:email"}
+
 	var config oauth.ClientConfig
 	if isLoopbackURL(callbackURL) {
-		config = oauth.NewLocalhostConfig(callbackURL, []string{"atproto"})
+		config = oauth.NewLocalhostConfig(callbackURL, scopes)
 	} else {
-		config = oauth.NewPublicConfig(clientID, callbackURL, []string{"atproto"})
+		config = oauth.NewPublicConfig(clientID, callbackURL, scopes)
 	}
 
 	store := NewPGStore(db)
