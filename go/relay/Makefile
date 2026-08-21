@@ -29,6 +29,8 @@ clean:
 
 db-up:
 	cd ../api && docker compose up -d
+	@docker exec earthed-postgres psql -U earthed -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'earthed_relay'" | grep -q 1 || \
+		docker exec earthed-postgres psql -U earthed -d postgres -c "CREATE DATABASE earthed_relay;"
 
 db-down:
 	cd ../api && docker compose down
