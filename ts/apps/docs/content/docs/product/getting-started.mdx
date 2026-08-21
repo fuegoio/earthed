@@ -27,6 +27,7 @@ LIMEN_SECRET=<32-byte-secret>
 EARTHED_DATABASE_URL=postgres://earthed:earthed@localhost:5432/earthed?sslmode=disable
 EARTHED_BASE_URL=http://localhost:8080
 EARTHED_WEB_URL=http://localhost:3000
+EARTHED_PDS_URL=http://localhost:2583
 ```
 
 `LIMEN_SECRET` is a 32-byte hex string used for session signing. Generate one with:
@@ -34,6 +35,11 @@ EARTHED_WEB_URL=http://localhost:3000
 ```bash
 openssl rand -hex 16
 ```
+
+`EARTHED_PDS_URL` points Earthed at a PDS for login and signup. For local
+development, run the [official PDS image](https://github.com/bluesky-social/pds)
+(see [AT Proto & identity](/self-hosting/at-proto)). Users can also log in with
+any existing AT Proto handle, such as a Bluesky account.
 
 ## 3. Run migrations
 
@@ -58,22 +64,11 @@ curl http://localhost:8080/v1/health
 
 ## 5. Create an account
 
-```bash
-curl -X POST http://localhost:8080/auth/signup \
-  -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"your-password"}'
-```
+Earthed uses AT Proto identity — there is no email/password signup. Start the
+web frontend (step 9) and sign in by entering an AT Proto handle. You can use
+a Bluesky handle (`alice.bsky.social`) or an account on your local PDS.
 
-Sign in to get a session cookie:
-
-```bash
-curl -X POST http://localhost:8080/auth/signin \
-  -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"your-password"}' \
-  -c cookies.txt
-```
-
-> **Email verification:** The verification token is printed to the server's terminal output. Copy the URL from the logs and open it before signing in.
+See [Identity & sync](/at-proto) for how login and data sync work.
 
 ## 6. Create an API token
 

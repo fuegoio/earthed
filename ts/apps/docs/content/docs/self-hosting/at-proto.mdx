@@ -1,0 +1,147 @@
+---
+title: AT Proto & identity
+description: How Earthed uses AT Proto for identity, OAuth login with a PDS, and the relay.
+---
+
+Earthed uses the [AT Protocol](https://atproto.com) for identity. Users log in
+with an AT Proto handle — the same account they use on Bluesky or any other
+AT Proto client. There are no Earthed-specific passwords.
+
+This page covers what an operator needs to know: the components involved, how
+login works, and how to run the PDS and relay alongside Earthed.
+
+## How identity works
+
+Every Earthed user is identified by a **DID** — a persistent identifier stored
+on their **PDS** (Personal Data Server). A handle (`alice.bsky.social`,
+`bob.earthed.app`) is a human-readable alias that resolves to a DID.
+
+```
+handle  ──resolve──▶  DID  ──points to──▶  PDS  ──holds──▶  user records
+```
+
+Earthed does not store passwords or issue its own identities. It authenticates
+users against their PDS using **AT Proto OAuth** (OAuth 2.0 with PKCE, DPoP,
+and PAR). After a successful login, Earthed issues its own session cookie so
+the web app can make authenticated requests.
+
+### Any server, any DID
+
+Every Earthed server can authenticate **any** DID, regardless of which PDS
+hosts it. A user with a Bluesky account (`alice.bsky.social`) and a user with
+an account on your own PDS (`bob.your-domain.com`) can both log into the same
+Earthed instance. You are not limited to users on your PDS.
+
+This means Earthed is a **cache and view** of each user's AT Proto data, not
+the source of truth. The PDS is the source of truth.
+
+## Components
+
+A full Earthed deployment has four pieces:
+
+| Component | Role | Required? |
+| --- | --- | --- |
+| API | Earthed REST server, session issuer, PDS/relay client | yes |
+| Web | Next.js frontend | yes |
+| PDS | Hosts user records, handles OAuth | one per user (yours or remote) |
+| Relay | Aggregates `io.earthed.*` records across PDSes | recommended |
+
+### The PDS
+
+Each user's data lives on a PDS. You have two options:
+
+- **Run your own PDS** and offer accounts on your domain (e.g.
+  `you.earthed.app`). This is how earthed.app itself works.
+- **Let users log in with any PDS** — including Bluesky's (`*.bsky.social`).
+  No PDS setup on your side; Earthed authenticates against the user's remote
+  PDS at login time.
+
+These are not exclusive. Running your own PDS lets people sign up directly on
+your instance, while still allowing anyone with an existing AT Proto account
+to log in.
+
+To run a PDS, use the [official PDS image](https://github.com/bluesky-social/pds).
+Earthed is compatible with any standards-compliant AT Proto PDS.
+
+### The relay
+
+The relay watches the repo streams of every PDS that hosts an Earthed user and
+aggregates `io.earthed.*` records (follows, article shares, feed subscriptions)
+into global counts. It then streams those events back to Earthed instances so
+they stay in sync across the federated network.
+
+The relay is a separate Go service with its own database. Point the API at it
+with `EARTHED_RELAY_URL`. If unset, cross-instance social features (global
+follower counts, federated shares) are disabled — the instance still works
+standalone.
+
+## Login flow
+
+```
+1. User enters their handle in the web UI
+2. Earthed resolves handle → DID → PDS endpoint
+3. Earthed registers as an OAuth client with that PDS (dynamic registration)
+4. Earthed sends a Pushed Authorization Request (PAR) and redirects the
+   user to the PDS's authorize endpoint with a PKCE challenge
+5. User approves on the PDS
+6. PDS redirects back to Earthed's callback with an authorization code
+7. Earthed exchanges the code for DPoP-bound access + refresh tokens,
+   stored keyed by the user's DID
+8. Earthed creates or looks up the local user row by DID, issues a
+   session cookie, and redirects to the app
+```
+
+Earthed holds a DPoP keypair per account so it can sign PDS requests with the
+bound access token. You do not need to manage these keys manually — Earthed
+generates and stores them.
+
+## Sync on first login
+
+Because Earthed is a cache of the user's PDS, the first time a DID logs into a
+given instance Earthed backfills the local database from the PDS:
+
+1. List the user's `io.earthed.*` records (`com.atproto.repo.listRecords` for
+   each collection).
+2. Populate the local cache: follows, shared articles, feed subscriptions,
+   feed lists, and the actor profile.
+3. Announce the user to the relay so it starts subscribing to that PDS repo
+   stream.
+4. Subscribe to the relay's event stream for that DID to receive live updates.
+
+Subsequent logins reuse the existing cache and resume the relay subscription.
+Local-only state that is not part of the AT Proto records — read state,
+folders, per-instance settings — stays on the instance where it was created
+and does not transfer with the DID.
+
+## Writing back to the PDS
+
+When a user follows someone, shares an article, or subscribes to a feed,
+Earthed writes an `io.earthed.*` record to their PDS repo (signed with the
+DPoP-bound access token). The relay picks up the record from the PDS repo
+stream and federates it. The local cache and the PDS stay in sync — the PDS is
+the canonical copy, the cache is derived.
+
+## Records Earthed uses
+
+| Collection | Purpose |
+| --- | --- |
+| `io.earthed.actor.profile` | The user's Earthed profile (handle, bio, instance URL) |
+| `io.earthed.graph.follow` | A follow relationship between two DIDs |
+| `io.earthed.share.article` | A shared article with metadata (URL, title, feed) |
+| `io.earthed.feed.subscription` | A feed the user subscribes to |
+| `io.earthed.feed.list` | A named, optionally public list of feeds |
+
+These are public records on the user's PDS. Other Earthed instances and the
+relay read them to build the federated social graph.
+
+## Configuration
+
+See [Configuration](/self-hosting/configuration) for the environment variables
+that control PDS and relay behavior. The key ones:
+
+- `EARTHED_PDS_URL` — your hosted PDS (optional; lets users sign up on your
+  domain).
+- `EARTHED_RELAY_URL` — the relay endpoint (optional; enables cross-instance
+  social features).
+- `EARTHED_OAUTH_REDIRECT_URL` — the public callback URL for OAuth
+  (`https://api.your-domain.com/auth/oauth/callback`).
