@@ -1544,13 +1544,21 @@ export const UserSchema = {
         },
         is_admin: {
             type: 'boolean'
+        },
+        pds_sync_status: {
+            type: 'string'
+        },
+        pds_synced_at: {
+            format: 'date-time',
+            type: 'string'
         }
     },
     required: [
         'id',
         'email',
         'is_admin',
-        'created_at'
+        'created_at',
+        'pds_sync_status'
     ],
     type: 'object'
 } as const;
@@ -2702,13 +2710,21 @@ export const UserWritableSchema = {
         },
         is_admin: {
             type: 'boolean'
+        },
+        pds_sync_status: {
+            type: 'string'
+        },
+        pds_synced_at: {
+            format: 'date-time',
+            type: 'string'
         }
     },
     required: [
         'id',
         'email',
         'is_admin',
-        'created_at'
+        'created_at',
+        'pds_sync_status'
     ],
     type: 'object'
 } as const;

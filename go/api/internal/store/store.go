@@ -677,10 +677,10 @@ func (s *Store) GetUserByID(ctx context.Context, id int) (*User, error) {
 	var handle sql.NullString
 	err := s.DB.QueryRowContext(ctx,
 		`SELECT u.id, COALESCE(u.email,''), COALESCE(u.first_name, ''), false, u.created_at,
-		        u.handle
+		        u.handle, u.pds_sync_status, u.pds_synced_at
 		 FROM users u
 		 WHERE u.id = $1`, id,
-	).Scan(&u.ID, &u.Email, &u.FirstName, &u.IsAdmin, &u.CreatedAt, &handle)
+	).Scan(&u.ID, &u.Email, &u.FirstName, &u.IsAdmin, &u.CreatedAt, &handle, &u.PDSSyncStatus, &u.PDSSyncedAt)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -689,6 +689,19 @@ func (s *Store) GetUserByID(ctx context.Context, id int) (*User, error) {
 	}
 	u.Handle = handle.String
 	return &u, nil
+}
+
+// SetUserSyncStatus updates the post-login PDS sync status for a user. When
+// status is a terminal state ("idle" or "failed"), pds_synced_at is stamped to
+// NOW(); for "syncing" it is left untouched.
+func (s *Store) SetUserSyncStatus(ctx context.Context, userID int, status string) error {
+	q := `UPDATE users SET pds_sync_status = $1 WHERE id = $2`
+	switch status {
+	case "idle", "failed":
+		q = `UPDATE users SET pds_sync_status = $1, pds_synced_at = NOW() WHERE id = $2`
+	}
+	_, err := s.DB.ExecContext(ctx, q, status, userID)
+	return err
 }
 
 // --- Cleanup ---

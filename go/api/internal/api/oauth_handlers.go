@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -213,12 +214,22 @@ func (h *OAuthHandlers) handleCallback(w http.ResponseWriter, r *http.Request) {
 
 	// Sync the PDS data into the local cache. On first login this backfills the
 	// user's existing io.sunred.* records; on subsequent logins it reconciles.
-	// Run synchronously so the user lands in an app that already has their data,
-	// but never block the login on a sync failure.
+	// The sync runs in the background so login is never blocked; the web UI
+	// polls the user's pds_sync_status to show a waiting state until it settles.
+	if err := h.store.SetUserSyncStatus(r.Context(), userID, "syncing"); err != nil {
+		slog.Warn("oauth: set sync status syncing", "did", did, "err", err)
+	}
 	go func() {
 		bgCtx := context.Background()
 		if err := h.syncFromPDS(bgCtx, did, userID, sessData.SessionID); err != nil {
 			slog.Warn("oauth: sync from pds", "did", did, "err", err)
+			if serr := h.store.SetUserSyncStatus(bgCtx, userID, "failed"); serr != nil {
+				slog.Warn("oauth: set sync status failed", "did", did, "err", serr)
+			}
+		} else {
+			if serr := h.store.SetUserSyncStatus(bgCtx, userID, "idle"); serr != nil {
+				slog.Warn("oauth: set sync status idle", "did", did, "err", serr)
+			}
 		}
 		// Announce to the relay so it subscribes to this PDS repo stream.
 		h.announceToRelay(bgCtx, did, sessData.HostURL, handle)
@@ -283,13 +294,18 @@ func (h *OAuthHandlers) syncFromPDS(ctx context.Context, did string, userID int,
 	client := sess.APIClient()
 
 	// Backfill each io.sunred.* collection by listing records newest-first.
+	// Sub-step failures are logged and collected so the caller can mark the
+	// sync as failed without aborting the remaining collections.
+	var errs []error
 	if err := syncFollows(ctx, client, h.store, userID); err != nil {
 		slog.Warn("sync: follows", "err", err)
+		errs = append(errs, err)
 	}
 	if err := syncFeedSubscriptions(ctx, client, h.store, userID); err != nil {
 		slog.Warn("sync: feed subs", "err", err)
+		errs = append(errs, err)
 	}
-	return nil
+	return errors.Join(errs...)
 }
 
 // announceToRelay notifies the relay of a user DID (see atproto.go).

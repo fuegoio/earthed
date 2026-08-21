@@ -147,6 +147,11 @@ type User struct {
 	// Handle is the user's social handle (e.g. "fuego"). Populated when a
 	// profile row exists; empty string otherwise.
 	Handle string `json:"handle,omitempty"`
+	// PDSSyncStatus tracks the post-login backfill from the user's PDS:
+	// "syncing" while in progress, "idle" once done, "failed" on error.
+	// The web UI polls this to show a waiting state on first login.
+	PDSSyncStatus string     `json:"pds_sync_status"`
+	PDSSyncedAt   *time.Time `json:"pds_synced_at,omitempty"`
 }
 
 // UserProfile holds the social profile data for a user.
@@ -179,17 +184,17 @@ type ATProtoCredentials struct {
 
 // SharedArticle is an article that a user shared on the social timeline.
 type SharedArticle struct {
-	ID           int64      `json:"id"`
-	UserID       int        `json:"user_id"`
-	ArticleURL   string     `json:"article_url"`
-	Title        string     `json:"title"`
-	Description  string     `json:"description,omitempty"`
-	FeedURL      string     `json:"feed_url,omitempty"`
-	FeedTitle    string     `json:"feed_title,omitempty"`
-	FeedSiteURL  string     `json:"feed_site_url,omitempty"`
-	Author       string     `json:"author,omitempty"`
-	PublishedAt  *time.Time `json:"published_at,omitempty"`
-	SharedAt     time.Time  `json:"shared_at"`
+	ID          int64      `json:"id"`
+	UserID      int        `json:"user_id"`
+	ArticleURL  string     `json:"article_url"`
+	Title       string     `json:"title"`
+	Description string     `json:"description,omitempty"`
+	FeedURL     string     `json:"feed_url,omitempty"`
+	FeedTitle   string     `json:"feed_title,omitempty"`
+	FeedSiteURL string     `json:"feed_site_url,omitempty"`
+	Author      string     `json:"author,omitempty"`
+	PublishedAt *time.Time `json:"published_at,omitempty"`
+	SharedAt    time.Time  `json:"shared_at"`
 	// Sharer info, populated on social timeline queries.
 	SharerHandle    string `json:"sharer_handle,omitempty"`
 	SharerFirstName string `json:"sharer_first_name,omitempty"`

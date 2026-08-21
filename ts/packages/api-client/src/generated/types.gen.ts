@@ -473,6 +473,8 @@ export type User = {
     handle?: string;
     id: number;
     is_admin: boolean;
+    pds_sync_status: string;
+    pds_synced_at?: string;
 };
 
 export type UserProfile = {
@@ -775,6 +777,8 @@ export type UserWritable = {
     handle?: string;
     id: number;
     is_admin: boolean;
+    pds_sync_status: string;
+    pds_synced_at?: string;
 };
 
 export type UserProfileWritable = {
