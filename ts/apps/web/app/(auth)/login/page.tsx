@@ -21,17 +21,30 @@ export default async function LoginPage({
   // redirect target (or home). 4xx/5xx from the API → render the form.
   await redirectIfAuthenticated(redirectTo);
 
-  const errorMessage = error ? ERROR_MESSAGES[error] ?? "Login failed." : null;
+  const errorMessage = error ? ERROR_MESSAGES[error] ?? "Login failed. Please try again." : null;
   const { default_pds } = await getOAuthConfig();
 
   return (
     <Suspense>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-1.5 text-center">
+          <h1 className="font-serif text-2xl font-bold tracking-tight">
+            Welcome to Earthed
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            A calm place to read your feeds.
+          </p>
+        </div>
+
         {errorMessage && (
-          <div className="rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          <div
+            role="alert"
+            className="rounded-lg border border-destructive/40 bg-destructive/8 px-4 py-3 text-sm text-destructive"
+          >
             {errorMessage}
           </div>
         )}
+
         <AuthForm signupAvailable={!!default_pds} />
       </div>
     </Suspense>
