@@ -26,11 +26,11 @@ Create a `.env` file in `go/api/`:
 SUNRED_DATABASE_URL=postgres://sunred:sunred@localhost:5432/sunred?sslmode=disable
 SUNRED_BASE_URL=http://127.0.0.1:8080
 SUNRED_WEB_URL=http://localhost:3000
-SUNRED_OAUTH_REDIRECT_URL=http://127.0.0.1:8080/auth/oauth/callback
 ```
 
-The OAuth callback URL uses `127.0.0.1` because RFC 8252 rejects `localhost`
-in redirect URIs. The API redirects `127.0.0.1` callbacks to `localhost` so
+`SUNRED_BASE_URL` must use `127.0.0.1` (not `localhost`) because RFC 8252
+rejects `localhost` in OAuth redirect URIs. The API derives the callback URL
+from `SUNRED_BASE_URL` and redirects `127.0.0.1` callbacks to `localhost` so
 the session cookie (host-only on `localhost`) is shared across ports 3000
 and 8080.
 

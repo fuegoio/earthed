@@ -25,7 +25,7 @@ description: Environment variables for the API and web containers.
 | `SUNRED_COOKIE_DOMAIN`        | (unset)                                                                   | Bare host to set as the cookie `Domain` (e.g. `sunred.app`), so the session is shared across subdomains. Set to the registrable domain shared by the API and web app |
 | `SUNRED_TRUSTED_ORIGINS`      | (unset)                                                                   | Comma-separated list of allowed browser origins (e.g. `https://app.sunred.app`). When unset, any origin is allowed (dev only). When set, `SUNRED_WEB_URL` is always included automatically |
 | `SUNRED_RELAY_URL`            | (unset)                                                                   | URL of the Sunred relay. Optional; enables cross-instance social features (global counts, federated shares). See [AT Proto & identity](/self-hosting/at-proto) |
-| `SUNRED_OAUTH_REDIRECT_URL`   | (unset)                                                                   | Public OAuth callback URL. In dev, set to `http://127.0.0.1:8080/auth/oauth/callback` (RFC 8252 requires `127.0.0.1`, not `localhost`; the API redirects `127.0.0.1` callbacks to `localhost` so the session cookie is scoped to `localhost`). In production, e.g. `https://api.your-domain.com/auth/oauth/callback` |
+| `SUNRED_DEFAULT_PDS`         | `https://snrd.social`                                                                   | PDS URL for the `/auth/oauth/signup` endpoint (server-side fallback; the web UI uses `NEXT_PUBLIC_SUNRED_DEFAULT_PDS`). See [AT Proto & identity](/self-hosting/at-proto) |
 
 ## Web
 

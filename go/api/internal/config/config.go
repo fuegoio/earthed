@@ -42,7 +42,7 @@ type Config struct {
 	// "<BaseURL>/client-metadata.json".
 	OAuthClientID string
 	// OAuthCallbackURL is the public OAuth redirect URL the PDS sends the
-	// authorization code back to. Defaults to "<BaseURL>/auth/oauth/callback".
+	// authorization code back to. Always "<BaseURL>/auth/oauth/callback".
 	OAuthCallbackURL string
 }
 
@@ -70,15 +70,15 @@ func Load() (*Config, error) {
 		DefaultPDS:    strings.TrimRight(strings.TrimSpace(env("SUNRED_DEFAULT_PDS", "https://snrd.social")), "/"),
 	}
 
-	// OAuth client_id and callback URL default from BaseURL. The client_id is a
+	// OAuth client_id and callback URL derive from BaseURL. The client_id is a
 	// URL pointing at the client-metadata.json document this server serves.
 	// For loopback dev, NewLocalhostConfig encodes the callback URL in the
 	// client_id as query params, so the PDS never fetches it — 127.0.0.1 is
-	// used (RFC 8252 rejects "localhost") and keeps the session cookie on the
-	// same origin as the web app via the /api proxy.
+	// used (RFC 8252 rejects "localhost") and the session cookie stays on
+	// localhost (shared across ports 3000 and 8080).
 	base := strings.TrimRight(strings.TrimSpace(cfg.BaseURL), "/")
 	cfg.OAuthClientID = env("SUNRED_OAUTH_CLIENT_ID", base+"/client-metadata.json")
-	cfg.OAuthCallbackURL = env("SUNRED_OAUTH_REDIRECT_URL", base+"/auth/oauth/callback")
+	cfg.OAuthCallbackURL = base + "/auth/oauth/callback"
 
 	switch cfg.CookieSameSite {
 	case "lax", "none", "strict":

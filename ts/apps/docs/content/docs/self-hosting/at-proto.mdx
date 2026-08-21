@@ -155,7 +155,8 @@ that control relay and OAuth behavior. The key ones:
 
 - `SUNRED_RELAY_URL` — the relay endpoint (optional; enables cross-instance
   social features).
-- `SUNRED_OAUTH_REDIRECT_URL` — the public callback URL for OAuth
-  (`https://api.your-domain.com/auth/oauth/callback`).
+- `SUNRED_BASE_URL` — the public URL of the API. The OAuth callback URL
+  derives from this (`<BaseURL>/auth/oauth/callback`). Must use `127.0.0.1`
+  (not `localhost`) in dev for RFC 8252 compliance.
 - `NEXT_PUBLIC_SUNRED_DEFAULT_PDS` — the default PDS shown on the login page
   (web-only config; defaults to `https://snrd.social`).
