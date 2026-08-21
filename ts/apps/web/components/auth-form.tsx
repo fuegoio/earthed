@@ -38,20 +38,6 @@ export function AuthForm({ signupAvailable = false }: { signupAvailable?: boolea
 
   return (
     <div className="flex flex-col gap-6">
-      <FieldDescription>
-        Use your{" "}
-        <a
-          href="https://atproto.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-medium text-foreground hover:underline"
-        >
-          AT Protocol
-        </a>{" "}
-        handle to log in. If you&apos;re unsure, this is likely your Bluesky (
-        <code className="text-xs">.bsky.social</code>) account.
-      </FieldDescription>
-
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
         <Field data-invalid={!!errors.handle}>
           <FieldLabel htmlFor="handle">Handle</FieldLabel>
@@ -69,7 +55,17 @@ export function AuthForm({ signupAvailable = false }: { signupAvailable?: boolea
             <FieldError>{errors.handle.message}</FieldError>
           ) : (
             <FieldDescription>
-              The same account you use in the Bluesky app.
+              Use your{" "}
+              <a
+                href="https://atproto.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-foreground hover:underline"
+              >
+                AT Protocol
+              </a>{" "}
+              handle to log in. If you&apos;re unsure, this is likely your Bluesky (
+              <code className="text-xs">.bsky.social</code>) account.
             </FieldDescription>
           )}
         </Field>
