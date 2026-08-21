@@ -95,7 +95,6 @@ func TestATProtoSyncShare_Share(t *testing.T) {
 	userID := mustSeedUser(t, s, "did:plc:sharer")
 	defer func() {
 		_, _ = s.DB.ExecContext(context.Background(), `DELETE FROM shared_articles WHERE user_id = $1`, userID)
-		_, _ = s.DB.ExecContext(context.Background(), `DELETE FROM user_profiles WHERE user_id = $1`, userID)
 	}()
 
 	pdsURL, calls := mockPDSPutRecord(t)
@@ -153,7 +152,6 @@ func TestATProtoSyncShare_Unshare(t *testing.T) {
 	userID := mustSeedUser(t, s, "did:plc:unsharer")
 	defer func() {
 		_, _ = s.DB.ExecContext(context.Background(), `DELETE FROM shared_articles WHERE user_id = $1`, userID)
-		_, _ = s.DB.ExecContext(context.Background(), `DELETE FROM user_profiles WHERE user_id = $1`, userID)
 	}()
 
 	pdsURL, calls := mockPDSPutRecord(t)
@@ -328,27 +326,21 @@ func TestRelayConsumer_UnfollowEvent(t *testing.T) {
 func seedCredentials(t *testing.T, s *store.Store, userID int, did, pdsURL string) {
 	t.Helper()
 	_, err := s.DB.ExecContext(context.Background(), `
-		INSERT INTO user_profiles (user_id, did, pds_url, atproto_access_token, atproto_refresh_token)
-		VALUES ($1, $2, $3, 'test-token', 'test-refresh')
-		ON CONFLICT (user_id) DO UPDATE SET
-			did = EXCLUDED.did, pds_url = EXCLUDED.pds_url,
-			atproto_access_token = EXCLUDED.atproto_access_token,
-			atproto_refresh_token = EXCLUDED.atproto_refresh_token`,
+		UPDATE users SET did = $2, pds_url = $3, atproto_access_token = 'test-token', atproto_refresh_token = 'test-refresh'
+		WHERE id = $1`,
 		userID, did, pdsURL)
 	if err != nil {
 		t.Fatalf("seed credentials: %v", err)
 	}
 	t.Cleanup(func() {
-		_, _ = s.DB.ExecContext(context.Background(), `DELETE FROM user_profiles WHERE user_id = $1`, userID)
 	})
 }
 
 func seedProfile(t *testing.T, s *store.Store, userID int, did, handle string) {
 	t.Helper()
 	_, err := s.DB.ExecContext(context.Background(), `
-		INSERT INTO user_profiles (user_id, did, handle)
-		VALUES ($1, $2, $3)
-		ON CONFLICT (user_id) DO UPDATE SET did = EXCLUDED.did, handle = EXCLUDED.handle`,
+		UPDATE users SET did = $2, handle = $3
+		WHERE id = $1`,
 		userID, did, handle)
 	if err != nil {
 		t.Fatalf("seed profile: %v", err)
@@ -359,6 +351,5 @@ func cleanupFollows(t *testing.T, s *store.Store, followerID, followeeID int) {
 	t.Helper()
 	t.Cleanup(func() {
 		_, _ = s.DB.ExecContext(context.Background(), `DELETE FROM user_follows WHERE follower_id = $1 AND followee_id = $2`, followerID, followeeID)
-		_, _ = s.DB.ExecContext(context.Background(), `DELETE FROM user_profiles WHERE user_id IN ($1, $2)`, followerID, followeeID)
 	})
 }

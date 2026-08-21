@@ -105,7 +105,7 @@ export default function DiscoverPage() {
                 )}
                 <p className="mt-1 text-xs text-muted-foreground">
                   {list.feed_count} {list.feed_count === 1 ? "feed" : "feeds"}
-                  {list.owner_email ? ` · by ${list.owner_email}` : ""}
+                  {list.owner_handle ? ` · by ${list.owner_handle}` : ""}
                 </p>
               </div>
               {list.is_following ? (

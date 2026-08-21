@@ -20,7 +20,6 @@ func TestConnectATProto_And_GetCredentials(t *testing.T) {
 	if err != nil {
 		t.Fatalf("UpsertHandle: %v", err)
 	}
-	t.Cleanup(func() { _, _ = s.DB.Exec(`DELETE FROM user_profiles WHERE user_id=$1`, userID) })
 
 	expires := time.Now().Add(2 * time.Hour).Truncate(time.Second)
 	if err := s.ConnectATProto(ctx, userID,
@@ -77,7 +76,6 @@ func TestGetATProtoCredentials_NoDID(t *testing.T) {
 	if err != nil {
 		t.Fatalf("UpsertHandle: %v", err)
 	}
-	t.Cleanup(func() { _, _ = s.DB.Exec(`DELETE FROM user_profiles WHERE user_id=$1`, userID) })
 
 	// No ConnectATProto call → DID is null → should return nil.
 	creds, err := s.GetATProtoCredentials(ctx, userID)
@@ -95,7 +93,6 @@ func TestDisconnectATProto(t *testing.T) {
 	userID := seedUser(t, s, fmt.Sprintf("atproto-disconnect-%d@example.com", time.Now().UnixNano()))
 	handle := fmt.Sprintf("disconnect%d", time.Now().UnixNano()%99999)
 	_, _ = s.UpsertHandle(ctx, userID, handle, "")
-	t.Cleanup(func() { _, _ = s.DB.Exec(`DELETE FROM user_profiles WHERE user_id=$1`, userID) })
 
 	expires := time.Now().Add(2 * time.Hour)
 	_ = s.ConnectATProto(ctx, userID, "did:plc:x", "https://pds.example.com", "acc", "ref", &expires)
@@ -118,7 +115,6 @@ func TestUpdateATProtoTokens(t *testing.T) {
 	userID := seedUser(t, s, fmt.Sprintf("atproto-tokens-%d@example.com", time.Now().UnixNano()))
 	handle := fmt.Sprintf("tokentest%d", time.Now().UnixNano()%99999)
 	_, _ = s.UpsertHandle(ctx, userID, handle, "")
-	t.Cleanup(func() { _, _ = s.DB.Exec(`DELETE FROM user_profiles WHERE user_id=$1`, userID) })
 
 	expires := time.Now().Add(2 * time.Hour)
 	_ = s.ConnectATProto(ctx, userID, "did:plc:tok", "https://pds.example.com", "old-acc", "old-ref", &expires)
@@ -151,7 +147,6 @@ func TestListUsersWithATProto(t *testing.T) {
 	_, _ = s.UpsertHandle(ctx, u2, h2, "")
 	_, _ = s.UpsertHandle(ctx, u3, h3, "") // u3 gets handle but no AT Proto
 	t.Cleanup(func() {
-		_, _ = s.DB.Exec(`DELETE FROM user_profiles WHERE user_id IN ($1,$2,$3)`, u1, u2, u3)
 	})
 
 	exp := time.Now().Add(2 * time.Hour)
@@ -190,7 +185,6 @@ func TestFollowATProtoRkey(t *testing.T) {
 	_, _ = s.UpsertHandle(ctx, u2, h2, "")
 	t.Cleanup(func() {
 		_, _ = s.DB.Exec(`DELETE FROM user_follows WHERE follower_id=$1 OR followee_id=$1 OR follower_id=$2 OR followee_id=$2`, u1, u2)
-		_, _ = s.DB.Exec(`DELETE FROM user_profiles WHERE user_id IN ($1,$2)`, u1, u2)
 	})
 	_ = s.FollowUser(ctx, u1, h2)
 

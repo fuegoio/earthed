@@ -33,7 +33,7 @@ var handleRe = regexp.MustCompile(`^[a-zA-Z0-9_-]{3,64}$`)
 
 // --- Handles / Profiles ---
 
-// UpsertHandle creates or updates the social handle for a user.
+// UpsertHandle creates or updates the handle and bio for a user.
 // Returns ErrHandleInvalid for bad format, ErrHandleTaken for conflicts.
 func (s *Store) UpsertHandle(ctx context.Context, userID int, handle, bio string) (*UserProfile, error) {
 	handle = strings.TrimSpace(handle)
@@ -43,17 +43,13 @@ func (s *Store) UpsertHandle(ctx context.Context, userID int, handle, bio string
 
 	var p UserProfile
 	err := s.DB.QueryRowContext(ctx, `
-		INSERT INTO user_profiles (user_id, handle, bio, updated_at)
-		VALUES ($1, $2, $3, NOW())
-		ON CONFLICT (user_id) DO UPDATE
-		  SET handle = EXCLUDED.handle,
-		      bio    = EXCLUDED.bio,
-		      updated_at = NOW()
-		RETURNING user_id, handle, bio, created_at, updated_at`,
+		UPDATE users SET handle = $2, bio = $3
+		WHERE id = $1
+		RETURNING id, COALESCE(handle, ''), bio, created_at`,
 		userID, handle, bio,
-	).Scan(&p.UserID, &p.Handle, &p.Bio, &p.CreatedAt, &p.UpdatedAt)
+	).Scan(&p.UserID, &p.Handle, &p.Bio, &p.CreatedAt)
 	if err != nil {
-		if strings.Contains(err.Error(), "idx_user_profiles_handle") ||
+		if strings.Contains(err.Error(), "idx_users_handle") ||
 			strings.Contains(err.Error(), "unique") {
 			return nil, ErrHandleTaken
 		}
@@ -68,25 +64,24 @@ func (s *Store) GetProfileByHandle(ctx context.Context, handle string, viewerID 
 	var p UserProfile
 	err := s.DB.QueryRowContext(ctx, `
 		SELECT
-		  p.user_id,
-		  p.handle,
-		  p.bio,
-		  p.created_at,
-		  p.updated_at,
-		  COALESCE(u.first_name, ''),
-		  (SELECT COUNT(*) FROM user_follows WHERE followee_id = p.user_id),
-		  (SELECT COUNT(*) FROM user_follows WHERE follower_id = p.user_id),
+		  u.id,
+		  u.handle,
+		  u.bio,
+		  u.created_at,
+		  COALESCE(u.display_name, ''),
+		  COALESCE(u.did, ''),
+		  (SELECT COUNT(*) FROM user_follows WHERE followee_id = u.id),
+		  (SELECT COUNT(*) FROM user_follows WHERE follower_id = u.id),
 		  CASE WHEN $2 > 0 THEN
-		    EXISTS(SELECT 1 FROM user_follows WHERE follower_id = $2 AND followee_id = p.user_id)
+		    EXISTS(SELECT 1 FROM user_follows WHERE follower_id = $2 AND followee_id = u.id)
 		  ELSE false END
-		FROM user_profiles p
-		JOIN users u ON u.id = p.user_id
-		WHERE p.handle = $1`,
+		FROM users u
+		WHERE u.handle = $1`,
 		handle, viewerID,
 	).Scan(
 		&p.UserID, &p.Handle, &p.Bio,
-		&p.CreatedAt, &p.UpdatedAt,
-		&p.FirstName,
+		&p.CreatedAt,
+		&p.DisplayName, &p.DID,
 		&p.FollowerCount, &p.FollowingCount,
 		&p.IsFollowing,
 	)
@@ -103,9 +98,9 @@ func (s *Store) GetProfileByHandle(ctx context.Context, handle string, viewerID 
 func (s *Store) GetProfileByUserID(ctx context.Context, userID int) (*UserProfile, error) {
 	var p UserProfile
 	err := s.DB.QueryRowContext(ctx, `
-		SELECT user_id, handle, bio, created_at, updated_at
-		FROM user_profiles WHERE user_id = $1`, userID,
-	).Scan(&p.UserID, &p.Handle, &p.Bio, &p.CreatedAt, &p.UpdatedAt)
+		SELECT id, COALESCE(handle, ''), bio, created_at
+		FROM users WHERE id = $1`, userID,
+	).Scan(&p.UserID, &p.Handle, &p.Bio, &p.CreatedAt)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -124,7 +119,7 @@ func (s *Store) FollowUser(ctx context.Context, followerID int, followeeHandle s
 	// Resolve handle → user_id.
 	var followeeID int
 	err := s.DB.QueryRowContext(ctx,
-		`SELECT user_id FROM user_profiles WHERE handle = $1`, followeeHandle,
+		`SELECT id FROM users WHERE handle = $1`, followeeHandle,
 	).Scan(&followeeID)
 	if err == sql.ErrNoRows {
 		return ErrProfileNotFound
@@ -153,7 +148,7 @@ func (s *Store) FollowUser(ctx context.Context, followerID int, followeeHandle s
 func (s *Store) UnfollowUser(ctx context.Context, followerID int, followeeHandle string) error {
 	var followeeID int
 	err := s.DB.QueryRowContext(ctx,
-		`SELECT user_id FROM user_profiles WHERE handle = $1`, followeeHandle,
+		`SELECT id FROM users WHERE handle = $1`, followeeHandle,
 	).Scan(&followeeID)
 	if err == sql.ErrNoRows {
 		return ErrProfileNotFound
@@ -173,13 +168,12 @@ func (s *Store) UnfollowUser(ctx context.Context, followerID int, followeeHandle
 func (s *Store) ListFollowing(ctx context.Context, followerID int) ([]UserProfile, error) {
 	rows, err := s.DB.QueryContext(ctx, `
 		SELECT
-		  p.user_id, p.handle, p.bio, p.created_at, p.updated_at,
-		  COALESCE(u.first_name, ''),
-		  (SELECT COUNT(*) FROM user_follows WHERE followee_id = p.user_id),
-		  (SELECT COUNT(*) FROM user_follows WHERE follower_id = p.user_id)
+		  u.id, u.handle, u.bio, u.created_at,
+		  COALESCE(u.display_name, ''),
+		  (SELECT COUNT(*) FROM user_follows WHERE followee_id = u.id),
+		  (SELECT COUNT(*) FROM user_follows WHERE follower_id = u.id)
 		FROM user_follows f
-		JOIN user_profiles p ON p.user_id = f.followee_id
-		JOIN users u ON u.id = p.user_id
+		JOIN users u ON u.id = f.followee_id
 		WHERE f.follower_id = $1
 		ORDER BY f.created_at DESC`, followerID,
 	)
@@ -191,8 +185,8 @@ func (s *Store) ListFollowing(ctx context.Context, followerID int) ([]UserProfil
 	for rows.Next() {
 		var p UserProfile
 		if err := rows.Scan(
-			&p.UserID, &p.Handle, &p.Bio, &p.CreatedAt, &p.UpdatedAt,
-			&p.FirstName, &p.FollowerCount, &p.FollowingCount,
+			&p.UserID, &p.Handle, &p.Bio, &p.CreatedAt,
+			&p.DisplayName, &p.FollowerCount, &p.FollowingCount,
 		); err != nil {
 			return nil, err
 		}
@@ -206,16 +200,15 @@ func (s *Store) ListFollowing(ctx context.Context, followerID int) ([]UserProfil
 func (s *Store) ListFollowers(ctx context.Context, userID, viewerID int) ([]UserProfile, error) {
 	rows, err := s.DB.QueryContext(ctx, `
 		SELECT
-		  p.user_id, p.handle, p.bio, p.created_at, p.updated_at,
-		  COALESCE(u.first_name, ''),
-		  (SELECT COUNT(*) FROM user_follows WHERE followee_id = p.user_id),
-		  (SELECT COUNT(*) FROM user_follows WHERE follower_id = p.user_id),
+		  u.id, u.handle, u.bio, u.created_at,
+		  COALESCE(u.display_name, ''),
+		  (SELECT COUNT(*) FROM user_follows WHERE followee_id = u.id),
+		  (SELECT COUNT(*) FROM user_follows WHERE follower_id = u.id),
 		  CASE WHEN $2 > 0 THEN
-		    EXISTS(SELECT 1 FROM user_follows WHERE follower_id = $2 AND followee_id = p.user_id)
+		    EXISTS(SELECT 1 FROM user_follows WHERE follower_id = $2 AND followee_id = u.id)
 		  ELSE false END
 		FROM user_follows f
-		JOIN user_profiles p ON p.user_id = f.follower_id
-		JOIN users u ON u.id = p.user_id
+		JOIN users u ON u.id = f.follower_id
 		WHERE f.followee_id = $1
 		ORDER BY f.created_at DESC`, userID, viewerID,
 	)
@@ -227,8 +220,8 @@ func (s *Store) ListFollowers(ctx context.Context, userID, viewerID int) ([]User
 	for rows.Next() {
 		var p UserProfile
 		if err := rows.Scan(
-			&p.UserID, &p.Handle, &p.Bio, &p.CreatedAt, &p.UpdatedAt,
-			&p.FirstName, &p.FollowerCount, &p.FollowingCount, &p.IsFollowing,
+			&p.UserID, &p.Handle, &p.Bio, &p.CreatedAt,
+			&p.DisplayName, &p.FollowerCount, &p.FollowingCount, &p.IsFollowing,
 		); err != nil {
 			return nil, err
 		}
@@ -237,7 +230,7 @@ func (s *Store) ListFollowers(ctx context.Context, userID, viewerID int) ([]User
 	return out, rows.Err()
 }
 
-// SearchUsers returns up to limit profiles whose handle or first_name match
+// SearchUsers returns up to limit profiles whose handle or display_name match
 // the query (case-insensitive prefix/substring match). The viewer is excluded
 // from the results, and IsFollowing is populated for each row.
 func (s *Store) SearchUsers(ctx context.Context, q string, viewerID, limit int) ([]UserProfile, error) {
@@ -254,20 +247,20 @@ func (s *Store) SearchUsers(ctx context.Context, q string, viewerID, limit int) 
 
 	rows, err := s.DB.QueryContext(ctx, `
 		SELECT
-		  p.user_id, p.handle, p.bio, p.created_at, p.updated_at,
-		  COALESCE(u.first_name, ''),
-		  (SELECT COUNT(*) FROM user_follows WHERE followee_id = p.user_id),
-		  (SELECT COUNT(*) FROM user_follows WHERE follower_id = p.user_id),
+		  u.id, u.handle, u.bio, u.created_at,
+		  COALESCE(u.display_name, ''),
+		  (SELECT COUNT(*) FROM user_follows WHERE followee_id = u.id),
+		  (SELECT COUNT(*) FROM user_follows WHERE follower_id = u.id),
 		  CASE WHEN $3 > 0 THEN
-		    EXISTS(SELECT 1 FROM user_follows WHERE follower_id = $3 AND followee_id = p.user_id)
+		    EXISTS(SELECT 1 FROM user_follows WHERE follower_id = $3 AND followee_id = u.id)
 		  ELSE false END
-		FROM user_profiles p
-		JOIN users u ON u.id = p.user_id
-		WHERE p.user_id <> $3
-		  AND (p.handle ILIKE $1 OR u.first_name ILIKE $1)
+		FROM users u
+		WHERE u.id <> $3
+		  AND u.handle IS NOT NULL
+		  AND (u.handle ILIKE $1 OR u.display_name ILIKE $1)
 		ORDER BY
-		  (p.handle ILIKE $2) DESC,
-		  (SELECT COUNT(*) FROM user_follows WHERE followee_id = p.user_id) DESC
+		  (u.handle ILIKE $2) DESC,
+		  (SELECT COUNT(*) FROM user_follows WHERE followee_id = u.id) DESC
 		LIMIT $4`,
 		like, q+"%", viewerID, limit,
 	)
@@ -279,8 +272,8 @@ func (s *Store) SearchUsers(ctx context.Context, q string, viewerID, limit int) 
 	for rows.Next() {
 		var p UserProfile
 		if err := rows.Scan(
-			&p.UserID, &p.Handle, &p.Bio, &p.CreatedAt, &p.UpdatedAt,
-			&p.FirstName, &p.FollowerCount, &p.FollowingCount, &p.IsFollowing,
+			&p.UserID, &p.Handle, &p.Bio, &p.CreatedAt,
+			&p.DisplayName, &p.FollowerCount, &p.FollowingCount, &p.IsFollowing,
 		); err != nil {
 			return nil, err
 		}
@@ -424,11 +417,10 @@ func (s *Store) ListSocialTimeline(ctx context.Context, followerID, limit, offse
 		  sa.id, sa.user_id, sa.article_url, sa.title, sa.description,
 		  sa.feed_url, sa.feed_title, sa.feed_site_url, sa.author,
 		  sa.published_at, sa.shared_at, sa.entry_id,
-		  COALESCE(p.handle, ''),
-		  COALESCE(u.first_name, '')
+		  COALESCE(u.handle, ''),
+		  COALESCE(u.display_name, '')
 		FROM shared_articles sa
 		JOIN user_follows f ON f.followee_id = sa.user_id AND f.follower_id = $1
-		JOIN user_profiles p ON p.user_id = sa.user_id
 		JOIN users u ON u.id = sa.user_id
 		ORDER BY sa.shared_at DESC
 		LIMIT $2 OFFSET $3`,
@@ -445,7 +437,7 @@ func (s *Store) ListSocialTimeline(ctx context.Context, followerID, limit, offse
 			&sa.ID, &sa.UserID, &sa.ArticleURL, &sa.Title, &sa.Description,
 			&sa.FeedURL, &sa.FeedTitle, &sa.FeedSiteURL, &sa.Author,
 			&sa.PublishedAt, &sa.SharedAt, &sa.EntryID,
-			&sa.SharerHandle, &sa.SharerFirstName,
+			&sa.SharerHandle, &sa.SharerDisplayName,
 		); err != nil {
 			return nil, err
 		}
@@ -470,15 +462,15 @@ func (s *Store) CountFeedSubscribers(ctx context.Context, feedID int) (int, erro
 func (s *Store) ListFeedSubscribers(ctx context.Context, feedID int) ([]UserProfile, error) {
 	rows, err := s.DB.QueryContext(ctx, `
 		SELECT
-		  p.user_id, p.handle, p.bio, p.created_at, p.updated_at,
-		  COALESCE(u.first_name, ''),
-		  (SELECT COUNT(*) FROM user_follows WHERE followee_id = p.user_id),
-		  (SELECT COUNT(*) FROM user_follows WHERE follower_id = p.user_id)
+		  u.id, u.handle, u.bio, u.created_at,
+		  COALESCE(u.display_name, ''),
+		  (SELECT COUNT(*) FROM user_follows WHERE followee_id = u.id),
+		  (SELECT COUNT(*) FROM user_follows WHERE follower_id = u.id)
 		FROM subscriptions s
-		JOIN user_profiles p ON p.user_id = s.user_id
 		JOIN users u ON u.id = s.user_id
 		WHERE s.feed_id = $1
-		ORDER BY p.handle ASC`, feedID,
+		  AND u.handle IS NOT NULL
+		ORDER BY u.handle ASC`, feedID,
 	)
 	if err != nil {
 		return nil, err
@@ -488,8 +480,8 @@ func (s *Store) ListFeedSubscribers(ctx context.Context, feedID int) ([]UserProf
 	for rows.Next() {
 		var p UserProfile
 		if err := rows.Scan(
-			&p.UserID, &p.Handle, &p.Bio, &p.CreatedAt, &p.UpdatedAt,
-			&p.FirstName, &p.FollowerCount, &p.FollowingCount,
+			&p.UserID, &p.Handle, &p.Bio, &p.CreatedAt,
+			&p.DisplayName, &p.FollowerCount, &p.FollowingCount,
 		); err != nil {
 			return nil, err
 		}

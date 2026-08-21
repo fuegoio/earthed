@@ -329,10 +329,10 @@ export function FeedListDetail({
               <span>
                 {feeds.length} {feeds.length === 1 ? "feed" : "feeds"}
               </span>
-              {!isOwner && list?.owner_email && (
+              {!isOwner && list?.owner_handle && (
                 <>
                   <span aria-hidden>·</span>
-                  <span>by {list.owner_email}</span>
+                  <span>by {list.owner_handle}</span>
                 </>
               )}
             </div>

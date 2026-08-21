@@ -22,7 +22,7 @@ import { getApiErrorMessage } from "@/lib/errors";
 import type { UserProfile } from "@/lib/types";
 
 function displayName(p: UserProfile): string {
-  return p.first_name?.trim() || `@${p.handle}`;
+  return p.display_name?.trim() || `@${p.handle}`;
 }
 
 function SearchRow({
@@ -174,26 +174,28 @@ export function FollowSearchDialog() {
           <DialogDescription>Search by handle or name to follow them.</DialogDescription>
         </DialogHeader>
 
-        <div className="relative px-4 pt-3">
-          <Search className="pointer-events-none absolute left-7 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="handle or name…"
-            aria-label="Search users"
-            autoFocus
-            className="pl-9 pr-9"
-          />
-          {q && (
-            <button
-              type="button"
-              onClick={() => setQ("")}
-              aria-label="Clear search"
-              className="absolute right-7 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-            >
-              <X className="size-4" />
-            </button>
-          )}
+        <div className="px-4 pt-3">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="handle or name…"
+              aria-label="Search users"
+              autoFocus
+              className="pl-9 pr-9"
+            />
+            {q && (
+              <button
+                type="button"
+                onClick={() => setQ("")}
+                aria-label="Clear search"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="size-4" />
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="mt-2 max-h-80 overflow-y-auto pb-2">

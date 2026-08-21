@@ -9,11 +9,11 @@ import { SyncStatusBar } from "@/components/sync-status-bar";
 
 export function AppShell({
   children,
-  userEmail,
+  userHandle,
   pdsSyncStatus,
 }: {
   children: React.ReactNode;
-  userEmail: string;
+  userHandle: string;
   pdsSyncStatus: string;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -31,7 +31,7 @@ export function AppShell({
         <div className="hidden flex-1 bg-sidebar lg:block" />
 
         <div className="flex w-full min-w-0 max-w-5xl shrink-0 overflow-hidden">
-          <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} userEmail={userEmail} />
+          <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} userHandle={userHandle} />
           <div className="flex min-w-0 flex-1 flex-col">
             <SyncStatusBar initialStatus={pdsSyncStatus} />
             <main className="flex-1 overflow-hidden bg-background">{children}</main>

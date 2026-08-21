@@ -704,7 +704,7 @@
                     "is_public": {
                         "type": "boolean"
                     },
-                    "owner_email": {
+                    "owner_handle": {
                         "type": "string"
                     },
                     "title": {
@@ -1228,7 +1228,7 @@
                         "format": "date-time",
                         "type": "string"
                     },
-                    "sharer_first_name": {
+                    "sharer_display_name": {
                         "type": "string"
                     },
                     "sharer_handle": {
@@ -1464,20 +1464,13 @@
                         "readOnly": true,
                         "type": "string"
                     },
-                    "email": {
-                        "format": "email",
-                        "maxLength": 255,
-                        "minLength": 1,
-                        "type": "string"
-                    },
-                    "first_name": {
+                    "display_name": {
                         "maxLength": 255,
                         "type": "string"
                     }
                 },
                 "required": [
-                    "first_name",
-                    "email"
+                    "display_name"
                 ],
                 "type": "object"
             },
@@ -1493,14 +1486,17 @@
                         "readOnly": true,
                         "type": "string"
                     },
+                    "bio": {
+                        "type": "string"
+                    },
                     "created_at": {
                         "format": "date-time",
                         "type": "string"
                     },
-                    "email": {
+                    "did": {
                         "type": "string"
                     },
-                    "first_name": {
+                    "display_name": {
                         "type": "string"
                     },
                     "handle": {
@@ -1513,6 +1509,9 @@
                     "is_admin": {
                         "type": "boolean"
                     },
+                    "is_remote": {
+                        "type": "boolean"
+                    },
                     "pds_sync_status": {
                         "type": "string"
                     },
@@ -1523,7 +1522,7 @@
                 },
                 "required": [
                     "id",
-                    "email",
+                    "handle",
                     "is_admin",
                     "created_at",
                     "pds_sync_status"
@@ -1552,7 +1551,7 @@
                     "did": {
                         "type": "string"
                     },
-                    "first_name": {
+                    "display_name": {
                         "type": "string"
                     },
                     "follower_count": {
@@ -1569,11 +1568,10 @@
                     "is_following": {
                         "type": "boolean"
                     },
-                    "pds_url": {
-                        "type": "string"
+                    "is_remote": {
+                        "type": "boolean"
                     },
-                    "updated_at": {
-                        "format": "date-time",
+                    "pds_url": {
                         "type": "string"
                     },
                     "user_id": {
@@ -1585,7 +1583,6 @@
                     "user_id",
                     "handle",
                     "created_at",
-                    "updated_at",
                     "follower_count",
                     "following_count"
                 ],

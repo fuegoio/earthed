@@ -276,3 +276,50 @@ type RelayEvent struct {
 	Payload   json.RawMessage
 	CreatedAt time.Time
 }
+
+// SearchResult is a single DID matching a search query.
+type SearchResult struct {
+	DID    string `json:"did"`
+	Handle string `json:"handle"`
+	PDSUrl string `json:"pdsUrl"`
+}
+
+// SearchDIDs returns up to limit tracked DIDs whose handle matches the query
+// (case-insensitive substring match). Excludes DIDs with empty handles.
+func (s *Store) SearchDIDs(ctx context.Context, q string, limit int) ([]SearchResult, error) {
+	if limit <= 0 {
+		limit = 20
+	}
+	like := "%" + q + "%"
+	rows, err := s.DB.QueryContext(ctx, `
+		SELECT did, handle, pds_url
+		FROM tracked_dids
+		WHERE handle ILIKE $1 AND handle <> ''
+		ORDER BY (handle ILIKE $2) DESC, announced_at DESC
+		LIMIT $3`, like, q+"%", limit)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = rows.Close() }()
+	var out []SearchResult
+	for rows.Next() {
+		var r SearchResult
+		if err := rows.Scan(&r.DID, &r.Handle, &r.PDSUrl); err != nil {
+			return nil, err
+		}
+		out = append(out, r)
+	}
+	return out, rows.Err()
+}
+
+// ResolveHandle returns the DID and PDS URL for a given handle (exact match).
+// Returns ("", "", nil) if not found.
+func (s *Store) ResolveHandle(ctx context.Context, handle string) (did, pdsURL string, err error) {
+	err = s.DB.QueryRowContext(ctx, `
+		SELECT did, pds_url FROM tracked_dids WHERE handle = $1 LIMIT 1`, handle,
+	).Scan(&did, &pdsURL)
+	if err == sql.ErrNoRows {
+		return "", "", nil
+	}
+	return did, pdsURL, err
+}

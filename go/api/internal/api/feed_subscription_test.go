@@ -80,15 +80,10 @@ func TestATProtoSyncFeedSubscription_Subscribe(t *testing.T) {
 	// Seed ATProto credentials for the user.
 	pdsURL, calls := mockPDSPutRecord(t)
 	_, _ = s.DB.ExecContext(context.Background(), `
-		INSERT INTO user_profiles (user_id, did, pds_url, atproto_access_token, atproto_refresh_token)
-		VALUES ($1, $2, $3, 'test-token', 'test-refresh')
-		ON CONFLICT (user_id) DO UPDATE SET
-			did = EXCLUDED.did, pds_url = EXCLUDED.pds_url,
-			atproto_access_token = EXCLUDED.atproto_access_token,
-			atproto_refresh_token = EXCLUDED.atproto_refresh_token`,
+		UPDATE users SET did = $2, pds_url = $3, atproto_access_token = 'test-token', atproto_refresh_token = 'test-refresh'
+		WHERE id = $1`,
 		userID, "did:plc:feedtest", pdsURL)
 	defer func() {
-		_, _ = s.DB.ExecContext(context.Background(), `DELETE FROM user_profiles WHERE user_id = $1`, userID)
 	}()
 
 	// Create a global feed locally and subscribe the user to it.
@@ -153,15 +148,10 @@ func TestATProtoSyncFeedSubscription_Unsubscribe(t *testing.T) {
 
 	pdsURL, calls := mockPDSPutRecord(t)
 	_, _ = s.DB.ExecContext(context.Background(), `
-		INSERT INTO user_profiles (user_id, did, pds_url, atproto_access_token, atproto_refresh_token)
-		VALUES ($1, $2, $3, 'test-token', 'test-refresh')
-		ON CONFLICT (user_id) DO UPDATE SET
-			did = EXCLUDED.did, pds_url = EXCLUDED.pds_url,
-			atproto_access_token = EXCLUDED.atproto_access_token,
-			atproto_refresh_token = EXCLUDED.atproto_refresh_token`,
+		UPDATE users SET did = $2, pds_url = $3, atproto_access_token = 'test-token', atproto_refresh_token = 'test-refresh'
+		WHERE id = $1`,
 		userID, "did:plc:unsubtest", pdsURL)
 	defer func() {
-		_, _ = s.DB.ExecContext(context.Background(), `DELETE FROM user_profiles WHERE user_id = $1`, userID)
 	}()
 
 	// Seed a feed subscription with a known rkey.

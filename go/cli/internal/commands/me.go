@@ -24,9 +24,9 @@ var meCmd = &cobra.Command{
 		}
 		u := *resp.JSON200
 		fmt.Printf("ID: %d\n", u.Id)
-		fmt.Printf("Email: %s\n", u.Email)
-		if u.FirstName != nil {
-			fmt.Printf("Name: %s\n", *u.FirstName)
+		fmt.Printf("Handle: %s\n", u.Handle)
+		if u.DisplayName != nil {
+			fmt.Printf("Name: %s\n", *u.DisplayName)
 		}
 		fmt.Printf("Admin: %v\n", u.IsAdmin)
 		fmt.Printf("Created: %s\n", u.CreatedAt.Format("2006-01-02 15:04"))

@@ -183,17 +183,14 @@ func (h *OAuthHandlers) handleCallback(w http.ResponseWriter, r *http.Request) {
 	// local user row. The email is available when the transition:email scope
 	// was granted by the PDS.
 	handle := ""
-	email := ""
 	if u, herr := h.oauthApp.ResumeSession(r.Context(), sessData.AccountDID, sessData.SessionID); herr == nil {
 		if c := u.APIClient(); c != nil {
 			var info struct {
 				Handle string `json:"handle"`
 				DID    string `json:"did"`
-				Email  string `json:"email"`
 			}
 			if err := c.Get(r.Context(), "com.atproto.server.getSession", nil, &info); err == nil {
 				handle = info.Handle
-				email = info.Email
 			}
 		}
 	}
@@ -203,13 +200,6 @@ func (h *OAuthHandlers) handleCallback(w http.ResponseWriter, r *http.Request) {
 		slog.Error("oauth: get/create user", "did", did, "err", err)
 		http.Redirect(w, r, h.cfg.WebURL+"/login?error=internal", http.StatusFound)
 		return
-	}
-
-	// Persist the email from the PDS session if one was returned.
-	if email != "" {
-		if err := h.store.UpdateUserEmail(r.Context(), userID, email); err != nil {
-			slog.Warn("oauth: update user email", "did", did, "err", err)
-		}
 	}
 
 	// Sync the PDS data into the local cache. When a relay is configured, the

@@ -170,7 +170,7 @@ function FeedListRow({ list, mine = false }: { list: FeedList; mine?: boolean })
         )}
         <p className="mt-0.5 text-xs text-muted-foreground">
           {list.feed_count} {list.feed_count === 1 ? "feed" : "feeds"}
-          {!mine && list.owner_email ? ` · by ${list.owner_email}` : ""}
+          {!mine && list.owner_handle ? ` · by ${list.owner_handle}` : ""}
         </p>
       </div>
     </Link>

@@ -130,7 +130,7 @@ type FeedList struct {
 	Feeds       []FeedListFeed `json:"feeds,omitempty"`
 	FeedCount   int            `json:"feed_count"`
 	IsFollowing bool           `json:"is_following,omitempty"`
-	OwnerEmail  string         `json:"owner_email,omitempty"`
+	OwnerHandle string         `json:"owner_handle,omitempty"`
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 }
@@ -147,17 +147,17 @@ type FeedListFeed struct {
 	Position   int    `json:"position"`
 }
 
-// User represents an authenticated account. Limen owns the users table;
-// this struct maps the columns the API needs to read.
+// User represents an authenticated account. The local database is a cache of
+// the user's ATProto data; the PDS is the source of truth.
 type User struct {
 	ID        int       `json:"id"`
-	Email     string    `json:"email"`
-	FirstName string    `json:"first_name,omitempty"`
+	Handle    string    `json:"handle"`
+	DID       string    `json:"did,omitempty"`
+	DisplayName string  `json:"display_name,omitempty"`
+	Bio       string    `json:"bio,omitempty"`
 	IsAdmin   bool      `json:"is_admin"`
+	IsRemote  bool      `json:"is_remote,omitempty"`
 	CreatedAt time.Time `json:"created_at"`
-	// Handle is the user's social handle (e.g. "fuego"). Populated when a
-	// profile row exists; empty string otherwise.
-	Handle string `json:"handle,omitempty"`
 	// PDSSyncStatus tracks the post-login backfill from the user's PDS:
 	// "syncing" while in progress, "idle" once done, "failed" on error.
 	// The web UI polls this to show a waiting state on first login.
@@ -165,21 +165,21 @@ type User struct {
 	PDSSyncedAt   *time.Time `json:"pds_synced_at,omitempty"`
 }
 
-// UserProfile holds the social profile data for a user.
+// UserProfile holds the public profile data for a user, with denormalised
+// social counts populated by query joins.
 type UserProfile struct {
-	UserID    int       `json:"user_id"`
-	Handle    string    `json:"handle"`
-	Bio       string    `json:"bio,omitempty"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	// AT Proto identity (set after connecting a DID).
-	DID    string `json:"did,omitempty"`
-	PDSUrl string `json:"pds_url,omitempty"`
+	UserID      int       `json:"user_id"`
+	Handle      string    `json:"handle"`
+	DisplayName string    `json:"display_name,omitempty"`
+	Bio         string    `json:"bio,omitempty"`
+	DID         string    `json:"did,omitempty"`
+	PDSUrl      string    `json:"pds_url,omitempty"`
+	IsRemote    bool      `json:"is_remote,omitempty"`
+	CreatedAt   time.Time `json:"created_at"`
 	// Denormalised fields set by query joins.
-	FirstName      string `json:"first_name,omitempty"`
-	FollowerCount  int    `json:"follower_count"`
-	FollowingCount int    `json:"following_count"`
-	IsFollowing    bool   `json:"is_following,omitempty"`
+	FollowerCount  int  `json:"follower_count"`
+	FollowingCount int  `json:"following_count"`
+	IsFollowing    bool `json:"is_following,omitempty"`
 }
 
 // ATProtoCredentials holds the PDS session tokens for a user. Never exposed
@@ -208,8 +208,8 @@ type SharedArticle struct {
 	SharedAt    time.Time  `json:"shared_at"`
 	EntryID     *int64     `json:"entry_id,omitempty"`
 	// Sharer info, populated on social timeline queries.
-	SharerHandle    string `json:"sharer_handle,omitempty"`
-	SharerFirstName string `json:"sharer_first_name,omitempty"`
+	SharerHandle      string `json:"sharer_handle,omitempty"`
+	SharerDisplayName string `json:"sharer_display_name,omitempty"`
 }
 
 // Store wraps a *sql.DB with query helpers for the Sunred schema.

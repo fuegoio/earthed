@@ -365,7 +365,7 @@ func (s *Store) ListEntries(ctx context.Context, userID int, feedID *int, folder
 	             f.etag_header, f.last_modified_header, f.parsing_error, f.parsing_error_count,
 	             f.disabled, f.scraper_rules, f.rewrite_rules, f.crawler,
 	             f.next_check_at, f.last_fetch_at, f.created_at, f.updated_at,
-	             COALESCE(sh.handle, ''), COALESCE(u.first_name, '')
+	             COALESCE(sh.handle, ''), COALESCE(sh.display_name, '')
 	      FROM entries e
 	      JOIN feeds f ON f.id = e.feed_id
 	      LEFT JOIN entry_state st ON st.entry_id = e.id AND st.user_id = $1
@@ -375,8 +375,7 @@ func (s *Store) ListEntries(ctx context.Context, userID int, feedID *int, folder
 	        WHERE sa.entry_id = e.id
 	        LIMIT 1
 	      ) sh_row ON true
-	      LEFT JOIN user_profiles sh ON sh.user_id = sh_row.user_id
-	      LEFT JOIN users u ON u.id = sh_row.user_id`
+	      LEFT JOIN users sh ON sh.id = sh_row.user_id`
 	args := []interface{}{userID}
 	argIdx := 2
 
@@ -451,7 +450,7 @@ func (s *Store) GetEntryByID(ctx context.Context, id int64, userID int) (*Entry,
 		        f.etag_header, f.last_modified_header, f.parsing_error, f.parsing_error_count,
 		        f.disabled, f.scraper_rules, f.rewrite_rules, f.crawler,
 		        f.next_check_at, f.last_fetch_at, f.created_at, f.updated_at,
-		        COALESCE(sh.handle, ''), COALESCE(u.first_name, '')
+		        COALESCE(sh.handle, ''), COALESCE(sh.display_name, '')
 		 FROM entries e
 		 JOIN feeds f ON f.id = e.feed_id
 		 LEFT JOIN entry_state st ON st.entry_id = e.id AND st.user_id = $2
@@ -460,8 +459,7 @@ func (s *Store) GetEntryByID(ctx context.Context, id int64, userID int) (*Entry,
 		   JOIN user_follows uf ON uf.followee_id = sa.user_id AND uf.follower_id = $2
 		   WHERE sa.entry_id = e.id LIMIT 1
 		 ) sh_row ON true
-		 LEFT JOIN user_profiles sh ON sh.user_id = sh_row.user_id
-		 LEFT JOIN users u ON u.id = sh_row.user_id
+		 LEFT JOIN users sh ON sh.id = sh_row.user_id
 		 WHERE e.id = $1 AND (`+visibleEntryFilter(userID)+`)`, id, userID,
 	).Scan(&e.ID, &e.FeedID, &e.Hash, &e.Title, &e.URL, &e.CommentsURL,
 		&e.Author, &e.Content, &e.Description, &e.Status, &e.Starred, &e.Liked,
@@ -775,14 +773,15 @@ func (s *Store) PurgeExpiredDeviceCodes(ctx context.Context, retention time.Dura
 
 // --- Users (Limen-managed table, read-only from here) ---
 
-// UpdateUser updates the first_name and email of the user with the given id.
-func (s *Store) UpdateUser(ctx context.Context, id int, firstName, email string) (*User, error) {
+// UpdateUser updates the display_name of the user with the given id.
+func (s *Store) UpdateUser(ctx context.Context, id int, displayName string) (*User, error) {
 	var u User
 	err := s.DB.QueryRowContext(ctx,
-		`UPDATE users SET first_name = $2, email = $3 WHERE id = $1
-		 RETURNING id, email, COALESCE(first_name, ''), false, created_at`,
-		id, firstName, email,
-	).Scan(&u.ID, &u.Email, &u.FirstName, &u.IsAdmin, &u.CreatedAt)
+		`UPDATE users SET display_name = $2 WHERE id = $1
+		 RETURNING id, COALESCE(handle, ''), COALESCE(did, ''), COALESCE(display_name, ''), COALESCE(bio, ''), false, is_remote, created_at,
+		           pds_sync_status, pds_synced_at`,
+		id, displayName,
+	).Scan(&u.ID, &u.Handle, &u.DID, &u.DisplayName, &u.Bio, &u.IsAdmin, &u.IsRemote, &u.CreatedAt, &u.PDSSyncStatus, &u.PDSSyncedAt)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -799,23 +798,20 @@ func (s *Store) DeleteUser(ctx context.Context, id int) error {
 }
 
 // GetUserByID returns the user with the given id, or nil.
-// The Handle field is populated when the user has a social profile.
 func (s *Store) GetUserByID(ctx context.Context, id int) (*User, error) {
 	var u User
-	var handle sql.NullString
 	err := s.DB.QueryRowContext(ctx,
-		`SELECT u.id, COALESCE(u.email,''), COALESCE(u.first_name, ''), false, u.created_at,
-		        u.handle, u.pds_sync_status, u.pds_synced_at
-		 FROM users u
-		 WHERE u.id = $1`, id,
-	).Scan(&u.ID, &u.Email, &u.FirstName, &u.IsAdmin, &u.CreatedAt, &handle, &u.PDSSyncStatus, &u.PDSSyncedAt)
+		`SELECT id, COALESCE(handle, ''), COALESCE(did, ''), COALESCE(display_name, ''), COALESCE(bio, ''),
+		        false, is_remote, created_at, pds_sync_status, pds_synced_at
+		 FROM users
+		 WHERE id = $1`, id,
+	).Scan(&u.ID, &u.Handle, &u.DID, &u.DisplayName, &u.Bio, &u.IsAdmin, &u.IsRemote, &u.CreatedAt, &u.PDSSyncStatus, &u.PDSSyncedAt)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
 	if err != nil {
 		return nil, err
 	}
-	u.Handle = handle.String
 	return &u, nil
 }
 
@@ -923,7 +919,7 @@ func (s *Store) ListFollowedFeedLists(ctx context.Context, userID int) ([]FeedLi
 		`SELECT fl.id, fl.user_id, fl.title, fl.description, fl.is_public,
 		        fl.created_at, fl.updated_at,
 		        (SELECT COUNT(*) FROM feed_list_feeds flf WHERE flf.feed_list_id = fl.id),
-		        u.email
+		        u.handle
 		 FROM feed_list_follows flf
 		 JOIN feed_lists fl ON fl.id = flf.feed_list_id
 		 JOIN users u ON u.id = fl.user_id
@@ -936,7 +932,7 @@ func (s *Store) ListFollowedFeedLists(ctx context.Context, userID int) ([]FeedLi
 	var lists []FeedList
 	for rows.Next() {
 		var fl FeedList
-		if err := rows.Scan(&fl.ID, &fl.UserID, &fl.Title, &fl.Description, &fl.IsPublic, &fl.CreatedAt, &fl.UpdatedAt, &fl.FeedCount, &fl.OwnerEmail); err != nil {
+		if err := rows.Scan(&fl.ID, &fl.UserID, &fl.Title, &fl.Description, &fl.IsPublic, &fl.CreatedAt, &fl.UpdatedAt, &fl.FeedCount, &fl.OwnerHandle); err != nil {
 			return nil, err
 		}
 		fl.IsFollowing = true
@@ -952,7 +948,7 @@ func (s *Store) ListPublicFeedLists(ctx context.Context, userID, limit, offset i
 		`SELECT fl.id, fl.user_id, fl.title, fl.description, fl.is_public,
 		        fl.created_at, fl.updated_at,
 		        (SELECT COUNT(*) FROM feed_list_feeds flf WHERE flf.feed_list_id = fl.id),
-		        u.email,
+		        u.handle,
 		        EXISTS(SELECT 1 FROM feed_list_follows flf WHERE flf.feed_list_id = fl.id AND flf.user_id = $1)
 		 FROM feed_lists fl
 		 JOIN users u ON u.id = fl.user_id
@@ -966,7 +962,7 @@ func (s *Store) ListPublicFeedLists(ctx context.Context, userID, limit, offset i
 	var lists []FeedList
 	for rows.Next() {
 		var fl FeedList
-		if err := rows.Scan(&fl.ID, &fl.UserID, &fl.Title, &fl.Description, &fl.IsPublic, &fl.CreatedAt, &fl.UpdatedAt, &fl.FeedCount, &fl.OwnerEmail, &fl.IsFollowing); err != nil {
+		if err := rows.Scan(&fl.ID, &fl.UserID, &fl.Title, &fl.Description, &fl.IsPublic, &fl.CreatedAt, &fl.UpdatedAt, &fl.FeedCount, &fl.OwnerHandle, &fl.IsFollowing); err != nil {
 			return nil, err
 		}
 		lists = append(lists, fl)
@@ -982,13 +978,13 @@ func (s *Store) GetFeedList(ctx context.Context, id, userID int) (*FeedList, err
 		`SELECT fl.id, fl.user_id, fl.title, fl.description, fl.is_public,
 		        fl.created_at, fl.updated_at,
 		        (SELECT COUNT(*) FROM feed_list_feeds flf WHERE flf.feed_list_id = fl.id),
-		        u.email,
+		        u.handle,
 		        EXISTS(SELECT 1 FROM feed_list_follows flf WHERE flf.feed_list_id = fl.id AND flf.user_id = $2)
 		 FROM feed_lists fl
 		 JOIN users u ON u.id = fl.user_id
 		 WHERE fl.id = $1 AND (fl.user_id = $2 OR fl.is_public = true OR
 		       EXISTS(SELECT 1 FROM feed_list_follows flf WHERE flf.feed_list_id = fl.id AND flf.user_id = $2))`, id, userID,
-	).Scan(&fl.ID, &fl.UserID, &fl.Title, &fl.Description, &fl.IsPublic, &fl.CreatedAt, &fl.UpdatedAt, &fl.FeedCount, &fl.OwnerEmail, &fl.IsFollowing)
+	).Scan(&fl.ID, &fl.UserID, &fl.Title, &fl.Description, &fl.IsPublic, &fl.CreatedAt, &fl.UpdatedAt, &fl.FeedCount, &fl.OwnerHandle, &fl.IsFollowing)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}

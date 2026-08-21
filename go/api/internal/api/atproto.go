@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -318,4 +319,60 @@ func (a *API) ingestFollowee(followeeUserID int) {
 	}
 	handle, _, _ := a.store.GetUserDID(ctx, followeeUserID)
 	a.announceUserToRelay(ctx, did, pdsURL, handle)
+}
+
+// relaySearchResult is a single DID returned by the relay searchDIDs endpoint.
+type relaySearchResult struct {
+	DID    string `json:"did"`
+	Handle string `json:"handle"`
+	PDSUrl string `json:"pdsUrl"`
+}
+
+// relaySearchDIDs queries the relay for DIDs matching the query string.
+// Returns nil if no relay is configured or the request fails.
+func (a *API) relaySearchDIDs(ctx context.Context, q string, limit int) []store.UserProfile {
+	if a.cfg.RelayURL == "" || q == "" {
+		return nil
+	}
+	rc := atproto.NewClient(a.cfg.RelayURL, "")
+	var out struct {
+		Results []relaySearchResult `json:"results"`
+	}
+	if err := rc.Query(ctx, "io.sunred.relay.searchDIDs", map[string]string{
+		"q":     q,
+		"limit": fmt.Sprintf("%d", limit),
+	}, &out); err != nil {
+		slog.Warn("relay: search dids", "err", err)
+		return nil
+	}
+	var profiles []store.UserProfile
+	for _, r := range out.Results {
+		profiles = append(profiles, store.UserProfile{
+			Handle:   r.Handle,
+			DID:      r.DID,
+			PDSUrl:   r.PDSUrl,
+			IsRemote: true,
+		})
+	}
+	return profiles
+}
+
+// relayResolveHandle queries the relay for the DID + PDS URL of a given handle.
+// Returns ("", "", nil) if not found or no relay configured.
+func (a *API) relayResolveHandle(ctx context.Context, handle string) (did, pdsURL string) {
+	if a.cfg.RelayURL == "" || handle == "" {
+		return "", ""
+	}
+	rc := atproto.NewClient(a.cfg.RelayURL, "")
+	var out struct {
+		DID    string `json:"did"`
+		PDSUrl string `json:"pdsUrl"`
+	}
+	if err := rc.Query(ctx, "io.sunred.relay.resolveHandle", map[string]string{
+		"handle": handle,
+	}, &out); err != nil {
+		slog.Warn("relay: resolve handle", "handle", handle, "err", err)
+		return "", ""
+	}
+	return out.DID, out.PDSUrl
 }

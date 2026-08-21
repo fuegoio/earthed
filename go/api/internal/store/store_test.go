@@ -36,9 +36,12 @@ func testDB(t *testing.T) *Store {
 func seedUser(t *testing.T, s *Store, email string) int {
 	t.Helper()
 	var id int
+	suffix := fmt.Sprintf("%d", time.Now().UnixNano())
+	did := fmt.Sprintf("did:plc:test%s", suffix)
+	handle := fmt.Sprintf("test%s", suffix)
 	err := s.DB.QueryRow(
-		`INSERT INTO users (email, password, email_verified_at) VALUES ($1, 'hash', NOW()) RETURNING id`,
-		email,
+		`INSERT INTO users (did, handle) VALUES ($1, $2) RETURNING id`,
+		did, handle,
 	).Scan(&id)
 	if err != nil {
 		t.Fatalf("seed user: %v", err)

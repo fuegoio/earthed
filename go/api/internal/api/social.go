@@ -152,7 +152,21 @@ func (a *API) registerSocialRoutes() {
 		if err := a.store.FollowUser(ctx, userID, input.Handle); err != nil {
 			switch {
 			case errors.Is(err, store.ErrProfileNotFound):
-				return nil, huma.Error404NotFound("user not found")
+				// Try resolving via the relay for cross-instance follow.
+				did, pdsURL := a.relayResolveHandle(ctx, input.Handle)
+				if did == "" {
+					return nil, huma.Error404NotFound("user not found")
+				}
+				followeeUserID, cerr := a.store.CreateRemoteUser(ctx, did, input.Handle, pdsURL)
+				if cerr != nil {
+					return nil, huma.Error500InternalServerError(fmt.Errorf("create remote user: %w", cerr).Error())
+				}
+				if ferr := a.store.FollowUser(ctx, userID, input.Handle); ferr != nil {
+					return nil, huma.Error500InternalServerError(ferr.Error())
+				}
+				go a.ATProtoSyncFollow(userID, followeeUserID, input.Handle, true)
+				go a.ingestFollowee(followeeUserID)
+				return nil, nil
 			case errors.Is(err, store.ErrCannotFollowSelf):
 				return nil, huma.Error422UnprocessableEntity(err.Error(), nil)
 			case errors.Is(err, store.ErrAlreadyFollowing):
@@ -239,6 +253,21 @@ func (a *API) registerSocialRoutes() {
 		}
 		if profiles == nil {
 			profiles = []store.UserProfile{}
+		}
+		// If local results are thin, fall back to the relay for cross-instance search.
+		if len(profiles) < input.Limit {
+			remaining := input.Limit - len(profiles)
+			remote := a.relaySearchDIDs(ctx, input.Query, remaining)
+			// Deduplicate by handle — skip remote results already in local results.
+			seen := make(map[string]bool, len(profiles))
+			for _, p := range profiles {
+				seen[p.Handle] = true
+			}
+			for _, r := range remote {
+				if !seen[r.Handle] {
+					profiles = append(profiles, r)
+				}
+			}
 		}
 		return &UserProfileListOutput{Body: profiles}, nil
 	})
