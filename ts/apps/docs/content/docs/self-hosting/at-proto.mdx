@@ -60,16 +60,16 @@ standards-compliant AT Proto PDS, yours or anyone else's.
 
 ### Offering signup
 
-To let users without an existing AT Proto account sign up directly on your
-instance, set `SUNRED_DEFAULT_PDS` to your PDS URL. The login page then shows a
-"Create account" link that starts the OAuth flow against that PDS, so the user
-creates their account on your PDS and is logged into Sunred in one step.
+The login page shows a **Continue with [PDS]** button that starts the OAuth
+flow against the instance's default PDS. The PDS decides whether to show
+login or signup — users without an existing account can create one on that
+PDS and are logged into Sunred in one step. The default PDS is configured
+on the web side via `NEXT_PUBLIC_SUNRED_DEFAULT_PDS` (default
+`https://snrd.social`).
 
-The default is `https://snrd.social`. To use a different PDS, override
-`SUNRED_DEFAULT_PDS`. To disable signup entirely, set it to an empty string.
-
-Users who already have an AT Proto account (Bluesky, another PDS) can always log
-in by entering their handle, regardless of whether a default PDS is configured.
+Users who already have an AT Proto account (Bluesky, another PDS) can always
+click **Login with a different handle** and enter their handle, regardless of
+the default PDS.
 
 ### The relay
 
@@ -86,8 +86,9 @@ standalone.
 ## Login flow
 
 ```
-1. User enters their handle in the web UI
-2. Sunred resolves handle → DID → PDS endpoint
+1. User clicks "Continue with [PDS]" or enters their handle in the web UI
+2. Sunred resolves the identifier (PDS URL resolves directly; a handle
+   resolves handle → DID → PDS endpoint)
 3. Sunred registers as an OAuth client with that PDS (dynamic registration)
 4. Sunred sends a Pushed Authorization Request (PAR) and redirects the
    user to the PDS's authorize endpoint with a PKCE challenge
@@ -98,6 +99,11 @@ standalone.
 8. Sunred creates or looks up the local user row by DID, issues a
    session cookie, and redirects to the app
 ```
+
+In development, the OAuth callback URL uses `127.0.0.1` (RFC 8252 rejects
+`localhost`). The API redirects `127.0.0.1` callbacks to `localhost` so the
+session cookie (host-only on `localhost`) is shared across the web (port 3000)
+and API (port 8080).
 
 Sunred holds a DPoP keypair per account so it can sign PDS requests with the
 bound access token. You do not need to manage these keys manually — Sunred
@@ -151,3 +157,5 @@ that control relay and OAuth behavior. The key ones:
   social features).
 - `SUNRED_OAUTH_REDIRECT_URL` — the public callback URL for OAuth
   (`https://api.your-domain.com/auth/oauth/callback`).
+- `NEXT_PUBLIC_SUNRED_DEFAULT_PDS` — the default PDS shown on the login page
+  (web-only config; defaults to `https://snrd.social`).

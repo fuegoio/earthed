@@ -32,9 +32,10 @@ type Config struct {
 	// announces new AT Proto users to the relay and queries it for global counts.
 	// Leave empty to disable relay integration.
 	RelayURL string
-	// DefaultPDS is the PDS URL used for new account signup. When set, the web
-	// login page shows a "Create account" link that starts the OAuth flow
-	// against this PDS. When unset, only existing-handle login is offered.
+	// DefaultPDS is the PDS URL used by the /auth/oauth/signup endpoint. The
+	// web UI uses NEXT_PUBLIC_SUNRED_DEFAULT_PDS for the "Continue with [PDS]"
+	// button on the login page; this server-side config is a fallback for the
+	// signup endpoint and the /auth/oauth/config response.
 	DefaultPDS string
 	// OAuthClientID is the full URL where Sunred serves its client metadata
 	// document (the PDS fetches this during the OAuth flow). Defaults to
