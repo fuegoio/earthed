@@ -23,17 +23,13 @@ This starts a PostgreSQL 16 container on port 5432 with database `earthed`, user
 Create a `.env` file in `go/api/`:
 
 ```bash
-LIMEN_SECRET=<32-byte-secret>
 EARTHED_DATABASE_URL=postgres://earthed:earthed@localhost:5432/earthed?sslmode=disable
 EARTHED_BASE_URL=http://localhost:8080
 EARTHED_WEB_URL=http://localhost:3000
 ```
 
-`LIMEN_SECRET` is a 32-byte hex string used for session signing. Generate one with:
-
-```bash
-openssl rand -hex 16
-```
+The OAuth client_id and callback URL default from `EARTHED_BASE_URL`, so no
+extra OAuth configuration is needed for local development.
 
 Users log in with their own AT Proto handle — typically a Bluesky account or an
 account on a personal PDS. No PDS setup is required. See

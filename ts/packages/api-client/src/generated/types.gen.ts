@@ -14,6 +14,16 @@ export type ApiToken = {
     user_id: number;
 };
 
+export type AtProtoStatusOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    connected: boolean;
+    did?: string;
+    handle?: string;
+};
+
 export type AddFeedListFeedInputBody = {
     /**
      * A URL to the JSON Schema for this object.
@@ -472,13 +482,21 @@ export type UserProfile = {
     readonly $schema?: string;
     bio?: string;
     created_at: string;
+    did?: string;
     first_name?: string;
     follower_count: number;
     following_count: number;
     handle: string;
     is_following?: boolean;
+    pds_url?: string;
     updated_at: string;
     user_id: number;
+};
+
+export type AtProtoStatusOutputBodyWritable = {
+    connected: boolean;
+    did?: string;
+    handle?: string;
 };
 
 export type AddFeedListFeedInputBodyWritable = {
@@ -762,11 +780,13 @@ export type UserWritable = {
 export type UserProfileWritable = {
     bio?: string;
     created_at: string;
+    did?: string;
     first_name?: string;
     follower_count: number;
     following_count: number;
     handle: string;
     is_following?: boolean;
+    pds_url?: string;
     updated_at: string;
     user_id: number;
 };
@@ -797,6 +817,31 @@ export type FeedSubscribersResponses = {
 };
 
 export type FeedSubscribersResponse2 = FeedSubscribersResponses[keyof FeedSubscribersResponses];
+
+export type AtprotoStatusData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/me/atproto';
+};
+
+export type AtprotoStatusErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type AtprotoStatusError = AtprotoStatusErrors[keyof AtprotoStatusErrors];
+
+export type AtprotoStatusResponses = {
+    /**
+     * OK
+     */
+    200: AtProtoStatusOutputBody;
+};
+
+export type AtprotoStatusResponse = AtprotoStatusResponses[keyof AtprotoStatusResponses];
 
 export type UpdateHandleData = {
     body: UpdateHandleInputBodyWritable;

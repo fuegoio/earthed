@@ -1,18 +1,18 @@
-// Package auth wires the Limen identity provider to the Earthed HTTP API
-// and exposes session and bearer-token middleware.
+// Package auth handles Earthed authentication: web session cookies and bearer
+// API tokens. Identity is provided by AT Proto OAuth (see the atproto package);
+// this package only resolves the authenticated user ID for a request.
 package auth
 
 import (
 	"context"
+	"crypto/rand"
 	"database/sql"
+	"encoding/hex"
+	"errors"
 	"fmt"
-	"log/slog"
 	"net/http"
 	"strings"
-
-	"github.com/thecodearcher/limen"
-	sqladapter "github.com/thecodearcher/limen/adapters/sql"
-	credentialpassword "github.com/thecodearcher/limen/plugins/credential-password"
+	"time"
 
 	"github.com/fuegoio/earthed/go/api/internal/config"
 	"github.com/fuegoio/earthed/go/api/internal/store"
@@ -22,58 +22,32 @@ type contextKey int
 
 const userKey contextKey = iota
 
-// Auth bundles the Limen instance with the Earthed store and database.
+// SessionCookie is the name of the Earthed web session cookie.
+const SessionCookie = "earthed_session"
+
+// SessionTTL is how long a web session cookie remains valid.
+const SessionTTL = 30 * 24 * time.Hour
+
+// ErrNoSession is returned when a request has no valid session or token.
+var ErrNoSession = errors.New("no valid session")
+
+// Auth resolves the authenticated user for HTTP requests.
 type Auth struct {
-	Limen *limen.Limen
 	Store *store.Store
 	DB    *sql.DB
+	cfg   *config.Config
 }
 
-// New builds an Auth instance configured from cfg, attaching the password
-// credential plugin. Email verification and password-reset callbacks log
-// instead of sending mail in this scaffold; wire a real mailer when needed.
+// New builds an Auth instance. Identity is resolved via web session cookies
+// or bearer API tokens; the actual AT Proto OAuth flow is handled by the
+// atproto package and the OAuth HTTP handlers.
 func New(cfg *config.Config, db *sql.DB, st *store.Store) (*Auth, error) {
-	plugins := []limen.Plugin{
-		credentialpassword.New(
-			credentialpassword.WithSendPasswordResetEmail(func(email, token string) {
-				slog.Info("password reset requested", "email", email, "token", token)
-			}),
-		),
-	}
-
-	authInstance, err := limen.New(&limen.Config{
-		BaseURL:  cfg.BaseURL,
-		Database: sqladapter.NewPostgreSQL(db),
-		Secret:   []byte(cfg.LimenSecret),
-		HTTP: limen.NewDefaultHTTPConfig(httpCookieOpts(cfg)...),
-		Email: limen.NewDefaultEmailConfig(
-			limen.WithEmailVerification(
-				limen.WithSendEmailVerificationMail(func(email, token string) {
-					slog.Info("email verification requested", "email", email, "token", token)
-				}),
-			),
-		),
-		Plugins: plugins,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("init limen: %w", err)
-	}
-
-	return &Auth{
-		Limen: authInstance,
-		Store: st,
-		DB:    db,
-	}, nil
+	return &Auth{Store: st, DB: db, cfg: cfg}, nil
 }
 
-// Handler returns the http.Handler that serves Limen auth endpoints.
-func (a *Auth) Handler() http.Handler {
-	return a.Limen.Handler()
-}
-
-// Middleware wraps protected API routes. It verifies the Limen session
-// (or bearer API token) and injects the authenticated user ID into the
-// request context.
+// Middleware wraps protected API routes. It resolves the user ID via a bearer
+// API token (Authorization: Bearer ...) or the web session cookie, then injects
+// it into the request context.
 func (a *Auth) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userID, err := a.resolveUserID(r)
@@ -90,21 +64,42 @@ func (a *Auth) resolveUserID(r *http.Request) (int, error) {
 	if bearer := bearerToken(r); bearer != "" {
 		return a.resolveToken(r.Context(), bearer)
 	}
-	session, err := a.Limen.GetSession(r)
-	if err != nil {
-		return 0, err
+	cookie, err := r.Cookie(SessionCookie)
+	if err != nil || cookie.Value == "" {
+		return 0, ErrNoSession
 	}
-	id, err := IDToInt(session.User.ID)
-	return id, err
+	return a.Store.GetWebSession(r.Context(), cookie.Value)
 }
 
 func (a *Auth) resolveToken(ctx context.Context, token string) (int, error) {
 	hash := HashToken(token)
 	t, err := a.Store.GetAPITokenByHash(ctx, hash)
 	if err != nil || t == nil {
-		return 0, fmt.Errorf("invalid token")
+		return 0, ErrNoSession
 	}
 	return t.UserID, nil
+}
+
+// IssueSession creates a web session for userID and sets the cookie on w.
+func (a *Auth) IssueSession(w http.ResponseWriter, userID int) error {
+	token, err := randomToken(32)
+	if err != nil {
+		return fmt.Errorf("gen session token: %w", err)
+	}
+	expiresAt := time.Now().Add(SessionTTL)
+	if err := a.Store.CreateWebSession(context.Background(), token, userID, expiresAt); err != nil {
+		return fmt.Errorf("create web session: %w", err)
+	}
+	http.SetCookie(w, a.sessionCookie(token, expiresAt))
+	return nil
+}
+
+// ClearSession deletes the web session for the request's cookie and expires it.
+func (a *Auth) ClearSession(w http.ResponseWriter, r *http.Request) {
+	if cookie, err := r.Cookie(SessionCookie); err == nil && cookie.Value != "" {
+		_ = a.Store.DeleteWebSession(r.Context(), cookie.Value)
+	}
+	http.SetCookie(w, a.sessionCookie("", time.Time{}))
 }
 
 // UserIDFromCtx extracts the authenticated user id stored by Middleware, or 0.
@@ -113,17 +108,24 @@ func UserIDFromCtx(ctx context.Context) int {
 	return v
 }
 
-// IDToInt coerces a Limen user id (int, int64 or float64) into an int.
-func IDToInt(id any) (int, error) {
-	switch v := id.(type) {
-	case int:
-		return v, nil
-	case int64:
-		return int(v), nil
-	case float64:
-		return int(v), nil
+func (a *Auth) sessionCookie(value string, expires time.Time) *http.Cookie {
+	ck := &http.Cookie{
+		Name:     SessionCookie,
+		Value:    value,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   a.cfg.CookieSecure,
+		SameSite: parseSameSite(a.cfg.CookieSameSite),
 	}
-	return 0, fmt.Errorf("unexpected user id type: %T", id)
+	if a.cfg.CookieDomain != "" {
+		ck.Domain = a.cfg.CookieDomain
+	}
+	if expires.IsZero() {
+		ck.MaxAge = -1
+	} else {
+		ck.Expires = expires
+	}
+	return ck
 }
 
 func bearerToken(r *http.Request) string {
@@ -134,9 +136,6 @@ func bearerToken(r *http.Request) string {
 	return strings.TrimPrefix(auth, "Bearer ")
 }
 
-// parseSameSite maps the config string ("lax", "none", "strict") to the
-// net/http SameSite mode. Defaults to Lax for unrecognized values, matching
-// Limen's own default.
 func parseSameSite(s string) http.SameSite {
 	switch strings.ToLower(s) {
 	case "none":
@@ -148,22 +147,11 @@ func parseSameSite(s string) http.SameSite {
 	}
 }
 
-// httpCookieOpts builds the Limen HTTP cookie/session options from config.
-// When CookieDomain is set, the session cookie is shared across that
-// registrable domain and its subdomains (cross-subdomain), so the web app
-// and API running on different subdomains share one session. When empty the
-// cookie stays host-only (the default for same-origin local development).
-func httpCookieOpts(cfg *config.Config) []limen.HTTPConfigOption {
-	opts := []limen.HTTPConfigOption{
-		limen.WithHTTPBasePath("/auth"),
-		limen.WithHTTPCSRFProtection(false),
-		limen.WithHTTPOriginCheck(false),
-		limen.WithHTTPCookieSecure(cfg.CookieSecure),
-		limen.WithHTTPCookieSameSite(parseSameSite(cfg.CookieSameSite)),
-		limen.WithHTTPTrustedOrigins(cfg.TrustedOrigins),
+// randomToken returns a hex-encoded random string of n bytes.
+func randomToken(n int) (string, error) {
+	b := make([]byte, n)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
 	}
-	if cfg.CookieDomain != "" {
-		opts = append(opts, limen.WithHTTPCookieCrossSubdomainEnabled(cfg.CookieDomain))
-	}
-	return opts
+	return hex.EncodeToString(b), nil
 }

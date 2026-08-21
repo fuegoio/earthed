@@ -37,7 +37,6 @@ services:
     ports:
       - "8080:8080"
     environment:
-      LIMEN_SECRET: <32-byte-secret>
       EARTHED_DATABASE_URL: postgres://earthed:<db-password>@postgres:5432/earthed?sslmode=disable
       EARTHED_BASE_URL: https://api.your-domain.com
       EARTHED_WEB_URL: https://your-domain.com

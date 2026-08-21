@@ -15,7 +15,6 @@ type Config struct {
 	DatabaseURL    string
 	BaseURL        string
 	WebURL         string
-	LimenSecret    string
 	LogFormat      string
 	PollingFreq    time.Duration
 	BatchSize      int
@@ -33,6 +32,13 @@ type Config struct {
 	// announces new AT Proto users to the relay and queries it for global counts.
 	// Leave empty to disable relay integration.
 	RelayURL string
+	// OAuthClientID is the full URL where Earthed serves its client metadata
+	// document (the PDS fetches this during the OAuth flow). Defaults to
+	// "<BaseURL>/client-metadata.json".
+	OAuthClientID string
+	// OAuthCallbackURL is the public OAuth redirect URL the PDS sends the
+	// authorization code back to. Defaults to "<BaseURL>/auth/oauth/callback".
+	OAuthCallbackURL string
 }
 
 // Load reads configuration from environment variables and validates it.
@@ -42,7 +48,6 @@ func Load() (*Config, error) {
 		DatabaseURL:    env("EARTHED_DATABASE_URL", "postgres://earthed:earthed@localhost:5432/earthed?sslmode=disable"),
 		BaseURL:        env("EARTHED_BASE_URL", "http://localhost:8080"),
 		WebURL:         env("EARTHED_WEB_URL", "http://localhost:3000"),
-		LimenSecret:    env("LIMEN_SECRET", ""),
 		LogFormat:      env("EARTHED_LOG_FORMAT", "pretty"),
 		PollingFreq:    envDuration("EARTHED_POLLING_FREQUENCY", 60*time.Second),
 		BatchSize:      envInt("EARTHED_BATCH_SIZE", 100),
@@ -59,12 +64,11 @@ func Load() (*Config, error) {
 		RelayURL:       env("EARTHED_RELAY_URL", ""),
 	}
 
-	if cfg.LimenSecret == "" {
-		return nil, fmt.Errorf("LIMEN_SECRET must be set (32 bytes)")
-	}
-	if len(cfg.LimenSecret) != 32 {
-		return nil, fmt.Errorf("LIMEN_SECRET must be exactly 32 bytes, got %d", len(cfg.LimenSecret))
-	}
+	// OAuth client_id and callback URL default from BaseURL. The client_id is a
+	// URL pointing at the client-metadata.json document this server serves.
+	base := strings.TrimRight(strings.TrimSpace(cfg.BaseURL), "/")
+	cfg.OAuthClientID = env("EARTHED_OAUTH_CLIENT_ID", base+"/client-metadata.json")
+	cfg.OAuthCallbackURL = env("EARTHED_OAUTH_REDIRECT_URL", base+"/auth/oauth/callback")
 
 	switch cfg.CookieSameSite {
 	case "lax", "none", "strict":

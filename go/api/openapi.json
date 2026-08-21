@@ -44,6 +44,33 @@
                 ],
                 "type": "object"
             },
+            "ATProtoStatusOutputBody": {
+                "additionalProperties": false,
+                "properties": {
+                    "$schema": {
+                        "description": "A URL to the JSON Schema for this object.",
+                        "examples": [
+                            "https://example.com/schemas/ATProtoStatusOutputBody.json"
+                        ],
+                        "format": "uri",
+                        "readOnly": true,
+                        "type": "string"
+                    },
+                    "connected": {
+                        "type": "boolean"
+                    },
+                    "did": {
+                        "type": "string"
+                    },
+                    "handle": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "connected"
+                ],
+                "type": "object"
+            },
             "AddFeedListFeedInputBody": {
                 "additionalProperties": false,
                 "properties": {
@@ -1508,6 +1535,9 @@
                         "format": "date-time",
                         "type": "string"
                     },
+                    "did": {
+                        "type": "string"
+                    },
                     "first_name": {
                         "type": "string"
                     },
@@ -1524,6 +1554,9 @@
                     },
                     "is_following": {
                         "type": "boolean"
+                    },
+                    "pds_url": {
+                        "type": "string"
                     },
                     "updated_at": {
                         "format": "date-time",
@@ -1591,6 +1624,37 @@
                 "summary": "Get subscriber count and public profiles for a feed",
                 "tags": [
                     "feeds"
+                ]
+            }
+        },
+        "/api/v1/me/atproto": {
+            "get": {
+                "operationId": "atproto-status",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ATProtoStatusOutputBody"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "default": {
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorModel"
+                                }
+                            }
+                        },
+                        "description": "Error"
+                    }
+                },
+                "summary": "Get AT Proto identity for the current user",
+                "tags": [
+                    "social"
                 ]
             }
         },
@@ -3764,6 +3828,10 @@
         {
             "description": "Social features: handles, follows, article sharing",
             "name": "social"
+        },
+        {
+            "description": "AT Protocol identity and PDS integration",
+            "name": "atproto"
         },
         {
             "description": "Device-flow login (CLI/TUI)",

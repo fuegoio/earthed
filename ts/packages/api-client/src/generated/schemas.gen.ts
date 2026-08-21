@@ -44,6 +44,34 @@ export const APITokenSchema = {
     type: 'object'
 } as const;
 
+export const ATProtoStatusOutputBodySchema = {
+    additionalProperties: false,
+    properties: {
+        $schema: {
+            description: 'A URL to the JSON Schema for this object.',
+            examples: [
+                'https://example.com/schemas/ATProtoStatusOutputBody.json'
+            ],
+            format: 'uri',
+            readOnly: true,
+            type: 'string'
+        },
+        connected: {
+            type: 'boolean'
+        },
+        did: {
+            type: 'string'
+        },
+        handle: {
+            type: 'string'
+        }
+    },
+    required: [
+        'connected'
+    ],
+    type: 'object'
+} as const;
+
 export const AddFeedListFeedInputBodySchema = {
     additionalProperties: false,
     properties: {
@@ -1546,6 +1574,9 @@ export const UserProfileSchema = {
             format: 'date-time',
             type: 'string'
         },
+        did: {
+            type: 'string'
+        },
         first_name: {
             type: 'string'
         },
@@ -1563,6 +1594,9 @@ export const UserProfileSchema = {
         is_following: {
             type: 'boolean'
         },
+        pds_url: {
+            type: 'string'
+        },
         updated_at: {
             format: 'date-time',
             type: 'string'
@@ -1579,6 +1613,25 @@ export const UserProfileSchema = {
         'updated_at',
         'follower_count',
         'following_count'
+    ],
+    type: 'object'
+} as const;
+
+export const ATProtoStatusOutputBodyWritableSchema = {
+    additionalProperties: false,
+    properties: {
+        connected: {
+            type: 'boolean'
+        },
+        did: {
+            type: 'string'
+        },
+        handle: {
+            type: 'string'
+        }
+    },
+    required: [
+        'connected'
     ],
     type: 'object'
 } as const;
@@ -2670,6 +2723,9 @@ export const UserProfileWritableSchema = {
             format: 'date-time',
             type: 'string'
         },
+        did: {
+            type: 'string'
+        },
         first_name: {
             type: 'string'
         },
@@ -2686,6 +2742,9 @@ export const UserProfileWritableSchema = {
         },
         is_following: {
             type: 'boolean'
+        },
+        pds_url: {
+            type: 'string'
         },
         updated_at: {
             format: 'date-time',
