@@ -67,10 +67,10 @@ var allowedTags = map[string]bool{
 
 // allowedAttributes lists the attributes preserved per tag.
 var allowedAttributes = map[string]map[string]bool{
-	"a":   {"href": true, "title": true, "rel": true},
-	"img": {"src": true, "alt": true, "title": true, "width": true, "height": true},
-	"video":      {"src": true, "width": true, "height": true, "controls": true},
-	"source":     {"src": true, "type": true},
+	"a":      {"href": true, "title": true, "rel": true},
+	"img":    {"src": true, "alt": true, "title": true, "width": true, "height": true},
+	"video":  {"src": true, "width": true, "height": true, "controls": true},
+	"source": {"src": true, "type": true},
 }
 
 // Sanitize strips disallowed tags and attributes from an HTML string.

@@ -33,7 +33,7 @@ func syncFollows(ctx context.Context, c *atclient.APIClient, st *store.Store, us
 		params := map[string]any{
 			"repo":       accountDID(c),
 			"collection": atproto.CollectionFollow,
-			"limit":       100,
+			"limit":      100,
 		}
 		if cursor != "" {
 			params["cursor"] = cursor
@@ -72,7 +72,7 @@ func syncFeedSubscriptions(ctx context.Context, c *atclient.APIClient, st *store
 		params := map[string]any{
 			"repo":       accountDID(c),
 			"collection": atproto.CollectionSubscription,
-			"limit":       100,
+			"limit":      100,
 		}
 		if cursor != "" {
 			params["cursor"] = cursor
@@ -83,10 +83,10 @@ func syncFeedSubscriptions(ctx context.Context, c *atclient.APIClient, st *store
 		}
 		for _, rec := range out.Records {
 			var fs struct {
-				FeedURL    string `json:"feedUrl"`
-				SiteURL    string `json:"siteUrl"`
-				Title      string `json:"title"`
-				CreatedAt  string `json:"createdAt"`
+				FeedURL   string `json:"feedUrl"`
+				SiteURL   string `json:"siteUrl"`
+				Title     string `json:"title"`
+				CreatedAt string `json:"createdAt"`
 			}
 			if err := json.Unmarshal(rec.Value, &fs); err != nil || fs.FeedURL == "" {
 				continue

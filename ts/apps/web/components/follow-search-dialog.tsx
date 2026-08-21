@@ -14,12 +14,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
-import { Button, buttonVariants } from "@workspace/ui/components/button";
+import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { getClient, searchUsers, followUser, unfollowUser, unwrap } from "@/lib/sunred";
 import { getApiErrorMessage } from "@/lib/errors";
-import { cn } from "@workspace/ui/lib/utils";
 import type { UserProfile } from "@/lib/types";
 
 function displayName(p: UserProfile): string {
@@ -236,13 +235,6 @@ export function FollowSearchDialog() {
               ? `${(results ?? []).length} ${(results ?? []).length === 1 ? "result" : "results"}`
               : "\u00A0"}
           </span>
-          <Link
-            href="/social"
-            onClick={() => setOpen(false)}
-            className={cn(buttonVariants({ variant: "link", size: "sm" }), "h-auto p-0 text-xs")}
-          >
-            Go to social
-          </Link>
         </div>
       </DialogContent>
     </Dialog>

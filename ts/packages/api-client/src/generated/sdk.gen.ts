@@ -295,7 +295,7 @@ export const getFeed = <ThrowOnError extends boolean = false>(options: Options<G
 /**
  * Update a feed
  *
- * Update the folder assignment and/or title of a feed.
+ * Update the folder assignment and/or title override of a subscription.
  */
 export const updateFeed = <ThrowOnError extends boolean = false>(options: Options<UpdateFeedData, ThrowOnError>): RequestResult<UpdateFeedResponses, UpdateFeedErrors, ThrowOnError> => (options.client ?? client).patch<UpdateFeedResponses, UpdateFeedErrors, ThrowOnError>({
     url: '/v1/feeds/{feedId}',

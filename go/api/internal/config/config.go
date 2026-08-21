@@ -67,7 +67,7 @@ func Load() (*Config, error) {
 		CookieDomain:   strings.TrimSpace(env("SUNRED_COOKIE_DOMAIN", "")),
 		TrustedOrigins: envList("SUNRED_TRUSTED_ORIGINS"),
 		RelayURL:       env("SUNRED_RELAY_URL", ""),
-		DefaultPDS:    strings.TrimRight(strings.TrimSpace(env("SUNRED_DEFAULT_PDS", "https://snrd.social")), "/"),
+		DefaultPDS:     strings.TrimRight(strings.TrimSpace(env("SUNRED_DEFAULT_PDS", "https://snrd.social")), "/"),
 	}
 
 	// OAuth client_id and callback URL derive from BaseURL. The client_id is a

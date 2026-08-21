@@ -159,6 +159,7 @@ func (a *API) ATProtoSyncShare(userID int, sa *store.SharedArticle, isShare bool
 			slog.Warn("atproto: delete share failed", "user_id", userID, "rkey", rkey, "err", err)
 		} else {
 			slog.Info("atproto: share deleted", "user_id", userID, "rkey", rkey)
+			_ = a.store.SetShareATProtoRkey(ctx, sa.ID, "")
 		}
 	}
 }
@@ -183,9 +184,9 @@ func (a *API) ATProtoSyncFeedSubscription(userID, feedID int, feedURL, siteURL, 
 			return
 		}
 		slog.Info("atproto: feed subscription written", "user_id", userID, "feed_url", feedURL, "rkey", rkey)
-		_ = a.store.SetFeedATProtoRkey(ctx, feedID, rkey)
+		_ = a.store.SetFeedATProtoRkey(ctx, userID, feedID, rkey)
 	} else {
-		rkey, err := a.store.GetFeedATProtoRkey(ctx, feedID)
+		rkey, err := a.store.GetFeedATProtoRkey(ctx, userID, feedID)
 		if err != nil || rkey == "" {
 			return
 		}

@@ -367,14 +367,23 @@ func TestCountFeedSubscribers(t *testing.T) {
 	u1 := seedUser(t, s, fmt.Sprintf("subs-u1-%d@example.com", time.Now().UnixNano()))
 	u2 := seedUser(t, s, fmt.Sprintf("subs-u2-%d@example.com", time.Now().UnixNano()))
 
-	// Seed feeds with the same URL for both users.
-	_, _ = s.DB.Exec(`INSERT INTO feeds (user_id, feed_url, title) VALUES ($1,$2,'F1')`, u1, feedURL)
-	_, _ = s.DB.Exec(`INSERT INTO feeds (user_id, feed_url, title) VALUES ($1,$2,'F2')`, u2, feedURL)
+	// One global feed; two users subscribe to it.
+	feed, err := s.GetOrCreateFeed(ctx, feedURL, "", "Shared Feed", "")
+	if err != nil {
+		t.Fatalf("GetOrCreateFeed: %v", err)
+	}
+	if _, err := s.CreateSubscription(ctx, u1, feed.ID, nil, ""); err != nil {
+		t.Fatalf("subscribe u1: %v", err)
+	}
+	if _, err := s.CreateSubscription(ctx, u2, feed.ID, nil, ""); err != nil {
+		t.Fatalf("subscribe u2: %v", err)
+	}
 	t.Cleanup(func() {
-		_, _ = s.DB.Exec(`DELETE FROM feeds WHERE feed_url=$1`, feedURL)
+		_, _ = s.DB.Exec(`DELETE FROM subscriptions WHERE feed_id = $1`, feed.ID)
+		_, _ = s.DB.Exec(`DELETE FROM feeds WHERE id = $1`, feed.ID)
 	})
 
-	n, err := s.CountFeedSubscribers(ctx, feedURL)
+	n, err := s.CountFeedSubscribers(ctx, feed.ID)
 	if err != nil {
 		t.Fatalf("CountFeedSubscribers: %v", err)
 	}
@@ -392,16 +401,25 @@ func TestListFeedSubscribers_OnlyWithHandles(t *testing.T) {
 	u1 := seedUser(t, s, fmt.Sprintf("sublist-u1-%d@example.com", time.Now().UnixNano()))
 	u2 := seedUser(t, s, fmt.Sprintf("sublist-u2-%d@example.com", time.Now().UnixNano()))
 
-	_, _ = s.DB.Exec(`INSERT INTO feeds (user_id, feed_url, title) VALUES ($1,$2,'Feed')`, u1, feedURL)
-	_, _ = s.DB.Exec(`INSERT INTO feeds (user_id, feed_url, title) VALUES ($1,$2,'Feed')`, u2, feedURL)
+	feed, err := s.GetOrCreateFeed(ctx, feedURL, "", "Feed", "")
+	if err != nil {
+		t.Fatalf("GetOrCreateFeed: %v", err)
+	}
+	if _, err := s.CreateSubscription(ctx, u1, feed.ID, nil, ""); err != nil {
+		t.Fatalf("subscribe u1: %v", err)
+	}
+	if _, err := s.CreateSubscription(ctx, u2, feed.ID, nil, ""); err != nil {
+		t.Fatalf("subscribe u2: %v", err)
+	}
 	// Only u1 has a handle.
 	_, _ = s.UpsertHandle(ctx, u1, handle, "")
 	t.Cleanup(func() {
-		_, _ = s.DB.Exec(`DELETE FROM feeds WHERE feed_url=$1`, feedURL)
+		_, _ = s.DB.Exec(`DELETE FROM subscriptions WHERE feed_id = $1`, feed.ID)
+		_, _ = s.DB.Exec(`DELETE FROM feeds WHERE id = $1`, feed.ID)
 		_, _ = s.DB.Exec(`DELETE FROM user_profiles WHERE user_id=$1`, u1)
 	})
 
-	subs, err := s.ListFeedSubscribers(ctx, feedURL)
+	subs, err := s.ListFeedSubscribers(ctx, feed.ID)
 	if err != nil {
 		t.Fatalf("ListFeedSubscribers: %v", err)
 	}
@@ -464,10 +482,13 @@ func TestListPublicFeedsByUser(t *testing.T) {
 	if len(feeds) < 2 {
 		t.Errorf("expected at least 2 feeds, got %d", len(feeds))
 	}
+	// Every returned feed must be one the user subscribes to.
+	seen := map[int]bool{}
 	for _, f := range feeds {
-		if f.UserID != u {
-			t.Errorf("feed user_id=%d, want %d", f.UserID, u)
-		}
+		seen[f.ID] = true
+	}
+	if !seen[f1] || !seen[f2] {
+		t.Errorf("expected both seeded feeds to be listed; got %v", seen)
 	}
 }
 

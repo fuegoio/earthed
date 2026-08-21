@@ -171,19 +171,20 @@ func (s *Store) GetShareATProtoRkey(ctx context.Context, shareID int64) (string,
 	return rkey.String, err
 }
 
-// SetFeedATProtoRkey records the AT Proto rkey for a feed subscription row.
-func (s *Store) SetFeedATProtoRkey(ctx context.Context, feedID int, rkey string) error {
+// SetFeedATProtoRkey records the AT Proto rkey for a user's subscription row.
+func (s *Store) SetFeedATProtoRkey(ctx context.Context, userID, feedID int, rkey string) error {
 	_, err := s.DB.ExecContext(ctx, `
-		UPDATE feeds SET atproto_rkey = $2 WHERE id = $1`, feedID, rkey,
+		UPDATE subscriptions SET atproto_rkey = $3, updated_at = NOW()
+		 WHERE user_id = $1 AND feed_id = $2`, userID, feedID, rkey,
 	)
 	return err
 }
 
-// GetFeedATProtoRkey retrieves the AT Proto rkey for a feed subscription.
-func (s *Store) GetFeedATProtoRkey(ctx context.Context, feedID int) (string, error) {
+// GetFeedATProtoRkey retrieves the AT Proto rkey for a user's subscription.
+func (s *Store) GetFeedATProtoRkey(ctx context.Context, userID, feedID int) (string, error) {
 	var rkey sql.NullString
 	err := s.DB.QueryRowContext(ctx, `
-		SELECT atproto_rkey FROM feeds WHERE id = $1`, feedID,
+		SELECT atproto_rkey FROM subscriptions WHERE user_id = $1 AND feed_id = $2`, userID, feedID,
 	).Scan(&rkey)
 	if err == sql.ErrNoRows {
 		return "", nil

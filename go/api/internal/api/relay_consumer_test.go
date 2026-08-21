@@ -94,13 +94,16 @@ func TestRelayConsumer_FeedSubscriptionEvent(t *testing.T) {
 	defer cancel()
 	go consumer.Start(ctx)
 
-	// Wait for the feed to appear.
+	// Wait for the feed + subscription to appear.
 	deadline := time.Now().Add(3 * time.Second)
 	for time.Now().Before(deadline) {
-		feed, _ := s.GetFeedByURL(context.Background(), "https://example.com/rss", userID)
+		feed, _ := s.GetFeedByURL(context.Background(), "https://example.com/rss")
 		if feed != nil {
 			if feed.Title != "Example" {
 				t.Errorf("feed title=%q, want 'Example'", feed.Title)
+			}
+			if sub, _ := s.GetSubscriptionFeed(context.Background(), feed.ID, userID); sub == nil {
+				t.Error("expected subscription to exist after feedSubscription event")
 			}
 			cancel()
 			return
@@ -165,14 +168,19 @@ func TestRelayConsumer_FeedUnsubscriptionEvent(t *testing.T) {
 
 	deadline := time.Now().Add(3 * time.Second)
 	for time.Now().Before(deadline) {
-		feed, _ := s.GetFeedByURL(context.Background(), "https://example.com/rss", userID)
+		feed, _ := s.GetFeedByURL(context.Background(), "https://example.com/rss")
 		if feed == nil {
+			time.Sleep(50 * time.Millisecond)
+			continue
+		}
+		// The global feed persists; unsubscription removes the subscription.
+		if sub, _ := s.GetSubscriptionFeed(context.Background(), feed.ID, userID); sub == nil {
 			cancel()
 			return
 		}
 		time.Sleep(50 * time.Millisecond)
 	}
-	t.Fatal("timeout waiting for feed to be deleted by unsubscription event")
+	t.Fatal("timeout waiting for subscription to be deleted by unsubscription event")
 }
 
 func TestRelayConsumer_FollowEvent(t *testing.T) {

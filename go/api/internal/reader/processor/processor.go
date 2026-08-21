@@ -88,7 +88,7 @@ func (p *Processor) ProcessFeed(ctx context.Context, feed *store.Feed) error {
 
 		hash := hashItem(item)
 		description := truncate(sanitizer.StripHTML(item.Description), 400)
-		entryID, err := p.store.CreateEntry(ctx, feed.UserID, feed.ID, hash, item.Title, item.Link, item.CommentsURL, item.Author, sanitized, description, publishedAt, item.Tags)
+		entryID, err := p.store.CreateEntry(ctx, feed.ID, hash, item.Title, item.Link, item.CommentsURL, item.Author, sanitized, description, publishedAt, item.Tags)
 		if err != nil {
 			slog.Error("create entry failed", "feed_id", feed.ID, "hash", hash, "err", err)
 			continue

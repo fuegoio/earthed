@@ -232,9 +232,9 @@ func (c *Client) DeleteRecord(ctx context.Context, did, collection, rkey string)
 // ListRecordsOutput is the response from com.atproto.repo.listRecords.
 type ListRecordsOutput struct {
 	Records []struct {
-		URI    string          `json:"uri"`
-		CID    string          `json:"cid"`
-		Value  json.RawMessage `json:"value"`
+		URI   string          `json:"uri"`
+		CID   string          `json:"cid"`
+		Value json.RawMessage `json:"value"`
 	} `json:"records"`
 	Cursor string `json:"cursor"`
 }

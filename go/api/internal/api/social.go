@@ -388,17 +388,17 @@ func (a *API) registerSocialRoutes() {
 	}, func(ctx context.Context, input *struct {
 		FeedID int `path:"feedId"`
 	}) (*FeedSubscribersOutput, error) {
-		userID := auth.UserIDFromCtx(ctx)
-		feed, err := a.store.GetFeedByID(ctx, input.FeedID, userID)
+		_ = auth.UserIDFromCtx(ctx)
+		feed, err := a.store.GetFeedGlobal(ctx, input.FeedID)
 		if err != nil || feed == nil {
 			return nil, huma.Error404NotFound("feed not found")
 		}
 
-		count, err := a.store.CountFeedSubscribers(ctx, feed.FeedURL)
+		count, err := a.store.CountFeedSubscribers(ctx, feed.ID)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
-		subs, err := a.store.ListFeedSubscribers(ctx, feed.FeedURL)
+		subs, err := a.store.ListFeedSubscribers(ctx, feed.ID)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}

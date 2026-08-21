@@ -49,35 +49,53 @@ func seedUser(t *testing.T, s *Store, email string) int {
 	return id
 }
 
-// seedFeed creates a test feed and returns its ID. Cleans up via t.Cleanup.
+// seedFeed creates a global feed and subscribes userID to it (optionally in a
+// folder). Returns the feed ID. Cleans up via t.Cleanup.
 func seedFeed(t *testing.T, s *Store, userID int, folderID *int, title string) int {
 	t.Helper()
 	var id int
 	err := s.DB.QueryRow(
-		`INSERT INTO feeds (user_id, folder_id, feed_url, title) VALUES ($1, $2, $3, $4) RETURNING id`,
-		userID, folderID, fmt.Sprintf("https://example.com/%s.xml", title), title,
+		`INSERT INTO feeds (feed_url, title) VALUES ($1, $2) RETURNING id`,
+		fmt.Sprintf("https://example.com/%s.xml", title), title,
 	).Scan(&id)
 	if err != nil {
 		t.Fatalf("seed feed: %v", err)
 	}
+	if _, err := s.DB.Exec(
+		`INSERT INTO subscriptions (user_id, feed_id, folder_id) VALUES ($1, $2, $3)`,
+		userID, id, folderID,
+	); err != nil {
+		t.Fatalf("seed subscription: %v", err)
+	}
 	t.Cleanup(func() {
+		_, _ = s.DB.Exec(`DELETE FROM subscriptions WHERE feed_id = $1`, id)
 		_, _ = s.DB.Exec(`DELETE FROM feeds WHERE id = $1`, id)
 	})
 	return id
 }
 
-// seedEntry creates a test entry and returns its ID. Cleans up via t.Cleanup.
+// seedEntry creates a global entry against feedID and writes per-user state
+// (status/starred) for userID. Absent state means unread; a state row is only
+// inserted when the entry is not "unread unstarred". Returns the entry ID.
 func seedEntry(t *testing.T, s *Store, userID, feedID int, title, status string, starred bool) int64 {
 	t.Helper()
 	var id int64
 	err := s.DB.QueryRow(
-		`INSERT INTO entries (user_id, feed_id, hash, title, content, status, starred, published_at)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+		`INSERT INTO entries (feed_id, hash, title, content, published_at)
+		 VALUES ($1, $2, $3, $3, NOW())
 		 RETURNING id`,
-		userID, feedID, fmt.Sprintf("hash-%d-%s", feedID, title), title, title, status, starred,
+		feedID, fmt.Sprintf("hash-%d-%s", feedID, title), title,
 	).Scan(&id)
 	if err != nil {
 		t.Fatalf("seed entry: %v", err)
+	}
+	if status != "unread" || starred {
+		if _, err := s.DB.Exec(
+			`INSERT INTO entry_state (user_id, entry_id, status, starred) VALUES ($1, $2, $3, $4)`,
+			userID, id, status, starred,
+		); err != nil {
+			t.Fatalf("seed entry state: %v", err)
+		}
 	}
 	t.Cleanup(func() {
 		_, _ = s.DB.Exec(`DELETE FROM entries WHERE id = $1`, id)

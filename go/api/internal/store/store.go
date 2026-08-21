@@ -108,35 +108,91 @@ func (s *Store) DeleteFolder(ctx context.Context, id, userID int) error {
 
 // --- Feeds ---
 
-// CreateFeed inserts a new feed subscription for the given user.
-func (s *Store) CreateFeed(ctx context.Context, userID int, folderID *int, feedURL, siteURL, title, description string) (*Feed, error) {
-	var f Feed
-	err := s.DB.QueryRowContext(ctx,
-		`INSERT INTO feeds (user_id, folder_id, feed_url, site_url, title, description)
-		 VALUES ($1, $2, $3, $4, $5, $6)
-		 RETURNING id, user_id, folder_id, feed_url, site_url, title, description,
-		           etag_header, last_modified_header, parsing_error, parsing_error_count,
-		           disabled, scraper_rules, rewrite_rules, crawler,
-		           next_check_at, last_fetch_at, created_at, updated_at`,
-		userID, folderID, feedURL, siteURL, title, description,
-	).Scan(&f.ID, &f.UserID, &f.FolderID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
+// feedColumns is the canonical column list for the global feeds table, in the
+// order scanFeedGlobal expects.
+const feedColumns = `id, feed_url, site_url, title, description,
+	etag_header, last_modified_header, parsing_error, parsing_error_count,
+	disabled, scraper_rules, rewrite_rules, crawler,
+	next_check_at, last_fetch_at, created_at, updated_at`
+
+func scanFeedGlobalRow(row *sql.Row, f *Feed) error {
+	return row.Scan(&f.ID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
 		&f.EtagHeader, &f.LastModified, &f.ParsingError, &f.ParsingErrorCount,
 		&f.Disabled, &f.ScraperRules, &f.RewriteRules, &f.Crawler,
 		&f.NextCheckAt, &f.LastFetchAt, &f.CreatedAt, &f.UpdatedAt)
-	if err != nil {
-		return nil, fmt.Errorf("create feed: %w", err)
+}
+
+func scanFeedGlobal(rows *sql.Rows, f *Feed) error {
+	return rows.Scan(&f.ID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
+		&f.EtagHeader, &f.LastModified, &f.ParsingError, &f.ParsingErrorCount,
+		&f.Disabled, &f.ScraperRules, &f.RewriteRules, &f.Crawler,
+		&f.NextCheckAt, &f.LastFetchAt, &f.CreatedAt, &f.UpdatedAt)
+}
+
+// GetOrCreateFeed returns the global feed for feedURL, creating it (with the
+// provided metadata) if missing. Existing metadata is upgraded in place when
+// the caller supplies non-empty values. Idempotent on feed_url.
+func (s *Store) GetOrCreateFeed(ctx context.Context, feedURL, siteURL, title, description string) (*Feed, error) {
+	var f Feed
+	row := s.DB.QueryRowContext(ctx,
+		`INSERT INTO feeds (feed_url, site_url, title, description)
+		 VALUES ($1, $2, $3, $4)
+		 ON CONFLICT (feed_url) DO UPDATE
+		   SET site_url    = COALESCE(NULLIF(EXCLUDED.site_url, ''), feeds.site_url),
+		       title       = COALESCE(NULLIF(EXCLUDED.title, ''), feeds.title),
+		       description = COALESCE(NULLIF(EXCLUDED.description, ''), feeds.description),
+		       updated_at  = NOW()
+		 RETURNING `+feedColumns,
+		feedURL, siteURL, title, description,
+	)
+	if err := scanFeedGlobalRow(row, &f); err != nil {
+		return nil, fmt.Errorf("get or create feed: %w", err)
 	}
 	return &f, nil
 }
 
-// ListFeeds returns all feeds for the given user.
+// GetFeedGlobal returns the global feed with the given id, or nil.
+func (s *Store) GetFeedGlobal(ctx context.Context, id int) (*Feed, error) {
+	var f Feed
+	row := s.DB.QueryRowContext(ctx,
+		`SELECT `+feedColumns+` FROM feeds WHERE id = $1`, id)
+	err := scanFeedGlobalRow(row, &f)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &f, nil
+}
+
+// GetFeedByURL returns the global feed matching feedURL, or nil.
+func (s *Store) GetFeedByURL(ctx context.Context, feedURL string) (*Feed, error) {
+	var f Feed
+	row := s.DB.QueryRowContext(ctx,
+		`SELECT `+feedColumns+` FROM feeds WHERE feed_url = $1`, feedURL)
+	err := scanFeedGlobalRow(row, &f)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &f, nil
+}
+
+// ListFeeds returns the feeds the given user subscribes to, joined to their
+// subscription (folder + title override). Ordered by subscription sort then title.
 func (s *Store) ListFeeds(ctx context.Context, userID int) ([]Feed, error) {
 	rows, err := s.DB.QueryContext(ctx,
-		`SELECT id, user_id, folder_id, feed_url, site_url, title, description,
-		        etag_header, last_modified_header, parsing_error, parsing_error_count,
-		        disabled, scraper_rules, rewrite_rules, crawler,
-		        next_check_at, last_fetch_at, created_at, updated_at
-		 FROM feeds WHERE user_id = $1 ORDER BY sort_order ASC, title ASC`, userID)
+		`SELECT f.id, f.feed_url, f.site_url, COALESCE(s.title_override, f.title), f.description,
+		        s.folder_id,
+		        f.etag_header, f.last_modified_header, f.parsing_error, f.parsing_error_count,
+		        f.disabled, f.scraper_rules, f.rewrite_rules, f.crawler,
+		        f.next_check_at, f.last_fetch_at, f.created_at, f.updated_at
+		 FROM feeds f
+		 JOIN subscriptions s ON s.feed_id = f.id AND s.user_id = $1
+		 ORDER BY s.sort_order ASC, COALESCE(s.title_override, f.title) ASC`, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +200,11 @@ func (s *Store) ListFeeds(ctx context.Context, userID int) ([]Feed, error) {
 	var feeds []Feed
 	for rows.Next() {
 		var f Feed
-		if err := scanFeed(rows, &f); err != nil {
+		if err := rows.Scan(&f.ID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
+			&f.FolderID,
+			&f.EtagHeader, &f.LastModified, &f.ParsingError, &f.ParsingErrorCount,
+			&f.Disabled, &f.ScraperRules, &f.RewriteRules, &f.Crawler,
+			&f.NextCheckAt, &f.LastFetchAt, &f.CreatedAt, &f.UpdatedAt); err != nil {
 			return nil, err
 		}
 		feeds = append(feeds, f)
@@ -152,16 +212,21 @@ func (s *Store) ListFeeds(ctx context.Context, userID int) ([]Feed, error) {
 	return feeds, rows.Err()
 }
 
-// GetFeedByID returns the feed with the given id scoped to userID, or nil.
-func (s *Store) GetFeedByID(ctx context.Context, id, userID int) (*Feed, error) {
+// GetSubscriptionFeed returns the feed with the given id if the user subscribes
+// to it, joined to their subscription (folder + title override), or nil.
+func (s *Store) GetSubscriptionFeed(ctx context.Context, id, userID int) (*Feed, error) {
 	var f Feed
 	err := s.DB.QueryRowContext(ctx,
-		`SELECT id, user_id, folder_id, feed_url, site_url, title, description,
-		        etag_header, last_modified_header, parsing_error, parsing_error_count,
-		        disabled, scraper_rules, rewrite_rules, crawler,
-		        next_check_at, last_fetch_at, created_at, updated_at
-		 FROM feeds WHERE id = $1 AND user_id = $2`, id, userID,
-	).Scan(&f.ID, &f.UserID, &f.FolderID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
+		`SELECT f.id, f.feed_url, f.site_url, COALESCE(s.title_override, f.title), f.description,
+		        s.folder_id,
+		        f.etag_header, f.last_modified_header, f.parsing_error, f.parsing_error_count,
+		        f.disabled, f.scraper_rules, f.rewrite_rules, f.crawler,
+		        f.next_check_at, f.last_fetch_at, f.created_at, f.updated_at
+		 FROM feeds f
+		 JOIN subscriptions s ON s.feed_id = f.id AND s.user_id = $2
+		 WHERE f.id = $1`, id, userID,
+	).Scan(&f.ID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
+		&f.FolderID,
 		&f.EtagHeader, &f.LastModified, &f.ParsingError, &f.ParsingErrorCount,
 		&f.Disabled, &f.ScraperRules, &f.RewriteRules, &f.Crawler,
 		&f.NextCheckAt, &f.LastFetchAt, &f.CreatedAt, &f.UpdatedAt)
@@ -174,56 +239,37 @@ func (s *Store) GetFeedByID(ctx context.Context, id, userID int) (*Feed, error) 
 	return &f, nil
 }
 
-// GetFeedByURL returns the user's feed matching feedURL, or nil.
-func (s *Store) GetFeedByURL(ctx context.Context, feedURL string, userID int) (*Feed, error) {
-	var f Feed
-	err := s.DB.QueryRowContext(ctx,
-		`SELECT id, user_id, folder_id, feed_url, site_url, title, description,
-		        etag_header, last_modified_header, parsing_error, parsing_error_count,
-		        disabled, scraper_rules, rewrite_rules, crawler,
-		        next_check_at, last_fetch_at, created_at, updated_at
-		 FROM feeds WHERE feed_url = $1 AND user_id = $2`, feedURL, userID,
-	).Scan(&f.ID, &f.UserID, &f.FolderID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
-		&f.EtagHeader, &f.LastModified, &f.ParsingError, &f.ParsingErrorCount,
-		&f.Disabled, &f.ScraperRules, &f.RewriteRules, &f.Crawler,
-		&f.NextCheckAt, &f.LastFetchAt, &f.CreatedAt, &f.UpdatedAt)
-	if err == sql.ErrNoRows {
-		return nil, nil
-	}
+// CreateSubscription links a user to a global feed. Idempotent on (user_id,
+// feed_id); returns the joined feed view. folderID and titleOverride are
+// applied only when creating a new subscription.
+func (s *Store) CreateSubscription(ctx context.Context, userID, feedID int, folderID *int, titleOverride string) (*Feed, error) {
+	_, err := s.DB.ExecContext(ctx,
+		`INSERT INTO subscriptions (user_id, feed_id, folder_id, title_override)
+		 VALUES ($1, $2, $3, NULLIF($4, ''))
+		 ON CONFLICT (user_id, feed_id) DO NOTHING`,
+		userID, feedID, folderID, titleOverride)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create subscription: %w", err)
 	}
-	return &f, nil
+	return s.GetSubscriptionFeed(ctx, feedID, userID)
 }
 
-// UpdateFeed updates mutable fields on the given feed.
-func (s *Store) UpdateFeed(ctx context.Context, id, userID int, folderID *int, title, scraperRules, rewriteRules string, disabled, crawler bool) (*Feed, error) {
-	var f Feed
-	err := s.DB.QueryRowContext(ctx,
-		`UPDATE feeds SET folder_id = $3, title = $4, scraper_rules = $5,
-		         rewrite_rules = $6, disabled = $7, crawler = $8, updated_at = NOW()
-		 WHERE id = $1 AND user_id = $2
-		 RETURNING id, user_id, folder_id, feed_url, site_url, title, description,
-		           etag_header, last_modified_header, parsing_error, parsing_error_count,
-		           disabled, scraper_rules, rewrite_rules, crawler,
-		           next_check_at, last_fetch_at, created_at, updated_at`,
-		id, userID, folderID, title, scraperRules, rewriteRules, disabled, crawler,
-	).Scan(&f.ID, &f.UserID, &f.FolderID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
-		&f.EtagHeader, &f.LastModified, &f.ParsingError, &f.ParsingErrorCount,
-		&f.Disabled, &f.ScraperRules, &f.RewriteRules, &f.Crawler,
-		&f.NextCheckAt, &f.LastFetchAt, &f.CreatedAt, &f.UpdatedAt)
-	if err == sql.ErrNoRows {
-		return nil, nil
-	}
+// UpdateSubscription updates the folder and/or title override on a user's
+// subscription. Returns the joined feed view, or nil if not subscribed.
+func (s *Store) UpdateSubscription(ctx context.Context, userID, feedID int, folderID *int, title string) (*Feed, error) {
+	_, err := s.DB.ExecContext(ctx,
+		`UPDATE subscriptions SET folder_id = $3, title_override = NULLIF($4, ''), updated_at = NOW()
+		 WHERE user_id = $1 AND feed_id = $2`,
+		userID, feedID, folderID, title)
 	if err != nil {
-		return nil, fmt.Errorf("update feed: %w", err)
+		return nil, fmt.Errorf("update subscription: %w", err)
 	}
-	return &f, nil
+	return s.GetSubscriptionFeed(ctx, feedID, userID)
 }
 
-// DeleteFeed removes a feed and all its entries (via ON DELETE CASCADE).
-func (s *Store) DeleteFeed(ctx context.Context, id, userID int) error {
-	_, err := s.DB.ExecContext(ctx, `DELETE FROM feeds WHERE id = $1 AND user_id = $2`, id, userID)
+// DeleteSubscription removes a user's subscription. The global feed survives.
+func (s *Store) DeleteSubscription(ctx context.Context, userID, feedID int) error {
+	_, err := s.DB.ExecContext(ctx, `DELETE FROM subscriptions WHERE user_id = $1 AND feed_id = $2`, userID, feedID)
 	return err
 }
 
@@ -250,13 +296,10 @@ func (s *Store) UpdateFeedFetchState(ctx context.Context, feedID int, etag, last
 	return err
 }
 
-// ListFeedsDueForRefresh returns up to limit feeds whose next_check_at <= now.
+// ListFeedsDueForRefresh returns up to limit global feeds whose next_check_at <= now.
 func (s *Store) ListFeedsDueForRefresh(ctx context.Context, limit int) ([]Feed, error) {
 	rows, err := s.DB.QueryContext(ctx,
-		`SELECT id, user_id, folder_id, feed_url, site_url, title, description,
-		        etag_header, last_modified_header, parsing_error, parsing_error_count,
-		        disabled, scraper_rules, rewrite_rules, crawler,
-		        next_check_at, last_fetch_at, created_at, updated_at
+		`SELECT `+feedColumns+`
 		 FROM feeds WHERE next_check_at <= NOW() AND disabled = false
 		 ORDER BY next_check_at ASC LIMIT $1`, limit)
 	if err != nil {
@@ -266,7 +309,7 @@ func (s *Store) ListFeedsDueForRefresh(ctx context.Context, limit int) ([]Feed, 
 	var feeds []Feed
 	for rows.Next() {
 		var f Feed
-		if err := scanFeed(rows, &f); err != nil {
+		if err := scanFeedGlobal(rows, &f); err != nil {
 			return nil, err
 		}
 		feeds = append(feeds, f)
@@ -276,20 +319,20 @@ func (s *Store) ListFeedsDueForRefresh(ctx context.Context, limit int) ([]Feed, 
 
 // --- Entries ---
 
-// CreateEntry inserts a new entry, returning whether it was actually inserted
-// (false when the hash already existed for this feed).
-func (s *Store) CreateEntry(ctx context.Context, userID, feedID int, hash, title, url, commentsURL, author, content, description string, publishedAt time.Time, tags []string) (int64, error) {
+// CreateEntry inserts a global entry (one per feed+hash), returning its id.
+// Returns 0 (no error) when the hash already existed for this feed.
+func (s *Store) CreateEntry(ctx context.Context, feedID int, hash, title, url, commentsURL, author, content, description string, publishedAt time.Time, tags []string) (int64, error) {
 	var id int64
 	if tags == nil {
 		tags = []string{}
 	}
 	tagArr := pq.Array(tags)
 	err := s.DB.QueryRowContext(ctx,
-		`INSERT INTO entries (user_id, feed_id, hash, title, url, comments_url, author, content, description, published_at, tags)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+		`INSERT INTO entries (feed_id, hash, title, url, comments_url, author, content, description, published_at, tags)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 		 ON CONFLICT (feed_id, hash) DO NOTHING
 		 RETURNING id`,
-		userID, feedID, hash, title, url, commentsURL, author, content, description, publishedAt, tagArr,
+		feedID, hash, title, url, commentsURL, author, content, description, publishedAt, tagArr,
 	).Scan(&id)
 	if err == sql.ErrNoRows {
 		return 0, nil
@@ -300,20 +343,45 @@ func (s *Store) CreateEntry(ctx context.Context, userID, feedID int, hash, title
 	return id, nil
 }
 
-// ListEntries returns entries for the given user, optionally filtered by feed,
-// folder, status, and starred. Results are paginated.
+// visibleEntryFilter returns a SQL fragment matching entry IDs the user is
+// allowed to see (subscribed feeds or shared by followed users), used to scope
+// state mutations. userID is inlined as an integer literal.
+func visibleEntryFilter(userID int) string {
+	uid := fmt.Sprintf("%d", userID)
+	return `(e.feed_id IN (SELECT feed_id FROM subscriptions WHERE user_id = ` + uid + `)
+	   OR e.id IN (SELECT sa.entry_id FROM shared_articles sa JOIN user_follows uf ON uf.followee_id = sa.user_id AND uf.follower_id = ` + uid + `))`
+}
+
+// ListEntries returns entries visible to the user — entries from feeds they
+// subscribe to, UNION entries shared by users they follow — with per-user
+// read/starred state from entry_state. Filters: feed, folder (subscription
+// folder), status, starred, full-text search. Paginated.
 func (s *Store) ListEntries(ctx context.Context, userID int, feedID *int, folderID *int, status string, starred *bool, search string, limit, offset int) ([]Entry, error) {
-	q := `SELECT e.id, e.user_id, e.feed_id, e.hash, e.title, e.url, e.comments_url,
-	             e.author, '' AS content, LEFT(e.description, 400) AS description, e.status, e.starred,
-	             e.published_at, e.changed_at, e.tags
-	      FROM entries e`
+	q := `SELECT e.id, e.feed_id, e.hash, e.title, e.url, e.comments_url,
+	             e.author, '' AS content, LEFT(e.description, 400) AS description,
+	             COALESCE(st.status, 'unread'), COALESCE(st.starred, false), COALESCE(st.liked, false),
+	             e.published_at, COALESCE(st.changed_at, e.created_at), e.tags,
+	             f.title, f.feed_url, f.site_url,
+	             COALESCE(sh.handle, ''), COALESCE(u.first_name, '')
+	      FROM entries e
+	      JOIN feeds f ON f.id = e.feed_id
+	      LEFT JOIN entry_state st ON st.entry_id = e.id AND st.user_id = $1
+	      LEFT JOIN LATERAL (
+	        SELECT sa.user_id, sa.entry_id FROM shared_articles sa
+	        JOIN user_follows uf ON uf.followee_id = sa.user_id AND uf.follower_id = $1
+	        WHERE sa.entry_id = e.id
+	        LIMIT 1
+	      ) sh_row ON true
+	      LEFT JOIN user_profiles sh ON sh.user_id = sh_row.user_id
+	      LEFT JOIN users u ON u.id = sh_row.user_id`
 	args := []interface{}{userID}
 	argIdx := 2
 
-	q += " WHERE e.user_id = $1"
+	q += " WHERE (e.feed_id IN (SELECT feed_id FROM subscriptions WHERE user_id = $1)"
+	q += " OR e.id IN (SELECT sa.entry_id FROM shared_articles sa JOIN user_follows uf ON uf.followee_id = sa.user_id AND uf.follower_id = $1))"
 
 	if folderID != nil {
-		q += fmt.Sprintf(" AND e.feed_id IN (SELECT f.id FROM feeds f WHERE f.user_id = $1 AND f.folder_id IN (WITH RECURSIVE folder_tree AS (SELECT id FROM folders WHERE id = $%d AND user_id = $1 UNION ALL SELECT child.id FROM folders child JOIN folder_tree ft ON child.parent_id = ft.id) SELECT id FROM folder_tree))", argIdx)
+		q += fmt.Sprintf(" AND e.feed_id IN (SELECT s.feed_id FROM subscriptions s WHERE s.user_id = $1 AND s.folder_id IN (WITH RECURSIVE folder_tree AS (SELECT id FROM folders WHERE id = $%d AND user_id = $1 UNION ALL SELECT child.id FROM folders child JOIN folder_tree ft ON child.parent_id = ft.id) SELECT id FROM folder_tree))", argIdx)
 		args = append(args, *folderID)
 		argIdx++
 	}
@@ -322,14 +390,13 @@ func (s *Store) ListEntries(ctx context.Context, userID int, feedID *int, folder
 		args = append(args, *feedID)
 		argIdx++
 	}
-
 	if status != "" {
-		q += fmt.Sprintf(" AND e.status = $%d", argIdx)
+		q += fmt.Sprintf(" AND COALESCE(st.status, 'unread') = $%d", argIdx)
 		args = append(args, status)
 		argIdx++
 	}
 	if starred != nil {
-		q += fmt.Sprintf(" AND e.starred = $%d", argIdx)
+		q += fmt.Sprintf(" AND COALESCE(st.starred, false) = $%d", argIdx)
 		args = append(args, *starred)
 		argIdx++
 	}
@@ -350,9 +417,11 @@ func (s *Store) ListEntries(ctx context.Context, userID int, feedID *int, folder
 	var entries []Entry
 	for rows.Next() {
 		var e Entry
-		if err := rows.Scan(&e.ID, &e.UserID, &e.FeedID, &e.Hash, &e.Title, &e.URL, &e.CommentsURL,
-			&e.Author, &e.Content, &e.Description, &e.Status, &e.Starred,
-			&e.PublishedAt, &e.ChangedAt, pq.Array(&e.Tags)); err != nil {
+		if err := rows.Scan(&e.ID, &e.FeedID, &e.Hash, &e.Title, &e.URL, &e.CommentsURL,
+			&e.Author, &e.Content, &e.Description, &e.Status, &e.Starred, &e.Liked,
+			&e.PublishedAt, &e.ChangedAt, pq.Array(&e.Tags),
+			&e.FeedTitle, &e.FeedURL, &e.FeedSiteURL,
+			&e.SharedByHandle, &e.SharedByFirstName); err != nil {
 			return nil, err
 		}
 		entries = append(entries, e)
@@ -360,17 +429,33 @@ func (s *Store) ListEntries(ctx context.Context, userID int, feedID *int, folder
 	return entries, rows.Err()
 }
 
-// GetEntryByID returns the entry with the given id scoped to userID, or nil.
+// GetEntryByID returns a visible entry with per-user state + feed/sharer info,
+// or nil if not visible to the user.
 func (s *Store) GetEntryByID(ctx context.Context, id int64, userID int) (*Entry, error) {
 	var e Entry
 	err := s.DB.QueryRowContext(ctx,
-		`SELECT id, user_id, feed_id, hash, title, url, comments_url,
-		        author, '' AS content, LEFT(description, 400) AS description, status, starred,
-		        published_at, changed_at, tags
-		 FROM entries WHERE id = $1 AND user_id = $2`, id, userID,
-	).Scan(&e.ID, &e.UserID, &e.FeedID, &e.Hash, &e.Title, &e.URL, &e.CommentsURL,
-		&e.Author, &e.Content, &e.Description, &e.Status, &e.Starred,
-		&e.PublishedAt, &e.ChangedAt, pq.Array(&e.Tags))
+		`SELECT e.id, e.feed_id, e.hash, e.title, e.url, e.comments_url,
+		        e.author, '' AS content, LEFT(e.description, 400) AS description,
+		        COALESCE(st.status, 'unread'), COALESCE(st.starred, false), COALESCE(st.liked, false),
+		        e.published_at, COALESCE(st.changed_at, e.created_at), e.tags,
+		        f.title, f.feed_url, f.site_url,
+		        COALESCE(sh.handle, ''), COALESCE(u.first_name, '')
+		 FROM entries e
+		 JOIN feeds f ON f.id = e.feed_id
+		 LEFT JOIN entry_state st ON st.entry_id = e.id AND st.user_id = $2
+		 LEFT JOIN LATERAL (
+		   SELECT sa.user_id FROM shared_articles sa
+		   JOIN user_follows uf ON uf.followee_id = sa.user_id AND uf.follower_id = $2
+		   WHERE sa.entry_id = e.id LIMIT 1
+		 ) sh_row ON true
+		 LEFT JOIN user_profiles sh ON sh.user_id = sh_row.user_id
+		 LEFT JOIN users u ON u.id = sh_row.user_id
+		 WHERE e.id = $1 AND (`+visibleEntryFilter(userID)+`)`, id, userID,
+	).Scan(&e.ID, &e.FeedID, &e.Hash, &e.Title, &e.URL, &e.CommentsURL,
+		&e.Author, &e.Content, &e.Description, &e.Status, &e.Starred, &e.Liked,
+		&e.PublishedAt, &e.ChangedAt, pq.Array(&e.Tags),
+		&e.FeedTitle, &e.FeedURL, &e.FeedSiteURL,
+		&e.SharedByHandle, &e.SharedByFirstName)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -380,42 +465,69 @@ func (s *Store) GetEntryByID(ctx context.Context, id int64, userID int) (*Entry,
 	return &e, nil
 }
 
-// UpdateEntryStatus sets the status of a set of entries for the given user.
+// UpdateEntryStatus sets the status of a set of visible entries for the user
+// via upsert into entry_state.
 func (s *Store) UpdateEntryStatus(ctx context.Context, entryIDs []int64, userID int, status string) error {
 	if len(entryIDs) == 0 {
 		return nil
 	}
 	_, err := s.DB.ExecContext(ctx,
-		`UPDATE entries SET status = $3, changed_at = NOW()
-		 WHERE id = ANY($1) AND user_id = $2`,
+		`INSERT INTO entry_state (user_id, entry_id, status, changed_at)
+		 SELECT $2, e.id, $3, NOW()
+		 FROM entries e
+		 WHERE e.id = ANY($1) AND (`+visibleEntryFilter(userID)+`)
+		 ON CONFLICT (user_id, entry_id) DO UPDATE SET status = EXCLUDED.status, changed_at = NOW()`,
 		pq.Array(entryIDs), userID, status)
 	return err
 }
 
-// ToggleEntryStarred flips the starred flag on a single entry.
+// ToggleEntryStarred sets the starred flag on a visible entry for the user.
 func (s *Store) ToggleEntryStarred(ctx context.Context, id int64, userID int, starred bool) error {
 	_, err := s.DB.ExecContext(ctx,
-		`UPDATE entries SET starred = $3, changed_at = NOW() WHERE id = $1 AND user_id = $2`,
+		`INSERT INTO entry_state (user_id, entry_id, starred, changed_at)
+		 SELECT $2, e.id, $3, NOW()
+		 FROM entries e
+		 WHERE e.id = $1 AND (`+visibleEntryFilter(userID)+`)
+		 ON CONFLICT (user_id, entry_id) DO UPDATE SET starred = EXCLUDED.starred, changed_at = NOW()`,
 		id, userID, starred)
 	return err
 }
 
-// MarkFeedEntriesRead sets all unread entries in the given feed to 'read'.
+// MarkFeedEntriesRead marks all unread entries in the given feed as read for
+// the user (upserts entry_state to 'read').
 func (s *Store) MarkFeedEntriesRead(ctx context.Context, feedID, userID int) error {
 	_, err := s.DB.ExecContext(ctx,
-		`UPDATE entries SET status = 'read', changed_at = NOW()
-		 WHERE feed_id = $1 AND user_id = $2 AND status = 'unread'`,
+		`INSERT INTO entry_state (user_id, entry_id, status, changed_at)
+		 SELECT $2, e.id, 'read', NOW()
+		 FROM entries e
+		 WHERE e.feed_id = $1 AND (`+visibleEntryFilter(userID)+`)
+		 ON CONFLICT (user_id, entry_id) DO UPDATE SET status = 'read', changed_at = NOW()`,
 		feedID, userID)
 	return err
 }
 
-// CountEntriesByFeed returns the number of entries for the given feed.
+// CountEntriesByFeed returns the number of entries for the given global feed.
 func (s *Store) CountEntriesByFeed(ctx context.Context, feedID int) (int, error) {
 	var count int
 	err := s.DB.QueryRowContext(ctx,
 		`SELECT COUNT(*) FROM entries WHERE feed_id = $1`, feedID,
 	).Scan(&count)
 	return count, err
+}
+
+// MarkAllEntriesRead marks every visible unread entry as read for the user
+// (upserts entry_state to 'read' for all subscribed feeds and shares by
+// followed users).
+func (s *Store) MarkAllEntriesRead(ctx context.Context, userID int) error {
+	_, err := s.DB.ExecContext(ctx,
+		`INSERT INTO entry_state (user_id, entry_id, status, changed_at)
+		 SELECT $1, e.id, 'read', NOW()
+		 FROM entries e
+		 WHERE COALESCE((SELECT st.status FROM entry_state st WHERE st.entry_id = e.id AND st.user_id = $1), 'unread') = 'unread'
+		   AND (`+visibleEntryFilter(userID)+`)
+		 ON CONFLICT (user_id, entry_id) DO UPDATE SET status = 'read', changed_at = NOW()`,
+		userID)
+	return err
 }
 
 // --- Enclosures ---
@@ -974,10 +1086,3 @@ func (s *Store) IsFeedListOwner(ctx context.Context, listID, userID int) (bool, 
 }
 
 // --- scan helper ---
-
-func scanFeed(rows *sql.Rows, f *Feed) error {
-	return rows.Scan(&f.ID, &f.UserID, &f.FolderID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
-		&f.EtagHeader, &f.LastModified, &f.ParsingError, &f.ParsingErrorCount,
-		&f.Disabled, &f.ScraperRules, &f.RewriteRules, &f.Crawler,
-		&f.NextCheckAt, &f.LastFetchAt, &f.CreatedAt, &f.UpdatedAt)
-}

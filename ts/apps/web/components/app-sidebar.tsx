@@ -13,7 +13,6 @@ import {
   LogOut,
   Sun,
   Moon,
-  Users,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Menu } from "@base-ui/react/menu";
@@ -51,7 +50,6 @@ function SidebarNav() {
     { href: "/", label: "Unread", icon: Circle },
     { href: "/all", label: "All", icon: LayoutList },
     { href: "/starred", label: "Starred", icon: Star },
-    { href: "/social", label: "Social", icon: Users },
     { href: "/lists", label: "Feed lists", icon: ListChecks },
   ];
 

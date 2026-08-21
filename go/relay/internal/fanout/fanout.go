@@ -269,17 +269,35 @@ func (f *Fanout) processShareRecord(ctx context.Context, did, pdsURL, rkey strin
 	articleURL, _ := rec["articleUrl"].(string)
 	feedURL, _ := rec["feedUrl"].(string)
 	title, _ := rec["title"].(string)
+	description, _ := rec["description"].(string)
+	feedTitle, _ := rec["feedTitle"].(string)
+	feedSiteURL, _ := rec["feedSiteUrl"].(string)
+	author, _ := rec["author"].(string)
 	sharedAt := parseTime(rec["sharedAt"])
+	var publishedAt *time.Time
+	if v, ok := rec["publishedAt"].(string); ok && v != "" {
+		t, err := time.Parse(time.RFC3339, v)
+		if err == nil {
+			utc := t.UTC()
+			publishedAt = &utc
+		}
+	}
 	isNew, err := f.store.RecordShare(ctx, did, rkey, articleURL, feedURL, title, pdsURL, &sharedAt)
 	if err != nil {
 		slog.Warn("fanout: record share", "err", err)
 		return
 	}
 	if isNew {
-		f.emit(ctx, "share", did, map[string]any{
+		payload := map[string]any{
 			"did": did, "rkey": rkey, "articleUrl": articleURL,
-			"feedUrl": feedURL, "title": title, "sharedAt": sharedAt,
-		})
+			"feedUrl": feedURL, "title": title, "description": description,
+			"feedTitle": feedTitle, "feedSiteUrl": feedSiteURL,
+			"author": author, "sharedAt": sharedAt,
+		}
+		if publishedAt != nil {
+			payload["publishedAt"] = publishedAt.Format(time.RFC3339)
+		}
+		f.emit(ctx, "share", did, payload)
 	}
 }
 

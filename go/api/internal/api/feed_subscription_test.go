@@ -91,13 +91,17 @@ func TestATProtoSyncFeedSubscription_Subscribe(t *testing.T) {
 		_, _ = s.DB.ExecContext(context.Background(), `DELETE FROM user_profiles WHERE user_id = $1`, userID)
 	}()
 
-	// Create a feed locally.
-	feed, err := s.CreateFeed(context.Background(), userID, nil,
+	// Create a global feed locally and subscribe the user to it.
+	feed, err := s.GetOrCreateFeed(context.Background(),
 		"https://feed.example.com/rss", "https://example.com", "Test Feed", "")
 	if err != nil {
 		t.Fatalf("create feed: %v", err)
 	}
+	if _, err := s.CreateSubscription(context.Background(), userID, feed.ID, nil, ""); err != nil {
+		t.Fatalf("create subscription: %v", err)
+	}
 	defer func() {
+		_, _ = s.DB.ExecContext(context.Background(), `DELETE FROM subscriptions WHERE feed_id = $1`, feed.ID)
 		_, _ = s.DB.ExecContext(context.Background(), `DELETE FROM feeds WHERE id = $1`, feed.ID)
 	}()
 
@@ -129,8 +133,8 @@ func TestATProtoSyncFeedSubscription_Subscribe(t *testing.T) {
 		t.Error("expected a putRecord call for io.sunred.feed.subscription")
 	}
 
-	// Verify the rkey was stored locally.
-	rkey, _ := s.GetFeedATProtoRkey(context.Background(), feed.ID)
+	// Verify the rkey was stored locally on the subscription.
+	rkey, _ := s.GetFeedATProtoRkey(context.Background(), userID, feed.ID)
 	if rkey == "" {
 		t.Error("expected non-empty atproto_rkey after subscribe sync")
 	}
@@ -160,14 +164,15 @@ func TestATProtoSyncFeedSubscription_Unsubscribe(t *testing.T) {
 		_, _ = s.DB.ExecContext(context.Background(), `DELETE FROM user_profiles WHERE user_id = $1`, userID)
 	}()
 
-	// Seed a feed with a known rkey.
+	// Seed a feed subscription with a known rkey.
 	_ = s.UpsertFeedSubscriptionWithRkey(context.Background(), userID,
 		"https://feed.example.com/rss", "https://example.com", "Test", "rkey-unsub-1")
-	feed, _ := s.GetFeedByURL(context.Background(), "https://feed.example.com/rss", userID)
+	feed, _ := s.GetFeedByURL(context.Background(), "https://feed.example.com/rss")
 	if feed == nil {
 		t.Fatal("expected feed to exist")
 	}
 	defer func() {
+		_, _ = s.DB.ExecContext(context.Background(), `DELETE FROM subscriptions WHERE feed_id = $1`, feed.ID)
 		_, _ = s.DB.ExecContext(context.Background(), `DELETE FROM feeds WHERE id = $1`, feed.ID)
 	}()
 
@@ -202,7 +207,7 @@ func TestFeedSubscriptionRoundTrip_StoreLevel(t *testing.T) {
 
 	userID, _, _ := s.GetOrCreateUserByDID(context.Background(), "did:plc:roundtrip", "roundtrip")
 	defer func() {
-		_, _ = s.DB.ExecContext(context.Background(), `DELETE FROM feeds WHERE user_id = $1`, userID)
+		_, _ = s.DB.ExecContext(context.Background(), `DELETE FROM subscriptions WHERE user_id = $1`, userID)
 	}()
 
 	// Step 1: Subscribe (write to PDS + store rkey locally).
@@ -217,20 +222,31 @@ func TestFeedSubscriptionRoundTrip_StoreLevel(t *testing.T) {
 	// (In production, the relay calls listRecords and emits a feedSubscription
 	// event. The API consumer then calls UpsertFeedSubscriptionWithRkey.)
 	// Verify the feed exists locally.
-	feed, err := s.GetFeedByURL(context.Background(), "https://rt.example.com/rss", userID)
+	feed, err := s.GetFeedByURL(context.Background(), "https://rt.example.com/rss")
 	if err != nil {
 		t.Fatalf("get feed by url: %v", err)
 	}
 	if feed == nil {
 		t.Fatal("expected feed to exist after upsert")
 	}
-	if feed.Title != "Round Trip" {
-		t.Errorf("feed title=%q, want 'Round Trip'", feed.Title)
+	defer func() {
+		_, _ = s.DB.ExecContext(context.Background(), `DELETE FROM feeds WHERE id = $1`, feed.ID)
+	}()
+	// The user must be subscribed to it.
+	sub, err := s.GetSubscriptionFeed(context.Background(), feed.ID, userID)
+	if err != nil {
+		t.Fatalf("get subscription: %v", err)
+	}
+	if sub == nil {
+		t.Fatal("expected subscription to exist after upsert")
+	}
+	if sub.Title != "Round Trip" {
+		t.Errorf("feed title=%q, want 'Round Trip'", sub.Title)
 	}
 
 	// Step 3: Simulate unsubscribe (relay emits feedUnsubscription).
 	// The API consumer calls DeleteFeedByRkey.
-	storedRkey, _ := s.GetFeedATProtoRkey(context.Background(), feed.ID)
+	storedRkey, _ := s.GetFeedATProtoRkey(context.Background(), userID, feed.ID)
 	if storedRkey != rkey {
 		t.Fatalf("stored rkey=%q, want %q", storedRkey, rkey)
 	}
@@ -239,9 +255,9 @@ func TestFeedSubscriptionRoundTrip_StoreLevel(t *testing.T) {
 		t.Fatalf("delete feed by rkey: %v", err)
 	}
 
-	// Step 4: Verify the feed is gone.
-	feed, _ = s.GetFeedByURL(context.Background(), "https://rt.example.com/rss", userID)
-	if feed != nil {
-		t.Error("expected feed to be deleted after unsubscription")
+	// Step 4: Verify the subscription is gone (the global feed persists).
+	sub, _ = s.GetSubscriptionFeed(context.Background(), feed.ID, userID)
+	if sub != nil {
+		t.Error("expected subscription to be deleted after unsubscription")
 	}
 }

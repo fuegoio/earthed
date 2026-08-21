@@ -455,6 +455,15 @@ export const EntrySchema = {
             format: 'int64',
             type: 'integer'
         },
+        feed_site_url: {
+            type: 'string'
+        },
+        feed_title: {
+            type: 'string'
+        },
+        feed_url: {
+            type: 'string'
+        },
         hash: {
             type: 'string'
         },
@@ -462,8 +471,17 @@ export const EntrySchema = {
             format: 'int64',
             type: 'integer'
         },
+        liked: {
+            type: 'boolean'
+        },
         published_at: {
             format: 'date-time',
+            type: 'string'
+        },
+        shared_by: {
+            type: 'string'
+        },
+        shared_by_name: {
             type: 'string'
         },
         starred: {
@@ -486,15 +504,10 @@ export const EntrySchema = {
         },
         url: {
             type: 'string'
-        },
-        user_id: {
-            format: 'int64',
-            type: 'integer'
         }
     },
     required: [
         'id',
-        'user_id',
         'feed_id',
         'hash',
         'title',
@@ -656,15 +669,10 @@ export const FeedSchema = {
         updated_at: {
             format: 'date-time',
             type: 'string'
-        },
-        user_id: {
-            format: 'int64',
-            type: 'integer'
         }
     },
     required: [
         'id',
-        'user_id',
         'feed_url',
         'site_url',
         'title',
@@ -1229,6 +1237,10 @@ export const SharedArticleSchema = {
         },
         description: {
             type: 'string'
+        },
+        entry_id: {
+            format: 'int64',
+            type: 'integer'
         },
         feed_site_url: {
             type: 'string'
@@ -1887,6 +1899,15 @@ export const EntryWritableSchema = {
             format: 'int64',
             type: 'integer'
         },
+        feed_site_url: {
+            type: 'string'
+        },
+        feed_title: {
+            type: 'string'
+        },
+        feed_url: {
+            type: 'string'
+        },
         hash: {
             type: 'string'
         },
@@ -1894,8 +1915,17 @@ export const EntryWritableSchema = {
             format: 'int64',
             type: 'integer'
         },
+        liked: {
+            type: 'boolean'
+        },
         published_at: {
             format: 'date-time',
+            type: 'string'
+        },
+        shared_by: {
+            type: 'string'
+        },
+        shared_by_name: {
             type: 'string'
         },
         starred: {
@@ -1918,15 +1948,10 @@ export const EntryWritableSchema = {
         },
         url: {
             type: 'string'
-        },
-        user_id: {
-            format: 'int64',
-            type: 'integer'
         }
     },
     required: [
         'id',
-        'user_id',
         'feed_id',
         'hash',
         'title',
@@ -2052,15 +2077,10 @@ export const FeedWritableSchema = {
         updated_at: {
             format: 'date-time',
             type: 'string'
-        },
-        user_id: {
-            format: 'int64',
-            type: 'integer'
         }
     },
     required: [
         'id',
-        'user_id',
         'feed_url',
         'site_url',
         'title',
@@ -2476,6 +2496,10 @@ export const SharedArticleWritableSchema = {
         },
         description: {
             type: 'string'
+        },
+        entry_id: {
+            format: 'int64',
+            type: 'integer'
         },
         feed_site_url: {
             type: 'string'

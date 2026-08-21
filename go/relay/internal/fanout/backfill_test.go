@@ -136,6 +136,65 @@ func TestBackfillDID_Follows(t *testing.T) {
 	}
 }
 
+func TestBackfillDID_Shares(t *testing.T) {
+	st := newStubStore()
+	pds := mockPDSServer(t, map[string][]map[string]any{
+		"io.sunred.share.article": {
+			{
+				"articleUrl":  "https://example.com/article1",
+				"title":       "Article One",
+				"description": "Description one",
+				"feedUrl":     "https://feed.example.com/rss",
+				"feedTitle":   "Feed",
+				"feedSiteUrl": "https://feed.example.com",
+				"author":      "Author",
+				"sharedAt":    "2025-01-01T00:00:00Z",
+				"publishedAt": "2024-12-01T00:00:00Z",
+			},
+		},
+	})
+
+	f := &Fanout{
+		store:       st,
+		httpClient:  &http.Client{},
+		subscribers: make(map[string]chan *store.RelayEvent),
+		workers:     make(map[string]context.CancelFunc),
+		testPDSURL:  pds.URL,
+	}
+
+	f.backfillDID(context.Background(), "did:plc:sharer", pds.URL)
+
+	// One share should be recorded.
+	if len(st.shares) != 1 {
+		t.Errorf("expected 1 share, got %d", len(st.shares))
+	}
+
+	// One share event should be emitted with full metadata.
+	shareEvents := 0
+	for _, evt := range st.events {
+		if evt.EventType == "share" {
+			shareEvents++
+			var p map[string]any
+			_ = json.Unmarshal(evt.Payload, &p)
+			if p["description"] != "Description one" {
+				t.Errorf("share event description=%v, want 'Description one'", p["description"])
+			}
+			if p["author"] != "Author" {
+				t.Errorf("share event author=%v, want 'Author'", p["author"])
+			}
+			if p["feedTitle"] != "Feed" {
+				t.Errorf("share event feedTitle=%v, want 'Feed'", p["feedTitle"])
+			}
+			if p["publishedAt"] != "2024-12-01T00:00:00Z" {
+				t.Errorf("share event publishedAt=%v, want '2024-12-01T00:00:00Z'", p["publishedAt"])
+			}
+		}
+	}
+	if shareEvents != 1 {
+		t.Errorf("expected 1 share event, got %d", shareEvents)
+	}
+}
+
 func TestBackfillAndSubscribe_EmitsBackfillComplete(t *testing.T) {
 	st := newStubStore()
 	pds := mockPDSServer(t, map[string][]map[string]any{})

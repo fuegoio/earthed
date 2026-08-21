@@ -122,14 +122,12 @@ func (c *RelayConsumer) processEvent(ctx context.Context, evt *relayEvent) error
 		return c.handleFeedSubEvent(ctx, evt)
 	case "feedUnsubscription":
 		return c.handleFeedUnsubEvent(ctx, evt)
+	case "share":
+		return c.handleShareEvent(ctx, evt)
+	case "unshare":
+		return c.handleUnshareEvent(ctx, evt)
 	case "backfillComplete":
 		return c.handleBackfillComplete(ctx, evt)
-	case "share", "unshare":
-		// Share events are logged but not yet processed by the API consumer.
-		// They require a full social-graph write path that is out of scope
-		// for the feed-subscription sync work.
-		slog.Debug("relay consumer: share event (not processed)", "type", evt.EventType, "did", evt.DID)
-		return nil
 	default:
 		slog.Debug("relay consumer: unknown event type", "type", evt.EventType)
 		return nil
@@ -202,6 +200,57 @@ func (c *RelayConsumer) handleFeedUnsubEvent(ctx context.Context, evt *relayEven
 		return nil
 	}
 	return c.store.DeleteFeedByRkey(ctx, userID, p.Rkey)
+}
+
+type sharePayload struct {
+	Rkey        string `json:"rkey"`
+	ArticleURL  string `json:"articleUrl"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	FeedURL     string `json:"feedUrl"`
+	FeedTitle   string `json:"feedTitle"`
+	FeedSiteURL string `json:"feedSiteUrl"`
+	Author      string `json:"author"`
+	PublishedAt string `json:"publishedAt"`
+	SharedAt    string `json:"sharedAt"`
+}
+
+func (c *RelayConsumer) handleShareEvent(ctx context.Context, evt *relayEvent) error {
+	var p sharePayload
+	if err := json.Unmarshal(evt.Payload, &p); err != nil {
+		return fmt.Errorf("unmarshal share payload: %w", err)
+	}
+	userID, _ := c.store.GetUserIDByDID(ctx, evt.DID)
+	if userID == 0 {
+		return nil
+	}
+	var publishedAt *time.Time
+	if p.PublishedAt != "" {
+		t, err := time.Parse(time.RFC3339, p.PublishedAt)
+		if err == nil {
+			utc := t.UTC()
+			publishedAt = &utc
+		}
+	}
+	return c.store.UpsertShareWithRkey(ctx, userID,
+		p.ArticleURL, p.Title, p.Description,
+		p.FeedURL, p.FeedTitle, p.FeedSiteURL,
+		p.Author, publishedAt, p.Rkey,
+	)
+}
+
+func (c *RelayConsumer) handleUnshareEvent(ctx context.Context, evt *relayEvent) error {
+	var p struct {
+		Rkey string `json:"rkey"`
+	}
+	if err := json.Unmarshal(evt.Payload, &p); err != nil {
+		return fmt.Errorf("unmarshal unshare payload: %w", err)
+	}
+	userID, _ := c.store.GetUserIDByDID(ctx, evt.DID)
+	if userID == 0 {
+		return nil
+	}
+	return c.store.DeleteShareByRkey(ctx, userID, p.Rkey)
 }
 
 func (c *RelayConsumer) handleBackfillComplete(ctx context.Context, evt *relayEvent) error {

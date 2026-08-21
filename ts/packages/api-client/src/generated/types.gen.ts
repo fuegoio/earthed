@@ -145,15 +145,20 @@ export type Entry = {
     description?: string;
     enclosures?: Array<Enclosure> | null;
     feed_id: number;
+    feed_site_url?: string;
+    feed_title?: string;
+    feed_url?: string;
     hash: string;
     id: number;
+    liked?: boolean;
     published_at: string;
+    shared_by?: string;
+    shared_by_name?: string;
     starred: boolean;
     status: string;
     tags?: Array<string> | null;
     title: string;
     url: string;
-    user_id: number;
 };
 
 export type ErrorDetail = {
@@ -223,7 +228,6 @@ export type Feed = {
     site_url: string;
     title: string;
     updated_at: string;
-    user_id: number;
 };
 
 export type FeedList = {
@@ -376,6 +380,7 @@ export type SharedArticle = {
     article_url: string;
     author?: string;
     description?: string;
+    entry_id?: number;
     feed_site_url?: string;
     feed_title?: string;
     feed_url?: string;
@@ -566,15 +571,20 @@ export type EntryWritable = {
     description?: string;
     enclosures?: Array<Enclosure> | null;
     feed_id: number;
+    feed_site_url?: string;
+    feed_title?: string;
+    feed_url?: string;
     hash: string;
     id: number;
+    liked?: boolean;
     published_at: string;
+    shared_by?: string;
+    shared_by_name?: string;
     starred: boolean;
     status: string;
     tags?: Array<string> | null;
     title: string;
     url: string;
-    user_id: number;
 };
 
 export type ErrorModelWritable = {
@@ -621,7 +631,6 @@ export type FeedWritable = {
     site_url: string;
     title: string;
     updated_at: string;
-    user_id: number;
 };
 
 export type FeedListWritable = {
@@ -716,6 +725,7 @@ export type SharedArticleWritable = {
     article_url: string;
     author?: string;
     description?: string;
+    entry_id?: number;
     feed_site_url?: string;
     feed_title?: string;
     feed_url?: string;

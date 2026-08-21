@@ -12,12 +12,12 @@ import (
 
 // Result holds the response of a feed fetch.
 type Result struct {
-	StatusCode    int
-	Body          []byte
-	ETag          string
-	LastModified  string
-	ContentType   string
-	NotModified   bool
+	StatusCode   int
+	Body         []byte
+	ETag         string
+	LastModified string
+	ContentType  string
+	NotModified  bool
 }
 
 // Fetcher fetches feed URLs with configurable timeout and conditional headers.

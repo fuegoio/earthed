@@ -130,27 +130,27 @@ func (s *Store) UpsertFollowWithRkey(ctx context.Context, followerID, followeeID
 }
 
 // UpsertFeedSubscriptionWithRkey records a feed subscription with its AT Proto
-// rkey so a later unsubscribe can delete the record.
+// rkey so a later unsubscribe can delete the record. The global feed is created
+// if missing; the subscription is created/updated for the user.
 func (s *Store) UpsertFeedSubscriptionWithRkey(ctx context.Context, userID int, feedURL, siteURL, title, rkey string) error {
-	_, err := s.DB.ExecContext(ctx,
-		`INSERT INTO feeds (user_id, feed_url, site_url, title, atproto_rkey)
-		 VALUES ($1, $2, $3, $4, $5)
-		 ON CONFLICT (user_id, feed_url) DO UPDATE SET
-		   site_url = EXCLUDED.site_url,
-		   title = EXCLUDED.title,
-		   atproto_rkey = EXCLUDED.atproto_rkey,
-		   updated_at = NOW()`,
-		userID, feedURL, siteURL, title, rkey,
+	feed, err := s.GetOrCreateFeed(ctx, feedURL, siteURL, title, "")
+	if err != nil {
+		return err
+	}
+	_, err = s.DB.ExecContext(ctx,
+		`INSERT INTO subscriptions (user_id, feed_id, atproto_rkey)
+		 VALUES ($1, $2, $3)
+		 ON CONFLICT (user_id, feed_id) DO UPDATE SET atproto_rkey = EXCLUDED.atproto_rkey, updated_at = NOW()`,
+		userID, feed.ID, rkey,
 	)
 	return err
 }
 
-// DeleteFeedByRkey removes a feed subscription by its AT Proto rkey.
+// DeleteFeedByRkey removes a user's subscription by its AT Proto rkey.
 // Used by the relay consumer to process feedUnsubscription events.
 func (s *Store) DeleteFeedByRkey(ctx context.Context, userID int, rkey string) error {
 	_, err := s.DB.ExecContext(ctx,
-		`DELETE FROM feeds WHERE user_id = $1 AND atproto_rkey = $2`,
-		userID, rkey,
+		`DELETE FROM subscriptions WHERE user_id = $1 AND atproto_rkey = $2`, userID, rkey,
 	)
 	return err
 }
@@ -161,6 +161,45 @@ func (s *Store) DeleteFollowByRkey(ctx context.Context, followerID int, rkey str
 	_, err := s.DB.ExecContext(ctx,
 		`DELETE FROM user_follows WHERE follower_id = $1 AND atproto_rkey = $2`,
 		followerID, rkey,
+	)
+	return err
+}
+
+// UpsertShareWithRkey records a shared article with its AT Proto rkey so a
+// later unshare can delete the record. Used by the relay consumer to process
+// share events.
+func (s *Store) UpsertShareWithRkey(ctx context.Context, userID int,
+	articleURL, title, description, feedURL, feedTitle, feedSiteURL, author string,
+	publishedAt *time.Time, rkey string,
+) error {
+	entryID := s.ensureSharedEntry(ctx, articleURL, title, description, feedURL, feedTitle, feedSiteURL, author, publishedAt)
+	_, err := s.DB.ExecContext(ctx, `
+		INSERT INTO shared_articles
+		  (user_id, article_url, title, description, feed_url, feed_title, feed_site_url, author, published_at, atproto_rkey, entry_id)
+		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+		ON CONFLICT (user_id, article_url) DO UPDATE
+		  SET title        = EXCLUDED.title,
+		      description  = EXCLUDED.description,
+		      feed_url     = EXCLUDED.feed_url,
+		      feed_title   = EXCLUDED.feed_title,
+		      feed_site_url= EXCLUDED.feed_site_url,
+		      author       = EXCLUDED.author,
+		      published_at = EXCLUDED.published_at,
+		      atproto_rkey = EXCLUDED.atproto_rkey,
+		      entry_id     = COALESCE(shared_articles.entry_id, EXCLUDED.entry_id),
+		      shared_at    = NOW()`,
+		userID, articleURL, title, description, feedURL, feedTitle, feedSiteURL, author, publishedAt, rkey,
+		sql.NullInt64{Int64: entryID, Valid: entryID > 0},
+	)
+	return err
+}
+
+// DeleteShareByRkey removes a shared article by its AT Proto rkey.
+// Used by the relay consumer to process unshare events.
+func (s *Store) DeleteShareByRkey(ctx context.Context, userID int, rkey string) error {
+	_, err := s.DB.ExecContext(ctx,
+		`DELETE FROM shared_articles WHERE user_id = $1 AND atproto_rkey = $2`,
+		userID, rkey,
 	)
 	return err
 }

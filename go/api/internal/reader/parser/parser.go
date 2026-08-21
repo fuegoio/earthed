@@ -126,8 +126,8 @@ func parseAtom(body []byte) (*Feed, error) {
 			Type string `xml:"type,attr"`
 		} `xml:"link"`
 		Entries []struct {
-			Title     string `xml:"title"`
-			Links     []struct {
+			Title string `xml:"title"`
+			Links []struct {
 				Href string `xml:"href,attr"`
 				Rel  string `xml:"rel,attr"`
 			} `xml:"link"`
@@ -202,7 +202,7 @@ func parseJSONFeed(body []byte) (*Feed, error) {
 			Enclosures []struct {
 				URL      string `json:"url"`
 				MimeType string `json:"mime_type"`
-				Size     int64   `json:"size"`
+				Size     int64  `json:"size"`
 			} `json:"attachments"`
 		} `json:"items"`
 	}

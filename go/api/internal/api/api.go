@@ -358,7 +358,7 @@ func (a *API) registerFeedRoutes() {
 		FeedID int `path:"feedId"`
 	}) (*FeedOutput, error) {
 		userID := auth.UserIDFromCtx(ctx)
-		feed, err := a.store.GetFeedByID(ctx, input.FeedID, userID)
+		feed, err := a.store.GetSubscriptionFeed(ctx, input.FeedID, userID)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
@@ -378,17 +378,17 @@ func (a *API) registerFeedRoutes() {
 		FeedID int `path:"feedId"`
 	}) (*struct{}, error) {
 		userID := auth.UserIDFromCtx(ctx)
-		// Fetch feed + rkey before deleting so we can replicate the
-		// unsubscribe to the user's PDS.
-		feed, err := a.store.GetFeedByID(ctx, input.FeedID, userID)
+		// Fetch the subscription's feed + rkey before deleting so we can
+		// replicate the unsubscribe to the user's PDS.
+		feed, err := a.store.GetSubscriptionFeed(ctx, input.FeedID, userID)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
 		if feed == nil {
 			return nil, huma.Error404NotFound("feed not found")
 		}
-		rkey, _ := a.store.GetFeedATProtoRkey(ctx, input.FeedID)
-		if err := a.store.DeleteFeed(ctx, input.FeedID, userID); err != nil {
+		rkey, _ := a.store.GetFeedATProtoRkey(ctx, userID, input.FeedID)
+		if err := a.store.DeleteSubscription(ctx, userID, input.FeedID); err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
 		if rkey != "" {
@@ -402,11 +402,11 @@ func (a *API) registerFeedRoutes() {
 		Method:      http.MethodPatch,
 		Path:        "/v1/feeds/{feedId}",
 		Summary:     "Update a feed",
-		Description: "Update the folder assignment and/or title of a feed.",
+		Description: "Update the folder assignment and/or title override of a subscription.",
 		Tags:        []string{"feeds"},
 	}, func(ctx context.Context, input *UpdateFeedInput) (*FeedOutput, error) {
 		userID := auth.UserIDFromCtx(ctx)
-		feed, err := a.store.GetFeedByID(ctx, input.FeedID, userID)
+		feed, err := a.store.GetSubscriptionFeed(ctx, input.FeedID, userID)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
@@ -421,7 +421,7 @@ func (a *API) registerFeedRoutes() {
 		if title == "" {
 			title = feed.Title
 		}
-		updated, err := a.store.UpdateFeed(ctx, input.FeedID, userID, folderID, title, feed.ScraperRules, feed.RewriteRules, feed.Disabled, feed.Crawler)
+		updated, err := a.store.UpdateSubscription(ctx, userID, input.FeedID, folderID, title)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
@@ -461,7 +461,13 @@ func (a *API) registerFeedRoutes() {
 			return nil, huma.Error503ServiceUnavailable("feed processor is not available")
 		}
 		userID := auth.UserIDFromCtx(ctx)
-		feed, err := a.store.GetFeedByID(ctx, input.FeedID, userID)
+		// Refresh is allowed by any subscriber; process the global feed.
+		if sub, err := a.store.GetSubscriptionFeed(ctx, input.FeedID, userID); err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		} else if sub == nil {
+			return nil, huma.Error404NotFound("feed not found")
+		}
+		feed, err := a.store.GetFeedGlobal(ctx, input.FeedID)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
@@ -471,7 +477,7 @@ func (a *API) registerFeedRoutes() {
 		if err := a.processor.ProcessFeed(ctx, feed); err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
-		feed, err = a.store.GetFeedByID(ctx, input.FeedID, userID)
+		feed, err = a.store.GetFeedGlobal(ctx, input.FeedID)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
@@ -648,6 +654,13 @@ func (a *API) registerEntryRoutes() {
 		}
 	}) (*struct{}, error) {
 		userID := auth.UserIDFromCtx(ctx)
+		// A null entry_ids means "all visible entries" (used by mark-all-read).
+		if input.Body.EntryIDs == nil {
+			if err := a.store.MarkAllEntriesRead(ctx, userID); err != nil {
+				return nil, huma.Error500InternalServerError(err.Error())
+			}
+			return nil, nil
+		}
 		if err := a.store.UpdateEntryStatus(ctx, input.Body.EntryIDs, userID, input.Body.Status); err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
@@ -767,18 +780,12 @@ func generateToken() string {
 }
 
 // subscribeToFeed fetches and parses the feed URL to populate site URL and
-// title, then creates the subscription. After creating the feed record, it
-// processes the feed to persist entries immediately — so the feed is not
+// title, then creates the subscription. After creating the global feed record,
+// it processes the feed to persist entries immediately — so the feed is not
 // empty after subscription. If the user already subscribes to the feed URL,
-// the existing feed is returned (idempotent), making it safe for feed-list
-// import.
+// the existing subscription is returned (idempotent), making it safe for
+// feed-list import.
 func (a *API) subscribeToFeed(ctx context.Context, userID int, feedURL string, folderID *int) (*store.Feed, error) {
-	if existing, err := a.store.GetFeedByURL(ctx, feedURL, userID); err != nil {
-		return nil, err
-	} else if existing != nil {
-		return existing, nil
-	}
-
 	siteURL := ""
 	title := feedURL
 	description := ""
@@ -791,10 +798,6 @@ func (a *API) subscribeToFeed(ctx context.Context, userID int, feedURL string, f
 			feedURL = discovery.FeedURL
 			if discovery.SiteURL != "" {
 				siteURL = discovery.SiteURL
-			}
-			// Check if we already subscribe to the discovered feed URL.
-			if existing, err := a.store.GetFeedByURL(ctx, feedURL, userID); err == nil && existing != nil {
-				return existing, nil
 			}
 			// Fetch and parse the feed to populate the real title and description.
 			if result, err := a.fetcher.Fetch(ctx, feedURL, "", ""); err == nil && !result.NotModified {
@@ -811,7 +814,22 @@ func (a *API) subscribeToFeed(ctx context.Context, userID int, feedURL string, f
 		}
 	}
 
-	feed, err := a.store.CreateFeed(ctx, userID, folderID, feedURL, siteURL, title, description)
+	// If the user already subscribes to this feed, return the existing view.
+	if feed, err := a.store.GetFeedByURL(ctx, feedURL); err != nil {
+		return nil, err
+	} else if feed != nil {
+		if sub, err := a.store.GetSubscriptionFeed(ctx, feed.ID, userID); err == nil && sub != nil {
+			return sub, nil
+		}
+	}
+
+	// Create or update the global feed, then subscribe the user to it.
+	feed, err := a.store.GetOrCreateFeed(ctx, feedURL, siteURL, title, description)
+	if err != nil {
+		return nil, err
+	}
+
+	sub, err := a.store.CreateSubscription(ctx, userID, feed.ID, folderID, "")
 	if err != nil {
 		return nil, err
 	}
@@ -822,15 +840,18 @@ func (a *API) subscribeToFeed(ctx context.Context, userID int, feedURL string, f
 		_ = a.processor.ProcessFeed(ctx, feed)
 	}
 
-	// Mark all entries as read so the user doesn't see a backlog of unread
-	// items from before they subscribed.
+	// Mark all existing entries as read so the user doesn't see a backlog of
+	// unread items from before they subscribed.
 	_ = a.store.MarkFeedEntriesRead(ctx, feed.ID, userID)
 
 	// Replicate the subscription to the user's PDS so it survives across
 	// instances and can be backfilled by the relay on future logins.
 	go a.ATProtoSyncFeedSubscription(userID, feed.ID, feed.FeedURL, feed.SiteURL, feed.Title, true, feed.CreatedAt)
 
-	return feed, nil
+	if sub != nil {
+		return sub, nil
+	}
+	return a.store.GetSubscriptionFeed(ctx, feed.ID, userID)
 }
 
 // --- Feed Lists ---

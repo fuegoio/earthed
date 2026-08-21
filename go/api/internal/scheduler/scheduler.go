@@ -13,9 +13,9 @@ import (
 
 // Scheduler ticks at a fixed interval and dispatches due feeds to the worker pool.
 type Scheduler struct {
-	store    *store.Store
-	worker   *worker.Pool
-	interval time.Duration
+	store     *store.Store
+	worker    *worker.Pool
+	interval  time.Duration
 	batchSize int
 }
 

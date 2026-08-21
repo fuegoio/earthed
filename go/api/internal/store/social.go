@@ -2,7 +2,9 @@ package store
 
 import (
 	"context"
+	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
 	"fmt"
 	"regexp"
 	"strings"
@@ -290,15 +292,43 @@ func (s *Store) SearchUsers(ctx context.Context, q string, viewerID, limit int) 
 // --- Shared articles ---
 
 // ShareArticle creates or replaces a shared article for the user.
+// ensureSharedEntry materializes a shared article as a global entry against its
+// source feed (creating the feed if missing) so that the article appears in
+// followers' entry streams via the ListEntries UNION. The entry is keyed by a
+// hash of the article URL within the source feed. Returns the entry id (0 if
+// the share carries no feed_url or on insert failure).
+func (s *Store) ensureSharedEntry(ctx context.Context,
+	articleURL, title, description, feedURL, feedTitle, feedSiteURL, author string,
+	publishedAt *time.Time,
+) int64 {
+	if feedURL == "" {
+		return 0
+	}
+	feed, err := s.GetOrCreateFeed(ctx, feedURL, feedSiteURL, feedTitle, "")
+	if err != nil || feed == nil {
+		return 0
+	}
+	h := sha256.Sum256([]byte(articleURL))
+	hash := hex.EncodeToString(h[:])
+	pubAt := time.Now()
+	if publishedAt != nil {
+		pubAt = *publishedAt
+	}
+	eid, _ := s.CreateEntry(ctx, feed.ID, hash, title, articleURL, "", author, "", description, pubAt, nil)
+	return eid
+}
+
 func (s *Store) ShareArticle(ctx context.Context, userID int,
 	articleURL, title, description, feedURL, feedTitle, feedSiteURL, author string,
 	publishedAt *time.Time,
 ) (*SharedArticle, error) {
+	entryID := s.ensureSharedEntry(ctx, articleURL, title, description, feedURL, feedTitle, feedSiteURL, author, publishedAt)
+
 	var sa SharedArticle
 	err := s.DB.QueryRowContext(ctx, `
 		INSERT INTO shared_articles
-		  (user_id, article_url, title, description, feed_url, feed_title, feed_site_url, author, published_at)
-		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+		  (user_id, article_url, title, description, feed_url, feed_title, feed_site_url, author, published_at, entry_id)
+		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
 		ON CONFLICT (user_id, article_url) DO UPDATE
 		  SET title        = EXCLUDED.title,
 		      description  = EXCLUDED.description,
@@ -307,13 +337,14 @@ func (s *Store) ShareArticle(ctx context.Context, userID int,
 		      feed_site_url= EXCLUDED.feed_site_url,
 		      author       = EXCLUDED.author,
 		      published_at = EXCLUDED.published_at,
+		      entry_id     = COALESCE(shared_articles.entry_id, EXCLUDED.entry_id),
 		      shared_at    = NOW()
 		RETURNING id, user_id, article_url, title, description,
-		          feed_url, feed_title, feed_site_url, author, published_at, shared_at`,
-		userID, articleURL, title, description, feedURL, feedTitle, feedSiteURL, author, publishedAt,
+		          feed_url, feed_title, feed_site_url, author, published_at, shared_at, entry_id`,
+		userID, articleURL, title, description, feedURL, feedTitle, feedSiteURL, author, publishedAt, sql.NullInt64{Int64: entryID, Valid: entryID > 0},
 	).Scan(
 		&sa.ID, &sa.UserID, &sa.ArticleURL, &sa.Title, &sa.Description,
-		&sa.FeedURL, &sa.FeedTitle, &sa.FeedSiteURL, &sa.Author, &sa.PublishedAt, &sa.SharedAt,
+		&sa.FeedURL, &sa.FeedTitle, &sa.FeedSiteURL, &sa.Author, &sa.PublishedAt, &sa.SharedAt, &sa.EntryID,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("share article: %w", err)
@@ -341,12 +372,12 @@ func (s *Store) GetSharedArticleByURL(ctx context.Context, userID int, articleUR
 	var sa SharedArticle
 	err := s.DB.QueryRowContext(ctx, `
 		SELECT id, user_id, article_url, title, description,
-		       feed_url, feed_title, feed_site_url, author, published_at, shared_at
+		       feed_url, feed_title, feed_site_url, author, published_at, shared_at, entry_id
 		FROM shared_articles WHERE user_id = $1 AND article_url = $2`,
 		userID, articleURL,
 	).Scan(
 		&sa.ID, &sa.UserID, &sa.ArticleURL, &sa.Title, &sa.Description,
-		&sa.FeedURL, &sa.FeedTitle, &sa.FeedSiteURL, &sa.Author, &sa.PublishedAt, &sa.SharedAt,
+		&sa.FeedURL, &sa.FeedTitle, &sa.FeedSiteURL, &sa.Author, &sa.PublishedAt, &sa.SharedAt, &sa.EntryID,
 	)
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -362,7 +393,7 @@ func (s *Store) GetSharedArticleByURL(ctx context.Context, userID int, articleUR
 func (s *Store) ListSharedArticlesByUser(ctx context.Context, userID int) ([]SharedArticle, error) {
 	rows, err := s.DB.QueryContext(ctx, `
 		SELECT id, user_id, article_url, title, description,
-		       feed_url, feed_title, feed_site_url, author, published_at, shared_at
+		       feed_url, feed_title, feed_site_url, author, published_at, shared_at, entry_id
 		FROM shared_articles
 		WHERE user_id = $1
 		ORDER BY shared_at DESC`, userID,
@@ -376,7 +407,7 @@ func (s *Store) ListSharedArticlesByUser(ctx context.Context, userID int) ([]Sha
 		var sa SharedArticle
 		if err := rows.Scan(
 			&sa.ID, &sa.UserID, &sa.ArticleURL, &sa.Title, &sa.Description,
-			&sa.FeedURL, &sa.FeedTitle, &sa.FeedSiteURL, &sa.Author, &sa.PublishedAt, &sa.SharedAt,
+			&sa.FeedURL, &sa.FeedTitle, &sa.FeedSiteURL, &sa.Author, &sa.PublishedAt, &sa.SharedAt, &sa.EntryID,
 		); err != nil {
 			return nil, err
 		}
@@ -392,7 +423,7 @@ func (s *Store) ListSocialTimeline(ctx context.Context, followerID, limit, offse
 		SELECT
 		  sa.id, sa.user_id, sa.article_url, sa.title, sa.description,
 		  sa.feed_url, sa.feed_title, sa.feed_site_url, sa.author,
-		  sa.published_at, sa.shared_at,
+		  sa.published_at, sa.shared_at, sa.entry_id,
 		  COALESCE(p.handle, ''),
 		  COALESCE(u.first_name, '')
 		FROM shared_articles sa
@@ -413,7 +444,7 @@ func (s *Store) ListSocialTimeline(ctx context.Context, followerID, limit, offse
 		if err := rows.Scan(
 			&sa.ID, &sa.UserID, &sa.ArticleURL, &sa.Title, &sa.Description,
 			&sa.FeedURL, &sa.FeedTitle, &sa.FeedSiteURL, &sa.Author,
-			&sa.PublishedAt, &sa.SharedAt,
+			&sa.PublishedAt, &sa.SharedAt, &sa.EntryID,
 			&sa.SharerHandle, &sa.SharerFirstName,
 		); err != nil {
 			return nil, err
@@ -425,29 +456,29 @@ func (s *Store) ListSocialTimeline(ctx context.Context, followerID, limit, offse
 
 // --- Feed subscribers ---
 
-// CountFeedSubscribers returns the number of users subscribed to a feed URL.
-func (s *Store) CountFeedSubscribers(ctx context.Context, feedURL string) (int, error) {
+// CountFeedSubscribers returns the number of users subscribed to the given feed.
+func (s *Store) CountFeedSubscribers(ctx context.Context, feedID int) (int, error) {
 	var n int
 	err := s.DB.QueryRowContext(ctx,
-		`SELECT COUNT(DISTINCT user_id) FROM feeds WHERE feed_url = $1`, feedURL,
+		`SELECT COUNT(DISTINCT user_id) FROM subscriptions WHERE feed_id = $1`, feedID,
 	).Scan(&n)
 	return n, err
 }
 
-// ListFeedSubscribers returns the public profiles of users subscribed to feedURL.
-// Profiles without a handle are excluded (anonymous subscribers).
-func (s *Store) ListFeedSubscribers(ctx context.Context, feedURL string) ([]UserProfile, error) {
+// ListFeedSubscribers returns the public profiles of users subscribed to the
+// given feed. Profiles without a handle are excluded (anonymous subscribers).
+func (s *Store) ListFeedSubscribers(ctx context.Context, feedID int) ([]UserProfile, error) {
 	rows, err := s.DB.QueryContext(ctx, `
 		SELECT
 		  p.user_id, p.handle, p.bio, p.created_at, p.updated_at,
 		  COALESCE(u.first_name, ''),
 		  (SELECT COUNT(*) FROM user_follows WHERE followee_id = p.user_id),
 		  (SELECT COUNT(*) FROM user_follows WHERE follower_id = p.user_id)
-		FROM feeds f
-		JOIN user_profiles p ON p.user_id = f.user_id
-		JOIN users u ON u.id = f.user_id
-		WHERE f.feed_url = $1
-		ORDER BY p.handle ASC`, feedURL,
+		FROM subscriptions s
+		JOIN user_profiles p ON p.user_id = s.user_id
+		JOIN users u ON u.id = s.user_id
+		WHERE s.feed_id = $1
+		ORDER BY p.handle ASC`, feedID,
 	)
 	if err != nil {
 		return nil, err
@@ -467,17 +498,18 @@ func (s *Store) ListFeedSubscribers(ctx context.Context, feedURL string) ([]User
 	return out, rows.Err()
 }
 
-// ListPublicFeedsByUser returns the feed subscriptions of a user (for public profile view).
+// ListPublicFeedsByUser returns the feeds a user subscribes to (for the public
+// profile view), joined to their subscription for the title.
 func (s *Store) ListPublicFeedsByUser(ctx context.Context, userID int) ([]Feed, error) {
-	rows, err := s.DB.QueryContext(ctx, `
-		SELECT id, user_id, folder_id, feed_url, site_url, title, description,
-		       etag_header, last_modified_header,
-		       parsing_error, parsing_error_count, disabled,
-		       scraper_rules, rewrite_rules, crawler,
-		       next_check_at, last_fetch_at, created_at, updated_at
-		FROM feeds
-		WHERE user_id = $1
-		ORDER BY title ASC`, userID,
+	rows, err := s.DB.QueryContext(ctx,
+		`SELECT f.id, f.feed_url, f.site_url, COALESCE(s.title_override, f.title), f.description,
+		        f.etag_header, f.last_modified_header,
+		        f.parsing_error, f.parsing_error_count, f.disabled,
+		        f.scraper_rules, f.rewrite_rules, f.crawler,
+		        f.next_check_at, f.last_fetch_at, f.created_at, f.updated_at
+		FROM feeds f
+		JOIN subscriptions s ON s.feed_id = f.id AND s.user_id = $1
+		ORDER BY COALESCE(s.title_override, f.title) ASC`, userID,
 	)
 	if err != nil {
 		return nil, err
@@ -487,7 +519,7 @@ func (s *Store) ListPublicFeedsByUser(ctx context.Context, userID int) ([]Feed, 
 	for rows.Next() {
 		var f Feed
 		if err := rows.Scan(
-			&f.ID, &f.UserID, &f.FolderID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
+			&f.ID, &f.FeedURL, &f.SiteURL, &f.Title, &f.Description,
 			&f.EtagHeader, &f.LastModified,
 			&f.ParsingError, &f.ParsingErrorCount, &f.Disabled,
 			&f.ScraperRules, &f.RewriteRules, &f.Crawler,

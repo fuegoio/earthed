@@ -17,15 +17,17 @@ type Folder struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-// Feed represents a single RSS/Atom/JSON Feed subscription owned by a user.
+// Feed is a global RSS/Atom/JSON Feed source: one row per feed_url, shared
+// fetch state. A user's view of a feed (folder, title override) comes from
+// their subscription; when listed for a user, FolderID/Title are populated
+// from the subscriptions join.
 type Feed struct {
 	ID                int        `json:"id"`
-	UserID            int        `json:"user_id"`
-	FolderID          *int       `json:"folder_id,omitempty"`
 	FeedURL           string     `json:"feed_url"`
 	SiteURL           string     `json:"site_url"`
 	Title             string     `json:"title"`
 	Description       string     `json:"description,omitempty"`
+	FolderID          *int       `json:"folder_id,omitempty"`
 	EtagHeader        string     `json:"-"`
 	LastModified      string     `json:"-"`
 	ParsingError      string     `json:"parsing_error,omitempty"`
@@ -40,24 +42,32 @@ type Feed struct {
 	UpdatedAt         time.Time  `json:"updated_at"`
 }
 
-// Entry is a single article/item belonging to a feed.
+// Entry is a single article/item belonging to a global feed. Read/starred
+// state is per-user (entry_state) and is populated on read; absent state means
+// unread. FeedTitle/FeedURL/FeedSiteURL and SharedBy* are denormalised on read
+// so a consumer can render the source feed and sharer without extra lookups.
 type Entry struct {
-	ID          int64       `json:"id"`
-	UserID      int         `json:"user_id"`
-	FeedID      int         `json:"feed_id"`
-	Hash        string      `json:"hash"`
-	Title       string      `json:"title"`
-	URL         string      `json:"url"`
-	CommentsURL string      `json:"comments_url,omitempty"`
-	Author      string      `json:"author,omitempty"`
-	Content     string      `json:"-"`
-	Description string      `json:"description,omitempty"`
-	Status      string      `json:"status"`
-	Starred     bool        `json:"starred"`
-	PublishedAt time.Time   `json:"published_at"`
-	ChangedAt   time.Time   `json:"changed_at"`
-	Tags        []string    `json:"tags,omitempty"`
-	Enclosures  []Enclosure `json:"enclosures,omitempty"`
+	ID                int64       `json:"id"`
+	FeedID            int         `json:"feed_id"`
+	Hash              string      `json:"hash"`
+	Title             string      `json:"title"`
+	URL               string      `json:"url"`
+	CommentsURL       string      `json:"comments_url,omitempty"`
+	Author            string      `json:"author,omitempty"`
+	Content           string      `json:"-"`
+	Description       string      `json:"description,omitempty"`
+	Status            string      `json:"status"`
+	Starred           bool        `json:"starred"`
+	Liked             bool        `json:"liked,omitempty"`
+	PublishedAt       time.Time   `json:"published_at"`
+	ChangedAt         time.Time   `json:"changed_at"`
+	Tags              []string    `json:"tags,omitempty"`
+	Enclosures        []Enclosure `json:"enclosures,omitempty"`
+	FeedTitle         string      `json:"feed_title,omitempty"`
+	FeedURL           string      `json:"feed_url,omitempty"`
+	FeedSiteURL       string      `json:"feed_site_url,omitempty"`
+	SharedByHandle    string      `json:"shared_by,omitempty"`
+	SharedByFirstName string      `json:"shared_by_name,omitempty"`
 }
 
 // Enclosure is a media attachment (podcast, image, file) on an entry.
@@ -195,6 +205,7 @@ type SharedArticle struct {
 	Author      string     `json:"author,omitempty"`
 	PublishedAt *time.Time `json:"published_at,omitempty"`
 	SharedAt    time.Time  `json:"shared_at"`
+	EntryID     *int64     `json:"entry_id,omitempty"`
 	// Sharer info, populated on social timeline queries.
 	SharerHandle    string `json:"sharer_handle,omitempty"`
 	SharerFirstName string `json:"sharer_first_name,omitempty"`
