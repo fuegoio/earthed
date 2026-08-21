@@ -37,10 +37,12 @@ func NewOAuthHandlers(oauthApp *oauth.ClientApp, st *store.Store, a *auth.Auth, 
 // the bare mux in main.go so they are reachable without authentication.
 func (h *OAuthHandlers) Routes() map[string]http.Handler {
 	return map[string]http.Handler{
-		"/auth/oauth/login":            http.HandlerFunc(h.handleLogin),
-		"/auth/oauth/callback":         http.HandlerFunc(h.handleCallback),
-		"/auth/signout":                http.HandlerFunc(h.handleSignout),
-		"/client-metadata.json":        http.HandlerFunc(h.handleClientMetadata),
+		"/auth/oauth/login":     http.HandlerFunc(h.handleLogin),
+		"/auth/oauth/signup":    http.HandlerFunc(h.handleSignup),
+		"/auth/oauth/config":    http.HandlerFunc(h.handleOAuthConfig),
+		"/auth/oauth/callback":  http.HandlerFunc(h.handleCallback),
+		"/auth/signout":         http.HandlerFunc(h.handleSignout),
+		"/client-metadata.json": http.HandlerFunc(h.handleClientMetadata),
 	}
 }
 
@@ -92,6 +94,51 @@ func (h *OAuthHandlers) handleLogin(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteLaxMode,
 	})
 	http.Redirect(w, r, authURL, http.StatusFound)
+}
+
+// handleSignup starts the OAuth flow against the configured default PDS
+// (EARTHED_DEFAULT_PDS). This lets users without an existing AT Proto account
+// sign up on the instance's own PDS. Returns 503 if no default PDS is configured.
+func (h *OAuthHandlers) handleSignup(w http.ResponseWriter, r *http.Request) {
+	if h.oauthApp == nil {
+		http.Error(w, "oauth not configured", http.StatusServiceUnavailable)
+		return
+	}
+	if h.cfg.DefaultPDS == "" {
+		http.Error(w, `{"error":"signup is not available on this instance"}`, http.StatusServiceUnavailable)
+		return
+	}
+
+	redirectTo := safeOAuthRedirect(r.URL.Query().Get("redirect"), h.cfg.WebURL)
+
+	// StartAuthFlow accepts a PDS URL as the identifier — it resolves directly
+	// to that PDS's auth server metadata rather than resolving a handle → DID.
+	authURL, err := h.oauthApp.StartAuthFlow(r.Context(), h.cfg.DefaultPDS)
+	if err != nil {
+		slog.Warn("oauth: start signup flow", "pds", h.cfg.DefaultPDS, "err", err)
+		http.Redirect(w, r, h.cfg.WebURL+"/login?error=signup_failed", http.StatusFound)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "earthed_oauth_redirect",
+		Value:    redirectTo,
+		Path:     "/",
+		MaxAge:   600,
+		HttpOnly: true,
+		Secure:   h.cfg.CookieSecure,
+		SameSite: http.SameSiteLaxMode,
+	})
+	http.Redirect(w, r, authURL, http.StatusFound)
+}
+
+// handleOAuthConfig returns public OAuth configuration so the web frontend
+// knows whether signup is available (default PDS configured).
+func (h *OAuthHandlers) handleOAuthConfig(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(map[string]any{
+		"default_pds": h.cfg.DefaultPDS,
+	})
 }
 
 // handleCallback completes the OAuth flow: exchanges the authorization code for
