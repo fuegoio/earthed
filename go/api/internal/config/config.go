@@ -73,7 +73,10 @@ func Load() (*Config, error) {
 	// URL pointing at the client-metadata.json document this server serves.
 	base := strings.TrimRight(strings.TrimSpace(cfg.BaseURL), "/")
 	cfg.OAuthClientID = env("EARTHED_OAUTH_CLIENT_ID", base+"/client-metadata.json")
-	cfg.OAuthCallbackURL = env("EARTHED_OAUTH_REDIRECT_URL", base+"/auth/oauth/callback")
+	// RFC 8252 requires loopback redirect URIs to use an IP (127.0.0.1), not
+	// the "localhost" hostname. Normalize so local dev works out of the box.
+	callbackBase := strings.Replace(base, "://localhost", "://127.0.0.1", 1)
+	cfg.OAuthCallbackURL = env("EARTHED_OAUTH_REDIRECT_URL", callbackBase+"/auth/oauth/callback")
 
 	switch cfg.CookieSameSite {
 	case "lax", "none", "strict":
