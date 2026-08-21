@@ -27,7 +27,6 @@ LIMEN_SECRET=<32-byte-secret>
 EARTHED_DATABASE_URL=postgres://earthed:earthed@localhost:5432/earthed?sslmode=disable
 EARTHED_BASE_URL=http://localhost:8080
 EARTHED_WEB_URL=http://localhost:3000
-EARTHED_PDS_URL=http://localhost:2583
 ```
 
 `LIMEN_SECRET` is a 32-byte hex string used for session signing. Generate one with:
@@ -36,10 +35,9 @@ EARTHED_PDS_URL=http://localhost:2583
 openssl rand -hex 16
 ```
 
-`EARTHED_PDS_URL` points Earthed at a PDS for login and signup. For local
-development, run the [official PDS image](https://github.com/bluesky-social/pds)
-(see [AT Proto & identity](/self-hosting/at-proto)). Users can also log in with
-any existing AT Proto handle, such as a Bluesky account.
+Users log in with their own AT Proto handle — typically a Bluesky account or an
+account on a personal PDS. No PDS setup is required. See
+[Identity & sync](/at-proto) for how login and data sync work.
 
 ## 3. Run migrations
 
@@ -65,8 +63,8 @@ curl http://localhost:8080/v1/health
 ## 5. Create an account
 
 Earthed uses AT Proto identity — there is no email/password signup. Start the
-web frontend (step 9) and sign in by entering an AT Proto handle. You can use
-a Bluesky handle (`alice.bsky.social`) or an account on your local PDS.
+web frontend (step 9) and sign in by entering an AT Proto handle, such as your
+Bluesky account.
 
 See [Identity & sync](/at-proto) for how login and data sync work.
 
