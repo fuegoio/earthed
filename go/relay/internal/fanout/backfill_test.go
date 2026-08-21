@@ -272,12 +272,13 @@ func TestBackfillDID_Pagination(t *testing.T) {
 		cursor := r.URL.Query().Get("cursor")
 		var recs []map[string]any
 		var nextCursor string
-		if cursor == "" {
+		switch cursor {
+		case "":
 			for i, rec := range page1 {
 				recs = append(recs, map[string]any{"uri": "at://x/io.sunred.feed.subscription/rkey" + jsonInt(i), "value": rec})
 			}
 			nextCursor = "page2"
-		} else if cursor == "page2" {
+		case "page2":
 			for i, rec := range page2 {
 				recs = append(recs, map[string]any{"uri": "at://x/io.sunred.feed.subscription/rkey" + jsonInt(i+10), "value": rec})
 			}
@@ -297,7 +298,9 @@ func TestBackfillDID_Pagination(t *testing.T) {
 		testPDSURL:  pds.URL,
 	}
 
-	f.backfillCollection(context.Background(), "did:plc:test", pds.URL, "io.sunred.feed.subscription")
+	if err := f.backfillCollection(context.Background(), "did:plc:test", pds.URL, "io.sunred.feed.subscription"); err != nil {
+		t.Fatalf("backfillCollection: %v", err)
+	}
 
 	if len(st.feedSubs) != 2 {
 		t.Errorf("expected 2 feed subs after pagination, got %d", len(st.feedSubs))
