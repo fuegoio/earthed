@@ -61,6 +61,11 @@ type announceUserInput struct {
 
 type announceUserOutput struct {
 	Tracked bool `json:"tracked"`
+	// New is true when the relay started tracking this DID for the first time
+	// (and thus kicked off a backfill that will emit a backfillComplete event).
+	// False on re-announce of an already-tracked DID — the API uses this to
+	// avoid waiting for a backfill event that will never come.
+	New bool `json:"new"`
 }
 
 func (s *Server) handleAnnounceUser(w http.ResponseWriter, r *http.Request) {
@@ -103,7 +108,7 @@ func (s *Server) handleAnnounceUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(announceUserOutput{Tracked: true})
+	_ = json.NewEncoder(w).Encode(announceUserOutput{Tracked: true, New: isNew})
 }
 
 // --- getCounts ---

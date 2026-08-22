@@ -74,6 +74,33 @@ func (s *Store) GetATProtoCredentials(ctx context.Context, userID int) (*ATProto
 	return &c, nil
 }
 
+// SetUserPDSSession records the user's PDS host and the OAuth session ID that
+// the API should resume to write io.sunred.* records to their PDS. Called from
+// the OAuth callback. The session data itself is persisted in oauth_sessions
+// by the indigo OAuth client; this column identifies the active session.
+func (s *Store) SetUserPDSSession(ctx context.Context, userID int, pdsURL, sessionID string) error {
+	_, err := s.DB.ExecContext(ctx, `
+		UPDATE users SET pds_url = $2, oauth_session_id = $3 WHERE id = $1`,
+		userID, pdsURL, sessionID,
+	)
+	return err
+}
+
+// GetUserOAuthSession returns the DID, OAuth session ID, and PDS URL for a
+// user. sessionID is "" when the user has no persisted OAuth session (e.g. a
+// remote user never logged in here). did is "" when the user has no AT Proto
+// identity.
+func (s *Store) GetUserOAuthSession(ctx context.Context, userID int) (did, sessionID, pdsURL string, err error) {
+	var d, sess, p sql.NullString
+	err = s.DB.QueryRowContext(ctx, `
+		SELECT did, oauth_session_id, pds_url FROM users WHERE id = $1`, userID,
+	).Scan(&d, &sess, &p)
+	if err == sql.ErrNoRows {
+		return "", "", "", nil
+	}
+	return d.String, sess.String, p.String, err
+}
+
 // UpdateATProtoTokens updates the access/refresh tokens for a user after a refresh.
 func (s *Store) UpdateATProtoTokens(ctx context.Context, userID int, accessToken, refreshToken string, expiresAt *time.Time) error {
 	_, err := s.DB.ExecContext(ctx, `

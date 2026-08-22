@@ -128,6 +128,7 @@ func run() (int, error) {
 
 	f := fetcher.New(cfg.HTTPTimeout, cfg.HTTPMaxBody, "Sunred")
 	apiHandler := api.New(humaRouter, st, authInst, cfg, f)
+	apiHandler.SetOAuthApp(atproto.NewOAuthAppAdapter(oauthApp))
 	apiHandler.RegisterRoutes()
 
 	oauthHandlers := api.NewOAuthHandlers(oauthApp, st, authInst, cfg)

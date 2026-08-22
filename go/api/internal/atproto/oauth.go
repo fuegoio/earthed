@@ -1,12 +1,38 @@
 package atproto
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"strings"
 
+	"github.com/bluesky-social/indigo/atproto/atclient"
 	"github.com/bluesky-social/indigo/atproto/auth/oauth"
+	"github.com/bluesky-social/indigo/atproto/syntax"
 )
+
+// OAuthApp resumes a user's OAuth session to obtain a DPoP-bound APIClient
+// for writing io.sunred.* records to their PDS. It decouples the API from the
+// indigo OAuth types.
+type OAuthApp interface {
+	WriterClient(ctx context.Context, did, sessionID string) (*atclient.APIClient, error)
+}
+
+type oauthAppAdapter struct{ app *oauth.ClientApp }
+
+// NewOAuthAppAdapter wraps the indigo OAuth ClientApp behind the OAuthApp
+// interface used by the API for record writes.
+func NewOAuthAppAdapter(app *oauth.ClientApp) OAuthApp {
+	return oauthAppAdapter{app: app}
+}
+
+func (a oauthAppAdapter) WriterClient(ctx context.Context, did, sessionID string) (*atclient.APIClient, error) {
+	sess, err := a.app.ResumeSession(ctx, syntax.DID(did), sessionID)
+	if err != nil {
+		return nil, err
+	}
+	return sess.APIClient(), nil
+}
 
 // NewOAuthApp builds the indigo OAuth ClientApp for Sunred.
 //

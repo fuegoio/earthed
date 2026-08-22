@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/bluesky-social/indigo/atproto/auth/oauth"
 	"github.com/bluesky-social/indigo/atproto/syntax"
@@ -202,6 +203,13 @@ func (h *OAuthHandlers) handleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Persist the PDS host and OAuth session ID so the API can resume the
+	// DPoP-bound session to write io.sunred.* records to the user's PDS on
+	// their behalf (follows, shares, feed subscriptions).
+	if err := h.store.SetUserPDSSession(r.Context(), userID, sessData.HostURL, sessData.SessionID); err != nil {
+		slog.Warn("oauth: persist pds session", "did", did, "err", err)
+	}
+
 	// Sync the PDS data into the local cache. When a relay is configured, the
 	// relay does the backfill (tap-style: historical records first, then live)
 	// and pushes events to the API's relay consumer; the sync status is set
@@ -213,10 +221,6 @@ func (h *OAuthHandlers) handleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 	go func() {
 		bgCtx := context.Background()
-		// Announce to the relay first. If a relay is configured, it will
-		// backfill the PDS and push events to the consumer.
-		h.announceToRelay(bgCtx, did, sessData.HostURL, handle)
-
 		if h.cfg.RelayURL == "" {
 			// No relay: fall back to direct listRecords backfill.
 			if err := h.syncFromPDS(bgCtx, did, userID, sessData.SessionID); err != nil {
@@ -229,9 +233,33 @@ func (h *OAuthHandlers) handleCallback(w http.ResponseWriter, r *http.Request) {
 					slog.Warn("oauth: set sync status idle", "did", did, "err", serr)
 				}
 			}
+			return
 		}
-		// When a relay is configured, the relay consumer will set the
-		// status to "idle" when it receives the backfillComplete event.
+
+		// Relay configured: announce so it backfills + tracks the DID. The
+		// relay only backfills newly-tracked DIDs and emits backfillComplete
+		// for those; an already-tracked DID (a re-login) needs no backfill, so
+		// dismiss the spinner right away instead of waiting for an event that
+		// will never come.
+		isNew, annErr := h.announceToRelay(bgCtx, did, sessData.HostURL, handle)
+		if annErr != nil || !isNew {
+			if serr := h.store.SetUserSyncStatus(bgCtx, userID, "idle"); serr != nil {
+				slog.Warn("oauth: set sync status idle", "did", did, "err", serr)
+			}
+			return
+		}
+		// Newly tracked: the relay consumer sets "idle" on backfillComplete.
+		// Add a safety net so a lost/late event can't keep the spinner up
+		// forever.
+		go func() {
+			t := time.NewTimer(3 * time.Minute)
+			defer t.Stop()
+			<-t.C
+			if u, _ := h.store.GetUserByID(bgCtx, userID); u != nil && u.PDSSyncStatus == "syncing" {
+				slog.Warn("oauth: backfill timed out, marking sync idle", "did", did)
+				_ = h.store.SetUserSyncStatus(bgCtx, userID, "idle")
+			}
+		}()
 	}()
 	_ = created
 
@@ -307,10 +335,13 @@ func (h *OAuthHandlers) syncFromPDS(ctx context.Context, did string, userID int,
 	return errors.Join(errs...)
 }
 
-// announceToRelay notifies the relay of a user DID (see atproto.go).
-func (h *OAuthHandlers) announceToRelay(ctx context.Context, did, pdsURL, handle string) {
+// announceToRelay notifies the relay of a user DID (see atproto.go). It returns
+// whether the relay newly started tracking the DID (isNew) — when false the
+// relay already has the records and live subscription, so no backfill event
+// will be emitted and the caller should not wait for one.
+func (h *OAuthHandlers) announceToRelay(ctx context.Context, did, pdsURL, handle string) (bool, error) {
 	if h.cfg.RelayURL == "" {
-		return
+		return false, nil
 	}
 	rc := atproto.NewClient(h.cfg.RelayURL, "")
 	type announceIn struct {
@@ -319,14 +350,19 @@ func (h *OAuthHandlers) announceToRelay(ctx context.Context, did, pdsURL, handle
 		InstanceURL string `json:"instanceUrl"`
 		Handle      string `json:"handle"`
 	}
+	var out struct {
+		New bool `json:"new"`
+	}
 	if err := rc.Procedure(ctx, "io.sunred.relay.announceUser", announceIn{
 		DID:         did,
 		PDSUrl:      pdsURL,
 		InstanceURL: h.cfg.BaseURL,
 		Handle:      handle,
-	}, nil); err != nil {
+	}, &out); err != nil {
 		slog.Warn("relay: announce user", "did", did, "err", err)
+		return false, err
 	}
+	return out.New, nil
 }
 
 // ptr returns a pointer to s. Convenience for optional string fields.
