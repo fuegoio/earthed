@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/danielgtaylor/huma/v2"
+	"github.com/bluesky-social/indigo/atproto/atclient"
 
 	"github.com/fuegoio/sunred/go/api/internal/atproto"
 	"github.com/fuegoio/sunred/go/api/internal/auth"
@@ -58,40 +59,64 @@ func (a *API) registerATProtoRoutes() {
 
 // --- AT Proto side-effects called from other handlers ---
 
-// atprotoWriterForUser returns an authenticated Writer for userID, or nil if
-// the user has no AT Proto connection or credentials are empty.
-// If the access token has expired, it attempts a refresh first.
-func (a *API) atprotoWriterForUser(ctx context.Context, userID int) (*atproto.Writer, *store.ATProtoCredentials, error) {
-	creds, err := a.store.GetATProtoCredentials(ctx, userID)
-	if err != nil || creds == nil {
-		return nil, nil, err
+// writerForUserOrFallback returns a Writer for writing io.sunred.* records to
+// the user's PDS, or nil if the user has no AT Proto identity. In production it
+// resumes the user's OAuth session (DPoP-bound) so the PDS accepts the writes;
+// the access token from createSession can't be used as a bearer because OAuth
+// tokens require a DPoP proof. When no OAuth app is wired (tests), it falls
+// back to an unauthenticated APIClient pointed at the stored pds_url — enough
+// for a mock PDS that ignores auth.
+func (a *API) writerForUserOrFallback(ctx context.Context, userID int) (*atproto.Writer, error) {
+	if a.writerForUser != nil {
+		return a.writerForUser(ctx, userID)
 	}
-
-	// Refresh if the token is expired or will expire within 5 minutes.
-	if creds.ExpiresAt != nil && time.Until(*creds.ExpiresAt) < 5*time.Minute {
-		refreshClient := atproto.NewClient(creds.PDSUrl, "")
-		newSession, err := refreshClient.RefreshSession(ctx, creds.RefreshToken)
-		if err != nil {
-			slog.Warn("atproto: token refresh failed", "user_id", userID, "err", err)
-			// Continue with the stale token — the PDS will return 401 if it's
-			// truly expired and the caller will see a write error.
-		} else {
-			expires := time.Now().Add(2 * time.Hour)
-			_ = a.store.UpdateATProtoTokens(ctx, userID, newSession.AccessJwt, newSession.RefreshJwt, &expires)
-			creds.AccessToken = newSession.AccessJwt
-			creds.RefreshToken = newSession.RefreshJwt
-		}
+	if a.oauthApp != nil {
+		return a.writerFromOAuthSession(ctx, userID)
 	}
+	return a.writerFromStoredPDS(ctx, userID)
+}
 
-	return atproto.NewWriter(creds.PDSUrl, creds.DID, creds.AccessToken), creds, nil
+// writerFromOAuthSession resumes the user's persisted OAuth session and returns
+// a Writer backed by the session's DPoP-bound APIClient.
+func (a *API) writerFromOAuthSession(ctx context.Context, userID int) (*atproto.Writer, error) {
+	did, sessionID, _, err := a.store.GetUserOAuthSession(ctx, userID)
+	if err != nil {
+		return nil, fmt.Errorf("get oauth session: %w", err)
+	}
+	if did == "" || sessionID == "" {
+		return nil, nil // not connected
+	}
+	c, err := a.oauthApp.WriterClient(ctx, did, sessionID)
+	if err != nil {
+		return nil, fmt.Errorf("resume oauth session: %w", err)
+	}
+	return atproto.NewWriter(c, did), nil
+}
+
+// writerFromStoredPDS builds an unauthenticated Writer from the stored pds_url.
+// Used by tests against a mock PDS, and as a last-resort fallback when OAuth is
+// not configured. Returns nil if the user has no DID / pds_url.
+func (a *API) writerFromStoredPDS(ctx context.Context, userID int) (*atproto.Writer, error) {
+	did, _, pdsURL, err := a.store.GetUserOAuthSession(ctx, userID)
+	if err != nil {
+		return nil, fmt.Errorf("get oauth session: %w", err)
+	}
+	if did == "" || pdsURL == "" {
+		return nil, nil // not connected
+	}
+	return atproto.NewWriter(atclient.NewAPIClient(pdsURL), did), nil
 }
 
 // ATProtoSyncFollow writes or deletes a follow record on the PDS.
 // Called fire-and-forget from FollowUser / UnfollowUser handlers.
 func (a *API) ATProtoSyncFollow(userID, followeeUserID int, followeeHandle string, isFollow bool) {
 	ctx := context.Background()
-	w, creds, err := a.atprotoWriterForUser(ctx, userID)
-	if err != nil || w == nil {
+	w, err := a.writerForUserOrFallback(ctx, userID)
+	if err != nil {
+		slog.Debug("atproto: skip follow sync, writer error", "user_id", userID, "is_follow", isFollow, "err", err)
+		return
+	}
+	if w == nil {
 		slog.Debug("atproto: skip follow sync, no credentials", "user_id", userID, "is_follow", isFollow)
 		return
 	}
@@ -125,14 +150,17 @@ func (a *API) ATProtoSyncFollow(userID, followeeUserID int, followeeHandle strin
 		}
 		_ = a.store.SetFollowATProtoRkey(ctx, userID, followeeUserID, "")
 	}
-	_ = creds
 }
 
 // ATProtoSyncShare writes or deletes a share record on the PDS.
 func (a *API) ATProtoSyncShare(userID int, sa *store.SharedArticle, isShare bool) {
 	ctx := context.Background()
-	w, _, err := a.atprotoWriterForUser(ctx, userID)
-	if err != nil || w == nil {
+	w, err := a.writerForUserOrFallback(ctx, userID)
+	if err != nil {
+		slog.Debug("atproto: skip share sync, writer error", "user_id", userID, "is_share", isShare, "err", err)
+		return
+	}
+	if w == nil {
 		slog.Debug("atproto: skip share sync, no credentials", "user_id", userID, "is_share", isShare)
 		return
 	}
@@ -171,8 +199,12 @@ func (a *API) ATProtoSyncShare(userID int, sa *store.SharedArticle, isShare bool
 // stored rkey.
 func (a *API) ATProtoSyncFeedSubscription(userID, feedID int, feedURL, siteURL, title string, isSubscribe bool, createdAt time.Time) {
 	ctx := context.Background()
-	w, _, err := a.atprotoWriterForUser(ctx, userID)
-	if err != nil || w == nil {
+	w, err := a.writerForUserOrFallback(ctx, userID)
+	if err != nil {
+		slog.Debug("atproto: skip feed subscription sync, writer error", "user_id", userID, "is_subscribe", isSubscribe, "err", err)
+		return
+	}
+	if w == nil {
 		slog.Debug("atproto: skip feed subscription sync, no credentials", "user_id", userID, "is_subscribe", isSubscribe)
 		return
 	}
@@ -203,8 +235,12 @@ func (a *API) ATProtoSyncFeedSubscription(userID, feedID int, feedURL, siteURL, 
 // ATProtoSyncFeedList writes or deletes a feed list record on the PDS.
 func (a *API) ATProtoSyncFeedList(userID, listID int, fl *store.FeedList, isCreate bool) {
 	ctx := context.Background()
-	w, _, err := a.atprotoWriterForUser(ctx, userID)
-	if err != nil || w == nil {
+	w, err := a.writerForUserOrFallback(ctx, userID)
+	if err != nil {
+		slog.Debug("atproto: skip feed list sync, writer error", "user_id", userID, "is_create", isCreate, "err", err)
+		return
+	}
+	if w == nil {
 		slog.Debug("atproto: skip feed list sync, no credentials", "user_id", userID, "is_create", isCreate)
 		return
 	}

@@ -14,6 +14,7 @@ import (
 
 	"github.com/danielgtaylor/huma/v2"
 
+	"github.com/fuegoio/sunred/go/api/internal/atproto"
 	"github.com/fuegoio/sunred/go/api/internal/auth"
 	"github.com/fuegoio/sunred/go/api/internal/config"
 	"github.com/fuegoio/sunred/go/api/internal/reader/discoverer"
@@ -32,6 +33,17 @@ type API struct {
 	cfg       *config.Config
 	fetcher   *fetcher.Fetcher
 	processor *processor.Processor
+
+	// oauthApp resumes a user's OAuth session (DPoP-bound) to write
+	// io.sunred.* records to their PDS. nil when OAuth is not configured
+	// (e.g. --openapi generation); in that case writerForUser falls back to
+	// an unauthenticated client built from the stored pds_url.
+	oauthApp atproto.OAuthApp
+
+	// writerForUser returns an authenticated Writer for a user's PDS, or nil
+	// if the user has no AT Proto connection. Tests override it to build a
+	// Writer from seeded pds_url credentials without an OAuth session.
+	writerForUser func(ctx context.Context, userID int) (*atproto.Writer, error)
 }
 
 // New returns an API bound to the given huma router, store, auth, config,
@@ -43,6 +55,14 @@ func New(humaAPI huma.API, st *store.Store, authInst *auth.Auth, cfg *config.Con
 		proc = processor.New(st, f)
 	}
 	return &API{huma: humaAPI, store: st, auth: authInst, cfg: cfg, fetcher: f, processor: proc}
+}
+
+// SetOAuthApp wires the OAuth app used to resume user sessions for PDS record
+// writes. Called once after New once the indigo OAuth ClientApp is built.
+// When not set, writerForUser falls back to an unauthenticated client built
+// from the stored pds_url (used by tests against a mock PDS).
+func (a *API) SetOAuthApp(app atproto.OAuthApp) {
+	a.oauthApp = app
 }
 
 // OpenAPITags returns the ordered tag list for the OpenAPI spec.

@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/bluesky-social/indigo/atproto/atclient"
 )
 
 // captured holds the last put/delete call received by the mock PDS.
@@ -50,7 +52,7 @@ func writerMock(t *testing.T) (pdsURL string, cap *captured) {
 
 func TestWriter_PutFollow(t *testing.T) {
 	pdsURL, cap := writerMock(t)
-	w := NewWriter(pdsURL, "did:plc:alice", "tok")
+	w := NewWriter(atclient.NewAPIClient(pdsURL), "did:plc:alice")
 	rkey, err := w.PutFollow(context.Background(), "did:plc:bob")
 	if err != nil {
 		t.Fatalf("PutFollow: %v", err)
@@ -68,7 +70,7 @@ func TestWriter_PutFollow(t *testing.T) {
 
 func TestWriter_DeleteFollow(t *testing.T) {
 	pdsURL, cap := writerMock(t)
-	w := NewWriter(pdsURL, "did:plc:alice", "tok")
+	w := NewWriter(atclient.NewAPIClient(pdsURL), "did:plc:alice")
 	err := w.DeleteFollow(context.Background(), "rkey-to-delete")
 	if err != nil {
 		t.Fatalf("DeleteFollow: %v", err)
@@ -83,7 +85,7 @@ func TestWriter_DeleteFollow(t *testing.T) {
 
 func TestWriter_PutShare(t *testing.T) {
 	pdsURL, cap := writerMock(t)
-	w := NewWriter(pdsURL, "did:plc:alice", "tok")
+	w := NewWriter(atclient.NewAPIClient(pdsURL), "did:plc:alice")
 	pub := time.Date(2025, 3, 1, 10, 0, 0, 0, time.UTC)
 	rkey, err := w.PutShare(context.Background(),
 		"https://example.com/article",
@@ -112,7 +114,7 @@ func TestWriter_PutShare(t *testing.T) {
 
 func TestWriter_PutShare_NilPublishedAt(t *testing.T) {
 	pdsURL, cap := writerMock(t)
-	w := NewWriter(pdsURL, "did:plc:alice", "tok")
+	w := NewWriter(atclient.NewAPIClient(pdsURL), "did:plc:alice")
 	_, err := w.PutShare(context.Background(), "https://x.com", "Title", "", "", "", "", "", nil, time.Now())
 	if err != nil {
 		t.Fatalf("PutShare nil publishedAt: %v", err)
@@ -124,7 +126,7 @@ func TestWriter_PutShare_NilPublishedAt(t *testing.T) {
 
 func TestWriter_PutFeedSubscription(t *testing.T) {
 	pdsURL, cap := writerMock(t)
-	w := NewWriter(pdsURL, "did:plc:alice", "tok")
+	w := NewWriter(atclient.NewAPIClient(pdsURL), "did:plc:alice")
 	rkey, err := w.PutFeedSubscription(context.Background(),
 		"https://example.com/feed.xml", "https://example.com", "Example Feed", time.Now(),
 	)
@@ -144,7 +146,7 @@ func TestWriter_PutFeedSubscription(t *testing.T) {
 
 func TestWriter_PutFeedList(t *testing.T) {
 	pdsURL, cap := writerMock(t)
-	w := NewWriter(pdsURL, "did:plc:alice", "tok")
+	w := NewWriter(atclient.NewAPIClient(pdsURL), "did:plc:alice")
 	feeds := []FeedListEntry{
 		{FeedURL: "https://a.com/feed.xml", Title: "Feed A"},
 	}
@@ -177,7 +179,7 @@ func TestWriter_PutFeedList(t *testing.T) {
 
 func TestWriter_DeleteFeedList(t *testing.T) {
 	pdsURL, cap := writerMock(t)
-	w := NewWriter(pdsURL, "did:plc:alice", "tok")
+	w := NewWriter(atclient.NewAPIClient(pdsURL), "did:plc:alice")
 	err := w.DeleteFeedList(context.Background(), "list-rkey-42")
 	if err != nil {
 		t.Fatalf("DeleteFeedList: %v", err)
