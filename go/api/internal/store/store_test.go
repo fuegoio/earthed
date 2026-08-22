@@ -120,7 +120,7 @@ func TestListEntriesByFeedID(t *testing.T) {
 	seedEntry(t, s, userID, feedID, "Entry B", "read", true)
 
 	fid := feedID
-	entries, err := s.ListEntries(ctx, userID, &fid, nil, "", nil, "", 50, 0)
+	entries, err := s.ListEntries(ctx, userID, &fid, nil, "", nil, "", "", 50, 0)
 	if err != nil {
 		t.Fatalf("ListEntries with feed_id failed: %v", err)
 	}
@@ -152,7 +152,7 @@ func TestListEntriesByFolderID(t *testing.T) {
 	seedEntry(t, s, userID, feedID, "Folder Entry", "unread", false)
 
 	fid := folderID
-	entries, err := s.ListEntries(ctx, userID, nil, &fid, "", nil, "", 50, 0)
+	entries, err := s.ListEntries(ctx, userID, nil, &fid, "", nil, "", "", 50, 0)
 	if err != nil {
 		t.Fatalf("ListEntries with folder_id failed: %v", err)
 	}
@@ -175,7 +175,7 @@ func TestListEntriesCombinedFilters(t *testing.T) {
 
 	fid := feedID
 	starred := true
-	entries, err := s.ListEntries(ctx, userID, &fid, nil, "unread", &starred, "", 50, 0)
+	entries, err := s.ListEntries(ctx, userID, &fid, nil, "unread", &starred, "", "", 50, 0)
 	if err != nil {
 		t.Fatalf("ListEntries with combined filters failed: %v", err)
 	}
@@ -197,7 +197,7 @@ func TestListEntriesNoFilters(t *testing.T) {
 	seedEntry(t, s, userID, feedID, "Entry 1", "unread", false)
 	seedEntry(t, s, userID, feedID, "Entry 2", "read", false)
 
-	entries, err := s.ListEntries(ctx, userID, nil, nil, "", nil, "", 50, 0)
+	entries, err := s.ListEntries(ctx, userID, nil, nil, "", nil, "", "", 50, 0)
 	if err != nil {
 		t.Fatalf("ListEntries with no filters failed: %v", err)
 	}
@@ -216,7 +216,7 @@ func TestListEntriesSearch(t *testing.T) {
 	seedEntry(t, s, userID, feedID, "Go programming language", "unread", false)
 	seedEntry(t, s, userID, feedID, "Rust memory safety", "unread", false)
 
-	entries, err := s.ListEntries(ctx, userID, nil, nil, "", nil, "Go", 50, 0)
+	entries, err := s.ListEntries(ctx, userID, nil, nil, "", nil, "Go", "", 50, 0)
 	if err != nil {
 		t.Fatalf("ListEntries with search failed: %v", err)
 	}

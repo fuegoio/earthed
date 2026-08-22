@@ -611,6 +611,7 @@ func (a *API) registerEntryRoutes() {
 		Status   string `query:"status" enum:"unread,read,removed" omitempty:""`
 		Starred  bool   `query:"starred" omitempty:""`
 		Search   string `query:"search" omitempty:""`
+		Source   string `query:"source" enum:"feeds,follows" omitempty:""`
 		Limit    int    `query:"limit" default:"50" maximum:"200"`
 		Offset   int    `query:"offset" default:"0"`
 	}) (*EntryListOutput, error) {
@@ -630,7 +631,7 @@ func (a *API) registerEntryRoutes() {
 		if input.Starred {
 			starred = &input.Starred
 		}
-		entries, err := a.store.ListEntries(ctx, userID, feedID, folderID, input.Status, starred, input.Search, input.Limit, input.Offset)
+		entries, err := a.store.ListEntries(ctx, userID, feedID, folderID, input.Status, starred, input.Search, input.Source, input.Limit, input.Offset)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
