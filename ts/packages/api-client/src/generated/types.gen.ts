@@ -1284,6 +1284,7 @@ export type ListEntriesData = {
         status?: 'unread' | 'read' | 'removed';
         starred?: boolean;
         search?: string;
+        source?: 'feeds' | 'follows';
         limit?: number;
         offset?: number;
     };

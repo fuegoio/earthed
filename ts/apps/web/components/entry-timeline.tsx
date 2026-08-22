@@ -28,6 +28,7 @@ export type EntryFilter = {
   status?: "unread" | "read" | "removed";
   starred?: boolean;
   search?: string;
+  source?: "feeds" | "follows";
 };
 
 const PAGE_SIZE = 50;

@@ -181,9 +181,13 @@ function SidebarContent({ userHandle }: { userHandle: string }) {
 
         <div className="flex flex-col gap-1">
           <div className="flex items-center justify-between pl-3 pr-2.5 pb-1">
-            <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <Link
+              href="/feeds"
+              aria-current={isActive(pathname, "/feeds") ? "page" : undefined}
+              className="text-xs font-medium uppercase tracking-wide text-muted-foreground transition-colors hover:text-foreground"
+            >
               Feeds
-            </h3>
+            </Link>
             <div className="flex items-center gap-0.5">
               <FolderCreateDialog />
               <Link
@@ -216,11 +220,17 @@ function SidebarContent({ userHandle }: { userHandle: string }) {
           )}
         </div>
 
+        <Separator />
+
         <div className="flex flex-col gap-1">
           <div className="flex items-center justify-between pl-3 pr-2.5 pb-1">
-            <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <Link
+              href="/follows"
+              aria-current={isActive(pathname, "/follows") ? "page" : undefined}
+              className="text-xs font-medium uppercase tracking-wide text-muted-foreground transition-colors hover:text-foreground"
+            >
               Follows
-            </h3>
+            </Link>
             <FollowSearchDialog />
           </div>
           {followingLoading ? (

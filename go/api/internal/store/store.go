@@ -355,8 +355,9 @@ func visibleEntryFilter(userID int) string {
 // ListEntries returns entries visible to the user — entries from feeds they
 // subscribe to, UNION entries shared by users they follow — with per-user
 // read/starred state from entry_state. Filters: feed, folder (subscription
-// folder), status, starred, full-text search. Paginated.
-func (s *Store) ListEntries(ctx context.Context, userID int, feedID *int, folderID *int, status string, starred *bool, search string, limit, offset int) ([]Entry, error) {
+// folder), status, starred, full-text search, source (feeds = own
+// subscriptions only, follows = shared by followed users only). Paginated.
+func (s *Store) ListEntries(ctx context.Context, userID int, feedID *int, folderID *int, status string, starred *bool, search string, source string, limit, offset int) ([]Entry, error) {
 	q := `SELECT e.id, e.feed_id, e.hash, e.title, e.url, e.comments_url,
 	             e.author, '' AS content, LEFT(e.description, 400) AS description,
 	             COALESCE(st.status, 'unread'), COALESCE(st.starred, false), COALESCE(st.liked, false),
@@ -379,8 +380,22 @@ func (s *Store) ListEntries(ctx context.Context, userID int, feedID *int, folder
 	args := []interface{}{userID}
 	argIdx := 2
 
-	q += " WHERE (e.feed_id IN (SELECT feed_id FROM subscriptions WHERE user_id = $1)"
-	q += " OR e.id IN (SELECT sa.entry_id FROM shared_articles sa JOIN user_follows uf ON uf.followee_id = sa.user_id AND uf.follower_id = $1))"
+	// The visibility scope is the union of own subscriptions and articles
+	// shared by followed users. The `source` filter narrows it to one branch,
+	// excluding the overlap so the two views partition the timeline:
+	//   feeds   → own subscriptions, not shared by follows
+	//   follows → shared by follows, not in own subscriptions
+	switch source {
+	case "feeds":
+		q += " WHERE e.feed_id IN (SELECT feed_id FROM subscriptions WHERE user_id = $1)"
+		q += " AND e.id NOT IN (SELECT sa.entry_id FROM shared_articles sa JOIN user_follows uf ON uf.followee_id = sa.user_id AND uf.follower_id = $1)"
+	case "follows":
+		q += " WHERE e.id IN (SELECT sa.entry_id FROM shared_articles sa JOIN user_follows uf ON uf.followee_id = sa.user_id AND uf.follower_id = $1)"
+		q += " AND e.feed_id NOT IN (SELECT feed_id FROM subscriptions WHERE user_id = $1)"
+	default:
+		q += " WHERE (e.feed_id IN (SELECT feed_id FROM subscriptions WHERE user_id = $1)"
+		q += " OR e.id IN (SELECT sa.entry_id FROM shared_articles sa JOIN user_follows uf ON uf.followee_id = sa.user_id AND uf.follower_id = $1))"
+	}
 
 	if folderID != nil {
 		q += fmt.Sprintf(" AND e.feed_id IN (SELECT s.feed_id FROM subscriptions s WHERE s.user_id = $1 AND s.folder_id IN (WITH RECURSIVE folder_tree AS (SELECT id FROM folders WHERE id = $%d AND user_id = $1 UNION ALL SELECT child.id FROM folders child JOIN folder_tree ft ON child.parent_id = ft.id) SELECT id FROM folder_tree))", argIdx)

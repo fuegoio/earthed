@@ -2391,6 +2391,18 @@
                     {
                         "explode": false,
                         "in": "query",
+                        "name": "source",
+                        "schema": {
+                            "enum": [
+                                "feeds",
+                                "follows"
+                            ],
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "explode": false,
+                        "in": "query",
                         "name": "limit",
                         "schema": {
                             "default": 50,
